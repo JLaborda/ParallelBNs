@@ -1,0 +1,30 @@
+# Language
+#sudo: required
+
+#services:
+#  - docker
+
+# Language
+language: java
+
+jdk: openjdk8 #oraclejdk8
+
+os:
+  - linux
+  - osx
+
+# Caching Maven Local Repositories
+cache:
+  directories:
+    - $HOME/.m2
+
+# Building phase
+install: true
+script:
+  #- ./mvnw clean install
+  - mvn -q clean install
+  # Codecov support
+  - mvn -q cobertura:cobertura
+after_success:
+  # Codecov support
+- bash <(curl -s https://codecov.io/bash) -t 6a58788b-64ad-4226-8e3d-e362b53d27fa
