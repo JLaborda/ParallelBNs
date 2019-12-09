@@ -16,8 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Hello world!
- *
+ * Main class. This class contains the methods and variables used to run the parallel BN algorithm
  */
 public class Main
 {
@@ -28,7 +27,7 @@ public class Main
     DataSet[] samples = null;
     ThGES[] search = null;
     Thread[] threads = null;
-    ArrayList[] subSets = null;
+    ArrayList<Node>[] subSets = null;
     ArrayList<Dag> graphs = null;
     Graph currentGraph = null;
     Graph previousGraph = null;
@@ -57,13 +56,21 @@ public class Main
     ArrayList<Double> scores_delta = new ArrayList<>();
 
 
-
-
+    /**
+     * Constructor of Main that uses a DataSet containing the data.
+     * @param data Dataset containing the data of the problem.
+     * @param nThreads Number of threads used in the problem.
+     */
     public Main(DataSet data, int nThreads){
         this.data = data;
         initialize(nThreads);
     }
 
+    /**
+     * Constructor of Main that uses the path to the csv file.
+     * @param path path to the csv file
+     * @param nThreads number of threads of the problem
+     */
     public Main(String path, int nThreads){
         this.data = readData(path);
         initialize(nThreads);
@@ -91,6 +98,10 @@ public class Main
         return dataSet;
     }
 
+    /**
+     * Initializes the general parameters of the class.
+     * @param nThreads number of threads used in the problem.
+     */
     private void initialize(int nThreads){
         this.nThreads = nThreads;
         this.samples = new DataSet[this.nThreads];
@@ -99,8 +110,4 @@ public class Main
         this.subSets = new ArrayList[this.nThreads];
     }
 
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
-    }
 }
