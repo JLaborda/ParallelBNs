@@ -13,14 +13,15 @@ import org.albacete.simd.pGES.ThGES;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * Main class. This class contains the methods and variables used to run the parallel BN algorithm
  */
+@SuppressWarnings("SpellCheckingInspection")
 public class Main
 {
-    DataSet data;
+    final DataSet data;
     int nThreads = 1;
     int nItInterleaving = 0;
     int maxIterations = 15;
@@ -33,6 +34,9 @@ public class Main
     Graph previousGraph = null;
     Scorer scorer = null;
     int it = 1;
+
+    TupleNode[] listOfArcs;
+
 
 
     long totalTimeIterations;
@@ -102,12 +106,35 @@ public class Main
      * Initializes the general parameters of the class.
      * @param nThreads number of threads used in the problem.
      */
+    @SuppressWarnings("unchecked")
     private void initialize(int nThreads){
         this.nThreads = nThreads;
         this.samples = new DataSet[this.nThreads];
         this.search = new ThGES[this.nThreads];
         this.threads = new Thread[this.nThreads];
         this.subSets = new ArrayList[this.nThreads];
+        // Number of arcs is n*(n-1)/2
+        this.listOfArcs = new TupleNode[this.data.getNumColumns() * (this.data.getNumColumns() -1) / 2];
+    }
+
+    /**
+     * Calculates the amount of possible arcs between the variables of the dataset and stores it.
+     */
+    public void calculateArcs(){
+        //1. Get edges (variables)
+        List<Node> variables = data.getVariables();
+        int index = 0;
+        //2. Iterate over variables and save pairs
+        for(int i=0; i<data.getNumColumns()-1; i++){
+            for(int j=i+1; j<data.getNumColumns(); j++){
+                // Getting pair of variables
+                Node var_A = variables.get(i);
+                Node var_B = variables.get(j);
+                //3. Storing pairs
+                this.listOfArcs[index] = new TupleNode(var_A,var_B);
+                index++;
+            }
+        }
     }
 
 }
