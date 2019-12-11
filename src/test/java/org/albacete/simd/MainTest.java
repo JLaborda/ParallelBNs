@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -35,7 +36,7 @@ public class MainTest
         List<Node> columns = new ArrayList<>(Arrays.asList(xray, dyspnoea, cancer, pollution, smoker));
         //Act
         Main main = new Main(path, 1);
-        DataSet data = main.data;
+        DataSet data = main.getData();
         int result = data.getNumColumns();
         //Assert
         assertEquals(num_cols, result);
@@ -45,31 +46,27 @@ public class MainTest
         }
     }
 
+    /**
+     * Testing that all the possible arcs from a dataset are generated.
+     * We check the size and the equality of the resulting arcs with its expected set.
+     */
     @Test
     public void calculateArcsTest(){
-        //Arrange
+        // Arrange
         String path = "src/test/resources/cancer.xbif_.csv";
         Main main = new Main(path, 1);
-
-        //Nodes:
-        /*ArrayList<Tuple<Node,Node>> expected = new ArrayList<>(Arrays.asList(new Tuple(xray, dyspnoea), new Tuple(xray, cancer), new Tuple(xray, pollution), new Tuple(xray, smoker),
-                new Tuple(dyspnoea, cancer), new Tuple(dyspnoea, pollution), new Tuple(dyspnoea, smoker),
-                new Tuple(cancer, pollution), new Tuple(cancer, smoker),
-                new Tuple(pollution, smoker)));
-        */
-
 
         TupleNode[] expected = new TupleNode[]{new TupleNode(xray, dyspnoea), new TupleNode(xray, cancer), new TupleNode(xray, pollution), new TupleNode(xray, smoker),
                 new TupleNode(dyspnoea, cancer), new TupleNode(dyspnoea, pollution), new TupleNode(dyspnoea, smoker),
                 new TupleNode(cancer, pollution), new TupleNode(cancer, smoker),
                 new TupleNode(pollution, smoker)};
-        //Act
+        // Act
         main.calculateArcs();
-        TupleNode[] result =  main.listOfArcs;
-        //Assert
-        assertEquals(expected.length, result.length);
+        TupleNode[] result =  main.getListOfArcs();
 
-        // ERROR: I need to check equality between nodes...
+        // Assert
+        // Asserting size
+        assertEquals(expected.length, result.length);
         for (TupleNode tupleNode1 : expected) {
             boolean isEqual = false;
             for (TupleNode tupleNode2 : result) {
@@ -78,7 +75,44 @@ public class MainTest
             }
             assertTrue(isEqual);
         }
-        //assertTrue(expected.equals(result));
+    }
 
+    /**
+     * Testing that the arcs have been splitted correctly
+     */
+    @Test
+    public void splitArcsTest(){
+        // Arrange
+        String path = "src/test/resources/cancer.xbif_.csv";
+        Main main = new Main(path, 2);
+
+        // Act
+        main.calculateArcs();
+        main.splitArcs();
+        TupleNode[] arcs = main.getListOfArcs();
+        ArrayList<TupleNode>[] subsets = main.getSubSets();
+
+        // Assert
+        // Checking that each arc is in fact in a subset, and that it is only once in it.
+        for (TupleNode edge : arcs) {
+            int counter = 0;
+            for (ArrayList<TupleNode> subset : subsets){
+                counter += Collections.frequency(subset, edge);
+            }
+            assertEquals(1, counter);
+        }
+
+
+    }
+    @Test
+    public void setgetSeedTest(){
+        // Arrange
+        long newSeed = 21;
+        String path = "src/test/resources/cancer.xbif_.csv";
+        Main main = new Main(path, 1);
+        // Act
+        main.setSeed(newSeed);
+        // Assert
+        assertEquals(newSeed, main.getSeed());
     }
 }
