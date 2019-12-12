@@ -59,7 +59,11 @@ public class MainTest
         TupleNode[] expected = new TupleNode[]{new TupleNode(xray, dyspnoea), new TupleNode(xray, cancer), new TupleNode(xray, pollution), new TupleNode(xray, smoker),
                 new TupleNode(dyspnoea, cancer), new TupleNode(dyspnoea, pollution), new TupleNode(dyspnoea, smoker),
                 new TupleNode(cancer, pollution), new TupleNode(cancer, smoker),
-                new TupleNode(pollution, smoker)};
+                new TupleNode(pollution, smoker),
+                new TupleNode(dyspnoea, xray), new TupleNode(cancer, xray), new TupleNode(pollution, xray), new TupleNode(smoker, xray),
+                new TupleNode(cancer, dyspnoea), new TupleNode(pollution, dyspnoea), new TupleNode(smoker, dyspnoea),
+                new TupleNode(pollution, cancer), new TupleNode(smoker, cancer),
+                new TupleNode(smoker, pollution)};
         // Act
         main.calculateArcs();
         TupleNode[] result =  main.getListOfArcs();
@@ -99,7 +103,8 @@ public class MainTest
             for (ArrayList<TupleNode> subset : subsets){
                 counter += Collections.frequency(subset, edge);
             }
-            assertEquals(1, counter);
+            // Double pairs
+            assertEquals(2, counter);
         }
 
 
