@@ -113,7 +113,7 @@ public class Main
         this.threads = new Thread[this.nThreads];
         this.subSets = new ArrayList[this.nThreads];
         // Number of arcs is n*(n-1)/2
-        this.listOfArcs = new TupleNode[this.data.getNumColumns() * (this.data.getNumColumns() -1) / 2];
+        this.listOfArcs = new TupleNode[this.data.getNumColumns() * (this.data.getNumColumns() -1)];
     }
 
     /**
@@ -129,9 +129,11 @@ public class Main
                 // Getting pair of variables
                 Node var_A = variables.get(i);
                 Node var_B = variables.get(j);
-                //3. Storing pairs
+                //3. Storing both pairs
                 // Maybe we can use Edge object
                 this.listOfArcs[index] = new TupleNode(var_A,var_B);
+                index++;
+                this.listOfArcs[index] = new TupleNode(var_B,var_A);
                 index++;
             }
         }
