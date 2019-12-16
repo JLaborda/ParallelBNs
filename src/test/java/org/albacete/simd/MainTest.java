@@ -1,10 +1,11 @@
 package org.albacete.simd;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.GraphNode;
-import edu.cmu.tetrad.graph.Node;
+import edu.cmu.tetrad.graph.*;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,12 +19,61 @@ import static org.junit.Assert.*;
 @SuppressWarnings("SpellCheckingInspection")
 public class MainTest
 {
+
+
     //Nodes of Cancer Network
     final Node xray = new GraphNode("Xray");
     final Node dyspnoea = new GraphNode("Dyspnoea");
     final Node cancer = new GraphNode ("Cancer");
     final Node pollution = new GraphNode("Pollution");
     final Node smoker = new GraphNode("Smoker");
+
+    ArrayList<TupleNode> subset1 = new ArrayList<>();
+    ArrayList<TupleNode> subset2 = new ArrayList<>();
+
+
+    private void initializeSubsets(){
+        // Seed used for arc split is 42
+
+        // Subset 1:
+        subset1.add(new TupleNode(dyspnoea, cancer));
+        subset1.add(new TupleNode(dyspnoea, smoker));
+        subset1.add(new TupleNode(xray, pollution));
+        subset1.add(new TupleNode(xray, cancer));
+        subset1.add(new TupleNode(cancer, pollution));
+
+
+        //Subset 2:
+        subset2.add(new TupleNode(pollution, smoker));
+        subset2.add(new TupleNode(cancer, smoker));
+        subset2.add(new TupleNode(dyspnoea, pollution));
+        subset2.add(new TupleNode(xray, smoker));
+        subset2.add(new TupleNode(xray, dyspnoea));
+
+    }
+
+    /**
+     * Testing constructors
+     */
+    @Test
+    public void constructorTest(){
+        // Arrange
+        String path = "src/test/resources/cancer.xbif_.csv";
+        DataSet dataset = Main.readData(path);
+        int num_cols = 5;
+
+        // Act
+        Main main1 = new Main(path, 1);
+        Main main2 = new Main(dataset, 1);
+        DataSet data1 = main1.getData();
+        DataSet data2 = main2.getData();
+
+        // Assert
+        assertNotNull(main1);
+        assertNotNull(main2);
+        assertEquals(num_cols, data1.getNumColumns());
+        assertEquals(num_cols, data2.getNumColumns());
+    }
 
     /**
      * Testing csv reading
@@ -41,9 +91,14 @@ public class MainTest
         //Assert
         assertEquals(num_cols, result);
         for (Node n: columns) {
-
             assertTrue(data.getVariableNames().contains(n.getName()));
         }
+    }
+
+    @Test(expected = Exception.class)
+    public void exceptionReadDataTest(){
+        String path = "";
+        Main main = new Main(path, 1);
     }
 
     /**
@@ -105,6 +160,58 @@ public class MainTest
 
 
     }
+
+    /**
+     * Tests the fes stage for two threads and the subsets of cancer splitted with a seed of 42
+     * @throws InterruptedException Exception caused by interruption of the threads.
+     */
+    @Test
+    public void fesStageTest() throws InterruptedException {
+        // Arrange
+        initializeSubsets();
+        // Expectation
+        List<Edge> expected1 = new ArrayList<>();
+        expected1.add(new Edge(cancer, dyspnoea, Endpoint.TAIL, Endpoint.ARROW));
+        expected1.add(new Edge(cancer, xray, Endpoint.TAIL, Endpoint.ARROW));
+        expected1.add(new Edge(pollution, cancer, Endpoint.TAIL, Endpoint.ARROW));
+        List<Edge> expected2 = new ArrayList<>();
+        expected2.add(new Edge(smoker, cancer, Endpoint.TAIL, Endpoint.ARROW));
+
+        // Creating main
+        String path = "src/test/resources/cancer.xbif_.csv";
+        Main main = new Main(path, 2);
+        main.calculateArcs();
+        main.splitArcs();
+
+        // Act
+        main.fesStage();
+        ArrayList<Dag> resultingGraphs = main.getGraphs();
+        Dag gdag1 = resultingGraphs.get(0);
+        Dag gdag2 = resultingGraphs.get(1);
+
+        // Assert
+        for(Edge edge : expected1){
+            assertTrue(gdag1.getEdges().contains(edge));
+        }
+        for(Edge edge : expected2){
+            assertTrue(gdag2.getEdges().contains(edge));
+        }
+    }
+
+
+    @Test
+    public void setgetMaxIterations(){
+        // Arrange
+        int expected = 21;
+        String path = "src/test/resources/cancer.xbif_.csv";
+        Main main = new Main(path, 1);
+        // Act
+        main.setMaxIterations(21);
+        int actual = main.getMaxIterations();
+        // Assert
+        assertEquals(expected, actual);
+    }
+
     @Test
     public void setgetSeedTest(){
         // Arrange

@@ -9,6 +9,7 @@ import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.pGES.Scorer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -178,11 +179,37 @@ public class Main
     }
 
     /**
-     * Runs the FES Stage, where threads run a FES algorithm for each subset of edges.
-     * @throws InterruptedException Exception caused by interruction.
+     * Transforms a graph to a DAG, and removes any possible inconsistency found throughout its stucture.
+     * @param g Graph to be transformed.
+     * @return Resulting DAG of the inserted graph.
      */
-    private void fesStage() throws InterruptedException {
+    private Dag removeInconsistencies(Graph g){
+        // Transforming the current graph into a DAG
+        SearchGraphUtils.pdagToDag(g);
 
+        // Checking Consistency
+        Node nodeT, nodeH;
+        for (Edge e : g.getEdges()){
+            if(!e.isDirected()) continue;
+            Endpoint endpoint1 = e.getEndpoint1();
+            if (endpoint1.equals(Endpoint.ARROW)){
+                nodeT = e.getNode1();
+                nodeH = e.getNode2();
+            }else{
+                nodeT = e.getNode2();
+                nodeH = e.getNode1();
+            }
+            if(g.existsDirectedPathFromTo(nodeT, nodeH)) g.removeEdge(e);
+        }
+        // Adding graph from each thread to the graphs array
+        return new Dag(g);
+
+    }
+
+    /**
+     * Configures the FES stage by initializing the graph and fes lists. It also initializes
+     */
+    private void fesConfig(){
         // Initializing Graphs structure
         this.graphs = new ArrayList<>();
 
@@ -191,11 +218,26 @@ public class Main
             this.fesArray[i] = new ThFES(this.data, this.subSets[i], this.nFESItInterleaving);
         }
 
+        // Initializing thread config
         for(int i = 0 ; i< this.nThreads; i++){
             //Graph g = this.search[i].search();
             this.fesArray[i].resetFlag(); 				// Reseting flag search
             this.threads[i] = new Thread(this.fesArray[i]);
-            this.threads[i].start();
+        }
+    }
+
+    /**
+     * Runs the FES Stage, where threads run a FES algorithm for each subset of edges.
+     * @throws InterruptedException Exception caused by interruction.
+     */
+    public void fesStage() throws InterruptedException {
+
+        // Configuring the fes stage
+        fesConfig();
+
+        // Running threads
+        for (Thread thread: this.threads) {
+            thread.start();
         }
 
         // Getting results
@@ -208,25 +250,10 @@ public class Main
             // Thread Score
             score_threads = score_threads + fesArray[i].getScoreBDeu();
 
-            // Transforming the current graph into a DAG
-            SearchGraphUtils.pdagToDag(g);
+            // Removing Inconsistencies and transforming it to a DAG
+            Dag gdag = removeInconsistencies(g);
 
-            // Checking Consistency
-            Node nodeT, nodeH;
-            for (Edge e : g.getEdges()){
-                if(!e.isDirected()) continue;
-                Endpoint endpoint1 = e.getEndpoint1();
-                if (endpoint1.equals(Endpoint.ARROW)){
-                    nodeT = e.getNode1();
-                    nodeH = e.getNode2();
-                }else{
-                    nodeT = e.getNode2();
-                    nodeH = e.getNode1();
-                }
-                if(g.existsDirectedPathFromTo(nodeT, nodeH)) g.removeEdge(e);
-            }
-            // Adding graph from each thread to the graphs array
-            Dag gdag = new Dag(g);
+            // Adding the new dag to the graph list
             this.graphs.add(gdag);
 
             System.out.println("Graph of Thread " + i + ": \n" + gdag);
@@ -291,6 +318,9 @@ public class Main
         this.maxIterations = maxIterations;
     }
 
+    public ArrayList<Dag> getGraphs(){
+        return this.graphs;
+    }
 
 
     public static void main(String[] args){

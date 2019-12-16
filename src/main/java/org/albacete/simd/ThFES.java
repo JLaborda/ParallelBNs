@@ -23,7 +23,6 @@ import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.NumberFormatUtil;
 import edu.cmu.tetrad.util.ProbUtils;
 import consensusBN.SubSet;
-import consensusBN.ListFabric;
 import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
 
@@ -91,6 +90,7 @@ public class ThFES implements Runnable{
      * Total calls done
      */
     private int numTotalCalls=0;
+
     /**
      * Total calls done to non-cached information
      */
@@ -152,9 +152,9 @@ public class ThFES implements Runnable{
     /**
      * Constructor of ThFES with an initial DAG
      * @param dataSet data of the problem
-     * @param initialDag
-     * @param subset
-     * @param maxIt
+     * @param initialDag initial DAG with which the FES stage starts with, if it's null, use the other constructor
+     * @param subset subset of edges the fes stage will try to add to the resulting graph
+     * @param maxIt maximum number of iterations allowed in the fes stage
      */
     public ThFES(DataSet dataSet,Graph initialDag, ArrayList<TupleNode> subset,int maxIt) {
         setDataSet(dataSet);
@@ -205,9 +205,7 @@ public class ThFES implements Runnable{
 
 
     private void setInitialDag(Graph initialDag2) {
-        // TODO Auto-generated method stub
         this.initialDag = new EdgeListGraph(initialDag2);
-
     }
 
 
@@ -460,24 +458,6 @@ public class ThFES implements Runnable{
         return tNeighbors;
     }
 
-    /**
-     * Get all nodes that are connected to Y by an undirected edge and adjacent
-     * to X
-     */
-    private static List<Node> getHNeighbors(Node x, Node y, Graph graph) {
-        List<Node> hNeighbors = new LinkedList<>(graph.getAdjacentNodes(y));
-        hNeighbors.retainAll(graph.getAdjacentNodes(x));
-
-        for (int i = hNeighbors.size() - 1; i >= 0; i--) {
-            Node z = hNeighbors.get(i);
-            Edge edge = graph.getEdge(y, z);
-            if (!Edges.isUndirectedEdge(edge)) {
-                hNeighbors.remove(z);
-            }
-        }
-
-        return hNeighbors;
-    }
 
     /**
      * Evaluate the Insert(X, Y, T) operator (Definition 12 from Chickering,
@@ -628,14 +608,6 @@ public class ThFES implements Runnable{
     }
 
 
-    public void setInitialGraph(Graph currentGraph){
-        this.initialDag = currentGraph;
-    }
-
-    public Graph getInitialGraph(){
-        return this.initialDag;
-    }
-
     //===========================SCORING METHODS===========================//
 
     private double scoreGraph(Graph graph) {
@@ -755,6 +727,18 @@ public class ThFES implements Runnable{
     }
 
 
+    //==========================SETTERS AND GETTERS=========================//
+
+
+    public void setInitialGraph(Graph currentGraph){
+        this.initialDag = currentGraph;
+    }
+
+    public Graph getInitialGraph(){
+        return this.initialDag;
+    }
+
+
     private List<Node> getVariables() {
         return variables;
     }
@@ -789,10 +773,15 @@ public class ThFES implements Runnable{
     }
 
     public void setMaxNumEdges(int maxNumEdges) {
-        if (maxNumEdges < -1) throw new IllegalArgumentException();
+        if (maxNumEdges < -1)
+            throw new IllegalArgumentException();
 
         this.maxNumEdges = maxNumEdges;
     }
+
+
+
+
 
 
 

@@ -29,7 +29,10 @@ public class ThFESTest {
         initializeSubsets();
     }
 
-    private Graph removeInconsistency(Graph graph){
+    private Graph removeInconsistencies(Graph graph){
+        // Transforming the current graph into a DAG
+        SearchGraphUtils.pdagToDag(graph);
+
         Node nodeT, nodeH;
         for (Edge e : graph.getEdges()){
             if(!e.isDirected()) continue;
@@ -67,10 +70,30 @@ public class ThFESTest {
 
     }
 
+    /**
+     * Checks that both constructors work perfectly
+     * @throws InterruptedException Exception caused by thread interruption
+     */
+    @Test
+    public void constructorTest() throws InterruptedException{
+        // Arrange
+        ThFES thread1 = new ThFES(dataset, subset1, 15);
+        thread1.run();
+        Graph graph = thread1.getCurrentGraph();
+        // Act
+        ThFES thread2 = new ThFES(dataset, graph, subset1, 15);
+        // Arrange
+        assertNotNull(thread1);
+        assertNotNull(thread2);
+
+    }
+
+    /**
+     * Checks the first iteration of the Cancer problem for the FES stage
+     * @throws InterruptedException Exception caused by thread interruption
+     */
     @Test
     public void searchTwoThreadsTest() throws InterruptedException {
-        /* Arrange */
-        initializeSubsets();
 
         // ThFES objects
         ThFES thread1 = new ThFES(dataset, subset1, 15);
@@ -88,17 +111,12 @@ public class ThFESTest {
         //Act
         thread1.run();
         thread2.run();
-
         Graph g1 = thread1.getCurrentGraph();
         Graph g2 = thread2.getCurrentGraph();
 
-        // Transforming the current graph into a DAG
-        SearchGraphUtils.pdagToDag(g1);
-        SearchGraphUtils.pdagToDag(g2);
-
         // Getting dags
-        Dag gdag1 = new Dag(g1);
-        Dag gdag2 = new Dag(g2);
+        Dag gdag1 = new Dag(removeInconsistencies(g1));
+        Dag gdag2 = new Dag(removeInconsistencies(g2));
 
 
         for(Edge edge : expected1){
@@ -249,6 +267,21 @@ public class ThFESTest {
         long actual = thfes.getElapsedTime();
         // Assert
         assertEquals(expected, actual, 0);
+    }
+
+    /**
+     * Checking elapsed time getter and setter
+     */
+    @Test
+    public void setterAndGetterOfMaxNumEdges(){
+        // Arrange
+        ThFES thfes = new ThFES(dataset, subset1, 15);
+        // Act
+        int expected = 23;
+        thfes.setMaxNumEdges(expected);
+        int actual = thfes.getMaxNumEdges();
+        // Assert
+        assertEquals(expected, actual);
     }
 
 
