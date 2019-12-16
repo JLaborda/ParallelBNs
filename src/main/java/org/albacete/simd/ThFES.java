@@ -32,7 +32,7 @@ public class ThFES implements Runnable{
     /**
      * Tuple of Nodes that will be checked by this thread in the FES method
      */
-    private TupleNode[] S;
+    private ArrayList<TupleNode> S;
     /**
      * Dataset of the problem in hands
      */
@@ -156,7 +156,7 @@ public class ThFES implements Runnable{
      * @param subset
      * @param maxIt
      */
-    public ThFES(DataSet dataSet,Graph initialDag, TupleNode[] subset,int maxIt) {
+    public ThFES(DataSet dataSet,Graph initialDag, ArrayList<TupleNode> subset,int maxIt) {
         setDataSet(dataSet);
         setInitialDag(initialDag);
         setSubSetSearch(subset);
@@ -174,7 +174,7 @@ public class ThFES implements Runnable{
     }
 
 
-    public ThFES(DataSet dataSet,TupleNode[] subset,int maxIt) {
+    public ThFES(DataSet dataSet, ArrayList<TupleNode> subset,int maxIt) {
         setDataSet(dataSet);
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
@@ -197,7 +197,7 @@ public class ThFES implements Runnable{
 
 
 
-    private void setSubSetSearch(TupleNode[] subset) {
+    private void setSubSetSearch(ArrayList<TupleNode> subset) {
         this.S=subset;
 
     }
@@ -259,7 +259,7 @@ public class ThFES implements Runnable{
      *
      * @return the resulting Pattern.
      */
-    public Graph search() {
+    private Graph search() {
         long startTime = System.currentTimeMillis();
         numTotalCalls=0;
         numNonCachedCalls=0;
@@ -312,8 +312,9 @@ public class ThFES implements Runnable{
         int it = 0;
 
         System.out.println("Initial Score = " + nf.format(bestScore));
-
+        // Calling fs to calculate best edge to add.
         bestInsert = fs(graph,bestScore);
+
         while((x_i != null) && (it < this.maxIt)){
             // Changing best score because x_i, and therefore, y_i is not null
             bestScore = bestInsert;
@@ -336,6 +337,7 @@ public class ThFES implements Runnable{
 
             // Checking that the maximum number of edges has not been reached
             if (getMaxNumEdges() != -1 && graph.getNumEdges() > getMaxNumEdges()) {
+                System.out.println("Maximum edges reached");
                 break;
             }
 
@@ -627,14 +629,16 @@ public class ThFES implements Runnable{
 
 
     public void setInitialGraph(Graph currentGraph){
-
         this.initialDag = currentGraph;
+    }
 
+    public Graph getInitialGraph(){
+        return this.initialDag;
     }
 
     //===========================SCORING METHODS===========================//
 
-    public double scoreGraph(Graph graph) {
+    private double scoreGraph(Graph graph) {
 //        Graph dag = SearchGraphUtils.dagFromPattern(graph);
         Graph dag = new EdgeListGraph(graph);
         SearchGraphUtils.pdagToDag(dag);
@@ -756,10 +760,6 @@ public class ThFES implements Runnable{
     }
 
 
-//    private DataSet dataSet() {
-//        return dataSet;
-//    }
-
     public double getStructurePrior() {
         return structurePrior;
     }
@@ -792,38 +792,6 @@ public class ThFES implements Runnable{
         if (maxNumEdges < -1) throw new IllegalArgumentException();
 
         this.maxNumEdges = maxNumEdges;
-    }
-
-    public double getModelBDeu() {
-        return modelBDeu;
-    }
-
-    public double getScore(Graph dag) {
-        return scoreGraph(dag);
-    }
-
-    public int getNumNonCachedCalls() {
-        return numNonCachedCalls;
-    }
-
-    public int getNumTotalCalls() {
-        return numTotalCalls;
-    }
-
-    public int getMaxParents() {
-        return ListFabric.getMaxSize()+1;
-    }
-
-    public void setMaxParents(int maxParents) {
-        ListFabric.setMaxSize(maxParents-1);
-    }
-
-    public boolean isUsePowerSetsCache() {
-        return PowerSetFabric.isUsePowerSetsCache();
-    }
-
-    public void setUsePowerSetsCache(boolean usePowerSetsCache) {
-        PowerSetFabric.setUsePowerSetsCache(usePowerSetsCache);
     }
 
 
