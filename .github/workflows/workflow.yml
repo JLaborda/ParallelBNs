@@ -26,6 +26,6 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }} #required
-          file: ./target/cobertura/coverage.xml #optional
+          file: ./target/site/cobertura/coverage.xml #optional
           yml: ./codecov.yml #optional
           fail_ci_if_error: true #optional (default = false)
