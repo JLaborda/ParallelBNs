@@ -5,10 +5,11 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.*;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.pGES.Scorer;
-import org.albacete.simd.pGES.ThGES;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -22,10 +23,10 @@ public class Main
     private final DataSet data;
     private int nThreads = 1;
     private long seed = 42;
-    private int nItInterleaving = 0;
+    private int nFESItInterleaving = 5;
     private int maxIterations = 15;
     private DataSet[] samples = null;
-    private ThGES[] search = null;
+    private ThFES[] fesArray = null;
     private Thread[] threads = null;
     private ArrayList<TupleNode>[] subSets = null;
     private ArrayList<Dag> graphs = null;
@@ -40,7 +41,7 @@ public class Main
 
     private long totalTimeIterations;
 
-
+    // We need to use the union fusion.
     private String fusionConsensus = "HeuristicConsensusMVoting";
     private String net_path = null;
     private String bbdd_path = null;
@@ -85,7 +86,7 @@ public class Main
      * Path to the csv file.
      * @return DataSet containing the data from the csv file.
      */
-    public DataSet readData(String path){
+    public static DataSet readData(String path){
         // Initial Configuration
         DataReader reader = new DataReader();
         reader.setDelimiter(DelimiterType.COMMA);
@@ -109,7 +110,7 @@ public class Main
     private void initialize(int nThreads){
         this.nThreads = nThreads;
         this.samples = new DataSet[this.nThreads];
-        this.search = new ThGES[this.nThreads];
+        this.fesArray = new ThFES[this.nThreads];
         this.threads = new Thread[this.nThreads];
         this.subSets = new ArrayList[this.nThreads];
         // Number of arcs is n*(n-1)/2
@@ -129,10 +130,12 @@ public class Main
                 // Getting pair of variables
                 Node var_A = variables.get(i);
                 Node var_B = variables.get(j);
-                //3. Storing pairs
+                //3. Storing both pairs
                 // Maybe we can use Edge object
                 this.listOfArcs[index] = new TupleNode(var_A,var_B);
                 index++;
+                //this.listOfArcs[index] = new TupleNode(var_B,var_A);
+                //index++;
             }
         }
     }
@@ -164,7 +167,125 @@ public class Main
         }
         this.subSets[this.subSets.length-1] = sub;
 
+        // Debugging
+        for (int i = 0; i < subSets.length; i++){
+            System.out.println("Subset " + i);
+            for( TupleNode tuple : subSets[i]){
+                System.out.print(tuple + ", ");
+            }
+            System.out.print("\n");
+        }
+
     }
+
+    /**
+     * Transforms a graph to a DAG, and removes any possible inconsistency found throughout its stucture.
+     * @param g Graph to be transformed.
+     * @return Resulting DAG of the inserted graph.
+     */
+    private Dag removeInconsistencies(Graph g){
+        // Transforming the current graph into a DAG
+        SearchGraphUtils.pdagToDag(g);
+
+        // Checking Consistency
+        Node nodeT, nodeH;
+        for (Edge e : g.getEdges()){
+            if(!e.isDirected()) continue;
+            Endpoint endpoint1 = e.getEndpoint1();
+            if (endpoint1.equals(Endpoint.ARROW)){
+                nodeT = e.getNode1();
+                nodeH = e.getNode2();
+            }else{
+                nodeT = e.getNode2();
+                nodeH = e.getNode1();
+            }
+            if(g.existsDirectedPathFromTo(nodeT, nodeH)) g.removeEdge(e);
+        }
+        // Adding graph from each thread to the graphs array
+        return new Dag(g);
+
+    }
+
+    /**
+     * Configures the FES stage by initializing the graph and fes lists. It also initializes
+     */
+    private void fesConfig(){
+        // Initializing Graphs structure
+        this.graphs = new ArrayList<>();
+
+        // Creating ThFES runnables
+        for (int i = 0; i < this.nThreads; i++) {
+            this.fesArray[i] = new ThFES(this.data, this.subSets[i], this.nFESItInterleaving);
+        }
+
+        // Initializing thread config
+        for(int i = 0 ; i< this.nThreads; i++){
+            //Graph g = this.search[i].search();
+            this.fesArray[i].resetFlag(); 				// Reseting flag search
+            this.threads[i] = new Thread(this.fesArray[i]);
+        }
+    }
+
+    /**
+     * Runs the FES Stage, where threads run a FES algorithm for each subset of edges.
+     * @throws InterruptedException Exception caused by interruction.
+     */
+    public void fesStage() throws InterruptedException {
+
+        // Configuring the fes stage
+        fesConfig();
+
+        // Running threads
+        for (Thread thread: this.threads) {
+            thread.start();
+        }
+
+        // Getting results
+        double score_threads = 0;
+        for(int i = 0 ; i< this.nThreads; i++){
+            // Joining threads and getting currentGraph
+            threads[i].join();
+            Graph g = fesArray[i].getCurrentGraph();
+
+            // Thread Score
+            score_threads = score_threads + fesArray[i].getScoreBDeu();
+
+            // Removing Inconsistencies and transforming it to a DAG
+            Dag gdag = removeInconsistencies(g);
+
+            // Adding the new dag to the graph list
+            this.graphs.add(gdag);
+
+            System.out.println("Graph of Thread " + i + ": \n" + gdag);
+
+        }
+    }
+
+    /**
+     * Main steps of the algorithm
+     */
+    public void search(){
+        // 1. Calculating Edges
+        calculateArcs();
+        splitArcs();
+
+        // 2. FES
+        try {
+            fesStage();
+        } catch (InterruptedException e) {
+            System.err.println("Error in FES Stage");
+            e.printStackTrace();
+        }
+
+        // 3. Fusion
+
+        // 4. BES
+
+        // 5. Fusion
+
+        // Iterate
+    }
+
 
     //*********** SETTERS AND GETTERS *************
 
@@ -188,16 +309,29 @@ public class Main
         return data;
     }
 
+
+    public int getMaxIterations() {
+        return maxIterations;
+    }
+
+    public void setMaxIterations(int maxIterations) {
+        this.maxIterations = maxIterations;
+    }
+
+    public ArrayList<Dag> getGraphs(){
+        return this.graphs;
+    }
+
+
     public static void main(String[] args){
         // 1. Read Data
         String path = "src/test/resources/cancer.xbif_.csv";
+        int maxIteration = 15;
         Main main = new Main(path, 2);
+        main.setMaxIterations(maxIteration);
 
-        // 2. Split Arcs
-        main.calculateArcs();
-        main.splitArcs();
-
-        // Print
+        // Running Algorithm
+        main.search();
     }
 
 }
