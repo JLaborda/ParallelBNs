@@ -23,5 +23,12 @@
 hs_err_pid*
 
 #idea
-.idea/
 *.iml
+/.idea/compiler.xml
+/.idea/encodings.xml
+/.idea/misc.xml
+/.idea/uiDesigner.xml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/.idea/codeStyles/
+/.idea/codeStyles/codeStyleConfig.xml
