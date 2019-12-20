@@ -17,7 +17,6 @@ import java.util.*;
 /**
  * Main class. This class contains the methods and variables used to run the parallel BN algorithm
  */
-@SuppressWarnings("SpellCheckingInspection")
 public class Main
 {
     private final DataSet data;
