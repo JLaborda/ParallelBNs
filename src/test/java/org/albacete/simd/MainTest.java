@@ -222,4 +222,74 @@ public class MainTest
         // Assert
         assertEquals(newSeed, main.getSeed());
     }
+
+    @Test
+    public void fusionTest() throws InterruptedException {
+        // Arrange
+        String path = "src/test/resources/cancer.xbif_.csv";
+        Main main = new Main(path, 2);
+
+        List<Node> nodes = new ArrayList<>();
+        nodes.add(cancer);
+        nodes.add(dyspnoea);
+        nodes.add(xray);
+        nodes.add(pollution);
+        nodes.add(smoker);
+        Dag expected = new Dag(nodes);
+        expected.addDirectedEdge(cancer, dyspnoea);
+        expected.addDirectedEdge(cancer, xray);
+        expected.addDirectedEdge(pollution, cancer);
+        expected.addDirectedEdge(smoker, cancer);
+
+        // Act
+        main.calculateArcs();
+        main.splitArcs();
+        main.fesStage();
+        Dag result = main.fusion();
+        System.out.println(result);
+
+        // Assert Nodes
+        List<Node> resultingNodes = result.getNodes();
+        List<Node> expectedNodes = expected.getNodes();
+        for(Node expNode : expectedNodes){
+            // System.out.println("Expected Node: " + expNode.getName());
+            boolean assertion = false;
+            for(Node resNode: resultingNodes){
+                // System.out.println("Resulting Node: " + resNode.getName());
+                if(expNode.getName().equals(resNode.getName())){
+                    assertion = true;
+                    break;
+                }
+            }
+            assertTrue(assertion);
+        }
+
+        // Assert Edges
+        List<Edge> resultingEdges = result.getEdges();
+        for(Edge resEdge : resultingEdges){
+            Node node1 = resEdge.getNode1();
+            Node node2 = resEdge.getNode2();
+
+            // System.out.println("Node1: " + node1.getName());
+            // System.out.println("Node2: " + node2.getName());
+
+            if(node1.getName().equals("Cancer")){
+                String node2Name = node2.getName();
+                assertTrue(((node2Name.equals("Dyspnoea")) || (node2Name.equals("Xray")) ));
+                continue;
+            }
+            if(node1.getName().equals("Pollution")){
+                assertTrue(node2.getName().equals("Cancer"));
+                continue;
+            }
+            if(node1.getName().equals("Smoker")){
+                assertTrue(node2.getName().equals("Cancer"));
+                continue;
+            }
+            // If node1 i not any of these nodes, then assert error
+            fail("Node1 is not in the expected range.");
+
+        }
+
+    }
 }
