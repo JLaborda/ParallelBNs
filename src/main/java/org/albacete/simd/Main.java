@@ -6,8 +6,9 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
-import org.albacete.simd.pGES.Scorer;
+import consensusBN.ConsensusUnion;
 
+import org.albacete.simd.pGES.Scorer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -213,8 +214,15 @@ public class Main
         this.graphs = new ArrayList<>();
 
         // Creating ThFES runnables
-        for (int i = 0; i < this.nThreads; i++) {
-            this.fesArray[i] = new ThFES(this.data, this.subSets[i], this.nFESItInterleaving);
+        if (this.currentGraph == null) {
+            for (int i = 0; i < this.nThreads; i++) {
+                this.fesArray[i] = new ThFES(this.data, this.subSets[i], this.nFESItInterleaving);
+            }
+        }
+        else{
+            for (int i = 0; i < this.nThreads; i++) {
+                this.fesArray[i] = new ThFES(this.data,this.currentGraph, this.subSets[i], this.nFESItInterleaving);
+            }
         }
 
         // Initializing thread config
@@ -261,6 +269,16 @@ public class Main
     }
 
     /**
+     * Joins the Dags of the FES and BES stages.
+     * @return Dag with the fusion consensus of the graphs of the previous stage
+     */
+    public Dag fusion(){
+        ConsensusUnion fusion = new ConsensusUnion(this.graphs);
+        return fusion.union();
+    }
+
+
+    /**
      * Main steps of the algorithm
      */
     public void search(){
@@ -277,7 +295,8 @@ public class Main
         }
 
         // 3. Fusion
-
+        this.currentGraph = fusion();
+        System.out.println(this.currentGraph);
         // 4. BES
 
         // 5. Fusion
