@@ -232,19 +232,11 @@ public class Main
         }
     }
 
-    /**
-     * Runs the FES Stage, where threads run a FES algorithm for each subset of edges.
-     * @throws InterruptedException Exception caused by interruction.
-     */
-    public void fesStage() throws InterruptedException {
-
-        // Configuring the fes stage
-        fesConfig();
-
-        // Running threads
+    private void runThreads() throws InterruptedException {
         for (Thread thread: this.threads) {
             thread.start();
         }
+
 
         // Getting results
         double score_threads = 0;
@@ -265,6 +257,22 @@ public class Main
             System.out.println("Graph of Thread " + i + ": \n" + gdag);
 
         }
+
+
+    }
+
+    /**
+     * Runs the FES Stage, where threads run a FES algorithm for each subset of edges.
+     * @throws InterruptedException Exception caused by interruction.
+     */
+    public void fesStage() throws InterruptedException {
+
+        // Configuring the fes stage
+        fesConfig();
+
+        // Running threads
+        runThreads();
+
     }
 
     private void besConfig(){
@@ -289,29 +297,7 @@ public class Main
         besConfig();
 
         // Running threads
-        for (Thread thread: this.threads) {
-            thread.start();
-        }
-
-        // Getting results
-        double score_threads = 0;
-        for(int i = 0 ; i< this.nThreads; i++){
-            // Joining threads and getting currentGraph
-            threads[i].join();
-            Graph g = gesThreads[i].getCurrentGraph();
-
-            // Thread Score
-            score_threads = score_threads + gesThreads[i].getScoreBDeu();
-
-            // Removing Inconsistencies and transforming it to a DAG
-            Dag gdag = removeInconsistencies(g);
-
-            // Adding the new dag to the graph list
-            this.graphs.add(gdag);
-
-            System.out.println("Graph of Thread " + i + ": \n" + gdag);
-
-        }
+        runThreads();
 
     }
 
