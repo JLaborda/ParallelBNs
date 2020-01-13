@@ -124,8 +124,10 @@ public class MainTest
         for (TupleNode tupleNode1 : expected) {
             boolean isEqual = false;
             for (TupleNode tupleNode2 : result) {
-                if (tupleNode1.equals(tupleNode2))
+                if (tupleNode1.equals(tupleNode2)) {
                     isEqual = true;
+                    break;
+                }
             }
             assertTrue(isEqual);
         }
@@ -279,11 +281,11 @@ public class MainTest
                 continue;
             }
             if(node1.getName().equals("Pollution")){
-                assertTrue(node2.getName().equals("Cancer"));
+                assertEquals("Cancer", node2.getName());
                 continue;
             }
             if(node1.getName().equals("Smoker")){
-                assertTrue(node2.getName().equals("Cancer"));
+                assertEquals("Cancer", node2.getName());
                 continue;
             }
             // If node1 i not any of these nodes, then assert error
@@ -291,5 +293,36 @@ public class MainTest
 
         }
 
+    }
+
+    @Test
+    public void besStageTest() throws InterruptedException {
+        // Arrange
+        initializeSubsets();
+        // Expectation
+        List<Edge> expected = new ArrayList<>();
+        expected.add(new Edge(cancer, dyspnoea, Endpoint.TAIL, Endpoint.ARROW));
+        expected.add(new Edge(cancer, xray, Endpoint.TAIL, Endpoint.ARROW));
+        expected.add(new Edge(pollution, cancer, Endpoint.TAIL, Endpoint.ARROW));
+        expected.add(new Edge(smoker, cancer, Endpoint.TAIL, Endpoint.ARROW));
+
+        // Creating main
+        String path = "src/test/resources/cancer.xbif_.csv";
+        Main main = new Main(path, 2);
+        main.calculateArcs();
+        main.splitArcs();
+        main.fesStage();
+        main.fusion();
+
+        // Act
+        main.besStage();
+        ArrayList<Dag> results = main.getGraphs();
+
+        // Assert
+        for(Dag graph : results){
+            for(Edge edge : expected) {
+                assertTrue(graph.getEdges().contains(edge));
+            }
+        }
     }
 }

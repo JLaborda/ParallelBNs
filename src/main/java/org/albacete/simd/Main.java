@@ -10,7 +10,6 @@ import consensusBN.ConsensusUnion;
 
 import org.albacete.simd.pGES.Scorer;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -26,7 +25,7 @@ public class Main
     private int nFESItInterleaving = 5;
     private int maxIterations = 15;
     private DataSet[] samples = null;
-    private ThFES[] fesArray = null;
+    private GESThread[] gesThreads = null;
     private Thread[] threads = null;
     private ArrayList<TupleNode>[] subSets = null;
     private ArrayList<Dag> graphs = null;
@@ -110,7 +109,7 @@ public class Main
     private void initialize(int nThreads){
         this.nThreads = nThreads;
         this.samples = new DataSet[this.nThreads];
-        this.fesArray = new ThFES[this.nThreads];
+        this.gesThreads = new ThFES[this.nThreads];
         this.threads = new Thread[this.nThreads];
         this.subSets = new ArrayList[this.nThreads];
         // Number of arcs is n*(n-1)/2
@@ -216,20 +215,20 @@ public class Main
         // Creating ThFES runnables
         if (this.currentGraph == null) {
             for (int i = 0; i < this.nThreads; i++) {
-                this.fesArray[i] = new ThFES(this.data, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new ThFES(this.data, this.subSets[i], this.nFESItInterleaving);
             }
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.fesArray[i] = new ThFES(this.data,this.currentGraph, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new ThFES(this.data,this.currentGraph, this.subSets[i], this.nFESItInterleaving);
             }
         }
 
         // Initializing thread config
         for(int i = 0 ; i< this.nThreads; i++){
             //Graph g = this.search[i].search();
-            this.fesArray[i].resetFlag(); 				// Reseting flag search
-            this.threads[i] = new Thread(this.fesArray[i]);
+            this.gesThreads[i].resetFlag(); 				// Reseting flag search
+            this.threads[i] = new Thread(this.gesThreads[i]);
         }
     }
 
@@ -252,10 +251,10 @@ public class Main
         for(int i = 0 ; i< this.nThreads; i++){
             // Joining threads and getting currentGraph
             threads[i].join();
-            Graph g = fesArray[i].getCurrentGraph();
+            Graph g = gesThreads[i].getCurrentGraph();
 
             // Thread Score
-            score_threads = score_threads + fesArray[i].getScoreBDeu();
+            score_threads = score_threads + gesThreads[i].getScoreBDeu();
 
             // Removing Inconsistencies and transforming it to a DAG
             Dag gdag = removeInconsistencies(g);
@@ -268,13 +267,63 @@ public class Main
         }
     }
 
+    private void besConfig(){
+        // Initializing Graphs structure
+        this.graphs = new ArrayList<>();
+        this.gesThreads = new GESThread[this.nThreads];
+
+        for (int i = 0; i < this.nThreads; i++) {
+            this.gesThreads[i] = new ThBES(this.data, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
+        }
+
+        // Initializing thread config
+        for(int i = 0 ; i< this.nThreads; i++){
+            //Graph g = this.search[i].search();
+            this.gesThreads[i].resetFlag(); 				// Reseting flag search
+            this.threads[i] = new Thread(this.gesThreads[i]);
+        }
+    }
+
+    public void besStage() throws InterruptedException {
+        // Configuring the fes stage
+        besConfig();
+
+        // Running threads
+        for (Thread thread: this.threads) {
+            thread.start();
+        }
+
+        // Getting results
+        double score_threads = 0;
+        for(int i = 0 ; i< this.nThreads; i++){
+            // Joining threads and getting currentGraph
+            threads[i].join();
+            Graph g = gesThreads[i].getCurrentGraph();
+
+            // Thread Score
+            score_threads = score_threads + gesThreads[i].getScoreBDeu();
+
+            // Removing Inconsistencies and transforming it to a DAG
+            Dag gdag = removeInconsistencies(g);
+
+            // Adding the new dag to the graph list
+            this.graphs.add(gdag);
+
+            System.out.println("Graph of Thread " + i + ": \n" + gdag);
+
+        }
+
+    }
+
+
     /**
      * Joins the Dags of the FES and BES stages.
      * @return Dag with the fusion consensus of the graphs of the previous stage
      */
     public Dag fusion(){
         ConsensusUnion fusion = new ConsensusUnion(this.graphs);
-        return fusion.union();
+        this.currentGraph = fusion.union();
+        return (Dag) this.currentGraph;
     }
 
 
@@ -295,9 +344,20 @@ public class Main
         }
 
         // 3. Fusion
-        this.currentGraph = fusion();
+        fusion();
         System.out.println(this.currentGraph);
+
         // 4. BES
+        try{
+            besStage();
+        } catch (InterruptedException e){
+            System.err.println("Error in BES Stage");
+            e.printStackTrace();
+        }
+        System.out.println("Results of BES: ");
+        for(Dag dag : this.graphs){
+            System.out.println(dag);
+        }
 
         // 5. Fusion
 
@@ -350,6 +410,7 @@ public class Main
 
         // Running Algorithm
         main.search();
+
     }
 
 }
