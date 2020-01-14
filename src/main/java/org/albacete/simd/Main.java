@@ -1,6 +1,5 @@
 package org.albacete.simd;
 
-import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
@@ -8,36 +7,35 @@ import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import consensusBN.ConsensusUnion;
 
-import org.albacete.simd.pGES.Scorer;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
 /**
  * Main class. This class contains the methods and variables used to run the parallel BN algorithm
  */
+@SuppressWarnings("DuplicatedCode")
 public class Main
 {
     private final DataSet data;
     private int nThreads = 1;
     private long seed = 42;
     private int nFESItInterleaving = 5;
+    private int nBESItInterleaving = 5;
     private int maxIterations = 15;
-    private DataSet[] samples = null;
     private GESThread[] gesThreads = null;
     private Thread[] threads = null;
     private ArrayList<TupleNode>[] subSets = null;
     private ArrayList<Dag> graphs = null;
     private Graph currentGraph = null;
-    private Graph previousGraph = null;
-    private Scorer scorer = null;
-    private int it = 1;
+    // private Graph previousGraph = null;
+    // private Scorer scorer = null;
+    // private int it = 1;
 
     private TupleNode[] listOfArcs;
 
 
-
+/* Unused structures (Used in experimentation)
     private long totalTimeIterations;
 
     // We need to use the union fusion.
@@ -57,7 +55,7 @@ public class Main
     private ArrayList<Double> scores_threads = new ArrayList<>();
     private ArrayList<Double> scores_fusion = new ArrayList<>();
     private ArrayList<Double> scores_delta = new ArrayList<>();
-
+*/
 
     /**
      * Constructor of Main that uses a DataSet containing the data.
@@ -108,7 +106,7 @@ public class Main
     @SuppressWarnings("unchecked")
     private void initialize(int nThreads){
         this.nThreads = nThreads;
-        this.samples = new DataSet[this.nThreads];
+        DataSet[] samples = new DataSet[this.nThreads];
         this.gesThreads = new ThFES[this.nThreads];
         this.threads = new Thread[this.nThreads];
         this.subSets = new ArrayList[this.nThreads];
@@ -281,7 +279,7 @@ public class Main
         this.gesThreads = new GESThread[this.nThreads];
 
         for (int i = 0; i < this.nThreads; i++) {
-            this.gesThreads[i] = new ThBES(this.data, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
+            this.gesThreads[i] = new ThBES(this.data, this.currentGraph, this.subSets[i], this.nBESItInterleaving);
         }
 
         // Initializing thread config
@@ -382,6 +380,14 @@ public class Main
         this.maxIterations = maxIterations;
     }
 
+    public void setnFESItInterleaving(int nFESItInterleaving) {
+        this.nFESItInterleaving = nFESItInterleaving;
+    }
+
+    public void setnBESItInterleaving(int nBESItInterleaving) {
+        this.nBESItInterleaving = nBESItInterleaving;
+    }
+
     public ArrayList<Dag> getGraphs(){
         return this.graphs;
     }
@@ -393,7 +399,8 @@ public class Main
         int maxIteration = 15;
         Main main = new Main(path, 2);
         main.setMaxIterations(maxIteration);
-
+        main.setnFESItInterleaving(5);
+        main.setnBESItInterleaving(5);
         // Running Algorithm
         main.search();
 

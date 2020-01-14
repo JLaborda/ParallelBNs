@@ -14,6 +14,7 @@ import consensusBN.SubSet;
 import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
 
+@SuppressWarnings("DuplicatedCode")
 public class ThFES extends GESThread{
 
 
@@ -39,7 +40,7 @@ public class ThFES extends GESThread{
         nValues=new int[dataSet.getNumColumns()];
         for(int i=0;i<dataSet.getNumColumns();i++)
             nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
-        initialize(10., 0.001);
+        initialize();
     }
 
 
@@ -57,7 +58,7 @@ public class ThFES extends GESThread{
         nValues=new int[dataSet.getNumColumns()];
         for(int i=0;i<dataSet.getNumColumns();i++)
             nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
-        initialize(10., 0.001);
+        initialize();
     }
 
 
@@ -78,7 +79,7 @@ public class ThFES extends GESThread{
      *
      * @return the resulting Pattern.
      */
-    public Graph search() {
+    private Graph search() {
         long startTime = System.currentTimeMillis();
         numTotalCalls=0;
         numNonCachedCalls=0;
@@ -103,9 +104,9 @@ public class ThFES extends GESThread{
 
     //===========================PRIVATE METHODS========================//
 
-    private void initialize(double samplePrior, double structurePrior) {
-        setStructurePrior(structurePrior);
-        setSamplePrior(samplePrior);
+    private void initialize() {
+        setStructurePrior(0.001);
+        setSamplePrior(10.0);
     }
 
     /**
@@ -142,7 +143,7 @@ public class ThFES extends GESThread{
             insert(x_i,y_i,t_0, graph);
 
             // Checking cycles?
-            boolean ciclos = graph.existsDirectedCycle();
+            // boolean ciclos = graph.existsDirectedCycle();
 
             //PDAGtoCPDAG
             rebuildPattern(graph);
@@ -207,7 +208,7 @@ public class ThFES extends GESThread{
                 continue;
             }
 // ---------------------------- chequea y evalua un enlace entre _x e _y-----------
-            List<Node> tNeighbors = getTNeighbors(_x, _y, graph);
+            List<Node> tNeighbors = getSubsetOfNeighbors(_x, _y, graph);
             PowerSet tSubsets = PowerSetFabric.getPowerSet(_x, _y, tNeighbors);
 
             while (tSubsets.hasMoreElements()) {

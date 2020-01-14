@@ -25,6 +25,7 @@ import weka.classifiers.bayes.net.BIFReader;
 
 
 
+@SuppressWarnings("DuplicatedCode")
 public class ParallelGES {
 
 	DataSet data;

@@ -13,6 +13,7 @@ import edu.cmu.tetrad.search.LocalScoreCache;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.ProbUtils;
 
+@SuppressWarnings("DuplicatedCode")
 public class Scorer {
 	
 	private DataSet data = null;
@@ -56,9 +57,9 @@ public class Scorer {
         this.variables = dataSet.getVariables();
     }
 
-    private void initialize(double samplePrior, double structurePrior) {
-        setStructurePrior(structurePrior);
-        setSamplePrior(samplePrior);
+    private void initialize() {
+        setStructurePrior(0.001);
+        setSamplePrior(10.0);
     }
 	
 	public Scorer(DataSet dataSet) {
@@ -72,7 +73,7 @@ public class Scorer {
         nValues=new int[dataSet.getNumColumns()];
         for(int i=0;i<dataSet.getNumColumns();i++)
         	nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
-        initialize(10., 0.001);
+        initialize();
 	}
 	
 	
@@ -129,7 +130,8 @@ public class Scorer {
       return score;
   }
 	
-	protected double localBdeuScore(int nNode, int[] nParents) {
+	@SuppressWarnings("DuplicatedCode")
+    protected double localBdeuScore(int nNode, int[] nParents) {
     	numTotalCalls++;
      	double oldScore = localScoreCache.get(nNode, nParents);
      	if (!Double.isNaN(oldScore)) {

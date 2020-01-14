@@ -13,6 +13,7 @@ import org.albacete.simd.TupleNode;
 import java.text.NumberFormat;
 import java.util.*;
 
+@SuppressWarnings({"DuplicatedCode", "unused"})
 public abstract class GESThread implements Runnable{
     /**
      * Tuple of Nodes that will be checked by this thread in the FES method
@@ -150,11 +151,6 @@ public abstract class GESThread implements Runnable{
     protected SubSet h_0;
 
 
-    /**
-     * Search method that explores the data and currentGraph to return a better Graph
-     * @return PDAG that contains either the result of the BES or FES method.
-     */
-    public abstract Graph search();
 
 
     public void setMaxIt(int maxIt) {
@@ -202,7 +198,7 @@ public abstract class GESThread implements Runnable{
      * Get all nodes that are connected to Y by an undirected edge and not
      * adjacent to X.
      */
-    public static List<Node> getTNeighbors(Node x, Node y, Graph graph) {
+    public static List<Node> getSubsetOfNeighbors(Node x, Node y, Graph graph) {
         List<Node> tNeighbors = new LinkedList<>(graph.getAdjacentNodes(y));
         tNeighbors.removeAll(graph.getAdjacentNodes(x));
 
@@ -216,25 +212,6 @@ public abstract class GESThread implements Runnable{
         }
 
         return tNeighbors;
-    }
-
-    /**
-     * Get all nodes that are connected to Y by an undirected edge and adjacent
-     * to X
-     */
-    public static List<Node> getHNeighbors(Node x, Node y, Graph graph) {
-        List<Node> hNeighbors = new LinkedList<>(graph.getAdjacentNodes(y));
-        hNeighbors.retainAll(graph.getAdjacentNodes(x));
-
-        for (int i = hNeighbors.size() - 1; i >= 0; i--) {
-            Node z = hNeighbors.get(i);
-            Edge edge = graph.getEdge(y, z);
-            if (!Edges.isUndirectedEdge(edge)) {
-                hNeighbors.remove(z);
-            }
-        }
-
-        return hNeighbors;
     }
 
 
@@ -257,7 +234,7 @@ public abstract class GESThread implements Runnable{
      * Do an actual insertion
      * (Definition 12 from Chickering, 2002).
      */
-    public void insert(Node x, Node y, Set<Node> subset, Graph graph) {
+    public static void insert(Node x, Node y, Set<Node> subset, Graph graph) {
         graph.addDirectedEdge(x, y);
 
         for (Node node : subset) {
@@ -340,7 +317,7 @@ public abstract class GESThread implements Runnable{
     /**
      * Verifies if every semidirected path from y to x contains a node in naYXT.
      */
-    protected boolean isSemiDirectedBlocked(Node x, Node y, List<Node> naYXT,
+    protected static boolean isSemiDirectedBlocked(Node x, Node y, List<Node> naYXT,
                                           Graph graph, Set<Node> marked) {
         if (naYXT.contains(y)) {
             return true;

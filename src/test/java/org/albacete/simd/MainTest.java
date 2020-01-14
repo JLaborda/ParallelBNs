@@ -4,8 +4,6 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,8 +25,8 @@ public class MainTest
     final Node pollution = new GraphNode("Pollution");
     final Node smoker = new GraphNode("Smoker");
 
-    ArrayList<TupleNode> subset1 = new ArrayList<>();
-    ArrayList<TupleNode> subset2 = new ArrayList<>();
+    final ArrayList<TupleNode> subset1 = new ArrayList<>();
+    final ArrayList<TupleNode> subset2 = new ArrayList<>();
 
 
     private void initializeSubsets(){
@@ -97,6 +95,7 @@ public class MainTest
     @Test(expected = Exception.class)
     public void exceptionReadDataTest(){
         String path = "";
+        //noinspection unused
         Main main = new Main(path, 1);
     }
 

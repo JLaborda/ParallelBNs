@@ -24,8 +24,8 @@ public class ThBESTest {
     final Node pollution = dataset.getVariable("Pollution");
     final Node smoker = dataset.getVariable("Smoker");
 
-    ArrayList<TupleNode> subset1 = new ArrayList<>();
-    ArrayList<TupleNode> subset2 = new ArrayList<>();
+    final ArrayList<TupleNode> subset1 = new ArrayList<>();
+    final ArrayList<TupleNode> subset2 = new ArrayList<>();
 
 
     public ThBESTest(){
