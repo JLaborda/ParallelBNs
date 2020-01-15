@@ -103,7 +103,7 @@ public class ThBES extends GESThread {
         bestDelete = bs(graph,bestScore);
 
         while((x_d != null) && (it < this.maxIt)){
-            // Changing best score because x_i, and therefore, y_i is not null
+            // Changing best score because x_d, and y_d are not null
             bestScore = bestDelete;
 
             // Deleting edge
@@ -117,9 +117,9 @@ public class ThBES extends GESThread {
 
             // Printing score
             if (!h_0.isEmpty())
-                System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_i, y_i) + " " + t_0);
+                System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_d, y_d) + " " + h_0);
             else
-                System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_i, y_i));
+                System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_d, y_d));
             bestScore = bestDelete;
 
             // Checking that the maximum number of edges has not been reached
@@ -152,19 +152,22 @@ public class ThBES extends GESThread {
         List<Edge> edges1 = graph.getEdges();
         List<Edge> edges = new ArrayList<>();
 
-        for (Edge edge : edges1) {
-            Node _x = edge.getNode1();
-            Node _y = edge.getNode2();
+        for (TupleNode tupleNode : this.S) {
+            Node _x = tupleNode.x;
+            Node _y = tupleNode.y;
 
-            if (Edges.isUndirectedEdge(edge)) {
-                edges.add(Edges.directedEdge(_x, _y));
-                edges.add(Edges.directedEdge(_y, _x));
-            } else {
-                edges.add(edge);
-            }
+            // Adding Edges to check
+            edges.add(Edges.directedEdge(_x, _y));
+            edges.add(Edges.directedEdge(_y, _x));
+
         }
 
         for (Edge edge : edges) {
+
+            // Checking if the edge is actually inside the graph
+            if(!graph.containsEdge(edge))
+                continue;
+
             Node _x = Edges.getDirectedEdgeTail(edge);
             Node _y = Edges.getDirectedEdgeHead(edge);
 
