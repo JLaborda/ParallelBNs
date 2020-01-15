@@ -7,9 +7,7 @@ import java.util.List;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DiscreteVariable;
-import edu.cmu.tetrad.graph.EdgeListGraph;
-import edu.cmu.tetrad.graph.Graph;
-import edu.cmu.tetrad.graph.Node;
+import edu.cmu.tetrad.graph.*;
 import consensusBN.SubSet;
 import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
@@ -197,12 +195,24 @@ public class ThFES extends GESThread{
         y_i=null;
         t_0 = null;
 
-        for (TupleNode tupleNode : this.S){
+        List<Edge> edges = new ArrayList<>();
+
+        for (TupleNode tupleNode : this.S) {
             Node _x = tupleNode.x;
             Node _y = tupleNode.y;
-            if (_x == _y) {
+
+            if (_x == _y)
                 continue;
-            }
+
+            // Adding Edges to check
+            edges.add(Edges.directedEdge(_x, _y));
+            edges.add(Edges.directedEdge(_y, _x));
+        }
+
+        for(Edge edge : edges){
+
+            Node _x = Edges.getDirectedEdgeTail(edge);
+            Node _y = Edges.getDirectedEdgeHead(edge);
 
             if (graph.isAdjacentTo(_x, _y)) {
                 continue;
