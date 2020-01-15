@@ -12,7 +12,6 @@ import java.util.Set;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DiscreteVariable;
-import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Edges;
@@ -28,6 +27,7 @@ import consensusBN.ListFabric;
 import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
 
+@SuppressWarnings("DuplicatedCode")
 public class ThGES implements Runnable{
 	
 	private ArrayList<Node> S = null;
@@ -127,7 +127,7 @@ public class ThGES implements Runnable{
         nValues=new int[dataSet.getNumColumns()];
         for(int i=0;i<dataSet.getNumColumns();i++)
         	nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
-        initialize(10., 0.001);
+        initialize();
     }
 
     
@@ -145,7 +145,7 @@ public class ThGES implements Runnable{
         nValues=new int[dataSet.getNumColumns()];
         for(int i=0;i<dataSet.getNumColumns();i++)
         	nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
-        initialize(10., 0.001);
+        initialize();
     }
     
     private void setMaxIt(int maxIt) {
@@ -243,9 +243,9 @@ public class ThGES implements Runnable{
 
     //===========================PRIVATE METHODS========================//
 
-    private void initialize(double samplePrior, double structurePrior) {
-        setStructurePrior(structurePrior);
-        setSamplePrior(samplePrior);
+    private void initialize() {
+        setStructurePrior(0.001);
+        setSamplePrior(10.0);
     }
 
     /**

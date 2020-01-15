@@ -21,8 +21,8 @@ public class ThFESTest {
     final Node pollution = dataset.getVariable("Pollution");
     final Node smoker = dataset.getVariable("Smoker");
 
-    ArrayList<TupleNode> subset1 = new ArrayList<>();
-    ArrayList<TupleNode> subset2 = new ArrayList<>();
+    final ArrayList<TupleNode> subset1 = new ArrayList<>();
+    final ArrayList<TupleNode> subset2 = new ArrayList<>();
 
 
     public ThFESTest(){
@@ -135,7 +135,7 @@ public class ThFESTest {
     @Test
     public void isAggressivelyPreventCyclesTest(){
         ThFES thfes = new ThFES(dataset, subset1, 15);
-        assertTrue(!thfes.isAggressivelyPreventCycles());
+        assertFalse(thfes.isAggressivelyPreventCycles());
     }
     /**
      * Checking that setter works correctly for AggressivelyPreventCycles variable
@@ -188,7 +188,7 @@ public class ThFESTest {
         thfes.resetFlag();
         boolean result = thfes.getFlag();
         // Assert
-        assertTrue(!result);
+        assertFalse(result);
     }
 
     /**

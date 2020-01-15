@@ -18,6 +18,7 @@ import edu.cmu.tetrad.graph.Dag;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
+@SuppressWarnings("DuplicatedCode")
 public class Experiments {
 
 	private String net_path;

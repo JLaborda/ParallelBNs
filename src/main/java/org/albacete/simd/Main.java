@@ -1,6 +1,5 @@
 package org.albacete.simd;
 
-import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
@@ -8,37 +7,35 @@ import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import consensusBN.ConsensusUnion;
 
-import org.albacete.simd.pGES.Scorer;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
 /**
  * Main class. This class contains the methods and variables used to run the parallel BN algorithm
  */
+@SuppressWarnings("DuplicatedCode")
 public class Main
 {
     private final DataSet data;
     private int nThreads = 1;
     private long seed = 42;
     private int nFESItInterleaving = 5;
+    private int nBESItInterleaving = 5;
     private int maxIterations = 15;
-    private DataSet[] samples = null;
-    private ThFES[] fesArray = null;
+    private GESThread[] gesThreads = null;
     private Thread[] threads = null;
     private ArrayList<TupleNode>[] subSets = null;
     private ArrayList<Dag> graphs = null;
     private Graph currentGraph = null;
-    private Graph previousGraph = null;
-    private Scorer scorer = null;
-    private int it = 1;
+    // private Graph previousGraph = null;
+    // private Scorer scorer = null;
+    // private int it = 1;
 
     private TupleNode[] listOfArcs;
 
 
-
+/* Unused structures (Used in experimentation)
     private long totalTimeIterations;
 
     // We need to use the union fusion.
@@ -58,7 +55,7 @@ public class Main
     private ArrayList<Double> scores_threads = new ArrayList<>();
     private ArrayList<Double> scores_fusion = new ArrayList<>();
     private ArrayList<Double> scores_delta = new ArrayList<>();
-
+*/
 
     /**
      * Constructor of Main that uses a DataSet containing the data.
@@ -109,8 +106,8 @@ public class Main
     @SuppressWarnings("unchecked")
     private void initialize(int nThreads){
         this.nThreads = nThreads;
-        this.samples = new DataSet[this.nThreads];
-        this.fesArray = new ThFES[this.nThreads];
+        DataSet[] samples = new DataSet[this.nThreads];
+        this.gesThreads = new ThFES[this.nThreads];
         this.threads = new Thread[this.nThreads];
         this.subSets = new ArrayList[this.nThreads];
         // Number of arcs is n*(n-1)/2
@@ -216,21 +213,50 @@ public class Main
         // Creating ThFES runnables
         if (this.currentGraph == null) {
             for (int i = 0; i < this.nThreads; i++) {
-                this.fesArray[i] = new ThFES(this.data, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new ThFES(this.data, this.subSets[i], this.nFESItInterleaving);
             }
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.fesArray[i] = new ThFES(this.data,this.currentGraph, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new ThFES(this.data, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
             }
         }
 
         // Initializing thread config
         for(int i = 0 ; i< this.nThreads; i++){
             //Graph g = this.search[i].search();
-            this.fesArray[i].resetFlag(); 				// Reseting flag search
-            this.threads[i] = new Thread(this.fesArray[i]);
+            this.gesThreads[i].resetFlag(); 				// Reseting flag search
+            this.threads[i] = new Thread(this.gesThreads[i]);
         }
+    }
+
+    private void runThreads() throws InterruptedException {
+        for (Thread thread: this.threads) {
+            thread.start();
+        }
+
+
+        // Getting results
+        double score_threads = 0;
+        for(int i = 0 ; i< this.nThreads; i++){
+            // Joining threads and getting currentGraph
+            threads[i].join();
+            Graph g = gesThreads[i].getCurrentGraph();
+
+            // Thread Score
+            score_threads = score_threads + gesThreads[i].getScoreBDeu();
+
+            // Removing Inconsistencies and transforming it to a DAG
+            Dag gdag = removeInconsistencies(g);
+
+            // Adding the new dag to the graph list
+            this.graphs.add(gdag);
+
+            System.out.println("Graph of Thread " + i + ": \n" + gdag);
+
+        }
+
+
     }
 
     /**
@@ -243,30 +269,36 @@ public class Main
         fesConfig();
 
         // Running threads
-        for (Thread thread: this.threads) {
-            thread.start();
+        runThreads();
+
+    }
+
+    private void besConfig(){
+        // Initializing Graphs structure
+        this.graphs = new ArrayList<>();
+        this.gesThreads = new GESThread[this.nThreads];
+
+        for (int i = 0; i < this.nThreads; i++) {
+            this.gesThreads[i] = new ThBES(this.data, this.currentGraph, this.subSets[i], this.nBESItInterleaving);
         }
 
-        // Getting results
-        double score_threads = 0;
+        // Initializing thread config
         for(int i = 0 ; i< this.nThreads; i++){
-            // Joining threads and getting currentGraph
-            threads[i].join();
-            Graph g = fesArray[i].getCurrentGraph();
-
-            // Thread Score
-            score_threads = score_threads + fesArray[i].getScoreBDeu();
-
-            // Removing Inconsistencies and transforming it to a DAG
-            Dag gdag = removeInconsistencies(g);
-
-            // Adding the new dag to the graph list
-            this.graphs.add(gdag);
-
-            System.out.println("Graph of Thread " + i + ": \n" + gdag);
-
+            //Graph g = this.search[i].search();
+            this.gesThreads[i].resetFlag(); 				// Reseting flag search
+            this.threads[i] = new Thread(this.gesThreads[i]);
         }
     }
+
+    public void besStage() throws InterruptedException {
+        // Configuring the fes stage
+        besConfig();
+
+        // Running threads
+        runThreads();
+
+    }
+
 
     /**
      * Joins the Dags of the FES and BES stages.
@@ -274,7 +306,8 @@ public class Main
      */
     public Dag fusion(){
         ConsensusUnion fusion = new ConsensusUnion(this.graphs);
-        return fusion.union();
+        this.currentGraph = fusion.union();
+        return (Dag) this.currentGraph;
     }
 
 
@@ -295,9 +328,20 @@ public class Main
         }
 
         // 3. Fusion
-        this.currentGraph = fusion();
+        fusion();
         System.out.println(this.currentGraph);
+
         // 4. BES
+        try{
+            besStage();
+        } catch (InterruptedException e){
+            System.err.println("Error in BES Stage");
+            e.printStackTrace();
+        }
+        System.out.println("Results of BES: ");
+        for(Dag dag : this.graphs){
+            System.out.println(dag);
+        }
 
         // 5. Fusion
 
@@ -336,6 +380,14 @@ public class Main
         this.maxIterations = maxIterations;
     }
 
+    public void setnFESItInterleaving(int nFESItInterleaving) {
+        this.nFESItInterleaving = nFESItInterleaving;
+    }
+
+    public void setnBESItInterleaving(int nBESItInterleaving) {
+        this.nBESItInterleaving = nBESItInterleaving;
+    }
+
     public ArrayList<Dag> getGraphs(){
         return this.graphs;
     }
@@ -347,9 +399,11 @@ public class Main
         int maxIteration = 15;
         Main main = new Main(path, 2);
         main.setMaxIterations(maxIteration);
-
+        main.setnFESItInterleaving(5);
+        main.setnBESItInterleaving(5);
         // Running Algorithm
         main.search();
+
     }
 
 }

@@ -1,15 +1,7 @@
 package org.albacete.simd;
 
-import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import org.junit.Test;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -41,7 +33,7 @@ public class TupleNodeTest {
         TupleNode t2 = new TupleNode(x,y);
 
         // Arrange
-        assertTrue(t1.equals(t2));
+        assertEquals(t1, t2);
 
     }
 
@@ -56,7 +48,7 @@ public class TupleNodeTest {
         TupleNode t2 = new TupleNode(y,x);
 
         // Arrange
-        assertTrue(t1.equals(t2));
+        assertEquals(t1, t2);
 
     }
 
@@ -71,7 +63,7 @@ public class TupleNodeTest {
         TupleNode t2 = new TupleNode(x,x);
 
         // Arrange
-        assertFalse(t1.equals(t2));
+        assertNotEquals(t1, t2);
 
     }
 
@@ -85,7 +77,7 @@ public class TupleNodeTest {
         TupleNode t1 = new TupleNode(x,x);
 
         // Arrange
-        assertFalse(t1.equals(y));
+        assertNotEquals(t1, y);
 
     }
 
