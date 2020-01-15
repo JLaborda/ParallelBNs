@@ -8,6 +8,7 @@ import consensusBN.ConsensusUnion;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -120,10 +121,22 @@ public class ThBESTest {
     @Test
     public void searchTwoThreadsTest() throws InterruptedException {
         //Arrange
+        /*
         Dag [] fesGraphs = fesStageExperiment();
         ArrayList<Dag> graphs = new ArrayList<>();
         Collections.addAll(graphs,fesGraphs);
         Dag fusionGraph = (new ConsensusUnion(graphs)).union();
+        */
+        List<Node> nodes = Arrays.asList(cancer, xray, dyspnoea, pollution, smoker);
+        Graph fusionGraph = new EdgeListGraph(nodes);
+        fusionGraph.addDirectedEdge(cancer, dyspnoea);
+        fusionGraph.addDirectedEdge(cancer, xray);
+        fusionGraph.addDirectedEdge(pollution, cancer);
+        fusionGraph.addDirectedEdge(smoker, cancer);
+        fusionGraph.addDirectedEdge(xray, dyspnoea);
+        fusionGraph.addUndirectedEdge(pollution, smoker);
+
+
 
         ThBES thread1 = new ThBES(dataset, fusionGraph, subset1, 15);
         ThBES thread2 = new ThBES(dataset, fusionGraph, subset2, 15);
@@ -133,7 +146,6 @@ public class ThBESTest {
         expected.add(new Edge(cancer,xray,Endpoint.TAIL, Endpoint.ARROW));
         expected.add(new Edge(pollution,cancer,Endpoint.TAIL, Endpoint.ARROW));
         expected.add(new Edge(smoker,cancer,Endpoint.TAIL, Endpoint.ARROW));
-
         // Act
         thread1.run();
         thread2.run();

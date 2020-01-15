@@ -143,9 +143,9 @@ public class ThBES extends GESThread {
     private double bs(Graph graph, double initialScore){
         //   	System.out.println("\n** BACKWARD ELIMINATION SEARCH");
         //   	System.out.println("Initial Score = " + nf.format(initialScore));
+
         PowerSetFabric.setMode(PowerSetFabric.MODE_BES);
         double bestScore = initialScore;
-
 
         x_d = y_d = null;
         h_0 = null;

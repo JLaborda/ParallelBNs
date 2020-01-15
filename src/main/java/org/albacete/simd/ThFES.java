@@ -187,11 +187,11 @@ public class ThFES extends GESThread{
 
     private double fs(Graph graph, double score) {
         //       System.out.println("** FORWARD EQUIVALENCE SEARCH");
-        double bestScore = score;
         //       System.out.println("Initial Score = " + nf.format(bestScore));
 
 // ------ Miramos el mejor FES ---
 
+        double bestScore = score;
         PowerSetFabric.setMode(PowerSetFabric.MODE_FES);
         x_i=null;
         y_i=null;

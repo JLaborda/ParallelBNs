@@ -218,7 +218,7 @@ public class Main
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new ThFES(this.data,this.currentGraph, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new ThFES(this.data, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
             }
         }
 
