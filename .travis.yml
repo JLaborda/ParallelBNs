@@ -21,7 +21,7 @@ cache:
 # Building phase
 install: true
 script:
-  #- ./mvnw clean install
+  #- ./mvn clean install
   - mvn -q clean install
   # Codecov support
   - mvn -q cobertura:cobertura

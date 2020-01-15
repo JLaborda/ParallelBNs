@@ -23,6 +23,7 @@ import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
 
+@SuppressWarnings("DuplicatedCode")
 public class SecuencialParallelGES {
 	
 	DataSet data;
