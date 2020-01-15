@@ -198,7 +198,7 @@ public class ThFESTest {
     public void getBDeuScoreTest(){
         // Arrange
         ThFES thfes = new ThFES(dataset, subset1, 15);
-        double expected = -10591.31350686319;
+        double expected = -10591.313506863182;
         // Act
         thfes.run();
         thfes.resetFlag();

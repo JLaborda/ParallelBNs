@@ -252,7 +252,7 @@ public class Main
             // Adding the new dag to the graph list
             this.graphs.add(gdag);
 
-            System.out.println("Graph of Thread " + i + ": \n" + gdag);
+            System.out.println("Graph of Thread " + (i +1) + ": \n" + gdag);
 
         }
 
@@ -329,6 +329,7 @@ public class Main
 
         // 3. Fusion
         fusion();
+        System.out.println("Fusion Graph");
         System.out.println(this.currentGraph);
 
         // 4. BES
