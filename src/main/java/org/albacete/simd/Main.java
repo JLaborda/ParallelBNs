@@ -28,7 +28,7 @@ public class Main
     private ArrayList<TupleNode>[] subSets = null;
     private ArrayList<Dag> graphs = null;
     private Graph currentGraph = null;
-    // private Graph previousGraph = null;
+    private Graph previousGraph = null;
     // private Scorer scorer = null;
     // private int it = 1;
 
@@ -106,7 +106,7 @@ public class Main
     @SuppressWarnings("unchecked")
     private void initialize(int nThreads){
         this.nThreads = nThreads;
-        DataSet[] samples = new DataSet[this.nThreads];
+        //DataSet[] samples = new DataSet[this.nThreads];
         this.gesThreads = new ThFES[this.nThreads];
         this.threads = new Thread[this.nThreads];
         this.subSets = new ArrayList[this.nThreads];
@@ -252,7 +252,7 @@ public class Main
             // Adding the new dag to the graph list
             this.graphs.add(gdag);
 
-            System.out.println("Graph of Thread " + (i +1) + ": \n" + gdag);
+            //System.out.println("Graph of Thread " + (i +1) + ": \n" + gdag);
 
         }
 
@@ -312,45 +312,74 @@ public class Main
 
 
     /**
+     * Convergence function that checks if the previous graph and the current graph are equal or not.
+     * @return true if there is convergence, false otherwise.
+     */
+    private boolean convergence(){
+        if(previousGraph == null)
+            return false;
+
+        if(previousGraph.equals(currentGraph)){
+            return true;
+        }
+        else{
+            this.previousGraph = new EdgeListGraph(this.currentGraph);
+            return false;
+        }
+    }
+
+    /**
      * Main steps of the algorithm
      */
     public void search(){
+
+        // Iteration counter
+        int it = 1;
         // 1. Calculating Edges
         calculateArcs();
         splitArcs();
 
-        // 2. FES
-        try {
-            fesStage();
-        } catch (InterruptedException e) {
-            System.err.println("Error in FES Stage");
-            e.printStackTrace();
-        }
+        do {
+            System.out.println("-----------------------");
+            System.out.println("Iteration: " + (it));
 
-        // 3. Fusion
-        fusion();
-        System.out.println("FES-Fusion Graph");
-        System.out.println(this.currentGraph);
+            // 2. FES
+            try {
+                fesStage();
+            } catch (InterruptedException e) {
+                System.err.println("Error in FES Stage");
+                e.printStackTrace();
+            }
 
-        // 4. BES
-        try{
-            besStage();
-        } catch (InterruptedException e){
-            System.err.println("Error in BES Stage");
-            e.printStackTrace();
-        }
-        // Printing
-        System.out.println("Results of BES: ");
-        for(Dag dag : this.graphs){
-            System.out.println(dag);
-        }
+            // 3. Fusion
+            fusion();
+            //System.out.println("FES-Fusion Graph");
+            //System.out.println(this.currentGraph);
 
-        // 5. Fusion
-        fusion();
-        System.out.println("BES-Fusion Graph");
-        System.out.println(this.currentGraph);
+            // 4. BES
+            try {
+                besStage();
+            } catch (InterruptedException e) {
+                System.err.println("Error in BES Stage");
+                e.printStackTrace();
+            }
+            // Printing
+            System.out.println("Results of BES: ");
+            for (Dag dag : this.graphs) {
+                System.out.println(dag);
+            }
 
-        // Iterate
+            // 5. Fusion
+            fusion();
+            System.out.println("Final Graph " + "("+ it + ")");
+            System.out.println(this.currentGraph);
+
+            // 6. Preparing for the next iteration
+            if (it >= this.maxIterations){
+                break;
+            }
+            it++;
+        }while(!convergence());
     }
 
 
@@ -400,7 +429,7 @@ public class Main
 
     public static void main(String[] args){
         // 1. Read Data
-        String path = "src/test/resources/cancer.xbif_.csv";
+        String path = "src/test/resources/alarm.xbif_.csv";
         int maxIteration = 15;
         Main main = new Main(path, 2);
         main.setMaxIterations(maxIteration);
