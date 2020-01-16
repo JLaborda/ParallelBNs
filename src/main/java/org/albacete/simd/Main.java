@@ -329,7 +329,7 @@ public class Main
 
         // 3. Fusion
         fusion();
-        System.out.println("Fusion Graph");
+        System.out.println("FES-Fusion Graph");
         System.out.println(this.currentGraph);
 
         // 4. BES
@@ -339,12 +339,16 @@ public class Main
             System.err.println("Error in BES Stage");
             e.printStackTrace();
         }
+        // Printing
         System.out.println("Results of BES: ");
         for(Dag dag : this.graphs){
             System.out.println(dag);
         }
 
         // 5. Fusion
+        fusion();
+        System.out.println("BES-Fusion Graph");
+        System.out.println(this.currentGraph);
 
         // Iterate
     }
