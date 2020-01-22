@@ -324,4 +324,32 @@ public class MainTest
             }
         }
     }
+
+    @Test
+    public void searchCancerTest() throws InterruptedException {
+        //Arrange
+        String path = "src/test/resources/cancer.xbif_.csv";
+        Main main = new Main(path, 2);
+
+        //Expectation
+        List<Node> nodes = Arrays.asList(cancer, dyspnoea, pollution, xray, smoker);
+        EdgeListGraph expectation = new EdgeListGraph(nodes);
+        expectation.addDirectedEdge(cancer, dyspnoea);
+        expectation.addDirectedEdge(cancer, xray);
+        expectation.addDirectedEdge(pollution, cancer);
+        expectation.addDirectedEdge(smoker, cancer);
+
+        // Act
+        main.search();
+
+        //Assert
+        assertEquals(expectation, main.getCurrentGraph());
+
+    }
+
+    @Test
+    public void mainExecutesTest(){
+        Main.main(null);
+    }
+
 }

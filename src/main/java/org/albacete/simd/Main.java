@@ -31,7 +31,7 @@ public class Main
     private Graph previousGraph = null;
     // private Scorer scorer = null;
     // private int it = 1;
-
+    private int it = 1;       // Iteration counter
     private TupleNode[] listOfArcs;
 
 
@@ -313,28 +313,31 @@ public class Main
 
     /**
      * Convergence function that checks if the previous graph and the current graph are equal or not.
-     * @return true if there is convergence, false otherwise.
+     * @return true if there is convergence, false if not.
+     * @throws InterruptedException Causes by thread interruptions.
      */
-    private boolean convergence(){
-        if(previousGraph == null)
-            return false;
-
-        if(previousGraph.equals(currentGraph)){
+    private boolean convergence() throws InterruptedException {
+        // Checking Iterations
+        if (it > this.maxIterations)
             return true;
+        it++;
+
+        // Checking that the threads have done something
+        for(int i=0; i<this.nThreads; i++) {
+            if (this.gesThreads[i].getFlag()) {
+                return false;
+            }
         }
-        else{
-            this.previousGraph = new EdgeListGraph(this.currentGraph);
-            return false;
-        }
+        return true;
+
     }
 
     /**
      * Main steps of the algorithm
      */
-    public void search(){
+    public void search() throws InterruptedException {
 
-        // Iteration counter
-        int it = 1;
+
         // 1. Calculating Edges
         calculateArcs();
         splitArcs();
@@ -374,11 +377,7 @@ public class Main
             System.out.println("Final Graph " + "("+ it + ")");
             System.out.println(this.currentGraph);
 
-            // 6. Preparing for the next iteration
-            if (it >= this.maxIterations){
-                break;
-            }
-            it++;
+            // 6. Checking convergence and preparing configurations for the next iteration
         }while(!convergence());
     }
 
@@ -426,17 +425,32 @@ public class Main
         return this.graphs;
     }
 
+    public Graph getCurrentGraph(){
+        return this.currentGraph;
+    }
+
+    public int getIterations(){
+        return it;
+    }
+
 
     public static void main(String[] args){
         // 1. Read Data
-        String path = "src/test/resources/alarm.xbif_.csv";
+        String path = "src/test/resources/cancer.xbif_.csv";
         int maxIteration = 15;
         Main main = new Main(path, 2);
         main.setMaxIterations(maxIteration);
         main.setnFESItInterleaving(5);
         main.setnBESItInterleaving(5);
+
         // Running Algorithm
-        main.search();
+        try {
+            main.search();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Number of Iterations: " + main.getIterations());
+        System.out.println("Resulting Graph: " + main.getCurrentGraph());
 
     }
 
