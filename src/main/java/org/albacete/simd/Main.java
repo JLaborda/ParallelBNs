@@ -28,10 +28,10 @@ public class Main
     private ArrayList<TupleNode>[] subSets = null;
     private ArrayList<Dag> graphs = null;
     private Graph currentGraph = null;
-    // private Graph previousGraph = null;
+    private Graph previousGraph = null;
     // private Scorer scorer = null;
     // private int it = 1;
-
+    private int it = 1;       // Iteration counter
     private TupleNode[] listOfArcs;
 
 
@@ -106,7 +106,7 @@ public class Main
     @SuppressWarnings("unchecked")
     private void initialize(int nThreads){
         this.nThreads = nThreads;
-        DataSet[] samples = new DataSet[this.nThreads];
+        //DataSet[] samples = new DataSet[this.nThreads];
         this.gesThreads = new ThFES[this.nThreads];
         this.threads = new Thread[this.nThreads];
         this.subSets = new ArrayList[this.nThreads];
@@ -252,7 +252,7 @@ public class Main
             // Adding the new dag to the graph list
             this.graphs.add(gdag);
 
-            System.out.println("Graph of Thread " + (i +1) + ": \n" + gdag);
+            //System.out.println("Graph of Thread " + (i +1) + ": \n" + gdag);
 
         }
 
@@ -312,45 +312,73 @@ public class Main
 
 
     /**
+     * Convergence function that checks if the previous graph and the current graph are equal or not.
+     * @return true if there is convergence, false if not.
+     * @throws InterruptedException Causes by thread interruptions.
+     */
+    private boolean convergence() throws InterruptedException {
+        // Checking Iterations
+        if (it > this.maxIterations)
+            return true;
+        it++;
+
+        // Checking that the threads have done something
+        for(int i=0; i<this.nThreads; i++) {
+            if (this.gesThreads[i].getFlag()) {
+                return false;
+            }
+        }
+        return true;
+
+    }
+
+    /**
      * Main steps of the algorithm
      */
-    public void search(){
+    public void search() throws InterruptedException {
+
+
         // 1. Calculating Edges
         calculateArcs();
         splitArcs();
 
-        // 2. FES
-        try {
-            fesStage();
-        } catch (InterruptedException e) {
-            System.err.println("Error in FES Stage");
-            e.printStackTrace();
-        }
+        do {
+            System.out.println("-----------------------");
+            System.out.println("Iteration: " + (it));
 
-        // 3. Fusion
-        fusion();
-        System.out.println("FES-Fusion Graph");
-        System.out.println(this.currentGraph);
+            // 2. FES
+            try {
+                fesStage();
+            } catch (InterruptedException e) {
+                System.err.println("Error in FES Stage");
+                e.printStackTrace();
+            }
 
-        // 4. BES
-        try{
-            besStage();
-        } catch (InterruptedException e){
-            System.err.println("Error in BES Stage");
-            e.printStackTrace();
-        }
-        // Printing
-        System.out.println("Results of BES: ");
-        for(Dag dag : this.graphs){
-            System.out.println(dag);
-        }
+            // 3. Fusion
+            fusion();
+            //System.out.println("FES-Fusion Graph");
+            //System.out.println(this.currentGraph);
 
-        // 5. Fusion
-        fusion();
-        System.out.println("BES-Fusion Graph");
-        System.out.println(this.currentGraph);
+            // 4. BES
+            try {
+                besStage();
+            } catch (InterruptedException e) {
+                System.err.println("Error in BES Stage");
+                e.printStackTrace();
+            }
+            // Printing
+            System.out.println("Results of BES: ");
+            for (Dag dag : this.graphs) {
+                System.out.println(dag);
+            }
 
-        // Iterate
+            // 5. Fusion
+            fusion();
+            System.out.println("Final Graph " + "("+ it + ")");
+            System.out.println(this.currentGraph);
+
+            // 6. Checking convergence and preparing configurations for the next iteration
+        }while(!convergence());
     }
 
 
@@ -397,6 +425,14 @@ public class Main
         return this.graphs;
     }
 
+    public Graph getCurrentGraph(){
+        return this.currentGraph;
+    }
+
+    public int getIterations(){
+        return it;
+    }
+
 
     public static void main(String[] args){
         // 1. Read Data
@@ -406,8 +442,15 @@ public class Main
         main.setMaxIterations(maxIteration);
         main.setnFESItInterleaving(5);
         main.setnBESItInterleaving(5);
+
         // Running Algorithm
-        main.search();
+        try {
+            main.search();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Number of Iterations: " + main.getIterations());
+        System.out.println("Resulting Graph: " + main.getCurrentGraph());
 
     }
 
