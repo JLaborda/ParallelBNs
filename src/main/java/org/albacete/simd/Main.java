@@ -278,8 +278,10 @@ public class Main
         this.graphs = new ArrayList<>();
         this.gesThreads = new GESThread[this.nThreads];
 
+        // Rearraging the subsets, so that the BES stage only deletes edges in the current graph.
+        ArrayList<TupleNode>[] subsets_BES = Utils.splitArcs(this.currentGraph.getEdges(), this.nThreads, this.seed);
         for (int i = 0; i < this.nThreads; i++) {
-            this.gesThreads[i] = new ThBES(this.data, this.currentGraph, this.subSets[i], this.nBESItInterleaving);
+            this.gesThreads[i] = new ThBES(this.data, this.currentGraph, subsets_BES[i]);
         }
 
         // Initializing thread config

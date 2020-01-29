@@ -86,7 +86,7 @@ public class ThBESTest {
         thread1.run();
         Graph graph = thread1.getCurrentGraph();
         // Act
-        ThBES thread2 = new ThBES(dataset, graph, subset1, 15);
+        ThBES thread2 = new ThBES(dataset, graph, subset1);
         // Arrange
         assertNotNull(thread2);
     }
@@ -141,7 +141,7 @@ public class ThBESTest {
         System.out.println(fusionGraph);
 
 
-        ThBES thread1 = new ThBES(dataset, fusionGraph, subset1, 15);
+        ThBES thread1 = new ThBES(dataset, fusionGraph, subset1);
         //ThBES thread2 = new ThBES(dataset, fusionGraph, subset2, 15);
 
         List<Edge> expected = new ArrayList<>();
