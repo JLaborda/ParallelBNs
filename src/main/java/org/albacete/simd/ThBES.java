@@ -19,13 +19,11 @@ public class ThBES extends GESThread {
      * @param dataSet data of the problem
      * @param initialDag initial DAG with which the FES stage starts with, if it's null, use the other constructor
      * @param subset subset of edges the fes stage will try to add to the resulting graph
-     * @param maxIt maximum number of iterations allowed in the fes stage
      */
-    public ThBES(DataSet dataSet, Graph initialDag, ArrayList<TupleNode> subset, int maxIt) {
+    public ThBES(DataSet dataSet, Graph initialDag, ArrayList<TupleNode> subset) {
         setDataSet(dataSet);
         setInitialDag(initialDag);
         setSubSetSearch(subset);
-        setMaxIt(maxIt);
         cases=new int[dataSet.getNumRows()][dataSet.getNumColumns()];
         for(int i=0;i<dataSet.getNumRows();i++) {
             for(int j=0;j<dataSet.getNumColumns();j++) {
@@ -102,7 +100,7 @@ public class ThBES extends GESThread {
         // Calling fs to calculate best edge to add.
         bestDelete = bs(graph,bestScore);
 
-        while((x_d != null) && (it < this.maxIt)){
+        while(x_d != null){
             // Changing best score because x_d, and y_d are not null
             bestScore = bestDelete;
 
