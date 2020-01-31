@@ -77,12 +77,13 @@
       <version>1.0</version>
     </dependency>
 
+    <!--librería de Tetrad manipulado por José Miguel Puerta-->
     <dependency>
-      <groupId>jmptetrad</groupId>
-      <artifactId>jmptetrad</artifactId>
+      <groupId>fusion</groupId>
+      <artifactId>fusion</artifactId>
       <scope>system</scope>
-      <version>1.0</version>
-      <systemPath>${basedir}/src/lib/jmptetrad.jar</systemPath>
+      <version>2.0</version>
+      <systemPath>${basedir}/src/lib/fusion.jar</systemPath>
     </dependency>
 
     <dependency>
