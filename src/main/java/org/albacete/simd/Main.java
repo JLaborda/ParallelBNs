@@ -33,6 +33,7 @@ public class Main
     // private int it = 1;
     private int it = 1;       // Iteration counter
     private TupleNode[] listOfArcs;
+    Random random = new Random(seed);
 
 
 /* Unused structures (Used in experimentation)
@@ -143,7 +144,6 @@ public class Main
     public void splitArcs(){
         // Shuffling arcs
         List<TupleNode> shuffledArcs = Arrays.asList(listOfArcs);
-        Random random = new Random(seed);
         Collections.shuffle(shuffledArcs, random);
 
         // Splitting Arcs into subsets
@@ -320,17 +320,19 @@ public class Main
      */
     private boolean convergence() throws InterruptedException {
         // Checking Iterations
-        if (it > this.maxIterations)
+        if (it >= this.maxIterations)
             return true;
-        it++;
 
         // Checking that the threads have done something
-        for(int i=0; i<this.nThreads; i++) {
+        // BUG:
+        /*for(int i=0; i<this.nThreads; i++) {
             if (this.gesThreads[i].getFlag()) {
+                it++;
                 return false;
             }
-        }
-        return true;
+        }*/
+        it++;
+        return false;
 
     }
 
@@ -342,11 +344,13 @@ public class Main
 
         // 1. Calculating Edges
         calculateArcs();
-        splitArcs();
 
         do {
             System.out.println("-----------------------");
             System.out.println("Iteration: " + (it));
+
+            //1.5 Random Repartitioning
+            splitArcs();
 
             // 2. FES
             try {
@@ -388,6 +392,7 @@ public class Main
 
     public void setSeed(long seed) {
         this.seed = seed;
+        this.random = new Random(seed);
     }
 
     public long getSeed(){
