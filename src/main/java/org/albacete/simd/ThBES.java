@@ -22,7 +22,7 @@ public class ThBES extends GESThread {
      */
     public ThBES(DataSet dataSet, Graph initialDag, ArrayList<TupleNode> subset) {
         setDataSet(dataSet);
-        setInitialDag(initialDag);
+        setInitialGraph(initialDag);
         setSubSetSearch(subset);
         cases=new int[dataSet.getNumRows()][dataSet.getNumColumns()];
         for(int i=0;i<dataSet.getNumRows();i++) {

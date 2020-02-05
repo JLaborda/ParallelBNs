@@ -26,7 +26,7 @@ public class ThFES extends GESThread{
      */
     public ThFES(DataSet dataSet,Graph initialDag, ArrayList<TupleNode> subset,int maxIt) {
         setDataSet(dataSet);
-        setInitialDag(initialDag);
+        setInitialGraph(initialDag);
         setSubSetSearch(subset);
         setMaxIt(maxIt);
         cases=new int[dataSet.getNumRows()][dataSet.getNumColumns()];
