@@ -33,18 +33,17 @@ public class ThBES extends GESThread {
         nValues=new int[dataSet.getNumColumns()];
         for(int i=0;i<dataSet.getNumColumns();i++)
             nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
-        initialize();
-    }
 
-
-    private void initialize() {
+        // Setting structure prior and sample prior
         setStructurePrior(0.001);
         setSamplePrior(10.0);
     }
 
-
-
     @Override
+    /*
+      Run method from {@link Thread Thread} interface. The method executes the {@link #search()} search} method to remove
+      edges from the initial graph.
+     */
     public void run() {
         this.currentGraph = search();
     }
@@ -66,7 +65,7 @@ public class ThBES extends GESThread {
         double score = scoreGraph(graph);
 
         // Do backward search.
-        score = bes(graph, score);//iges(graph, score);
+        score = bes(graph, score);
 
         long endTime = System.currentTimeMillis();
         this.elapsedTime = endTime - startTime;
@@ -94,7 +93,6 @@ public class ThBES extends GESThread {
         x_d = null;
         y_d = null;
         h_0 = null;
-        int it = 0;
 
         System.out.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
@@ -108,7 +106,7 @@ public class ThBES extends GESThread {
             delete(x_d,y_d,h_0, graph);
 
             // Checking cycles?
-            // boolean ciclos = graph.existsDirectedCycle();
+            // boolean cycles = graph.existsDirectedCycle();
 
             //PDAGtoCPDAG
             rebuildPattern(graph);
@@ -128,7 +126,6 @@ public class ThBES extends GESThread {
 
             // Indicating that the thread has added an edge to the graph
             this.flag = true;
-            it++;
 
             // Executing BS function to calculate the best edge to be added
             bestDelete = bs(graph,bestScore);
@@ -138,6 +135,13 @@ public class ThBES extends GESThread {
 
     }
 
+    /**
+     * BS method of the BES algorithm. It finds the best possible edge, alongside with the subset h_0 that is best suited
+     * for deletion in the current graph.
+     * @param graph current graph of the thread.
+     * @param initialScore score the current graph has.
+     * @return score of the best possible deletion found.
+     */
     private double bs(Graph graph, double initialScore){
         //   	System.out.println("\n** BACKWARD ELIMINATION SEARCH");
         //   	System.out.println("Initial Score = " + nf.format(initialScore));
@@ -147,7 +151,7 @@ public class ThBES extends GESThread {
 
         x_d = y_d = null;
         h_0 = null;
-        List<Edge> edges1 = graph.getEdges();
+
         List<Edge> edges = new ArrayList<>();
 
         for (TupleNode tupleNode : this.S) {
@@ -185,13 +189,13 @@ public class ThBES extends GESThread {
                     continue;
                 }
 
-                // INICIO TEST 1
+                // START TEST 1
                 List<Node> naYXH = findNaYX(_x, _y, graph);
                 naYXH.removeAll(hSubset);
                 if (!isClique(naYXH, graph)) {
                     continue;
                 }
-                // FIN TEST 1
+                // END TEST 1
 
                 bestScore = evalScore;
                 x_d = _x;
