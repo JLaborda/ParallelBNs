@@ -7,9 +7,13 @@ import java.util.*;
 public class Utils {
 
     /**
-     * Separates the set of possible arcs into as many subsets as threads we use to solve the problem
+     * Separates the set of possible arcs into as many subsets as threads we use to solve the problem.
+     * @param listOfArcs Array of {@link TupleNode TupleNode} of all the possible edges for the actual problem.
+     * @param numSplits The number of splits to do in the listOfArcs.
+     * @param seed The random seed used for the splits.
+     * @return The subsets of the listOfArcs in an ArrayList of TupleNode.
      */
-    public static ArrayList<TupleNode>[] splitArcs(TupleNode[] listOfArcs, int numSplits, long seed){
+    public static ArrayList<TupleNode>[] split(TupleNode[] listOfArcs, int numSplits, long seed){
 
 
         ArrayList<TupleNode>[] subSets = new ArrayList[numSplits];
@@ -41,15 +45,27 @@ public class Utils {
 
     }
 
-    public static ArrayList<TupleNode>[] splitArcs(List<Edge> edges, int numSplits, long seed){
+    /**
+     * Separates the set of possible arcs into as many subsets as threads we use to solve the problem.
+     * @param edges List of {@link Edge Edges} of all the possible edges for the actual problem.
+     * @param numSplits The number of splits to do in the listOfArcs.
+     * @param seed The random seed used for the splits.
+     * @return The subsets of the listOfArcs in an ArrayList of TupleNode.
+     */
+    public static ArrayList<TupleNode>[] split(List<Edge> edges, int numSplits, long seed){
         // Transforming edges into TupleNodes
         TupleNode[] listOfArcs = new TupleNode[edges.size()];
         for(int i=0; i<edges.size(); i++){
             listOfArcs[i] = edgeToTupleNode(edges.get(i));
         }
-        return splitArcs(listOfArcs, numSplits, seed);
+        return split(listOfArcs, numSplits, seed);
     }
 
+    /**
+     * Transforms an Edge into a TupleNode
+     * @param edge {@link Edge Edge} passed as argument to transform itself into a {@link TupleNode TupleNode}
+     * @return The corresponding {@link TupleNode TupleNode} of the edge.
+     */
     public static TupleNode edgeToTupleNode(Edge edge){
         return new TupleNode(edge.getNode1(), edge.getNode2());
     }
