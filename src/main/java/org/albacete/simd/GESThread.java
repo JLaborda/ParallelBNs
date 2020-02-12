@@ -227,10 +227,14 @@ public abstract class GESThread implements Runnable{
     }
 
     /**
-     * Find all nodes that are connected to Y by an undirected edge that are
+     * Find all the nodes that are connected to Y by an undirected edge that are
      * adjacent to X (that is, by undirected or directed edge) NOTE: very
      * inefficient implementation, since the current library does not allow
      * access to the adjacency list/matrix of the graph.
+     * @param x Node X
+     * @param y Node Y
+     * @param graph current graph of the problem
+     * @return List of nodes that are connected to Y and adjacent to X.
      */
     protected static List<Node> findNaYX(Node x, Node y, Graph graph) {
         List<Node> naYX = new LinkedList<>(graph.getAdjacentNodes(y));
