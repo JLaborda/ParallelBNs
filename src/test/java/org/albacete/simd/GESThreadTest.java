@@ -26,7 +26,7 @@ public class GESThreadTest {
     /**
      * Dataset created from the data file
      */
-    final DataSet dataset = Main.readData(path);
+    final DataSet dataset = Utils.readData(path);
     /**
      * Variable X-Ray
      */

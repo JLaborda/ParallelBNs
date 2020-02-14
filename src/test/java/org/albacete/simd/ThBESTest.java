@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class ThBESTest {
     //Nodes of Cancer Network
     final String path = "src/test/resources/cancer.xbif_.csv";
-    final DataSet dataset = Main.readData(path);
+    final DataSet dataset = Utils.readData(path);
     final Node xray = dataset.getVariable("Xray");
     final Node dyspnoea = dataset.getVariable("Dyspnoea");
     final Node cancer = dataset.getVariable("Cancer");

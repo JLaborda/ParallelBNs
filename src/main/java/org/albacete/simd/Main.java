@@ -103,31 +103,10 @@ public class Main
      * @param nThreads number of threads of the problem
      */
     public Main(String path, int nThreads){
-        this.data = readData(path);
+        this.data = Utils.readData(path);
         initialize(nThreads);
     }
 
-    /**
-     * Stores the data from a csv as a DataSet object.
-     * @param path
-     * Path to the csv file.
-     * @return DataSet containing the data from the csv file.
-     */
-    public static DataSet readData(String path){
-        // Initial Configuration
-        DataReader reader = new DataReader();
-        reader.setDelimiter(DelimiterType.COMMA);
-        reader.setMaxIntegralDiscrete(100);
-        DataSet dataSet = null;
-        // Reading data
-        try {
-            dataSet = reader.parseTabular(new File(path));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return dataSet;
-    }
 
     /**
      * Initializes the general parameters of the class.
@@ -171,36 +150,8 @@ public class Main
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem
      */
     public void splitArcs(){
-        // Shuffling arcs
-        List<TupleNode> shuffledArcs = Arrays.asList(listOfArcs);
-        Collections.shuffle(shuffledArcs, random);
 
-        // Splitting Arcs into subsets
-        int n = 0;
-        for(int s = 0; s< subSets.length-1; s++){
-            ArrayList<TupleNode> sub = new ArrayList<>();
-            for(int i = 0; i < Math.floorDiv(shuffledArcs.size(),this.nThreads) ; i++){
-                sub.add(shuffledArcs.get(n));
-                n++;
-            }
-            this.subSets[s] = sub;
-        }
-
-        // Adding leftovers
-        ArrayList<TupleNode> sub = new ArrayList<>();
-        for(int i = n; i < shuffledArcs.size(); i++ ){
-            sub.add(shuffledArcs.get(i));
-        }
-        this.subSets[this.subSets.length-1] = sub;
-
-        // Debugging
-        for (int i = 0; i < subSets.length; i++){
-            System.out.println("Subset " + i);
-            for( TupleNode tuple : subSets[i]){
-                System.out.print(tuple + ", ");
-            }
-            System.out.print("\n");
-        }
+        this.subSets = Utils.split(listOfArcs, nThreads, seed);
 
     }
 
@@ -398,7 +349,7 @@ public class Main
             System.out.println("Iteration: " + (it));
 
             // 2 Random Repartitioning
-            splitArcs();
+            this.subSets = Utils.split(listOfArcs, nThreads, seed);
 
             // 3. FES
             try {

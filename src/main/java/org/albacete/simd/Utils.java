@@ -1,7 +1,12 @@
 package org.albacete.simd;
 
+import edu.cmu.tetrad.data.DataReader;
+import edu.cmu.tetrad.data.DataSet;
+import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Edge;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class Utils {
@@ -69,6 +74,29 @@ public class Utils {
     public static TupleNode edgeToTupleNode(Edge edge){
         return new TupleNode(edge.getNode1(), edge.getNode2());
     }
+
+    /**
+     * Stores the data from a csv as a DataSet object.
+     * @param path
+     * Path to the csv file.
+     * @return DataSet containing the data from the csv file.
+     */
+    public static DataSet readData(String path){
+        // Initial Configuration
+        DataReader reader = new DataReader();
+        reader.setDelimiter(DelimiterType.COMMA);
+        reader.setMaxIntegralDiscrete(100);
+        DataSet dataSet = null;
+        // Reading data
+        try {
+            dataSet = reader.parseTabular(new File(path));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return dataSet;
+    }
+
 
 
 }

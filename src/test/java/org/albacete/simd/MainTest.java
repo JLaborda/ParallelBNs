@@ -56,7 +56,7 @@ public class MainTest
     public void constructorTest(){
         // Arrange
         String path = "src/test/resources/cancer.xbif_.csv";
-        DataSet dataset = Main.readData(path);
+        DataSet dataset = Utils.readData(path);
         int num_cols = 5;
 
         // Act
@@ -326,7 +326,7 @@ public class MainTest
     }
 
     @Test
-    public void searchCancerTest() throws InterruptedException {
+    public void searchCancerTest(){
         //Arrange
         String path = "src/test/resources/cancer.xbif_.csv";
         Main main = new Main(path, 2);
