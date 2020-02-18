@@ -16,19 +16,50 @@ import static org.junit.Assert.*;
  */
 public class MainTest
 {
+    /**
+     * String containing the path to the data used in the test. The data used in these tests is made by sampling the
+     * cancer Bayesian Network @see
+     * <a href="https://www.bnlearn.com/bnrepository/discrete-small.html">https://www.bnlearn.com/bnrepository/discrete-small.html</a>
+     */
+    final String path = "src/test/resources/cancer.xbif_.csv";
+    /**
+     * Dataset created from the data file
+     */
+    final DataSet dataset = Utils.readData(path);
+    /**
+     * Variable X-Ray
+     */
+    final Node xray = dataset.getVariable("Xray");
+    /**
+     * Variable Dysponea
+     */
+    final Node dyspnoea = dataset.getVariable("Dyspnoea");
+    /**
+     * Variabe Cancer
+     */
+    final Node cancer = dataset.getVariable("Cancer");
+    /**
+     * Variable Pollution
+     */
+    final Node pollution = dataset.getVariable("Pollution");
+    /**
+     * Variable Smoker
+     */
+    final Node smoker = dataset.getVariable("Smoker");
 
-
-    //Nodes of Cancer Network
-    final Node xray = new GraphNode("Xray");
-    final Node dyspnoea = new GraphNode("Dyspnoea");
-    final Node cancer = new GraphNode ("Cancer");
-    final Node pollution = new GraphNode("Pollution");
-    final Node smoker = new GraphNode("Smoker");
-
+    /**
+     * Subset1 of pairs of nodes or variables.
+     */
     final ArrayList<TupleNode> subset1 = new ArrayList<>();
+    /**
+     * Subset2 of pairs of nodes or variables.
+     */
     final ArrayList<TupleNode> subset2 = new ArrayList<>();
 
 
+    /**
+     * This method initializes the subsets, splitting the nodes in what is expected to happen when the seed is 42
+     */
     private void initializeSubsets(){
         // Seed used for arc split is 42
 
@@ -50,13 +81,12 @@ public class MainTest
     }
 
     /**
-     * Testing constructors
+     * Testing both possible constructors of the Main class
+     * @result Both objects should have the same dataset stored in it.
      */
     @Test
     public void constructorTest(){
         // Arrange
-        String path = "src/test/resources/cancer.xbif_.csv";
-        DataSet dataset = Utils.readData(path);
         int num_cols = 5;
 
         // Act
@@ -73,12 +103,12 @@ public class MainTest
     }
 
     /**
-     * Testing csv reading
+     * Testing that the csv read is correct
+     * @result The resulting DataSet should be the one corresponding to the cancer DataSet.
      */
     @Test
     public void readDataTest(){
         //Arrange
-        String path = "src/test/resources/cancer.xbif_.csv";
         int num_cols = 5;
         List<Node> columns = new ArrayList<>(Arrays.asList(xray, dyspnoea, cancer, pollution, smoker));
         //Act
@@ -92,21 +122,26 @@ public class MainTest
         }
     }
 
+    /**
+     * When an incorrect path is passed to the Main constructor, an exception should be thrown
+     * @result An exception is thrown caused by an incorrect path.
+     */
     @Test(expected = Exception.class)
     public void exceptionReadDataTest(){
         String path = "";
         //noinspection unused
         Main main = new Main(path, 1);
+        fail();
     }
 
     /**
      * Testing that all the possible arcs from a dataset are generated.
      * We check the size and the equality of the resulting arcs with its expected set.
+     * @result The arcs should be the same as the expected set of TupleNodes.
      */
     @Test
     public void calculateArcsTest(){
         // Arrange
-        String path = "src/test/resources/cancer.xbif_.csv";
         Main main = new Main(path, 1);
 
         TupleNode[] expected = new TupleNode[]{new TupleNode(xray, dyspnoea), new TupleNode(xray, cancer), new TupleNode(xray, pollution), new TupleNode(xray, smoker),
@@ -133,12 +168,12 @@ public class MainTest
     }
 
     /**
-     * Testing that the arcs have been splitted correctly
+     * Testing that the arcs have been divided correctly.
+     * @result Each arc is only once in a subset.
      */
     @Test
     public void splitArcsTest(){
         // Arrange
-        String path = "src/test/resources/cancer.xbif_.csv";
         Main main = new Main(path, 2);
 
         // Act
@@ -157,13 +192,13 @@ public class MainTest
             // Double pairs
             assertEquals(1, counter);
         }
-
-
     }
 
     /**
-     * Tests the fes stage for two threads and the subsets of cancer splitted with a seed of 42
+     * Tests the fes stage for two threads with the subsets of cancer divided into two, with a seed equal to 42.
      * @throws InterruptedException Exception caused by interruption of the threads.
+     * @result The FES stage executes correctly, and the resulting graphs are the same all the times.
+     *
      */
     @Test
     public void fesStageTest() throws InterruptedException {
@@ -199,11 +234,14 @@ public class MainTest
     }
 
 
+    /**
+     * Testing the setter and getter of MaxIterations
+     * @result MaxIterations is changed to 21 and obtained as such.
+     */
     @Test
     public void setgetMaxIterations(){
         // Arrange
         int expected = 21;
-        String path = "src/test/resources/cancer.xbif_.csv";
         Main main = new Main(path, 1);
         // Act
         main.setMaxIterations(21);
@@ -212,11 +250,14 @@ public class MainTest
         assertEquals(expected, actual);
     }
 
+    /**
+     * Testing the setter and getter of Seed
+     * @result Seed is changed to 21 and obtained as such.
+     */
     @Test
     public void setgetSeedTest(){
         // Arrange
         long newSeed = 21;
-        String path = "src/test/resources/cancer.xbif_.csv";
         Main main = new Main(path, 1);
         // Act
         main.setSeed(newSeed);
@@ -224,10 +265,14 @@ public class MainTest
         assertEquals(newSeed, main.getSeed());
     }
 
+    /**
+     * Testing the fusion method. The fusion should combine the graphs generated in the FES stage into a single DAG.
+     * @result The resulting Graph should have the same nodes and edges as the expected graph.
+     * @throws InterruptedException Caused by an external interruption.
+     */
     @Test
     public void fusionTest() throws InterruptedException {
         // Arrange
-        String path = "src/test/resources/cancer.xbif_.csv";
         Main main = new Main(path, 2);
 
         List<Node> nodes = new ArrayList<>();
@@ -294,6 +339,11 @@ public class MainTest
 
     }
 
+    /**
+     * Tests that the bes stage works, and in this case, it doesn't delete any edge added in the fes stage.
+     * @result The bes stage doesn't delete any edge from the resulting fusion graph.
+     * @throws InterruptedException External interruption.
+     */
     @Test
     public void besStageTest() throws InterruptedException {
         // Arrange
@@ -306,7 +356,6 @@ public class MainTest
         expected.add(new Edge(smoker, cancer, Endpoint.TAIL, Endpoint.ARROW));
 
         // Creating main
-        String path = "src/test/resources/cancer.xbif_.csv";
         Main main = new Main(path, 2);
         main.calculateArcs();
         main.splitArcs();
@@ -325,10 +374,13 @@ public class MainTest
         }
     }
 
+    /**
+     * Tests the search method of the Main class.
+     * @result The resulting graph is equal to the expected graph for the cancer dataset.
+     */
     @Test
     public void searchCancerTest(){
         //Arrange
-        String path = "src/test/resources/cancer.xbif_.csv";
         Main main = new Main(path, 2);
 
         //Expectation
@@ -347,7 +399,11 @@ public class MainTest
 
     }
 
-    @Test
+    /**
+     * Executes the main function in order to see that everything is working, and that no exceptions are being thrown.
+     * @result No exception is thrown.
+     */
+    @Test(expected = Test.None.class)
     public void mainExecutesTest(){
         Main.main(null);
     }
