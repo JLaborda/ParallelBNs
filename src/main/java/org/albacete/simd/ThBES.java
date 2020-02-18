@@ -39,11 +39,11 @@ public class ThBES extends GESThread {
         setSamplePrior(10.0);
     }
 
-    @Override
-    /*
-      Run method from {@link Thread Thread} interface. The method executes the {@link #search()} search} method to remove
-      edges from the initial graph.
+    /**
+    Run method from {@link Runnable Runnable} interface. The method executes the {@link #search()} search} method to remove
+    edges from the initial graph.
      */
+    @Override
     public void run() {
         this.currentGraph = search();
     }

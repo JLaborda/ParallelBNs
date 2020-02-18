@@ -79,6 +79,9 @@ public class ThFES extends GESThread{
     }
 
 
+
+    //===========================PRIVATE METHODS========================//
+
     /**
      * Greedy equivalence search: Start from the empty graph, add edges till
      * model is significant. Then start deleting edges till a minimum is
@@ -108,10 +111,6 @@ public class ThFES extends GESThread{
 
     }
 
-
-    //===========================PRIVATE METHODS========================//
-
-
     /**
      * Forward equivalence search.
      *
@@ -132,13 +131,13 @@ public class ThFES extends GESThread{
         x_i = null;
         y_i = null;
         t_0 = null;
-        int it = 0;
+        iterations = 0;
 
         System.out.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
         bestInsert = fs(graph,bestScore);
 
-        while((x_i != null) && (it < this.maxIt)){
+        while((x_i != null) && (iterations < this.maxIt)){
             // Changing best score because x_i, and therefore, y_i is not null
             bestScore = bestInsert;
 
@@ -159,14 +158,14 @@ public class ThFES extends GESThread{
             bestScore = bestInsert;
 
             // Checking that the maximum number of edges has not been reached
-            if (getMaxNumEdges() != -1 && graph.getNumEdges() > getMaxNumEdges()) {
+            if (getMaxNumEdges() != -1 && graph.getNumEdges() >= getMaxNumEdges()) {
                 System.out.println("Maximum edges reached");
                 break;
             }
 
             // Indicating that the thread has added an edge to the graph
             this.flag = true;
-            it++;
+            iterations++;
 
             // Executing FS function to calculate the best edge to be added
             bestInsert = fs(graph,bestScore);

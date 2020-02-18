@@ -123,6 +123,10 @@ public abstract class GESThread implements Runnable{
     protected int maxIt;
 
     /**
+     * Total number of iterations done.
+     */
+    protected int iterations = 0;
+    /**
      * Node X from the edge X->Y that can be inserted in the graph.
      */
     protected Node x_i;
@@ -701,6 +705,9 @@ public abstract class GESThread implements Runnable{
         return tNeighbors;
     }
 
+    public int getIterations(){
+        return this.iterations;
+    }
 
 
 

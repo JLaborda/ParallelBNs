@@ -4,6 +4,7 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Edge;
+import edu.cmu.tetrad.graph.Node;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +75,34 @@ public class Utils {
     public static TupleNode edgeToTupleNode(Edge edge){
         return new TupleNode(edge.getNode1(), edge.getNode2());
     }
+
+    /**
+     * Calculates the amount of possible arcs between the variables of the dataset and stores it.
+     * @param data DataSet used to calculate the arcs between its columns (nodes).
+     */
+    public static TupleNode[] calculateArcs(DataSet data){
+        //0. Accumulator
+        TupleNode[] listOfArcs = new TupleNode[data.getNumColumns() * (data.getNumColumns() -1) / 2];
+        //1. Get edges (variables)
+        List<Node> variables = data.getVariables();
+        int index = 0;
+        //2. Iterate over variables and save pairs
+        for(int i=0; i<data.getNumColumns()-1; i++){
+            for(int j=i+1; j<data.getNumColumns(); j++){
+                // Getting pair of variables
+                Node var_A = variables.get(i);
+                Node var_B = variables.get(j);
+                //3. Storing both pairs
+                // Maybe we can use Edge object
+                listOfArcs[index] = new TupleNode(var_A,var_B);
+                index++;
+                //this.listOfArcs[index] = new TupleNode(var_B,var_A);
+                //index++;
+            }
+        }
+        return listOfArcs;
+    }
+
 
     /**
      * Stores the data from a csv as a DataSet object.

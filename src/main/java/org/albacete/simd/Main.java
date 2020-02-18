@@ -127,25 +127,8 @@ public class Main
      * Calculates the amount of possible arcs between the variables of the dataset and stores it.
      */
     public void calculateArcs(){
-        //1. Get edges (variables)
-        List<Node> variables = data.getVariables();
-        int index = 0;
-        //2. Iterate over variables and save pairs
-        for(int i=0; i<data.getNumColumns()-1; i++){
-            for(int j=i+1; j<data.getNumColumns(); j++){
-                // Getting pair of variables
-                Node var_A = variables.get(i);
-                Node var_B = variables.get(j);
-                //3. Storing both pairs
-                // Maybe we can use Edge object
-                this.listOfArcs[index] = new TupleNode(var_A,var_B);
-                index++;
-                //this.listOfArcs[index] = new TupleNode(var_B,var_A);
-                //index++;
-            }
-        }
+        this.listOfArcs = Utils.calculateArcs(this.data);
     }
-
     /**
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem
      */
@@ -330,7 +313,7 @@ public class Main
     }
 
     /**
-     * Executes the algorithm. It has 7 steps. The first step is to calculate the arcs ({@link #calculateArcs()} calculateArcs),
+     * Executes the algorithm. It has 7 steps. The first step is to calculate the arcs ({@link Utils calculateArcs} calculateArcs),
      * next, it enters a loop where at the start of each iteration a random repartition is done ({@link #splitArcs()} splitArcs),
      * then, the {@link #fesStage() fesStage} is executed. Once it has finished, a {@link #fusion() fusion} is done, joining
      * all of the DAGs obtained in the previous stage. The next step is the {@link #besStage() besStage}, in each subset,
@@ -342,7 +325,7 @@ public class Main
 
 
         // 1. Calculating Edges
-        calculateArcs();
+        this.listOfArcs = Utils.calculateArcs(this.data);
 
         do {
             System.out.println("-----------------------");
