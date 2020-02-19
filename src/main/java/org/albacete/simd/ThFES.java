@@ -15,8 +15,6 @@ import consensusBN.PowerSetFabric;
 @SuppressWarnings("DuplicatedCode")
 public class ThFES extends GESThread{
 
-
-
     /**
      * Constructor of ThFES with an initial DAG
      * @param dataSet data of the problem
@@ -26,7 +24,7 @@ public class ThFES extends GESThread{
      */
     public ThFES(DataSet dataSet,Graph initialDag, ArrayList<TupleNode> subset,int maxIt) {
         setDataSet(dataSet);
-        setInitialDag(initialDag);
+        setInitialGraph(initialDag);
         setSubSetSearch(subset);
         setMaxIt(maxIt);
         cases=new int[dataSet.getNumRows()][dataSet.getNumColumns()];
@@ -38,10 +36,16 @@ public class ThFES extends GESThread{
         nValues=new int[dataSet.getNumColumns()];
         for(int i=0;i<dataSet.getNumColumns();i++)
             nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
-        initialize();
+        setStructurePrior(0.001);
+        setSamplePrior(10.0);
     }
 
-
+    /**
+     * Constructor of ThFES with an initial DataSet
+     * @param dataSet data of the problem.
+     * @param subset subset of edges the fes stage will try to add to the resulting graph
+     * @param maxIt maximum number of iterations allowed in the fes stage
+     */
     public ThFES(DataSet dataSet, ArrayList<TupleNode> subset,int maxIt) {
         setDataSet(dataSet);
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
@@ -56,7 +60,8 @@ public class ThFES extends GESThread{
         nValues=new int[dataSet.getNumColumns()];
         for(int i=0;i<dataSet.getNumColumns();i++)
             nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
-        initialize();
+        setStructurePrior(0.001);
+        setSamplePrior(10.0);
     }
 
 
@@ -64,11 +69,18 @@ public class ThFES extends GESThread{
     //==========================PUBLIC METHODS==========================//
 
 
-    // Thread method
+    @Override
+    /*
+      Run method from {@link Thread Thread} interface. The method executes the {@link #search()} search} method to add
+      edges to the initial graph.
+     */
     public void run(){
         this.currentGraph = search();
     }
 
+
+
+    //===========================PRIVATE METHODS========================//
 
     /**
      * Greedy equivalence search: Start from the empty graph, add edges till
@@ -90,21 +102,13 @@ public class ThFES extends GESThread{
         double score = scoreGraph(graph);
 
         // Do forward search.
-        score = fes(graph, score);//iges(graph, score);
+        score = fes(graph, score);
 
         long endTime = System.currentTimeMillis();
         this.elapsedTime = endTime - startTime;
         this.modelBDeu = score;
         return graph;
 
-    }
-
-
-    //===========================PRIVATE METHODS========================//
-
-    private void initialize() {
-        setStructurePrior(0.001);
-        setSamplePrior(10.0);
     }
 
     /**
@@ -127,13 +131,13 @@ public class ThFES extends GESThread{
         x_i = null;
         y_i = null;
         t_0 = null;
-        int it = 0;
+        iterations = 0;
 
         System.out.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
         bestInsert = fs(graph,bestScore);
 
-        while((x_i != null) && (it < this.maxIt)){
+        while((x_i != null) && (iterations < this.maxIt)){
             // Changing best score because x_i, and therefore, y_i is not null
             bestScore = bestInsert;
 
@@ -141,7 +145,7 @@ public class ThFES extends GESThread{
             insert(x_i,y_i,t_0, graph);
 
             // Checking cycles?
-            // boolean ciclos = graph.existsDirectedCycle();
+            // boolean cycles = graph.existsDirectedCycle();
 
             //PDAGtoCPDAG
             rebuildPattern(graph);
@@ -154,14 +158,14 @@ public class ThFES extends GESThread{
             bestScore = bestInsert;
 
             // Checking that the maximum number of edges has not been reached
-            if (getMaxNumEdges() != -1 && graph.getNumEdges() > getMaxNumEdges()) {
+            if (getMaxNumEdges() != -1 && graph.getNumEdges() >= getMaxNumEdges()) {
                 System.out.println("Maximum edges reached");
                 break;
             }
 
             // Indicating that the thread has added an edge to the graph
             this.flag = true;
-            it++;
+            iterations++;
 
             // Executing FS function to calculate the best edge to be added
             bestInsert = fs(graph,bestScore);
@@ -172,22 +176,22 @@ public class ThFES extends GESThread{
     }
 
     /**
-     * Forward search.
+     * Forward search. Finds the best possible edge to be added into the current graph and returns its score.
      *
      * @param graph The graph in the state prior to the forward equivalence
      *              search.
      * @param score The score in the state prior to the forward equivalence
      *              search
-     * @return the score in the state after the forward equivelance search.
+     * @return the score in the state after the forward equivalence search.
      *         Note that the graph is changed as a side-effect to its state after
-     *         the forward equivelance search.
+     *         the forward equivalence search.
      */
 
     private double fs(Graph graph, double score) {
         //       System.out.println("** FORWARD EQUIVALENCE SEARCH");
         //       System.out.println("Initial Score = " + nf.format(bestScore));
 
-// ------ Miramos el mejor FES ---
+// ------ Searching for the best FES ---
 
         double bestScore = score;
         PowerSetFabric.setMode(PowerSetFabric.MODE_FES);
@@ -217,7 +221,7 @@ public class ThFES extends GESThread{
             if (graph.isAdjacentTo(_x, _y)) {
                 continue;
             }
-// ---------------------------- chequea y evalua un enlace entre _x e _y-----------
+// ---------------------------- Checking and evaluating an edge between _x and _y-----------
             List<Node> tNeighbors = getSubsetOfNeighbors(_x, _y, graph);
             PowerSet tSubsets = PowerSetFabric.getPowerSet(_x, _y, tNeighbors);
 
@@ -234,7 +238,7 @@ public class ThFES extends GESThread{
                 List<Node> naYXT = new LinkedList<>(tSubset);
                 naYXT.addAll(findNaYX(_x, _y, graph));
 
-                // INICIO TEST 1
+                // START TEST 1
                 if (tSubset.firstTest == SubSet.TEST_NOT_EVALUATED) {
                     if (!isClique(naYXT, graph)) {
                         continue;
@@ -242,17 +246,17 @@ public class ThFES extends GESThread{
                 } else if (tSubset.firstTest == SubSet.TEST_FALSE) {
                     continue;
                 }
-                // FIN TEST 1
+                // END TEST 1
 
-                // INICIO TEST 2
+                // START TEST 2
                 if (tSubset.secondTest == SubSet.TEST_NOT_EVALUATED) {
                     if (!isSemiDirectedBlocked(_x, _y, naYXT, graph, new HashSet<>())) {
                         continue;
                     }
-                } else if (tSubset.secondTest == SubSet.TEST_FALSE) { // No puede ocurrir
+                } else if (tSubset.secondTest == SubSet.TEST_FALSE) { // This can't happen
                     continue;
                 }
-                // FIN TEST 2
+                // END TEST 2
 
                 bestScore = evalScore;
                 x_i = _x;
@@ -260,7 +264,7 @@ public class ThFES extends GESThread{
                 t_0 = tSubset;
             }
 
-            //.......................... hasta aqui se evalua un enlace.
+            //.......................... an edge is evaluated until here.
 
         }
 

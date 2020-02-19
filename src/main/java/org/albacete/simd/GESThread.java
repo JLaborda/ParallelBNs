@@ -8,11 +8,14 @@ import edu.cmu.tetrad.search.MeekRules;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.NumberFormatUtil;
 import edu.cmu.tetrad.util.ProbUtils;
-import org.albacete.simd.TupleNode;
 
 import java.text.NumberFormat;
 import java.util.*;
 
+/*
+  GESThread is an abstract class that encapsulates the common attributes and methods of the threads executed in both the FES
+  and BES stage. For future versions, there could be more types of threads other than {@link ThFES ThFES} and {@link ThBES ThBES}.
+ */
 @SuppressWarnings({"DuplicatedCode", "unused"})
 public abstract class GESThread implements Runnable{
     /**
@@ -88,7 +91,6 @@ public abstract class GESThread implements Runnable{
      */
     protected long elapsedTime;
 
-
     /**
      * True if cycles are to be aggressively prevented. May be expensive
      * for large graphs (but also useful for large graphs).
@@ -121,6 +123,10 @@ public abstract class GESThread implements Runnable{
     protected int maxIt;
 
     /**
+     * Total number of iterations done.
+     */
+    protected int iterations = 0;
+    /**
      * Node X from the edge X->Y that can be inserted in the graph.
      */
     protected Node x_i;
@@ -150,74 +156,14 @@ public abstract class GESThread implements Runnable{
      */
     protected SubSet h_0;
 
-
-
-
-    public void setMaxIt(int maxIt) {
-        this.maxIt = maxIt;
-    }
-
-
-    public void setSubSetSearch(ArrayList<TupleNode> subset) {
-        this.S=subset;
-
-    }
-
-    public void setInitialDag(Graph initialDag2) {
-        this.initialDag = new EdgeListGraph(initialDag2);
-    }
-
-
-    public boolean isAggressivelyPreventCycles() {
-        return this.aggressivelyPreventCycles;
-    }
-
-    public void setAggressivelyPreventCycles(boolean aggressivelyPreventCycles) {
-        this.aggressivelyPreventCycles = aggressivelyPreventCycles;
-    }
-
-    // Thread method
-    public synchronized boolean getFlag() throws InterruptedException{
-        // While searching is not complete, wait
-        while (currentGraph == null)
-            wait();
-        return this.flag;
-    }
-
-    // Thread method
-    public synchronized void resetFlag(){
-        this.flag = false;
-    }
-
-    public double getScoreBDeu() {
-        return this.modelBDeu;
-    }
-
-
     /**
-     * Get all nodes that are connected to Y by an undirected edge and not
-     * adjacent to X.
-     */
-    public static List<Node> getSubsetOfNeighbors(Node x, Node y, Graph graph) {
-        List<Node> tNeighbors = new LinkedList<>(graph.getAdjacentNodes(y));
-        tNeighbors.removeAll(graph.getAdjacentNodes(x));
-
-        for (int i = tNeighbors.size() - 1; i >= 0; i--) {
-            Node z = tNeighbors.get(i);
-            Edge edge = graph.getEdge(y, z);
-
-            if (!Edges.isUndirectedEdge(edge)) {
-                tNeighbors.remove(z);
-            }
-        }
-
-        return tNeighbors;
-    }
-
-
-    /**
-     * Evaluate the Insert(X, Y, T) operator (Definition 12 from Chickering,
-     * 2002).
+     * Evaluate the Insert(X, Y, T) operator (@see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf"> Definition 12 from Chickering 2002</a>,
+     * ).
+     * @param x First {@link Node Node} of the edge being considered to insert the graph.
+     * @param y Second {@link Node Node} of the edge being considered to insert the graph.
+     * @param t Set of {@link Node Nodes} to be considered when making the insertion.
+     * @param graph Current {@link Graph Graph} of the stage.
+     * @return Score difference of the insertion.
      */
     public double insertEval(Node x, Node y, Set<Node> t, Graph graph) {
         // set1 contains x; set2 does not.
@@ -229,10 +175,13 @@ public abstract class GESThread implements Runnable{
         return scoreGraphChange(y, set1, set2);
     }
 
-
     /**
-     * Do an actual insertion
-     * (Definition 12 from Chickering, 2002).
+     * Do an actual insertion of an edge.
+     * (@see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf"> Definition 12 from Chickering 2002</a>).
+     * @param x First {@link Node Node} of the edge being inserted into the graph.
+     * @param y Second {@link Node Node} of the edge being inserted into the graph.
+     * @param subset Set of {@link Node Nodes} that allow the insertion.
+     * @param graph Current {@link Graph Graph} of the stage where the edge will be inserted into.
      */
     public static void insert(Node x, Node y, Set<Node> subset, Graph graph) {
         graph.addDirectedEdge(x, y);
@@ -244,7 +193,11 @@ public abstract class GESThread implements Runnable{
     }
 
     /**
-     * Do an actual deletion (Definition 13 from Chickering, 2002).
+     * Do an actual deletion (@see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf"> Definition 13 from Chickering 2002</a>).
+     * @param x First {@link Node Node} of the edge being deleted from the graph.
+     * @param y Second {@link Node Node} of the edge being deleted from the graph.
+     * @param subset Set of {@link Node Nodes} that allow the deletion.
+     * @param graph Current {@link Graph Graph} of the stage where the edge will be deleted from.
      */
     public static void delete(Node x, Node y, Set<Node> subset, Graph graph) {
         graph.removeEdges(x, y);
@@ -259,10 +212,13 @@ public abstract class GESThread implements Runnable{
         }
     }
 
-
     /**
-     * Evaluate the Delete(X, Y, T) operator (Definition 12 from Chickering,
-     * 2002).
+     * Evaluate the Delete(X, Y, T) operator (@see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf"> Definition 13 from Chickering 2002</a>).
+     * @param x First {@link Node Node} of the edge being considered for deletion.
+     * @param y Second {@link Node Node} of the edge being considered for deletion.
+     * @param h Set of {@link Node Nodes} to be considered when making the deletion.
+     * @param graph Current {@link Graph Graph} of the stage.
+     * @return Score difference of the deletion.
      */
     protected double deleteEval(Node x, Node y, Set<Node> h, Graph graph) {
         Set<Node> set1 = new HashSet<>(findNaYX(x, y, graph));
@@ -274,14 +230,15 @@ public abstract class GESThread implements Runnable{
         return scoreGraphChange(y, set1, set2);
     }
 
-
-    //--Auxiliary methods.
-
     /**
-     * Find all nodes that are connected to Y by an undirected edge that are
+     * Find all the nodes that are connected to Y by an undirected edge that are
      * adjacent to X (that is, by undirected or directed edge) NOTE: very
      * inefficient implementation, since the current library does not allow
      * access to the adjacency list/matrix of the graph.
+     * @param x Node X
+     * @param y Node Y
+     * @param graph current graph of the problem
+     * @return List of nodes that are connected to Y and adjacent to X.
      */
     protected static List<Node> findNaYX(Node x, Node y, Graph graph) {
         List<Node> naYX = new LinkedList<>(graph.getAdjacentNodes(y));
@@ -301,12 +258,15 @@ public abstract class GESThread implements Runnable{
 
     /**
      * Returns true if the given set forms a clique in the given graph.
+     * @param set Set of Nodes that is being checked for a clique
+     * @param graph Current graph of the stage
+     * @return true if there is a clique, false otherwise.
      */
     protected static boolean isClique(List<Node> set, Graph graph) {
-        List<Node> setv = new LinkedList<>(set);
-        for (int i = 0; i < setv.size() - 1; i++) {
-            for (int j = i + 1; j < setv.size(); j++) {
-                if (!graph.isAdjacentTo(setv.get(i), setv.get(j))) {
+        List<Node> setNeighbors = new LinkedList<>(set);
+        for (int i = 0; i < setNeighbors.size() - 1; i++) {
+            for (int j = i + 1; j < setNeighbors.size(); j++) {
+                if (!graph.isAdjacentTo(setNeighbors.get(i), setNeighbors.get(j))) {
                     return false;
                 }
             }
@@ -315,7 +275,14 @@ public abstract class GESThread implements Runnable{
     }
 
     /**
-     * Verifies if every semidirected path from y to x contains a node in naYXT.
+     * Verifies if every semi-directed path from y to x contains a node in naYXT.
+     * @param x Starting node of the test.
+     * @param y Ending node of the test
+     * @param naYXT List of nodes being checked to be in the semi-directed path between x and y.
+     * @param graph Current graph of the stage.
+     * @param marked Set of Nodes being stored to avoid cycles.
+     * @return true if there is a semi-directed path between x and y that contains a node stored in naYXT,
+     * false if there isn't.
      */
     protected static boolean isSemiDirectedBlocked(Node x, Node y, List<Node> naYXT,
                                           Graph graph, Set<Node> marked) {
@@ -346,11 +313,10 @@ public abstract class GESThread implements Runnable{
         return true;
     }
 
-
-
     /**
      * Completes a pattern that was modified by an insertion/deletion operator
-     * Based on the algorithm described on Appendix C of (Chickering, 2002).
+     * Based on the algorithm described on @see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf">Appendix C of (Chickering, 2002)</a>.
+     * @param graph Graph being rebuilt.
      */
     protected void rebuildPattern(Graph graph) {
         SearchGraphUtils.basicPattern(graph);
@@ -365,7 +331,9 @@ public abstract class GESThread implements Runnable{
      * </p> *IMPORTANT!* *It assumes all colliders are oriented, as well as
      * arrows dictated by time order.*
      *
-     * ELIMINADO BACKGROUND KNOWLEDGE
+     * ELIMINATING BACKGROUND KNOWLEDGE
+     *
+     * @param graph Graph being transformed into a PDAG.
      */
     protected void pdag(Graph graph) {
         MeekRules rules = new MeekRules();
@@ -373,6 +341,10 @@ public abstract class GESThread implements Runnable{
         rules.orientImplied(graph);
     }
 
+    /**
+     * Sets the data for the thread and all of its related variables.
+     * @param dataSet {@link DataSet DataSet} of the problem.
+     */
     protected void setDataSet(DataSet dataSet) {
         List<String> _varNames = dataSet.getVariableNames();
 
@@ -381,6 +353,10 @@ public abstract class GESThread implements Runnable{
         this.variables = dataSet.getVariables();
     }
 
+    /**
+     * Builds the indexing structure for the Graph passed as argument.
+     * @param graph Graph being indexed.
+     */
     protected void buildIndexing(Graph graph) {
         this.hashIndices = new HashMap<>();
         for (Node next : graph.getNodes()) {
@@ -393,9 +369,13 @@ public abstract class GESThread implements Runnable{
         }
     }
 
-
     //===========================SCORING METHODS===========================//
 
+    /**
+     * Scores a DAG using the BDeu score function
+     * @param graph DAG graph being evaluated
+     * @return score of the graph.
+     */
     protected double scoreGraph(Graph graph) {
 //        Graph dag = SearchGraphUtils.dagFromPattern(graph);
         Graph dag = new EdgeListGraph(graph);
@@ -428,8 +408,16 @@ public abstract class GESThread implements Runnable{
         return score;
     }
 
+    /**
+     * Score difference of the node y when it is associated as child with one set of parents and when it is associated with another one.
+     * @param y {@link Node Node} being considered for the score.
+     * @param parents1 Set of {@link Node Node} of the first set of parents.
+     * @param parents2 Set of {@link Node Node} of the second set of parents.
+     * @return Score difference between both possibilities.
+     */
     protected double scoreGraphChange(Node y, Set<Node> parents1,
                                     Set<Node> parents2) {
+        // Getting indexes
         int yIndex = hashIndices.get(y);
         int[] parentIndices1 = new int[parents1.size()];
 
@@ -444,12 +432,19 @@ public abstract class GESThread implements Runnable{
         for (Node aParents2 : parents2) {
             parentIndices2[count2++] = (hashIndices.get(aParents2));
         }
+
+        // Calculating the scores of both possibilities and returning the difference
         double score1 = localBdeuScore(yIndex, parentIndices1);
         double score2 = localBdeuScore(yIndex, parentIndices2);
         return score1 - score2;
     }
 
-
+    /**
+     * Bdeu Score function for a {@link Node node} and a set of parent nodes.
+     * @param nNode index of the child node
+     * @param nParents index of the parents of the node being considered as child.
+     * @return The Bdeu score of the combination.
+     */
     protected double localBdeuScore(int nNode, int[] nParents) {
         numTotalCalls++;
         double oldScore = localScoreCache.get(nNode, nParents);
@@ -491,7 +486,7 @@ public abstract class GESThread implements Runnable{
 
         for (int iParent = 0; iParent < cardinality; iParent++) {
             double N_ij = 0;
-            double N_ijk = 0;
+            double N_ijk;
 
             for (int iSymbol = 0; iSymbol < numValues; iSymbol++) {
                 if (Ni_jk[iParent][iSymbol] != 0) {
@@ -515,49 +510,90 @@ public abstract class GESThread implements Runnable{
 
     //==========================SETTERS AND GETTERS=========================//
 
-
+    /**
+     * Sets the initial graph with the graph passed as argument.
+     * @param currentGraph The Graph we want to set.
+     */
     public void setInitialGraph(Graph currentGraph){
         this.initialDag = currentGraph;
     }
 
+    /**
+     * Gets the initial Dag of the Thread
+     * @return the initial Dag
+     */
     public Graph getInitialGraph(){
         return this.initialDag;
     }
 
-
+    /**
+     * Gets the variables of the DataSet
+     * @return list of Nodes of the problem's DataSet
+     */
     public List<Node> getVariables() {
         return variables;
     }
 
-
+    /**
+     * Gets the structurePrior
+     * @return the structurePrior
+     */
     public double getStructurePrior() {
         return structurePrior;
     }
 
+    /**
+     * Gets the samplePrior
+     * @return the samplePrior
+     */
     public double getSamplePrior() {
         return samplePrior;
     }
 
+    /**
+     * Sets the structurePrior
+     * @param structurePrior the structurePrior to be set
+     */
     public void setStructurePrior(double structurePrior) {
         this.structurePrior = structurePrior;
     }
 
+    /**
+     * Sets the samplePrior
+     * @param samplePrior the samplePrior of the thread
+     */
     public void setSamplePrior(double samplePrior) {
         this.samplePrior = samplePrior;
     }
 
+    /**
+     * Gets the elapsed time the thread has been executed.
+     * @return the elapsed time.
+     */
     public long getElapsedTime() {
         return elapsedTime;
     }
 
+    /**
+     * Sets the elapsed time
+     * @param elapsedTime the elapsed time the thread has spent running.
+     */
     public void setElapsedTime(long elapsedTime) {
         this.elapsedTime = elapsedTime;
     }
 
+    /**
+     * Gets the maximum number of edges allowed
+     * @return the maximum number of edges
+     */
     public int getMaxNumEdges() {
         return maxNumEdges;
     }
 
+    /**
+     * Sets the maximum number of edges
+     * @param maxNumEdges maximum number of edges to be set.
+     */
     public void setMaxNumEdges(int maxNumEdges) {
         if (maxNumEdges < -1)
             throw new IllegalArgumentException();
@@ -565,8 +601,78 @@ public abstract class GESThread implements Runnable{
         this.maxNumEdges = maxNumEdges;
     }
 
-    // Thread method
+
+
+    /**
+     * Sets the maximum iterations the thread can do. This is used in {@link ThFES ThFES} threads.
+     * @param maxIt the maximum number of iterations
+     */
+    public void setMaxIt(int maxIt) {
+        this.maxIt = maxIt;
+    }
+
+    /**
+     * Sets the subset that is searched by the thread.
+     * @param subset Subset of {@link TupleNode TupleNode}.
+     */
+    public void setSubSetSearch(ArrayList<TupleNode> subset) {
+        this.S=subset;
+
+    }
+
+    /**
+     * Checking if the thread is aggressively preventing cycles
+     * @return true if it prevents cycles, false otherwise.
+     */
+    public boolean isAggressivelyPreventCycles() {
+        return this.aggressivelyPreventCycles;
+    }
+
+    /**
+     * Sets the aggressivelyPreventCycles boolean value
+     * @param aggressivelyPreventCycles true if it prevents cycles, false otherwise.
+     */
+    public void setAggressivelyPreventCycles(boolean aggressivelyPreventCycles) {
+        this.aggressivelyPreventCycles = aggressivelyPreventCycles;
+    }
+
+    /**
+     * Gets the BDeu score of the current Graph.
+     * @return the BDeu score of the current Graph.
+     */
+    public double getScoreBDeu() {
+        return this.modelBDeu;
+    }
+
+    //-----------------------------THREAD METHODS--------------------------------//
+
+    /**
+     * Gets the flag of the thread that indicates if the thread has added or deleted an edge in it's algorithm stage.
+     * @return the flag of the thread
+     * @throws InterruptedException Exception caused by external interruption
+     */
+    public synchronized boolean getFlag() throws InterruptedException{
+        // While searching is not complete, wait
+        while (currentGraph == null)
+            wait();
+        return this.flag;
+    }
+
+    /**
+     * Resets the flag of the thread. The flag value is changed to false.
+     */
+    public synchronized void resetFlag(){
+        this.flag = false;
+    }
+
+    /**
+     * Synchronized getter for the currentGraph. Since the thread could still be working when called, a synchronization
+     * needs to be established.
+     * @return the currentGraph done by the thread
+     * @throws InterruptedException Exception caused by external interruptions.
+     */
     public synchronized Graph getCurrentGraph() throws InterruptedException{
+        // This is a thread method that needs to be synchronized.
         // While searching is not complete, wait
         while (currentGraph == null)
             wait();
@@ -574,6 +680,34 @@ public abstract class GESThread implements Runnable{
     }
 
 
+
+    /**
+     * Get all nodes that are connected to Y by an undirected edge and not
+     * adjacent to X.
+     * @param x {@link Node Node} X, where the resulting nodes are neighbors of the {@link Node Node} Y, but not of X.
+     * @param y {@link Node Node} Y, where the resulting nodes are neighbors of the {@link Node Node} Y, but not of X.
+     * @param graph {@link Graph Graph} of the current constructed graph.
+     * @return {@link List List} of {@link Node Nodes} that are neighbors of the {@link Node Node} Y, but not of {@link Node Node} X.
+     */
+    public static List<Node> getSubsetOfNeighbors(Node x, Node y, Graph graph) {
+        List<Node> tNeighbors = new LinkedList<>(graph.getAdjacentNodes(y));
+        tNeighbors.removeAll(graph.getAdjacentNodes(x));
+
+        for (int i = tNeighbors.size() - 1; i >= 0; i--) {
+            Node z = tNeighbors.get(i);
+            Edge edge = graph.getEdge(y, z);
+
+            if (!Edges.isUndirectedEdge(edge)) {
+                tNeighbors.remove(z);
+            }
+        }
+
+        return tNeighbors;
+    }
+
+    public int getIterations(){
+        return this.iterations;
+    }
 
 
 
