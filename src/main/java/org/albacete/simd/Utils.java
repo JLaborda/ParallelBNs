@@ -19,6 +19,7 @@ public class Utils {
      * @param seed The random seed used for the splits.
      * @return The subsets of the listOfArcs in an ArrayList of TupleNode.
      */
+    @SuppressWarnings("unchecked")
     public static ArrayList<TupleNode>[] split(TupleNode[] listOfArcs, int numSplits, long seed){
 
 

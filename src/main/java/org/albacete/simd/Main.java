@@ -1,14 +1,9 @@
 package org.albacete.simd;
 
-import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import consensusBN.ConsensusUnion;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -80,10 +75,6 @@ public class Main
      */
     private TupleNode[] listOfArcs;
 
-    /**
-     * {@link Random Random} generator. It is instantiated with a seed number for reproducibility.
-     */
-    Random random = new Random(seed);
 
 
 
@@ -375,7 +366,6 @@ public class Main
      */
     public void setSeed(long seed) {
         this.seed = seed;
-        this.random = new Random(seed);
     }
 
     /**

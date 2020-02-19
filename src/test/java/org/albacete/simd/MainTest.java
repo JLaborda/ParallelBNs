@@ -403,7 +403,7 @@ public class MainTest
      * Executes the main function in order to see that everything is working, and that no exceptions are being thrown.
      * @result No exception is thrown.
      */
-    @Test(expected = Test.None.class)
+    @Test
     public void mainExecutesTest(){
         Main.main(null);
     }

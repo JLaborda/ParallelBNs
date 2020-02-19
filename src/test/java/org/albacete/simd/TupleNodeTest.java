@@ -54,12 +54,12 @@ public class TupleNodeTest {
     @Test
     public void equalsReverseTest(){
         // Arrange
-        Node x = new GraphNode("X");
-        Node y = new GraphNode("Y");
+        Node node1 = new GraphNode("X");
+        Node node2= new GraphNode("Y");
 
         // Act
-        TupleNode t1 = new TupleNode(x,y);
-        TupleNode t2 = new TupleNode(y,x);
+        TupleNode t1 = new TupleNode(node1,node2);
+        TupleNode t2 = new TupleNode(node2,node1);
 
         // Arrange
         assertEquals(t1, t2);
@@ -73,12 +73,12 @@ public class TupleNodeTest {
     @Test
     public void notEqualTest(){
         // Arrange
-        Node x = new GraphNode("X");
-        Node y = new GraphNode("Y");
+        Node node1 = new GraphNode("X");
+        Node node2 = new GraphNode("Y");
 
         // Act
-        TupleNode t1 = new TupleNode(x,y);
-        TupleNode t2 = new TupleNode(x,x);
+        TupleNode t1 = new TupleNode(node1, node2);
+        TupleNode t2 = new TupleNode(node1, node1);
 
         // Arrange
         assertNotEquals(t1, t2);
@@ -92,11 +92,12 @@ public class TupleNodeTest {
     @Test
     public void notEqualNotTupleTest(){
         // Arrange
-        Node x = new GraphNode("X");
+        Node node1 = new GraphNode("X");
+        Node node2 = new GraphNode("Y");
         Object y = new Object();
 
         // Act
-        TupleNode t1 = new TupleNode(x,x);
+        TupleNode t1 = new TupleNode(node1, node2);
 
         // Arrange
         assertNotEquals(t1, y);

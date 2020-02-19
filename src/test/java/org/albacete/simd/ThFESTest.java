@@ -172,7 +172,6 @@ public class ThFESTest {
     /**
      * Checking that fes stops when there are no more edges to be added.
      * @result The number of iterations is less than the maximum iterations set
-     * @throws InterruptedException Exception caused by thread interruption
      */
     @Test
     public void noMoreEdgesToAddInFESTest(){

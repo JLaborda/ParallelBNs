@@ -3,11 +3,7 @@ package org.albacete.simd;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import org.junit.Test;
-
-import javax.rmi.CORBA.Util;
-
 import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

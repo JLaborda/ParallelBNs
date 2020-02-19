@@ -3,13 +3,11 @@ package org.albacete.simd;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
-import consensusBN.ConsensusUnion;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
