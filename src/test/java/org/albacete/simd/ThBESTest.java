@@ -62,6 +62,7 @@ public class ThBESTest {
      * This method initializes the subsets, splitting the nodes in what is expected to happen when the seed is 42
      */
     public ThBESTest(){
+        GESThread.setCases(dataset);
         initializeSubsets();
     }
 

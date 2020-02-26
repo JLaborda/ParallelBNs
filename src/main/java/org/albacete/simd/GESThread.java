@@ -2,6 +2,7 @@ package org.albacete.simd;
 
 import consensusBN.SubSet;
 import edu.cmu.tetrad.data.DataSet;
+import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.LocalScoreCache;
 import edu.cmu.tetrad.search.MeekRules;
@@ -110,12 +111,12 @@ public abstract class GESThread implements Runnable{
     /**
      * Cases for each variable of the problem.
      */
-    protected int[][] cases;
+    protected static int[][] cases;
 
     /**
      * Number of values a variable can take.
      */
-    protected int[] nValues;
+    protected static int[] nValues;
 
     /**
      * Maximum number of iterations.
@@ -505,6 +506,20 @@ public abstract class GESThread implements Runnable{
 
         localScoreCache.add(nNode, nParents, fLogScore);
         return fLogScore;
+    }
+
+    public static void setCases(DataSet dataSet){
+        // Starting cases
+        cases=new int[dataSet.getNumRows()][dataSet.getNumColumns()];
+        for(int i=0;i<dataSet.getNumRows();i++) {
+            for (int j = 0; j < dataSet.getNumColumns(); j++) {
+                cases[i][j] = dataSet.getInt(i, j);
+            }
+        }
+        // Initializing nValues
+        nValues=new int[dataSet.getNumColumns()];
+        for(int i=0;i<dataSet.getNumColumns();i++)
+            nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
     }
 
 
