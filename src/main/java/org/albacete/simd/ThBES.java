@@ -24,15 +24,6 @@ public class ThBES extends GESThread {
         setDataSet(dataSet);
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
-        cases=new int[dataSet.getNumRows()][dataSet.getNumColumns()];
-        for(int i=0;i<dataSet.getNumRows();i++) {
-            for(int j=0;j<dataSet.getNumColumns();j++) {
-                cases[i][j]=dataSet.getInt(i, j);
-            }
-        }
-        nValues=new int[dataSet.getNumColumns()];
-        for(int i=0;i<dataSet.getNumColumns();i++)
-            nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
 
         // Setting structure prior and sample prior
         setStructurePrior(0.001);

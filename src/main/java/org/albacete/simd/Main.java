@@ -6,6 +6,9 @@ import edu.cmu.tetrad.search.SearchGraphUtils;
 import consensusBN.ConsensusUnion;
 import java.util.*;
 
+
+// TAMBIÉN HAY QUE QUITAR LAS DEPENDENCIAS DE TETRAD NORMAL (4.4)
+
 /**
  * @author Jorge Daniel Laborda
  * @version 0.1
@@ -314,6 +317,8 @@ public class Main
      */
     public void search(){
 
+        // Initial Configuration: Cases
+        GESThread.setCases(this.data);
 
         // 1. Calculating Edges
         this.listOfArcs = Utils.calculateArcs(this.data);

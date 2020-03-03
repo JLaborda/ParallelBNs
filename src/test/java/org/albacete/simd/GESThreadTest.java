@@ -495,6 +495,36 @@ public class GESThreadTest {
         fail();
     }
 
+    @Test
+    public void setCasesTest(){
+        // Arrange
+        String path = "src/test/resources/casesTest.csv";
+        DataSet data = Utils.readData(path);
+        int[] expNValues = {2,2,2,2,2};
+        int[][] expCases = {{0,0,0,1,0},
+                {0,0,0,1,0},
+                {1,0,1,1,0},
+                {0,1,0,0,1}};
+
+        // Act
+        GESThread.setCases(data);
+        int[][] resultCases = GESThread.cases;
+        int[] resultNValues = GESThread.nValues;
+
+        // Assert
+        assertEquals(expNValues.length, resultNValues.length);
+        assertEquals(expCases.length, resultCases.length);
+        for (int i = 0; i < expCases.length; i++) {
+            assertEquals(expNValues[i], resultNValues[i]);
+            assertEquals(expCases[i].length, resultCases[i].length);
+            for (int j = 0; j < expCases[i].length; j++) {
+                //System.out.println("(" + i + ", " + j + ")");
+                assertEquals(expCases[i][j], resultCases[i][j]);
+            }
+        }
+
+    }
+
 
 }
 

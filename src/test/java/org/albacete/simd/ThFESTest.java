@@ -56,6 +56,7 @@ public class ThFESTest {
      * Constructor of the test. It initializes the subsets.
      */
     public ThFESTest(){
+        GESThread.setCases(dataset);
         initializeSubsets();
     }
 
@@ -220,7 +221,7 @@ public class ThFESTest {
         ArrayList<TupleNode> subset1 = subsets[0];
         ArrayList<TupleNode> subset2 = subsets[1];
 
-
+        GESThread.setCases(alarmDataset);
         ThFES thread1 = new ThFES(alarmDataset, subset1, 100);
         ThFES thread2 = new ThFES(alarmDataset, subset2, 100);
 

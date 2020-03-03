@@ -27,15 +27,6 @@ public class ThFES extends GESThread{
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
         setMaxIt(maxIt);
-        cases=new int[dataSet.getNumRows()][dataSet.getNumColumns()];
-        for(int i=0;i<dataSet.getNumRows();i++) {
-            for(int j=0;j<dataSet.getNumColumns();j++) {
-                cases[i][j]=dataSet.getInt(i, j);
-            }
-        }
-        nValues=new int[dataSet.getNumColumns()];
-        for(int i=0;i<dataSet.getNumColumns();i++)
-            nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
         setStructurePrior(0.001);
         setSamplePrior(10.0);
     }
@@ -51,15 +42,6 @@ public class ThFES extends GESThread{
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
         setMaxIt(maxIt);
-        cases=new int[dataSet.getNumRows()][dataSet.getNumColumns()];
-        for(int i=0;i<dataSet.getNumRows();i++) {
-            for(int j=0;j<dataSet.getNumColumns();j++) {
-                cases[i][j]=dataSet.getInt(i, j);
-            }
-        }
-        nValues=new int[dataSet.getNumColumns()];
-        for(int i=0;i<dataSet.getNumColumns();i++)
-            nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
         setStructurePrior(0.001);
         setSamplePrior(10.0);
     }
