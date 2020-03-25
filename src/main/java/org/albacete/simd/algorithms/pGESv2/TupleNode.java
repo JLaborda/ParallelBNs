@@ -1,4 +1,4 @@
-package org.albacete.simd;
+package org.albacete.simd.algorithms.pGESv2;
 
 import edu.cmu.tetrad.graph.Node;
 

@@ -1,10 +1,9 @@
-package org.albacete.simd;
+package org.albacete.simd.algorithms.pGESv2;
 
 import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
 import consensusBN.SubSet;
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
 
 import java.util.ArrayList;

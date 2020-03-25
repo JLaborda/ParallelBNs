@@ -1,9 +1,11 @@
-package org.albacete.simd;
+package org.albacete.simd.algorithms.pGESv2;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import consensusBN.ConsensusUnion;
+import org.albacete.simd.utils.Utils;
+
 import java.util.*;
 
 

@@ -1,23 +1,20 @@
 package org.albacete.simd.experiments;
 
-import consensusBN.ConsensusBES;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
-import org.albacete.simd.Main;
-import org.albacete.simd.Utils;
+import edu.cmu.tetrad.graph.Node;
+import org.albacete.simd.algorithms.pGESv2.Main;
+import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.ListIterator;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +38,7 @@ public class Experiments {
     private Main alg;
     private static HashMap<String, HashMap<String,String>> map;
 
-    private int shd;
+    private int shd = Integer.MAX_VALUE;
     private double score;
     private double [] dfmm;
     private long elapsedTime;
@@ -114,19 +111,33 @@ public class Experiments {
 
             // Metrics
             this.elapsedTime = endTime - startTime;
+            System.out.println("Original DAG:");
+            System.out.println(bn2.getDag());
+            System.out.println("Total Nodes Original DAG:");
+            System.out.println(bn2.getDag().getNodes().size());
+
+            /*
+            List<Node> nodes_original = bn2.getDag().getNodes();
+            List<Node> nodes_created = alg.getCurrentGraph().getNodes();
+
+            boolean cond = true;
+            for(Node node_original : nodes_original){
+                if (!nodes_created.contains(node_original)){
+                    cond = false;
+                }
+            }
+            */
+
+            // System.out.println(cond);
+
+
+
             this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
             this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
             this.nIterations = alg.getIterations();
             this.score = Utils.scoreGraph(alg.getCurrentGraph(), dataSet); //alg.getFinalScore();
 
-            // Report
-            System.out.println("SHD: "+shd);
-            System.out.println("Final BDeu: " +this.score);
-            System.out.println("Total execution time (s): " + elapsedTime/1000);
-            System.out.println("Total number of Iterations: " + this.nIterations);
-            System.out.println("dfMM: "+ dfmm[0]);
-            System.out.println("dfMM plus: "+ dfmm[1]);
-            System.out.println("dfMM minus: "+ dfmm[2]);
+            printResults();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,7 +145,44 @@ public class Experiments {
 
     }
 
-    //TODO: save experiments
+    public void printResults(){
+        // Report
+        System.out.println("Current DAG:");
+        System.out.println(alg.getCurrentGraph());
+        System.out.println("Total Nodes Current DAG");
+        System.out.println(alg.getCurrentGraph().getNodes().size());
+        System.out.println("-------------------------\nMetrics: ");
+
+        System.out.println("SHD: "+shd);
+        System.out.println("Final BDeu: " +this.score);
+        System.out.println("Total execution time (s): " + elapsedTime/1000);
+        System.out.println("Total number of Iterations: " + this.nIterations);
+        System.out.println("dfMM: "+ dfmm[0]);
+        System.out.println("dfMM plus: "+ dfmm[1]);
+        System.out.println("dfMM minus: "+ dfmm[2]);
+
+    }
+
+    public double[] getDfmm() {
+        return dfmm;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public int getShd() {
+        return shd;
+    }
+
+    public long getElapsedTimeMiliseconds() {
+        return elapsedTime;
+    }
+
+    public int getnIterations() {
+        return nIterations;
+    }
+
     public void saveExperiment() {
         try {
             // Saving paths
@@ -151,39 +199,7 @@ public class Experiments {
             //FileWriter csvWriter_iters = new FileWriter(file_iters);
             FileWriter csvWriter_global = new FileWriter(file_global);
 
-            // Iterations results header
-            /*
-            csvWriter_iters.append("Iteration");
-            csvWriter_iters.append(",");
-            csvWriter_iters.append("Score_Threads");
-            csvWriter_iters.append(",");
-            csvWriter_iters.append("Score_Fusion");
-            csvWriter_iters.append(",");
-            csvWriter_iters.append("Score_Delta");
-            csvWriter_iters.append(",");
-            csvWriter_iters.append("Time_Iteration(ms)");
-            csvWriter_iters.append(",");
-            csvWriter_iters.append("Time_Fusion(ms)");
-            csvWriter_iters.append(",");
-            csvWriter_iters.append("Time_Delta(ms)");
-            csvWriter_iters.append("\n");
 
-            // Getting results
-            ArrayList<Double> score_threads = this.alg.getScores_threads();
-            ArrayList<Double> score_fusion = this.alg.getScores_fusion();
-            ArrayList<Double> score_delta = this.alg.getScores_delta();
-            ArrayList<Long> time_iterations = this.alg.getTimes_iterations();
-            ArrayList<Long> time_fusion = this.alg.getTimes_fusion();
-            ArrayList<Long> time_delta = this.alg.getTimes_delta();
-
-            // All of the arrays should have the same size.
-            for(int i=0; i< score_threads.size(); i++) {
-                String row = (i+1) + "," + score_threads.get(i) + "," + score_fusion.get(i) + "," + score_delta.get(i) + "," + time_iterations.get(i) + "," + time_fusion.get(i) + "," + time_delta.get(i) + "\n";
-                csvWriter_iters.append(row);
-            }
-            csvWriter_iters.flush();
-            csvWriter_iters.close();
-            */
 
             // Saving global results
             csvWriter_global.append("SHD");
@@ -243,7 +259,7 @@ public class Experiments {
     }
 
     //public static HashMap<String, ArrayList<String>> hashNetworks(ArrayList<String> net_paths, ArrayList<String> bbdd_paths){
-    public static HashMap<String, HashMap<String, String>> hashNetworks(ArrayList<String> net_paths, ArrayList<String> bbdd_paths){
+    public static HashMap<String, HashMap<String, String>> hashNetworks(List<String> net_paths, List<String> bbdd_paths){
 
         HashMap<String, HashMap<String,String>> result = new HashMap<String,HashMap<String,String>>();
 
@@ -264,18 +280,20 @@ public class Experiments {
             for(String bbdd_path: bbdd_paths) {
                 if(bbdd_path.contains(bbdd_number)) {
                     for(String net_path: net_paths) {
-                        Pattern pattern = Pattern.compile("/(.*)\\.");
+                        //Pattern pattern = Pattern.compile("/(.*)\\.");
+                        Pattern pattern = Pattern.compile("/(\\w+)\\..*");
                         Matcher matcher = pattern.matcher(net_path);
-                        String net_name = null;
+
                         if (matcher.find()) {
                             //System.out.println("Match!");
-                            net_name = matcher.group(1);
+                            String net_name = matcher.group(1);
+                            //System.out.println("Net name: " + net_name);
+                            //System.out.println("BBDD Path: " + bbdd_path);
+                            if (bbdd_path.contains(net_name)){
+                                aux.put(net_path, bbdd_path);
+                            }
                         }
-                        else
-                            continue;
-                        if (bbdd_path.contains(net_name)){
-                            aux.put(net_path, bbdd_path);
-                        }
+
                     }
                 }
             }
@@ -366,7 +384,8 @@ public class Experiments {
 
 
         // Running Single Experiment
-        Experiments experiment = new Experiments("res/networks/win95pts.xbif", "res/networks/BBDD/win95pts.xbif_.csv", 2, 5);
+        //Experiments experiment = new Experiments("res/networks/win95pts.xbif", "res/networks/BBDD/win95pts.xbif_.csv", 2, 5);
+        Experiments experiment = new Experiments("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv", 2, 5);
         experiment.runExperiment();
         //Saving Experiment
         experiment.saveExperiment();

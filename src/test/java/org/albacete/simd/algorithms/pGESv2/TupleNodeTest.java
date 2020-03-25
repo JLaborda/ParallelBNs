@@ -1,6 +1,7 @@
-package org.albacete.simd;
+package org.albacete.simd.algorithms.pGESv2;
 
 import edu.cmu.tetrad.graph.*;
+import org.albacete.simd.algorithms.pGESv2.TupleNode;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

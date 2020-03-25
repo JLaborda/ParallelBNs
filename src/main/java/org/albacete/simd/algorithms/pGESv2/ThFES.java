@@ -1,4 +1,4 @@
-package org.albacete.simd;
+package org.albacete.simd.algorithms.pGESv2;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
 import consensusBN.SubSet;
 import consensusBN.PowerSet;

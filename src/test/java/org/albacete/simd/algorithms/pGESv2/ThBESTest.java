@@ -1,9 +1,14 @@
-package org.albacete.simd;
+package org.albacete.simd.algorithms.pGESv2;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 
+import org.albacete.simd.algorithms.pGESv2.GESThread;
+import org.albacete.simd.algorithms.pGESv2.ThBES;
+import org.albacete.simd.algorithms.pGESv2.ThFES;
+import org.albacete.simd.algorithms.pGESv2.TupleNode;
+import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
 import java.util.ArrayList;

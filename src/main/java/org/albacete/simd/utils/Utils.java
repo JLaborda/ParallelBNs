@@ -1,6 +1,7 @@
-package org.albacete.simd;
+package org.albacete.simd.utils;
 
 import consensusBN.ConsensusBES;
+import consensusBN.PairWiseConsensusBES;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
@@ -9,6 +10,7 @@ import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.LocalScoreCache;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.ProbUtils;
+import org.albacete.simd.algorithms.pGESv2.TupleNode;
 
 import java.io.File;
 import java.io.IOException;
@@ -142,33 +144,86 @@ public class Utils {
     }
 
 
-    public static int compare(Dag bn1, Dag bn2){
-        ArrayList<Dag> dags = new ArrayList<Dag>();
-        dags.add(bn1);
-        dags.add(bn2);
-        ensureVariables(dags);
-        ConsensusBES cons = new ConsensusBES(dags);
-        cons.fusion();
-        return cons.getNumberOfInsertedEdges();
+    public static Node getNodeByName(List<Node> nodes, String name){
+        for(Node n : nodes){
+            if (n.getName().equals(name)){
+                return n;
+            }
+        }
+        return null;
+    }
+
+    public static int getIndexOfNodeByName(List<Node> nodes, String name){
+        for(int i = 0; i < nodes.size(); i++){
+            Node n = nodes.get(i);
+            if(n.getName().equals(name)){
+                return i;
+            }
+        }
+        return -1;
     }
 
     private static void ensureVariables(ArrayList<Dag> setofbns){
 
         List<Node> nodes = setofbns.get(0).getNodes();
-
+        System.out.println("Nodes: " + nodes);
         for(int i = 1 ; i< setofbns.size(); i++){
             Dag oldDag = setofbns.get(i);
             List<Edge> oldEdges = oldDag.getEdges();
             Dag newdag = new Dag(nodes);
             for(Edge e: oldEdges){
-                Node node1 = setofbns.get(0).getNode(e.getNode1().getName());
-                Node node2 = setofbns.get(0).getNode(e.getNode2().getName());
-                Edge newEdge = new Edge(node1,node2, e.getEndpoint1(), e.getEndpoint2());
+                System.out.println("Node1");
+                System.out.println(e.getNode1());
+                System.out.println("Node2");
+                System.out.println(e.getNode2());
+
+                //int tailIndex = nodes.indexOf(e.getNode1());
+                //int headIndex = nodes.indexOf(e.getNode2());
+
+                int tailIndex = getIndexOfNodeByName(nodes, e.getNode1().getName());
+                int headIndex = getIndexOfNodeByName(nodes, e.getNode2().getName());
+
+                System.out.println("tail: " + tailIndex);
+                System.out.println("head: "  + headIndex);
+                Edge newEdge = new Edge(nodes.get(tailIndex),nodes.get(headIndex), Endpoint.TAIL, Endpoint.ARROW);
                 newdag.addEdge(newEdge);
             }
             setofbns.remove(i);
             setofbns.add(i, newdag);
         }
+    }
+
+    public static int compare(Dag bn1, Dag bn2){
+        ArrayList<Dag> dags = new ArrayList<>();
+        dags.add(bn1);
+        dags.add(bn2);
+        ensureVariables(dags);
+        PairWiseConsensusBES kl = new PairWiseConsensusBES(dags.get(0), dags.get(1));
+        kl.getFusion();
+        int hmd =  kl.getHammingDistance();
+        return hmd;
+    }
+
+
+    public static List<Node> getMarkovBlanket(Dag bn, Node n){
+        List<Node> mb = new ArrayList<>();
+
+        // Adding children and parents to the Markov's Blanket of this node
+        List<Node> children = bn.getChildren(n);
+        List<Node> parents = bn.getParents(n);
+
+        mb.addAll(children);
+        mb.addAll(parents);
+
+        for(Node child : children){
+            for(Node father : bn.getParents(child)){
+                if (!father.equals(n)){
+                    mb.add(father);
+                }
+            }
+        }
+
+        return mb;
     }
 
     public static double [] avgMarkovBlanquetdif(Dag original, Dag created) {
@@ -186,21 +241,10 @@ public class Utils {
         for( Node e1 : original.getNodes()) {
             Node e2 = created.getNode(e1.getName());
 
-            // Creando los mantos de markov de la variable en cada DAG.
-            ArrayList<Node> mb1 = new ArrayList<Node>();
-            ArrayList<Node> mb2 = new ArrayList<Node>();
+            // Creating Markov's Blanket
+            List<Node> mb1 = getMarkovBlanket(original, e1);
+            List<Node> mb2 = getMarkovBlanket(created, e2);
 
-            mb1.addAll(original.getParents(e1));
-            mb1.addAll(original.getChildren(e1));
-            for(Node c: original.getChildren(e1)) {
-                mb1.addAll(original.getParents(c));
-            }
-
-            mb2.addAll(created.getParents(e2));
-            mb2.addAll(created.getChildren(e2));
-            for(Node c: created.getChildren(e2)) {
-                mb2.addAll(created.getParents(c));
-            }
 
             ArrayList<String> names1 = new ArrayList<String>();
             ArrayList<String> names2 = new ArrayList<String>();
