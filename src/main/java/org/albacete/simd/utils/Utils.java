@@ -397,5 +397,33 @@ public class Utils {
     }
 
 
+    /**
+     * Transforms a graph to a DAG, and removes any possible inconsistency found throughout its structure.
+     * @param g Graph to be transformed.
+     * @return Resulting DAG of the inserted graph.
+     */
+    public static Dag removeInconsistencies(Graph g){
+        // Transforming the current graph into a DAG
+        SearchGraphUtils.pdagToDag(g);
+
+        // Checking Consistency
+        Node nodeT, nodeH;
+        for (Edge e : g.getEdges()){
+            if(!e.isDirected()) continue;
+            Endpoint endpoint1 = e.getEndpoint1();
+            if (endpoint1.equals(Endpoint.ARROW)){
+                nodeT = e.getNode1();
+                nodeH = e.getNode2();
+            }else{
+                nodeT = e.getNode2();
+                nodeH = e.getNode1();
+            }
+            if(g.existsDirectedPathFromTo(nodeT, nodeH)) g.removeEdge(e);
+        }
+        // Adding graph from each thread to the graphs array
+        return new Dag(g);
+
+    }
+
 
 }

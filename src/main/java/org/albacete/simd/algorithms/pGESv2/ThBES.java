@@ -16,7 +16,7 @@ public class ThBES extends GESThread {
     /**
      * Constructor of ThFES with an initial DAG
      * @param dataSet data of the problem
-     * @param initialDag initial DAG with which the FES stage starts with, if it's null, use the other constructor
+     * @param initialDag initial DAG with which the FES stage starts with.
      * @param subset subset of edges the fes stage will try to add to the resulting graph
      */
     public ThBES(DataSet dataSet, Graph initialDag, ArrayList<TupleNode> subset) {

@@ -2,6 +2,7 @@ package org.albacete.simd.experiments;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +19,7 @@ public class ExperimentsTest {
         int nThreads = 2;
         int nItInterleaving = 5;
 
-        Experiments exp = new Experiments(net_path, bbdd_path, nThreads, nItInterleaving);
+        Experiment exp = new Experiment(net_path, bbdd_path, nThreads, nItInterleaving);
 
         //Asserting
         assertNotNull(exp);
@@ -34,7 +35,7 @@ public class ExperimentsTest {
         int nThreads = 2;
         int nItInterleaving = 5;
 
-        Experiments exp = new Experiments(net_path, bbdd_path, nThreads, nItInterleaving);
+        Experiment exp = new Experiment(net_path, bbdd_path, nThreads, nItInterleaving);
         exp.runExperiment();
 
         assertNotEquals(0.0, exp.getScore(), 0.000001);
@@ -50,7 +51,7 @@ public class ExperimentsTest {
         // Arrange
         String netFolder = "res/networks/";
         // Act
-        ArrayList<String> net_paths = Experiments.getNetworkPaths(netFolder);
+        ArrayList<String> net_paths = Experiment.getNetworkPaths(netFolder);
         // Assert
         assertTrue(net_paths.contains(netFolder + "munin.xbif"));
         assertFalse(net_paths.contains(netFolder + "munin1.net"));
@@ -60,7 +61,7 @@ public class ExperimentsTest {
         // Arrange
         String bbddFolder = "res/networks/BBDD/";
         // Act
-        ArrayList<String> bbdd_paths = Experiments.getBBDDPaths(bbddFolder);
+        ArrayList<String> bbdd_paths = Experiment.getBBDDPaths(bbddFolder);
         // Assert
         assertTrue(bbdd_paths.contains(bbddFolder + "alarm.xbif50000_.csv"));
         assertFalse(bbdd_paths.contains(bbdd_paths + "munin1.net"));
@@ -76,7 +77,7 @@ public class ExperimentsTest {
 
 
         //Act
-        HashMap<String, HashMap<String, String>> result = Experiments.hashNetworks(netPaths, bbddPaths);
+        HashMap<String, HashMap<String, String>> result = Experiment.hashNetworks(netPaths, bbddPaths);
 
         //Assert
         assertFalse(result.isEmpty());
@@ -96,7 +97,7 @@ public class ExperimentsTest {
         netPaths = Arrays.asList("res/networks/alarm.net");
 
         //Act
-        result = Experiments.hashNetworks(netPaths, bbddPaths);
+        result = Experiment.hashNetworks(netPaths, bbddPaths);
 
         //Assert
         assertFalse(result.isEmpty());
@@ -105,15 +106,28 @@ public class ExperimentsTest {
 
         result2 = result.get("xbif50000_");
         assertTrue(result2.isEmpty());
+    }
 
 
+    @Test
+    public void saveExperimentTest(){
+        //Arrange: Creating Experiment
+        Experiment experiment = new Experiment("res/networks/cancer.xbif", "res/networks/BBDD/cancer.xbif_.csv", 2, 5);
+        experiment.runExperiment();
 
+        //Act: Saving Experiment
+        experiment.saveExperiment();
 
+        //Assert: Checking if the file has been saved
+        String path = "./experiments/networks/cancer/cancer.xbif_T2_I5_global_results.csv";
 
+        File temp = new File(path);
 
-
+        assertTrue(temp.exists());
 
     }
+
+
 
 
 

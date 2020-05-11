@@ -5,7 +5,7 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
-import edu.cmu.tetrad.graph.Node;
+import org.albacete.simd.algorithms.GES.GES;
 import org.albacete.simd.algorithms.pGESv2.Main;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
@@ -18,24 +18,16 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-        /*We are checking the following hyperparameters:
-        * Threads: [1, 2, 4, 8, 16]
-        * Interleaving: [5,10,15]
-        *
-        * We are going to experiment over */
+public class ExperimentGES {
 
 
-public class Experiments {
 
     private String net_path;
     private String bbdd_path;
     private String net_name;
     private String bbdd_name;
-    private int nThreads;
-    //private String fusion_consensus;
-    private int nItInterleaving;
     private int maxIterations = 15;
-    private Main alg;
+    private GES alg;
     private static HashMap<String, HashMap<String,String>> map;
 
     private int shd = Integer.MAX_VALUE;
@@ -45,7 +37,7 @@ public class Experiments {
     private int nIterations;
 
 
-    public Experiments(String net_path, String bbdd_path,  int nThreads, int nItInterleaving) {
+    public ExperimentGES(String net_path, String bbdd_path) {
         this.net_path = net_path;
         this.bbdd_path = bbdd_path;
         Pattern pattern = Pattern.compile("/(.*)\\.");
@@ -64,9 +56,6 @@ public class Experiments {
             bbdd_name = matcher.group(1);
         }
 
-
-        this.nThreads = nThreads;
-        this.nItInterleaving = nItInterleaving;
     }
 
 
@@ -75,13 +64,11 @@ public class Experiments {
 
     public void runExperiment() {
         try {
-            System.out.println("Starting Experiment:");
+            System.out.println("Starting GES Experiment:");
             System.out.println("-----------------------------------------");
             System.out.println("\tNet Name: " + net_name);
             System.out.println("\tBBDD Name: " + bbdd_name);
             //System.out.println("\tFusion Consensus: " + fusion_consensus);
-            System.out.println("\tnThreads: " + nThreads);
-            System.out.println("\tnItInterleaving: " + nItInterleaving);
             System.out.println("-----------------------------------------");
 
             System.out.println("Net_path: " + net_path);
@@ -99,9 +86,7 @@ public class Experiments {
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new Main(dataSet,this.nThreads);
-            this.alg.setMaxIterations(this.maxIterations);
-            this.alg.setNFESItInterleaving(this.nItInterleaving);
+            this.alg = new GES(dataSet);
 
             // Search is executed
             alg.search();
@@ -116,17 +101,17 @@ public class Experiments {
             System.out.println("Total Nodes Original DAG:");
             System.out.println(bn2.getDag().getNodes().size());
 
-            /*
-            List<Node> nodes_original = bn2.getDag().getNodes();
-            List<Node> nodes_created = alg.getCurrentGraph().getNodes();
+        /*
+        List<Node> nodes_original = bn2.getDag().getNodes();
+        List<Node> nodes_created = alg.getCurrentGraph().getNodes();
 
-            boolean cond = true;
-            for(Node node_original : nodes_original){
-                if (!nodes_created.contains(node_original)){
-                    cond = false;
-                }
+        boolean cond = true;
+        for(Node node_original : nodes_original){
+            if (!nodes_created.contains(node_original)){
+                cond = false;
             }
-            */
+        }
+        */
 
             // System.out.println(cond);
 
@@ -134,7 +119,7 @@ public class Experiments {
 
             this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
             this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
-            this.nIterations = alg.getIterations();
+            //this.nIterations = alg.getIterations();
             this.score = Utils.scoreGraph(alg.getCurrentGraph(), dataSet); //alg.getFinalScore();
 
             printResults();
@@ -145,7 +130,7 @@ public class Experiments {
 
     }
 
-    public void printResults(){
+    public void printResults() throws InterruptedException {
         // Report
         System.out.println("Current DAG:");
         System.out.println(alg.getCurrentGraph());
@@ -187,7 +172,7 @@ public class Experiments {
         try {
             // Saving paths
             //String path_iters = "experiments/" + this.net_name + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_" + this.fusion_consensus + "_iteratation_results.csv";
-            String path_global = "experiments/" + this.net_name + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving +  "_global_results.csv";
+            String path_global = "experiments/" + this.net_name + "/" + this.bbdd_name + "_ges" + "_global_results.csv";
 
             // Files
             //File file_iters = new File(path_iters);
@@ -212,12 +197,10 @@ public class Experiments {
             csvWriter_global.append(",");
             csvWriter_global.append("dfMM minus");
             csvWriter_global.append(",");
-            csvWriter_global.append("Total iterations");
-            csvWriter_global.append(",");
             csvWriter_global.append("Total time(s)");
             csvWriter_global.append("\n");
 
-            String row = this.shd + "," + this.score + "," + this.dfmm[0] + "," + this.dfmm[1] + "," + this.dfmm[2] + "," + this.nIterations + ","  + elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
+            String row = this.shd + "," + this.score + "," + this.dfmm[0] + "," + this.dfmm[1] + "," + this.dfmm[2] +  ","  + elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
             csvWriter_global.append(row);
 
             csvWriter_global.flush();
@@ -304,18 +287,13 @@ public class Experiments {
     }
 
     public static void runAllExperiments(){
-        // Hiperparameters
         int [] nThreads = new int[] {1,2,4,8};
         int [] nInterleavings = new int[] {5,10,15};
-
-        // Running Single Experiment
-        //Experiments experiment = new Experiments("networks/win95pts.xbif", "networks/BBDD/win95pts.xbif_.csv", fusions[0], nThreads[0], nInterleavings[0]);
-        //experiment.runExperiment();
-        //Saving Experiment
-        //experiment.saveExperiment();
+        runAllExperiments(nThreads, nInterleavings, map);
+    }
 
 
-
+    public static void runAllExperiments(int[] nThreads, int[] nInterleavings, HashMap<String, HashMap<String,String>> map) {
         for(int j=0; j<nThreads.length; j++) {
             int nThread = nThreads[j];
             for(int k=0; k<nInterleavings.length; k++) {
@@ -331,7 +309,7 @@ public class Experiments {
                         System.out.println("BBDD_Path: " + bbdd_path);
 
                         // Running Experiment
-                        Experiments experiment = new Experiments(net_path, bbdd_path, nThread, nInterleaving);
+                        org.albacete.simd.experiments.Experiment experiment = new org.albacete.simd.experiments.Experiment(net_path, bbdd_path, nThread, nInterleaving);
                         experiment.runExperiment();
                         //Saving Experiment
                         experiment.saveExperiment();
@@ -340,9 +318,7 @@ public class Experiments {
                 }
             }
         }
-
     }
-
 
     public static void main(String[] args) {
         String netFolder = "res/networks/";
@@ -369,23 +345,12 @@ public class Experiments {
             }
         }
 
-        //Problems with:
-		/*
-		 * -----------------------------------------
-		Net Name: barley
-		BBDD Name: barley.xbif_
-		Fusion Consensus: ConsensusBES
-		nThreads: 2
-		nItInterleaving: 15
-		-----------------------------------------
-		Net_path: networks/barley.xbif
-		BBDD_path: networks/BBDD/barley.xbif_.csv
-		 * */
-
 
         // Running Single Experiment
         //Experiments experiment = new Experiments("res/networks/win95pts.xbif", "res/networks/BBDD/win95pts.xbif_.csv", 2, 5);
-        Experiments experiment = new Experiments("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv", 2, 5);
+        //org.albacete.simd.experiments.Experiment experiment = new org.albacete.simd.experiments.Experiment("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv", 2, 5);
+        ExperimentGES experiment = new ExperimentGES("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv");
+
         experiment.runExperiment();
         //Saving Experiment
         experiment.saveExperiment();
@@ -400,4 +365,6 @@ public class Experiments {
 
 
 }
+
+
 

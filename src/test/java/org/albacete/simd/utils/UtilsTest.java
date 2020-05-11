@@ -267,7 +267,7 @@ public class UtilsTest {
 
         //TEST: Checking score cache gets previous scores:
         double score3 = Utils.scoreGraph(g2, data);
-        assertEquals(-10701.380698450566, score2, 0.000001);
+        assertEquals(-10701.380698450566, score3, 0.000001);
 
     }
 

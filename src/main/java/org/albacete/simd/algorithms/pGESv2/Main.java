@@ -134,33 +134,7 @@ public class Main
 
     }
 
-    /**
-     * Transforms a graph to a DAG, and removes any possible inconsistency found throughout its structure.
-     * @param g Graph to be transformed.
-     * @return Resulting DAG of the inserted graph.
-     */
-    private Dag removeInconsistencies(Graph g){
-        // Transforming the current graph into a DAG
-        SearchGraphUtils.pdagToDag(g);
 
-        // Checking Consistency
-        Node nodeT, nodeH;
-        for (Edge e : g.getEdges()){
-            if(!e.isDirected()) continue;
-            Endpoint endpoint1 = e.getEndpoint1();
-            if (endpoint1.equals(Endpoint.ARROW)){
-                nodeT = e.getNode1();
-                nodeH = e.getNode2();
-            }else{
-                nodeT = e.getNode2();
-                nodeH = e.getNode1();
-            }
-            if(g.existsDirectedPathFromTo(nodeT, nodeH)) g.removeEdge(e);
-        }
-        // Adding graph from each thread to the graphs array
-        return new Dag(g);
-
-    }
 
     /**
      * Configures the FES stage by initializing the graph and fes lists. It also initializes
@@ -210,7 +184,7 @@ public class Main
             score_threads = score_threads + gesThreads[i].getScoreBDeu();
 
             // Removing Inconsistencies and transforming it to a DAG
-            Dag gdag = removeInconsistencies(g);
+            Dag gdag = Utils.removeInconsistencies(g);
 
             // Adding the new dag to the graph list
             this.graphs.add(gdag);
