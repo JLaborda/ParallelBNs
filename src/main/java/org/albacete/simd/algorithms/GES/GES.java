@@ -1,22 +1,16 @@
 package org.albacete.simd.algorithms.GES;
 
-import com.sun.istack.internal.NotNull;
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.data.DiscreteVariable;
-import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
 import edu.cmu.tetrad.search.LocalScoreCache;
-import edu.cmu.tetrad.search.SearchGraphUtils;
-import edu.cmu.tetrad.util.ProbUtils;
 import org.albacete.simd.algorithms.pGESv2.GESThread;
 import org.albacete.simd.algorithms.pGESv2.ThBES;
 import org.albacete.simd.algorithms.pGESv2.ThFES;
 import org.albacete.simd.algorithms.pGESv2.TupleNode;
 import org.albacete.simd.utils.Utils;
 
-import javax.xml.crypto.Data;
 import java.util.*;
 
 public class GES {
