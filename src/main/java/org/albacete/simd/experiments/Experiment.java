@@ -144,7 +144,7 @@ public class Experiment {
 
     }
 
-    public void printResults(){
+    public void printResults() {
         // Report
         System.out.println("Current DAG:");
         System.out.println(alg.getCurrentGraph());
@@ -337,54 +337,83 @@ public class Experiment {
     }
 
         public static void main(String[] args) {
-        String netFolder = "res/networks/";
-        String bbddFolder = "res/networks/BBDD/";
-        ArrayList<String> net_paths = getNetworkPaths(netFolder);
-        ArrayList<String> bbdd_paths = getBBDDPaths(bbddFolder);
+            /*
+            String netFolder = "res/networks/";
+            String bbddFolder = "res/networks/BBDD/";
+            ArrayList<String> net_paths = getNetworkPaths(netFolder);
+            ArrayList<String> bbdd_paths = getBBDDPaths(bbddFolder);
 
 
 
-        System.out.println("net_names: " + net_paths);
-        System.out.println("bbdd_names: " + bbdd_paths);
+            System.out.println("net_names: " + net_paths);
+            System.out.println("bbdd_names: " + bbdd_paths);
 
-        map =  hashNetworks(net_paths, bbdd_paths);
+            map =  hashNetworks(net_paths, bbdd_paths);
 
-        System.out.println("Values in Map:");
-        for (String key: map.keySet()) {
-            HashMap<String, String> aux = map.get(key);
-            for(String k : aux.keySet()) {
-                System.out.println("BBDD_Number: " + key);
-                System.out.println("Key: " + k);
-                System.out.println("Value: " + aux.get(k));
-                System.out.println("******************");
+            System.out.println("Values in Map:");
+            for (String key: map.keySet()) {
+                HashMap<String, String> aux = map.get(key);
+                for(String k : aux.keySet()) {
+                    System.out.println("BBDD_Number: " + key);
+                    System.out.println("Key: " + k);
+                    System.out.println("Value: " + aux.get(k));
+                    System.out.println("******************");
+
+                }
+            }
+            */
+            //Problems with:
+            /*
+             * -----------------------------------------
+            Net Name: barley
+            BBDD Name: barley.xbif_
+            Fusion Consensus: ConsensusBES
+            nThreads: 2
+            nItInterleaving: 15
+            -----------------------------------------
+            Net_path: networks/barley.xbif
+            BBDD_path: networks/BBDD/barley.xbif_.csv
+             * */
+
+
+            // Running Single Experiment
+            //Experiments experiment = new Experiments("res/networks/win95pts.xbif", "res/networks/BBDD/win95pts.xbif_.csv", 2, 5);
+
+            String netPath = "";
+            String bbddPath = "";
+            int nThreads = 0;
+            int nInterleaving = 0;
+            Experiment experiment = null;
+            if (args.length == 4) {
+                netPath = args[0];
+                bbddPath = args[1];
+                nThreads = Integer.parseInt(args[2]);
+                nInterleaving = Integer.parseInt(args[3]);
+                experiment = new Experiment(netPath, bbddPath, nThreads, nInterleaving);
 
             }
-        }
+            else if(args.length == 2){
+                netPath = args[0];
+                bbddPath = args[1];
+                experiment = new ExperimentGES(netPath, bbddPath);
 
-        //Problems with:
-		/*
-		 * -----------------------------------------
-		Net Name: barley
-		BBDD Name: barley.xbif_
-		Fusion Consensus: ConsensusBES
-		nThreads: 2
-		nItInterleaving: 15
-		-----------------------------------------
-		Net_path: networks/barley.xbif
-		BBDD_path: networks/BBDD/barley.xbif_.csv
-		 * */
+            }
+            else{
+                System.err.println("Error, the number of arguments is incorrect. Use 4 (netPath, bbddPath, nThreads, nInterleaving) if you want to test the pGESv2 algorithm, or 2 (netPath, bbddPath) if you want to test the control GES algorithm");
+                System.exit(-1);
+            }
+            //Experiment experiment = new Experiment("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv", 2, 5);
 
+            if(netPath.equals("") || bbddPath.equals("") ){
+                System.err.println("Error, netPath or bbddPath has not been initialized.");
+                System.exit(-1);
+            }
 
-        // Running Single Experiment
-        //Experiments experiment = new Experiments("res/networks/win95pts.xbif", "res/networks/BBDD/win95pts.xbif_.csv", 2, 5);
-        Experiment experiment = new Experiment("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv", 2, 5);
-        experiment.runExperiment();
-        //Saving Experiment
-        experiment.saveExperiment();
+            // Running Experiment
+            experiment.runExperiment();
+            //Saving Experiment
+            experiment.saveExperiment();
 
-
-        // Running all the experiments
-        //runAllExperiments();
 
     }
 

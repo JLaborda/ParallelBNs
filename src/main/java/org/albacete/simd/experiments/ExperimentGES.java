@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ExperimentGES {
+public class ExperimentGES extends Experiment{
 
 
 
@@ -38,30 +38,13 @@ public class ExperimentGES {
 
 
     public ExperimentGES(String net_path, String bbdd_path) {
-        this.net_path = net_path;
-        this.bbdd_path = bbdd_path;
-        Pattern pattern = Pattern.compile("/(.*)\\.");
-        Matcher matcher = pattern.matcher(this.net_path);
-        if (matcher.find()) {
-            System.out.println("Match!");
-            System.out.println(matcher.group(1));
-            net_name = matcher.group(1);
-        }
-
-        pattern = Pattern.compile(".*/(.*).csv");
-        matcher = pattern.matcher(this.bbdd_path);
-        if (matcher.find()) {
-            System.out.println("Match!");
-            System.out.println(matcher.group(1));
-            bbdd_name = matcher.group(1);
-        }
-
+        super(net_path, bbdd_path, 0, 0);
     }
 
 
 
 
-
+    @Override
     public void runExperiment() {
         try {
             System.out.println("Starting GES Experiment:");
@@ -129,45 +112,31 @@ public class ExperimentGES {
         }
 
     }
+    @Override
+    public void printResults(){
+        try {
+            // Report
+            System.out.println("Current DAG:");
+            System.out.println(alg.getCurrentGraph());
+            System.out.println("Total Nodes Current DAG");
+            System.out.println(alg.getCurrentGraph().getNodes().size());
+            System.out.println("-------------------------\nMetrics: ");
 
-    public void printResults() throws InterruptedException {
-        // Report
-        System.out.println("Current DAG:");
-        System.out.println(alg.getCurrentGraph());
-        System.out.println("Total Nodes Current DAG");
-        System.out.println(alg.getCurrentGraph().getNodes().size());
-        System.out.println("-------------------------\nMetrics: ");
-
-        System.out.println("SHD: "+shd);
-        System.out.println("Final BDeu: " +this.score);
-        System.out.println("Total execution time (s): " + elapsedTime/1000);
-        System.out.println("Total number of Iterations: " + this.nIterations);
-        System.out.println("dfMM: "+ dfmm[0]);
-        System.out.println("dfMM plus: "+ dfmm[1]);
-        System.out.println("dfMM minus: "+ dfmm[2]);
+            System.out.println("SHD: " + shd);
+            System.out.println("Final BDeu: " + this.score);
+            System.out.println("Total execution time (s): " + elapsedTime / 1000);
+            System.out.println("Total number of Iterations: " + this.nIterations);
+            System.out.println("dfMM: " + dfmm[0]);
+            System.out.println("dfMM plus: " + dfmm[1]);
+            System.out.println("dfMM minus: " + dfmm[2]);
+        }
+        catch(InterruptedException e){
+            e.printStackTrace();
+        }
 
     }
 
-    public double[] getDfmm() {
-        return dfmm;
-    }
-
-    public double getScore() {
-        return score;
-    }
-
-    public int getShd() {
-        return shd;
-    }
-
-    public long getElapsedTimeMiliseconds() {
-        return elapsedTime;
-    }
-
-    public int getnIterations() {
-        return nIterations;
-    }
-
+    @Override
     public void saveExperiment() {
         try {
             // Saving paths
@@ -213,112 +182,10 @@ public class ExperimentGES {
 
     }
 
-    public static ArrayList<String> getNetworkPaths(String netFolder){
-        // Getting networks
-
-        File f = new File(netFolder);
-        ArrayList<String> net_paths = new ArrayList<String>(Arrays.asList(f.list()));
-        net_paths.removeIf(s -> !s.contains(".xbif"));
-        ListIterator<String> iter = net_paths.listIterator();
-        while(iter.hasNext()) {
-            iter.set(netFolder + iter.next());
-        }
-
-        return net_paths;
-
-    }
-
-    public static ArrayList<String> getBBDDPaths(String bbddFolder){
-        // Getting BBDD
-
-        File f = new File(bbddFolder);
-        ArrayList<String> bbdd_paths = new ArrayList<String>(Arrays.asList(f.list()));
-
-        ListIterator<String> iter = bbdd_paths.listIterator();
-        while(iter.hasNext()) {
-            iter.set(bbddFolder + iter.next());
-        }
-        return bbdd_paths;
-    }
-
-    //public static HashMap<String, ArrayList<String>> hashNetworks(ArrayList<String> net_paths, ArrayList<String> bbdd_paths){
-    public static HashMap<String, HashMap<String, String>> hashNetworks(List<String> net_paths, List<String> bbdd_paths){
-
-        HashMap<String, HashMap<String,String>> result = new HashMap<String,HashMap<String,String>>();
-
-        ArrayList<String> bbdd_numbers = new ArrayList<String>();
-
-        for(String bbdd: bbdd_paths) {
-            Pattern pattern =Pattern.compile("(xbif.*).csv");
-            Matcher matcher = pattern.matcher(bbdd);
-            if(matcher.find()) {
-                bbdd_numbers.add(matcher.group(1));
-            }
-        }
-
-        for(String bbdd_number : bbdd_numbers) {
-            HashMap<String, String> aux = new HashMap<String, String>();
 
 
-            for(String bbdd_path: bbdd_paths) {
-                if(bbdd_path.contains(bbdd_number)) {
-                    for(String net_path: net_paths) {
-                        //Pattern pattern = Pattern.compile("/(.*)\\.");
-                        Pattern pattern = Pattern.compile("/(\\w+)\\..*");
-                        Matcher matcher = pattern.matcher(net_path);
-
-                        if (matcher.find()) {
-                            //System.out.println("Match!");
-                            String net_name = matcher.group(1);
-                            //System.out.println("Net name: " + net_name);
-                            //System.out.println("BBDD Path: " + bbdd_path);
-                            if (bbdd_path.contains(net_name)){
-                                aux.put(net_path, bbdd_path);
-                            }
-                        }
-
-                    }
-                }
-            }
-            result.put(bbdd_number, aux);
-
-        }
-        return result;
-    }
-
-    public static void runAllExperiments(){
-        int [] nThreads = new int[] {1,2,4,8};
-        int [] nInterleavings = new int[] {5,10,15};
-        runAllExperiments(nThreads, nInterleavings, map);
-    }
 
 
-    public static void runAllExperiments(int[] nThreads, int[] nInterleavings, HashMap<String, HashMap<String,String>> map) {
-        for(int j=0; j<nThreads.length; j++) {
-            int nThread = nThreads[j];
-            for(int k=0; k<nInterleavings.length; k++) {
-                int nInterleaving = nInterleavings[k];
-                for(String key1 : map.keySet()) {
-                    HashMap<String,String> aux = map.get(key1);
-                    for (String net_path: aux.keySet()) {
-                        System.out.println("***********************************");
-                        System.out.println("***********NEW EXPERIMENT**********");
-                        System.out.println("***********************************");
-                        String bbdd_path = aux.get(net_path);
-                        System.out.println("Net_Path: " + net_path);
-                        System.out.println("BBDD_Path: " + bbdd_path);
-
-                        // Running Experiment
-                        org.albacete.simd.experiments.Experiment experiment = new org.albacete.simd.experiments.Experiment(net_path, bbdd_path, nThread, nInterleaving);
-                        experiment.runExperiment();
-                        //Saving Experiment
-                        experiment.saveExperiment();
-
-                    }
-                }
-            }
-        }
-    }
 
     public static void main(String[] args) {
         String netFolder = "res/networks/";
