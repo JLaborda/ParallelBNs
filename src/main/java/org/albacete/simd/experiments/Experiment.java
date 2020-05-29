@@ -408,7 +408,10 @@ public class Experiment {
                 System.err.println("Error, netPath or bbddPath has not been initialized.");
                 System.exit(-1);
             }
-
+            System.out.println("Arguments length: " + args.length);
+            System.out.println("net: " + netPath);
+            System.out.println("bbdd: " + bbddPath);
+            
             // Running Experiment
             experiment.runExperiment();
             //Saving Experiment
