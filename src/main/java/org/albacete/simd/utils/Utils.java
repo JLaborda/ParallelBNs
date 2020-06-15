@@ -15,6 +15,8 @@ import org.albacete.simd.algorithms.pGESv2.TupleNode;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
 
@@ -424,6 +426,52 @@ public class Utils {
         return new Dag(g);
 
     }
+
+
+    public static HashMap<String, HashMap<String, String>> hashNetworks(List<String> net_paths, List<String> bbdd_paths, Set<String> names){
+
+        HashMap<String, HashMap<String,String>> result = new HashMap<String,HashMap<String,String>>();
+
+        ArrayList<String> bbdd_numbers = new ArrayList<String>();
+
+        for(String bbdd: bbdd_paths) {
+            java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(xbif.*).csv");
+            Matcher matcher = pattern.matcher(bbdd);
+            if(matcher.find()) {
+                bbdd_numbers.add(matcher.group(1));
+            }
+        }
+
+        for(String bbdd_number : bbdd_numbers) {
+            HashMap<String, String> aux = new HashMap<String, String>();
+
+
+            for(String bbdd_path: bbdd_paths) {
+                if(bbdd_path.contains(bbdd_number)) {
+                    for(String net_path: net_paths) {
+                        //Pattern pattern = Pattern.compile("/(.*)\\.");
+                        java.util.regex.Pattern pattern = Pattern.compile("/(\\w+)\\..*");
+                        Matcher matcher = pattern.matcher(net_path);
+
+                        if (matcher.find()) {
+                            //System.out.println("Match!");
+                            String net_name = matcher.group(1);
+                            System.out.println(net_name);
+                            //System.out.println("BBDD Path: " + bbdd_path);
+                            if (bbdd_path.contains(net_name) & names.contains(net_name)){
+                                aux.put(net_path, bbdd_path);
+                            }
+                        }
+
+                    }
+                }
+            }
+            result.put(bbdd_number, aux);
+
+        }
+        return result;
+    }
+
 
 
 }

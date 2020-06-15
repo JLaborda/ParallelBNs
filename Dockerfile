@@ -8,5 +8,5 @@ CMD java -jar pbn-demo.jar
 
 # COPY . /ParallelBNs
 # WORKDIR /ParallelBNs
-# RUN javac src/main/java/org/albacete/simd/Main.java
+# RUN javac src/pGESv2/java/org/albacete/simd/Main.java
 #CMD ["java", "Main"]

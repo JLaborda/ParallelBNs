@@ -1,0 +1,1 @@
+res/networks/alarm.xbif res/networks/BBDD/alarm.xbif_.csv

@@ -29,3 +29,14 @@ hs_err_pid*
 
 #idea
 .idea/
+
+#other settings
+.settings/
+target/
+
+#experiment folder
+experiments/
+#thread errors
+*.log
+parallel-error
+parallel-output

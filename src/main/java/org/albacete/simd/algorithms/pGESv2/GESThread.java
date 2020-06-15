@@ -158,6 +158,14 @@ public abstract class GESThread implements Runnable{
     protected SubSet h_0;
 
     /**
+     * Id of the thread
+     */
+    protected int id = -1;
+
+    private String log = "";
+
+
+    /**
      * Evaluate the Insert(X, Y, T) operator (@see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf"> Definition 12 from Chickering 2002</a>,
      * ).
      * @param x First {@link Node Node} of the edge being considered to insert the graph.
@@ -185,10 +193,13 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage where the edge will be inserted into.
      */
     public static void insert(Node x, Node y, Set<Node> subset, Graph graph) {
+        System.out.println("Insert: " + x + " -> " + y);
         graph.addDirectedEdge(x, y);
 
         for (Node node : subset) {
+            System.out.println("Delete: " + node + " -- " + y);
             graph.removeEdge(node, y);
+            System.out.println("Insert: " + node + " -> " + y);
             graph.addDirectedEdge(node, y);
         }
     }
@@ -201,14 +212,19 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage where the edge will be deleted from.
      */
     public static void delete(Node x, Node y, Set<Node> subset, Graph graph) {
+        System.out.println("Delete: " + x + " -- " + y);
         graph.removeEdges(x, y);
 
         for (Node aSubset : subset) {
             if (!graph.isParentOf(aSubset, x) && !graph.isParentOf(x, aSubset)) {
+                System.out.println("Delete: " + x + " -- " + aSubset);
                 graph.removeEdge(x, aSubset);
+                System.out.println("Insert: " + x + " -> " + aSubset);
                 graph.addDirectedEdge(x, aSubset);
             }
+            System.out.println("Delete: " + y + " -- " + aSubset);
             graph.removeEdge(y, aSubset);
+            System.out.println("Insert: " + y + " -> " + aSubset);
             graph.addDirectedEdge(y, aSubset);
         }
     }
@@ -725,5 +741,12 @@ public abstract class GESThread implements Runnable{
     }
 
 
+    public int getId(){
+        return this.id;
+    }
+
+    public String getLog(){
+        return this.log;
+    }
 
 }

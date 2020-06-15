@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N parallelBN
+#PBS -N parallelBNs
 #PBS -l mem=8gb
 #PBS -o parallel-output
 #PBS -e parallel-error
@@ -8,18 +8,18 @@
 # Change directory to the job submission directory
 cd $PBS_O_WORKDIR
 
-MAIN_PATH="/home/frubio/jorge"
-PARAMS="${MAIN_PATH}/ParallelGES/Fusion/myexperiments.txt"
-JAVA_BIN="/home/frubio/java/jdk1.8.0_45/bin/java"
-JAR_PATH="${MAIN_PATH}/ParallelGES/Fusion/libraries/"
-SOURCE_PATH="${JAR_PATH}weka.jar:${JAR_PATH}tetrad/tetrad.jar:${JAR_PATH}tetrad-libs/"
-CLASSPATH="${MAIN_PATH}/ParallelGES/Fusion/bin/"
+MAIN_PATH="/home/jorlabs/projects/ParallelBNs-git/ParallelBNs"
+PARAMS="${MAIN_PATH}/scripts/scripts/pgesv2_experiments.txt"
+JAVA_BIN="/home/jorlabs/java/jdk1.8.0_251/bin/java"
+LIB_PATH="${MAIN_PATH}/src/lib/"
+SOURCE_PATH="${LIB_PATH}colt.jar:${LIB_PATH}commons-collections-3.1.jar:${LIB_PATH}f2jutil.jar:${LIB_PATH}fusion.jar:${LIB_PATH}Jama-1.0.2.jar:${LIB_PATH}jdepend.jar:${LIB_PATH}jh.jar:${LIB_PATH}junit.jar:${LIB_PATH}jxl.jar:${LIB_PATH}mrjtoolkitstubs.jar:${LIB_PATH}mtj.jar:${LIB_PATH}opt77.jar:${LIB_PATH}pal-1.4.jar:${LIB_PATH}weka.jar:${LIB_PATH}xom-1.1.jar"
+CLASSPATH="${MAIN_PATH}/target/classes/"
 
 ## Load parameters:
 Y="$PBS_ARRAY_INDEX"
 #Y=1
 linea=`awk -v line=$Y 'NR==line {print $0}' $PARAMS`
-col=1
+col=0
 for i in $linea
 do
 	params[$col]=$i
@@ -31,10 +31,10 @@ nColsMenos1=`expr $nCols - 1`
 ## End load parameters
 
 ## Map Parameters:
-NETWORK=${params[1]}
-DATASET=${params[2]}
-FUSION=${params[3]}
-NTHREADS=${params[4]}
-NITINTERLEAVING=${params[5]}
+NETWORK=${params[0]}
+DATASET=${params[1]} 
+NTHREADS=${params[2]}
+NITINTERLEAVING=${params[3]}
 
-$JAVA_BIN -classpath $CLASSPATH:$SOURCE_PATH parallelGES.LaunchExperiment $NETWORK $DATASET $FUSION $NTHREADS $NITINTERLEAVING
+
+$JAVA_BIN -classpath $CLASSPATH:$SOURCE_PATH org.albacete.simd.experiments.Experiment "$MAIN_PATH/$NETWORK" "$MAIN_PATH/$DATASET" $NTHREADS $NITINTERLEAVING

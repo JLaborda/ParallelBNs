@@ -1,0 +1,321 @@
+Match!
+networks/cancer
+Match!
+cancer.xbif_
+Starting Experiment:
+-----------------------------------------
+	Net Name: networks/cancer
+	BBDD Name: cancer.xbif_
+	nThreads: 2
+	nItInterleaving: 10
+-----------------------------------------
+Net_path: res/networks/cancer.xbif
+BBDD_path: res/networks/BBDD/cancer.xbif_.csv
+Numero de variables: 5
+============================
+Iteration: 1
+============================
+----------------------------
+Splits: 
+Split 1
+(Dyspnoea, Cancer)
+(Dyspnoea, Smoker)
+(Xray, Pollution)
+(Xray, Cancer)
+(Cancer, Pollution)
+Split 2
+(Pollution, Smoker)
+(Cancer, Smoker)
+(Dyspnoea, Pollution)
+(Xray, Smoker)
+(Xray, Dyspnoea)
+----------------------------
+FES STAGE
+** FORWARD EQUIVALENCE SEARCH
+** FORWARD EQUIVALENCE SEARCH
+Initial Score = -10660.7146
+Initial Score = -10660.7146
+Thread 1 inserting: (Xray, Cancer, [])
+Thread 2 inserting: (Cancer, Smoker, [])
+Insert: Cancer -> Smoker
+Insert: Xray -> Cancer
+[2] Score: -10649.0622 (+11.6524)	Operator: Cancer --- Smoker
+[1] Score: -10600.2261 (+60.4884)	Operator: Xray --- Cancer
+Thread 1 inserting: (Dyspnoea, Cancer, [])
+Insert: Dyspnoea -> Cancer
+[1] Score: -10593.2568 (+67.4578)	Operator: Dyspnoea --- Cancer
+Thread 1 inserting: (Pollution, Cancer, [])
+Insert: Pollution -> Cancer
+[1] Score: -10591.3135 (+69.4010)	Operator: Pollution --- Cancer
+Results of FES: 
+Thread 1
+
+Graph Nodes:
+Xray Dyspnoea Cancer Pollution Smoker 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+
+
+Thread 2
+
+Graph Nodes:
+Xray Dyspnoea Cancer Pollution Smoker 
+
+Graph Edges: 
+1. Smoker --> Cancer
+
+
+----------------------------
+FES-Fusion Graph
+
+Graph Nodes:
+Smoker Pollution Cancer Dyspnoea Xray 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+----------------------------
+BES STAGE
+** BACKWARD EQUIVALENCE SEARCH
+** BACKWARD EQUIVALENCE SEARCH
+Initial Score = -10579.7215
+Initial Score = -10579.7215
+Results of BES: 
+Thread 1
+
+Graph Nodes:
+Smoker Pollution Cancer Dyspnoea Xray 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+Thread 2
+
+Graph Nodes:
+Smoker Pollution Cancer Dyspnoea Xray 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+----------------------------
+BES-Fusion Graph
+Graph ITERATION (1)
+
+Graph Nodes:
+Pollution Smoker Cancer Xray Dyspnoea 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+----------------------------
+============================
+Iteration: 2
+============================
+----------------------------
+Splits: 
+Split 1
+(Cancer, Pollution)
+(Cancer, Smoker)
+(Xray, Pollution)
+(Dyspnoea, Smoker)
+(Dyspnoea, Pollution)
+Split 2
+(Xray, Dyspnoea)
+(Xray, Smoker)
+(Pollution, Smoker)
+(Xray, Cancer)
+(Dyspnoea, Cancer)
+----------------------------
+FES STAGE
+** FORWARD EQUIVALENCE SEARCH
+** FORWARD EQUIVALENCE SEARCH
+Initial Score = -10579.7215
+Initial Score = -10579.7215
+Results of FES: 
+Thread 1
+
+Graph Nodes:
+Pollution Smoker Cancer Xray Dyspnoea 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+Thread 2
+
+Graph Nodes:
+Pollution Smoker Cancer Xray Dyspnoea 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+----------------------------
+FES-Fusion Graph
+
+Graph Nodes:
+Smoker Pollution Cancer Dyspnoea Xray 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+----------------------------
+BES STAGE
+** BACKWARD EQUIVALENCE SEARCH
+Initial Score = -10579.7215
+** BACKWARD EQUIVALENCE SEARCH
+Initial Score = -10579.7215
+Results of BES: 
+Thread 1
+
+Graph Nodes:
+Smoker Pollution Cancer Dyspnoea Xray 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+Thread 2
+
+Graph Nodes:
+Smoker Pollution Cancer Dyspnoea Xray 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+----------------------------
+BES-Fusion Graph
+Graph ITERATION (2)
+
+Graph Nodes:
+Pollution Smoker Cancer Xray Dyspnoea 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+----------------------------
+Original DAG:
+
+Graph Nodes:
+Xray Dyspnoea Cancer Pollution Smoker 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+Total Nodes Original DAG:
+5
+Nodes: [Xray, Dyspnoea, Cancer, Pollution, Smoker]
+Node1
+Pollution
+Node2
+Cancer
+tail: 3
+head: 2
+Node1
+Smoker
+Node2
+Cancer
+tail: 4
+head: 2
+Node1
+Cancer
+Node2
+Xray
+tail: 2
+head: 0
+Node1
+Cancer
+Node2
+Dyspnoea
+tail: 2
+head: 1
+Current DAG:
+
+Graph Nodes:
+Pollution Smoker Cancer Xray Dyspnoea 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+Total Nodes Current DAG
+5
+-------------------------
+Metrics: 
+SHD: 0
+Final BDeu: -10579.721475137561
+Total execution time (s): 0
+Total number of Iterations: 2
+dfMM: 0.0
+dfMM plus: 0.0
+dfMM minus: 0.0
+Current DAG:
+
+Graph Nodes:
+Pollution Smoker Cancer Xray Dyspnoea 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+Total Nodes Current DAG
+5
+-------------------------
+Metrics: 
+SHD: 0
+Final BDeu: -10579.721475137561
+Total execution time (s): 0
+Total number of Iterations: 2
+dfMM: 0.0
+dfMM plus: 0.0
+dfMM minus: 0.0

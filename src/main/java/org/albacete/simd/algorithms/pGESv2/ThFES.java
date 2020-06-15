@@ -21,6 +21,9 @@ public class ThFES extends GESThread{
      * @param subset subset of edges the fes stage will try to add to the resulting graph
      * @param maxIt maximum number of iterations allowed in the fes stage
      */
+
+    private static int threadCounter = 1;
+
     public ThFES(DataSet dataSet,Graph initialDag, ArrayList<TupleNode> subset,int maxIt) {
         setDataSet(dataSet);
         setInitialGraph(initialDag);
@@ -28,6 +31,8 @@ public class ThFES extends GESThread{
         setMaxIt(maxIt);
         setStructurePrior(0.001);
         setSamplePrior(10.0);
+        this.id = threadCounter;
+        threadCounter++;
     }
 
     /**
@@ -43,6 +48,8 @@ public class ThFES extends GESThread{
         setMaxIt(maxIt);
         setStructurePrior(0.001);
         setSamplePrior(10.0);
+        this.id = threadCounter;
+        threadCounter++;
     }
 
 
@@ -123,6 +130,7 @@ public class ThFES extends GESThread{
             bestScore = bestInsert;
 
             // Inserting edge
+            System.out.println("Thread " + getId() + " inserting: (" + x_i + ", " + y_i + ", " + t_0+ ")");
             insert(x_i,y_i,t_0, graph);
 
             // Checking cycles?
@@ -133,9 +141,9 @@ public class ThFES extends GESThread{
 
             // Printing score
             if (!t_0.isEmpty())
-                System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert-score) +")\tOperator: " + graph.getEdge(x_i, y_i) + " " + t_0);
+                System.out.println("["+getId() + "] Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert-score) +")\tOperator: " + graph.getEdge(x_i, y_i) + " " + t_0);
             else
-                System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert-score) +")\tOperator: " + graph.getEdge(x_i, y_i));
+                System.out.println("["+getId() + "] Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert-score) +")\tOperator: " + graph.getEdge(x_i, y_i));
             bestScore = bestInsert;
 
             // Checking that the maximum number of edges has not been reached

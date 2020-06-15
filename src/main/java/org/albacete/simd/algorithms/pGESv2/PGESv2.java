@@ -2,7 +2,6 @@ package org.albacete.simd.algorithms.pGESv2;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import edu.cmu.tetrad.search.SearchGraphUtils;
 import consensusBN.ConsensusUnion;
 import org.albacete.simd.utils.Utils;
 
@@ -16,7 +15,7 @@ import java.util.*;
  * @version 0.1
  * Main class. This class contains the methods and variables used to run the parallel BN algorithm
  */
-public class Main
+public class PGESv2
 {
     /**
      * {@link DataSet DataSet}DataSet containing the values of the variables of the problem in hand.
@@ -80,7 +79,9 @@ public class Main
      */
     private TupleNode[] listOfArcs;
 
+    private boolean fesFlag = false;
 
+    private boolean besFlag = false;
 
 
     /**
@@ -88,7 +89,7 @@ public class Main
      * @param data Dataset containing the data of the problem.
      * @param nThreads Number of threads used in the problem.
      */
-    public Main(DataSet data, int nThreads){
+    public PGESv2(DataSet data, int nThreads){
         this.data = data;
         initialize(nThreads);
     }
@@ -98,7 +99,7 @@ public class Main
      * @param path path to the csv file
      * @param nThreads number of threads of the problem
      */
-    public Main(String path, int nThreads){
+    public PGESv2(String path, int nThreads){
         this.data = Utils.readData(path);
         initialize(nThreads);
     }
@@ -197,6 +198,16 @@ public class Main
 
     }
 
+    public boolean checkWorkingStatus() throws InterruptedException {
+        for (GESThread g: gesThreads) {
+           if (g.getFlag() ){
+               return true;
+           }
+        }
+        return false;
+    }
+
+
     /**
      * Runs the FES Stage, where each thread runs a FES algorithm for its corresponding subset of edges.
      * @throws InterruptedException Exception caused by an external interruption.
@@ -208,6 +219,9 @@ public class Main
 
         // Running threads
         runThreads();
+
+        //Working Status
+        this.fesFlag = checkWorkingStatus();
 
     }
 
@@ -241,11 +255,14 @@ public class Main
      * @throws InterruptedException Interruption caused by an external interruption.
      */
     public void besStage() throws InterruptedException {
-        // Configuring the fes stage
+        // Configuring the bes stage
         besConfig();
 
         // Running threads
         runThreads();
+
+        // Checking working status
+        besFlag = checkWorkingStatus();
     }
 
 
@@ -261,6 +278,61 @@ public class Main
 
 
     /**
+
+     * Joins the Dags of either the FES or BES stage.
+
+     * @return Dag with the fusion consensus of the graphs of the previous stage
+
+     */
+
+    public Dag fusionIntersection(){
+
+
+
+        ArrayList<Node> order = new ArrayList<Node>(this.currentGraph.getTierOrdering());
+
+
+
+        for(Dag g: this.graphs) {
+
+            for(Edge e:g.getEdges()) {
+
+                if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW)) continue;
+
+                if((order.indexOf(e.getNode1()) > order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.ARROW && e.getEndpoint2()==Endpoint.TAIL)) continue;
+
+                if(e.getEndpoint1()==Endpoint.TAIL) e.setEndpoint1(Endpoint.ARROW); else e.setEndpoint1(Endpoint.TAIL);
+
+                if(e.getEndpoint2()==Endpoint.TAIL) e.setEndpoint2(Endpoint.ARROW); else e.setEndpoint2(Endpoint.TAIL);
+
+            }
+
+        }
+
+
+        // Looping over each edge of the currentGraph and checking if it has been deleted in any of the resulting graphs of the BES stage.
+        // If it has been deleted, then it is removed from the currentGraph.
+        for(Edge e: this.currentGraph.getEdges()) {
+
+            for(Dag g: this.graphs)
+
+                if(!g.containsEdge(e)) {
+
+                    this.currentGraph.removeEdge(e);
+
+                    break;
+
+                }
+
+
+
+        }
+
+        return (Dag) this.currentGraph;
+
+    }
+
+    /**
      * Convergence function that checks if the previous graph and the current graph are equal or not.
      * @return true if there is convergence, false if not.
      */
@@ -268,6 +340,11 @@ public class Main
         // Checking Iterations
         if (it >= this.maxIterations)
             return true;
+
+        // Checking working status
+        if(!fesFlag && !besFlag){
+            return true;
+        }
 
         // Checking that the threads have done something
         // BUG: This will only get the results of the besThreads, making it impossible to know if the fesThreads have actually done something
@@ -279,7 +356,6 @@ public class Main
         }*/
         it++;
         return false;
-
     }
 
     /**
@@ -300,12 +376,25 @@ public class Main
         this.listOfArcs = Utils.calculateArcs(this.data);
 
         do {
-            System.out.println("-----------------------");
+            System.out.println("============================");
             System.out.println("Iteration: " + (it));
+            System.out.println("============================");
 
             // 2 Random Repartitioning
             this.subSets = Utils.split(listOfArcs, nThreads, seed);
 
+            System.out.println("----------------------------");
+            System.out.println("Splits: ");
+            int i = 1;
+            for( ArrayList<TupleNode> s : subSets){
+                System.out.println("Split " + i);
+                i++;
+                for(TupleNode t : s){
+                    System.out.println(t);
+                }
+            }
+            System.out.println("----------------------------");
+            System.out.println("FES STAGE");
             // 3. FES
             try {
                 fesStage();
@@ -314,13 +403,26 @@ public class Main
                 e.printStackTrace();
             }
 
+            // Printing
+            System.out.println("Results of FES: ");
+            i = 1;
+            for (Dag dag : this.graphs) {
+                System.out.println("Thread " + i);
+                System.out.println(dag);
+                i++;
+            }
+
             // 4. Fusion
             fusion();
-            //System.out.println("FES-Fusion Graph");
-            //System.out.println(this.currentGraph);
+            System.out.println("----------------------------");
+            System.out.println("FES-Fusion Graph");
+            System.out.println(this.currentGraph);
+            System.out.println("----------------------------");
+
 
             // 5. BES
             try {
+                System.out.println("BES STAGE");
                 besStage();
             } catch (InterruptedException e) {
                 System.err.println("Error in BES Stage");
@@ -328,14 +430,22 @@ public class Main
             }
             // Printing
             System.out.println("Results of BES: ");
-            for (Dag dag : this.graphs) {
-                System.out.println(dag);
-            }
 
-            // 6. Fusion
-            fusion();
-            System.out.println("Final Graph " + "("+ it + ")");
+            i = 1;
+            for (Dag dag : this.graphs) {
+                System.out.println("Thread " + i);
+                System.out.println(dag);
+                i++;
+            }
+            // 6. Intersection Fusion
+            System.out.println("----------------------------");
+            System.out.println("BES-Fusion Graph");
+            this.currentGraph = fusionIntersection();
+
+            // Results of the iteration
+            System.out.println("Graph ITERATION " + "("+ it + ")");
             System.out.println(this.currentGraph);
+            System.out.println("----------------------------");
 
             // 7. Checking convergence and preparing configurations for the next iteration
         }while(!convergence());
@@ -439,17 +549,18 @@ public class Main
         String path = "src/test/resources/cancer.xbif_.csv";
 
         // 2. Configuring algorithm
-        Main main = new Main(path, 2);
+        PGESv2 pGESv2 = new PGESv2(path, 2);
         int maxIteration = 15;
-        main.setMaxIterations(maxIteration);
-        main.setNFESItInterleaving(5);
+        pGESv2.setMaxIterations(maxIteration);
+        pGESv2.setNFESItInterleaving(5);
 
         // 3. Running Algorithm
-        main.search();
+        pGESv2.search();
 
         // 4. Printing out the results
-        System.out.println("Number of Iterations: " + main.getIterations());
-        System.out.println("Resulting Graph: " + main.getCurrentGraph());
+        System.out.println("Number of Iterations: " + pGESv2.getIterations());
+        System.out.println("Resulting Graph: " + pGESv2.getCurrentGraph());
+
 
     }
 
