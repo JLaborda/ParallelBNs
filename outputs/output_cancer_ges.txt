@@ -1,0 +1,115 @@
+Match!
+networks/cancer
+Match!
+cancer.xbif_
+Starting GES Experiment:
+-----------------------------------------
+	Net Name: networks/cancer
+	BBDD Name: cancer.xbif_
+-----------------------------------------
+Net_path: res/networks/cancer.xbif
+BBDD_path: res/networks/BBDD/cancer.xbif_.csv
+Numero de variables: 5
+FES stage: 
+** FORWARD EQUIVALENCE SEARCH
+Initial Score = -10660.7146
+Thread 1 inserting: (Xray, Cancer, [])
+Insert: Xray -> Cancer
+[1] Score: -10600.2261 (+60.4884)	Operator: Xray --- Cancer
+Thread 1 inserting: (Cancer, Smoker, [])
+Insert: Cancer -> Smoker
+[1] Score: -10588.5738 (+72.1408)	Operator: Cancer --- Smoker
+Thread 1 inserting: (Dyspnoea, Cancer, [])
+Insert: Dyspnoea -> Cancer
+[1] Score: -10581.6044 (+79.1101)	Operator: Dyspnoea --- Cancer
+Thread 1 inserting: (Pollution, Cancer, [])
+Insert: Pollution -> Cancer
+[1] Score: -10579.6612 (+81.0534)	Operator: Pollution --- Cancer
+BES stage: 
+** BACKWARD EQUIVALENCE SEARCH
+Initial Score = -10579.6612
+Original DAG:
+
+Graph Nodes:
+Xray Dyspnoea Cancer Pollution Smoker 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Xray
+3. Pollution --> Cancer
+4. Smoker --> Cancer
+
+
+Total Nodes Original DAG:
+5
+Nodes: [Xray, Dyspnoea, Cancer, Pollution, Smoker]
+Node1
+Cancer
+Node2
+Xray
+tail: 2
+head: 0
+Node1
+Cancer
+Node2
+Dyspnoea
+tail: 2
+head: 1
+Node1
+Cancer
+Node2
+Pollution
+tail: 2
+head: 3
+Node1
+Smoker
+Node2
+Cancer
+tail: 4
+head: 2
+Current DAG:
+
+Graph Nodes:
+Xray Dyspnoea Cancer Pollution Smoker 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Pollution
+3. Cancer --> Xray
+4. Smoker --> Cancer
+
+
+Total Nodes Current DAG
+5
+-------------------------
+Metrics: 
+SHD: 2
+Final BDeu: -10579.661154393842
+Total execution time (s): 0
+Total number of Iterations: 0
+dfMM: 0.4
+dfMM plus: 0.0
+dfMM minus: 2.0
+Current DAG:
+
+Graph Nodes:
+Xray Dyspnoea Cancer Pollution Smoker 
+
+Graph Edges: 
+1. Cancer --> Dyspnoea
+2. Cancer --> Pollution
+3. Cancer --> Xray
+4. Smoker --> Cancer
+
+
+Total Nodes Current DAG
+5
+-------------------------
+Metrics: 
+SHD: 2
+Final BDeu: -10579.661154393842
+Total execution time (s): 0
+Total number of Iterations: 0
+dfMM: 0.4
+dfMM plus: 0.0
+dfMM minus: 2.0

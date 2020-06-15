@@ -5,7 +5,7 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
-import org.albacete.simd.algorithms.pGESv2.Main;
+import org.albacete.simd.algorithms.pGESv2.PGESv2;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
@@ -26,15 +26,15 @@ import java.util.regex.Pattern;
 
 public class Experiment {
 
-    private String net_path;
-    private String bbdd_path;
-    private String net_name;
-    private String bbdd_name;
+    protected String net_path;
+    protected String bbdd_path;
+    protected String net_name;
+    protected String bbdd_name;
     private int nThreads;
     //private String fusion_consensus;
     private int nItInterleaving;
     private int maxIterations = 15;
-    private Main alg;
+    private PGESv2 alg;
     private static HashMap<String, HashMap<String,String>> map;
 
     private int shd = Integer.MAX_VALUE;
@@ -42,6 +42,8 @@ public class Experiment {
     private double [] dfmm;
     private long elapsedTime;
     private int nIterations;
+
+    private String log = "";
 
 
     public Experiment(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
@@ -98,7 +100,7 @@ public class Experiment {
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new Main(dataSet,this.nThreads);
+            this.alg = new PGESv2(dataSet,this.nThreads);
             this.alg.setMaxIterations(this.maxIterations);
             this.alg.setNFESItInterleaving(this.nItInterleaving);
 

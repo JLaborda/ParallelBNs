@@ -13,6 +13,8 @@ import java.util.List;
 public class ThBES extends GESThread {
 
 
+    private static int threadCounter = 1;
+
     /**
      * Constructor of ThFES with an initial DAG
      * @param dataSet data of the problem
@@ -27,6 +29,8 @@ public class ThBES extends GESThread {
         // Setting structure prior and sample prior
         setStructurePrior(0.001);
         setSamplePrior(10.0);
+        this.id = threadCounter;
+        threadCounter++;
     }
 
     /**
@@ -93,6 +97,7 @@ public class ThBES extends GESThread {
             bestScore = bestDelete;
 
             // Deleting edge
+            System.out.println("Thread " + getId() + " deleting: (" + x_d + ", " + y_d + ", " + h_0+ ")");
             delete(x_d,y_d,h_0, graph);
 
             // Checking cycles?

@@ -2,8 +2,6 @@ package org.albacete.simd.algorithms.pGESv2;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.algorithms.pGESv2.Main;
-import org.albacete.simd.algorithms.pGESv2.TupleNode;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -17,7 +15,7 @@ import static org.junit.Assert.*;
 /**
  * Unit test for Main Class.
  */
-public class MainTest
+public class PGESv2Test
 {
     /**
      * String containing the path to the data used in the test. The data used in these tests is made by sampling the
@@ -93,14 +91,14 @@ public class MainTest
         int num_cols = 5;
 
         // Act
-        Main main1 = new Main(path, 1);
-        Main main2 = new Main(dataset, 1);
-        DataSet data1 = main1.getData();
-        DataSet data2 = main2.getData();
+        PGESv2 PGESv21 = new PGESv2(path, 1);
+        PGESv2 PGESv22 = new PGESv2(dataset, 1);
+        DataSet data1 = PGESv21.getData();
+        DataSet data2 = PGESv22.getData();
 
         // Assert
-        assertNotNull(main1);
-        assertNotNull(main2);
+        assertNotNull(PGESv21);
+        assertNotNull(PGESv22);
         assertEquals(num_cols, data1.getNumColumns());
         assertEquals(num_cols, data2.getNumColumns());
     }
@@ -115,8 +113,8 @@ public class MainTest
         int num_cols = 5;
         List<Node> columns = new ArrayList<>(Arrays.asList(xray, dyspnoea, cancer, pollution, smoker));
         //Act
-        Main main = new Main(path, 1);
-        DataSet data = main.getData();
+        PGESv2 pGESv2 = new PGESv2(path, 1);
+        DataSet data = pGESv2.getData();
         int result = data.getNumColumns();
         //Assert
         assertEquals(num_cols, result);
@@ -133,7 +131,7 @@ public class MainTest
     public void exceptionReadDataTest(){
         String path = "";
         //noinspection unused
-        Main main = new Main(path, 1);
+        PGESv2 pGESv2 = new PGESv2(path, 1);
         fail();
     }
 
@@ -145,15 +143,15 @@ public class MainTest
     @Test
     public void calculateArcsTest(){
         // Arrange
-        Main main = new Main(path, 1);
+        PGESv2 pGESv2 = new PGESv2(path, 1);
 
         TupleNode[] expected = new TupleNode[]{new TupleNode(xray, dyspnoea), new TupleNode(xray, cancer), new TupleNode(xray, pollution), new TupleNode(xray, smoker),
                 new TupleNode(dyspnoea, cancer), new TupleNode(dyspnoea, pollution), new TupleNode(dyspnoea, smoker),
                 new TupleNode(cancer, pollution), new TupleNode(cancer, smoker),
                 new TupleNode(pollution, smoker)};
         // Act
-        main.calculateArcs();
-        TupleNode[] result =  main.getListOfArcs();
+        pGESv2.calculateArcs();
+        TupleNode[] result =  pGESv2.getListOfArcs();
 
         // Assert
         // Asserting size
@@ -177,13 +175,13 @@ public class MainTest
     @Test
     public void splitArcsTest(){
         // Arrange
-        Main main = new Main(path, 2);
+        PGESv2 pGESv2 = new PGESv2(path, 2);
 
         // Act
-        main.calculateArcs();
-        main.splitArcs();
-        TupleNode[] arcs = main.getListOfArcs();
-        ArrayList<TupleNode>[] subsets = main.getSubSets();
+        pGESv2.calculateArcs();
+        pGESv2.splitArcs();
+        TupleNode[] arcs = pGESv2.getListOfArcs();
+        ArrayList<TupleNode>[] subsets = pGESv2.getSubSets();
 
         // Assert
         // Checking that each arc is in fact in a subset, and that it is only once in it.
@@ -217,13 +215,13 @@ public class MainTest
 
         // Creating main
         String path = "src/test/resources/cancer.xbif_.csv";
-        Main main = new Main(path, 2);
-        main.calculateArcs();
-        main.splitArcs();
+        PGESv2 pGESv2 = new PGESv2(path, 2);
+        pGESv2.calculateArcs();
+        pGESv2.splitArcs();
 
         // Act
-        main.fesStage();
-        ArrayList<Dag> resultingGraphs = main.getGraphs();
+        pGESv2.fesStage();
+        ArrayList<Dag> resultingGraphs = pGESv2.getGraphs();
         Dag gdag1 = resultingGraphs.get(0);
         Dag gdag2 = resultingGraphs.get(1);
 
@@ -245,10 +243,10 @@ public class MainTest
     public void setgetMaxIterations(){
         // Arrange
         int expected = 21;
-        Main main = new Main(path, 1);
+        PGESv2 pGESv2 = new PGESv2(path, 1);
         // Act
-        main.setMaxIterations(21);
-        int actual = main.getMaxIterations();
+        pGESv2.setMaxIterations(21);
+        int actual = pGESv2.getMaxIterations();
         // Assert
         assertEquals(expected, actual);
     }
@@ -261,11 +259,11 @@ public class MainTest
     public void setgetSeedTest(){
         // Arrange
         long newSeed = 21;
-        Main main = new Main(path, 1);
+        PGESv2 pGESv2 = new PGESv2(path, 1);
         // Act
-        main.setSeed(newSeed);
+        pGESv2.setSeed(newSeed);
         // Assert
-        assertEquals(newSeed, main.getSeed());
+        assertEquals(newSeed, pGESv2.getSeed());
     }
 
     /**
@@ -276,7 +274,7 @@ public class MainTest
     @Test
     public void fusionTest() throws InterruptedException {
         // Arrange
-        Main main = new Main(path, 2);
+        PGESv2 pGESv2 = new PGESv2(path, 2);
 
         List<Node> nodes = new ArrayList<>();
         nodes.add(cancer);
@@ -291,10 +289,10 @@ public class MainTest
         expected.addDirectedEdge(smoker, cancer);
 
         // Act
-        main.calculateArcs();
-        main.splitArcs();
-        main.fesStage();
-        Dag result = main.fusion();
+        pGESv2.calculateArcs();
+        pGESv2.splitArcs();
+        pGESv2.fesStage();
+        Dag result = pGESv2.fusion();
         System.out.println(result);
 
         // Assert Nodes
@@ -359,15 +357,15 @@ public class MainTest
         expected.add(new Edge(smoker, cancer, Endpoint.TAIL, Endpoint.ARROW));
 
         // Creating main
-        Main main = new Main(path, 2);
-        main.calculateArcs();
-        main.splitArcs();
-        main.fesStage();
-        main.fusion();
+        PGESv2 pGESv2 = new PGESv2(path, 2);
+        pGESv2.calculateArcs();
+        pGESv2.splitArcs();
+        pGESv2.fesStage();
+        pGESv2.fusion();
 
         // Act
-        main.besStage();
-        ArrayList<Dag> results = main.getGraphs();
+        pGESv2.besStage();
+        ArrayList<Dag> results = pGESv2.getGraphs();
 
         // Assert
         for(Dag graph : results){
@@ -384,7 +382,7 @@ public class MainTest
     @Test
     public void searchCancerTest(){
         //Arrange
-        Main main = new Main(path, 2);
+        PGESv2 pGESv2 = new PGESv2(path, 2);
 
         //Expectation
         List<Node> nodes = Arrays.asList(cancer, dyspnoea, pollution, xray, smoker);
@@ -395,10 +393,10 @@ public class MainTest
         expectation.addDirectedEdge(smoker, cancer);
 
         // Act
-        main.search();
+        pGESv2.search();
 
         //Assert
-        assertEquals(expectation, main.getCurrentGraph());
+        assertEquals(expectation, pGESv2.getCurrentGraph());
 
     }
 
@@ -408,7 +406,7 @@ public class MainTest
      */
     @Test
     public void mainExecutesTest(){
-        Main.main(null);
+        PGESv2.main(null);
     }
 
 }

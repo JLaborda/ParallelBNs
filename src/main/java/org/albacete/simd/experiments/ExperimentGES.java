@@ -6,7 +6,6 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
 import org.albacete.simd.algorithms.GES.GES;
-import org.albacete.simd.algorithms.pGESv2.Main;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
@@ -15,17 +14,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ExperimentGES extends Experiment{
 
 
 
-    private String net_path;
-    private String bbdd_path;
-    private String net_name;
-    private String bbdd_name;
+
     private int maxIterations = 15;
     private GES alg;
     private static HashMap<String, HashMap<String,String>> map;
