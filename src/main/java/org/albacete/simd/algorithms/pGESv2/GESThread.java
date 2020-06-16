@@ -75,7 +75,7 @@ public abstract class GESThread implements Runnable{
     /**
      * Caches scores for discrete search.
      */
-    protected final LocalScoreCache localScoreCache = new LocalScoreCache();
+    protected final static LocalScoreCacheConcurrent localScoreCache = new LocalScoreCacheConcurrent();
 
     /**
      * Total calls done
