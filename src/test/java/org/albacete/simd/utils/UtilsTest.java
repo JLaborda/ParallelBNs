@@ -243,6 +243,23 @@ public class UtilsTest {
         assertEquals(expected_mbminus, result[2 ], 0.000001);
     }
 
+    @Test
+    public void getNodeByNameTest() throws Exception {
+        BIFReader bf = new BIFReader();
+        bf.processFile("res/networks/cancer.xbif");
+        BayesNet bn = (BayesNet) bf;
+        System.out.println("Numero de variables: "+bn.getNrOfNodes());
+        MlBayesIm bn2 = new MlBayesIm(bn);
+
+        Dag dag = bn2.getDag();
+
+        Node n = Utils.getNodeByName(dag.getNodes(), "Pollution");
+        Node n2 = Utils.getNodeByName(dag.getNodes(), "");
+
+        assertNotNull(n);
+        assertNull(n2);
+    }
+
     /* For some reason this test doesn't get the same score always.
     @Test
     public void scoreGraph() throws Exception {

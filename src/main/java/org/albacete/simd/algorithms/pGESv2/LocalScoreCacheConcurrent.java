@@ -46,4 +46,11 @@ public class LocalScoreCacheConcurrent {
     public void clear() {
         this.map.clear();
     }
+
+    @Override
+    public String toString() {
+        return "LocalScoreCacheConcurrent{" +
+                "map=" + map +
+                '}';
+    }
 }

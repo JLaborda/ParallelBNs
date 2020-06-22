@@ -1,5 +1,7 @@
 package org.albacete.simd.algorithms.pGESv2;
 
+import java.util.Objects;
+
 public class DualKey<K1,K2> {
     private final K1 key1;
     private final K2 key2;
@@ -26,5 +28,16 @@ public class DualKey<K1,K2> {
             }
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + key1.toString() + ", " + key2.toString() + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        //return super.hashCode();
+        return Objects.hash(key1, key2);
     }
 }

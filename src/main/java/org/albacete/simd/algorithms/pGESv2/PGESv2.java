@@ -223,6 +223,15 @@ public class PGESv2
         //Working Status
         this.fesFlag = checkWorkingStatus();
 
+        //Printing localScoreMap
+        for (GESThread thread: gesThreads) {
+            System.out.println("---------------------------");
+            System.out.println("ThFES " + thread.getId());
+            System.out.println("LocalScoreMap:");
+            System.out.println(thread.getLocalScoreCache());
+            System.out.println("---------------------------");
+        }
+
     }
 
     /**
@@ -263,6 +272,16 @@ public class PGESv2
 
         // Checking working status
         besFlag = checkWorkingStatus();
+
+        //Printing localScoreMap
+        for (GESThread thread: gesThreads) {
+            System.out.println("---------------------------");
+            System.out.println("ThBES " + thread.getId());
+            System.out.println("LocalScoreMap:");
+            System.out.println(thread.getLocalScoreCache());
+            System.out.println("---------------------------");
+        }
+
     }
 
 

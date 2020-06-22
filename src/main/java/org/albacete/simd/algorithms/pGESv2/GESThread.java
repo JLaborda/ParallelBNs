@@ -75,7 +75,7 @@ public abstract class GESThread implements Runnable{
     /**
      * Caches scores for discrete search.
      */
-    protected final static LocalScoreCacheConcurrent localScoreCache = new LocalScoreCacheConcurrent();
+    protected static LocalScoreCacheConcurrent localScoreCache = new LocalScoreCacheConcurrent();
 
     /**
      * Total calls done
@@ -464,7 +464,7 @@ public abstract class GESThread implements Runnable{
      */
     protected double localBdeuScore(int nNode, int[] nParents) {
         numTotalCalls++;
-        double oldScore = localScoreCache.get(nNode, nParents);
+        double oldScore =localScoreCache.get(nNode, nParents);
         if (!Double.isNaN(oldScore)) {
             return oldScore;
         }
@@ -749,4 +749,7 @@ public abstract class GESThread implements Runnable{
         return this.log;
     }
 
+    public static LocalScoreCacheConcurrent getLocalScoreCache() {
+        return localScoreCache;
+    }
 }
