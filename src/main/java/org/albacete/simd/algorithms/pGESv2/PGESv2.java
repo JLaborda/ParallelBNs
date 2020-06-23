@@ -290,9 +290,64 @@ public class PGESv2
      * @return Dag with the fusion consensus of the graphs of the previous stage
      */
     public Dag fusion(){
+
+        // Applying ConsensusUnion fusion
         ConsensusUnion fusion = new ConsensusUnion(this.graphs);
-        this.currentGraph = fusion.union();
-        return (Dag) this.currentGraph;
+        Graph fusionGraph = fusion.union();
+
+        // Getting Scores
+        double fusionScore = Utils.scoreGraph(fusionGraph,this.data);
+        double currentScore = Utils.scoreGraph(currentGraph, this.data);
+
+        System.out.println("Fusion Score: " + fusionScore);
+        System.out.println("Current Score: " + currentScore);
+
+        // Checking if the score has improved
+        if (fusionScore > currentScore) {
+            return (Dag) fusionGraph;
+        }
+
+
+        // If the score has not improved, then we check what edges added in the FES stage improve the score
+        ArrayList<Node> order = new ArrayList<Node>(this.currentGraph.getTierOrdering());
+
+        // Applying ancestral order into the graphs.
+        for(Dag g: this.graphs) {
+            for(Edge e:g.getEdges()) {
+
+                if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW)) continue;
+
+                if((order.indexOf(e.getNode1()) > order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.ARROW && e.getEndpoint2()==Endpoint.TAIL)) continue;
+
+                if(e.getEndpoint1()==Endpoint.TAIL) e.setEndpoint1(Endpoint.ARROW); else e.setEndpoint1(Endpoint.TAIL);
+
+                if(e.getEndpoint2()==Endpoint.TAIL) e.setEndpoint2(Endpoint.ARROW); else e.setEndpoint2(Endpoint.TAIL);
+
+            }
+
+        }
+
+        for(Dag g : this.graphs){
+            for(Edge e: g.getEdges()){
+                // If an edge has been added in the fes stage that was not in the current graph we check if it improves the score
+                if(!currentGraph.containsEdge(e)){
+                    // Copying graph
+                    Dag aux = new Dag(currentGraph);
+                    // Adding edge into the copy
+                    aux.addEdge(e);
+
+                    // Geeting scores
+                    fusionScore = Utils.scoreGraph(aux,this.data);
+                    currentScore = Utils.scoreGraph(currentGraph, this.data);
+
+                    // If there is an improvement, we add the edge into the currentGraph
+                    if(fusionScore > currentScore){
+                        currentGraph.addEdge(e);
+                    }
+                }
+            }
+        }
+        return (Dag) currentGraph;
     }
 
 
@@ -432,7 +487,7 @@ public class PGESv2
             }
 
             // 4. Fusion
-            fusion();
+            this.currentGraph = fusion();
             System.out.println("----------------------------");
             System.out.println("FES-Fusion Graph");
             System.out.println(this.currentGraph);

@@ -260,6 +260,19 @@ public class UtilsTest {
         assertNull(n2);
     }
 
+    @Test
+    public void scoreGraph(){
+        String path = "./res/networks/BBDD/cancer.xbif50000_.csv";
+        DataSet data = Utils.readData(path);
+        Graph g = null;
+
+        double score = Utils.scoreGraph(g, data);
+
+        assertEquals(Double.MIN_VALUE, score, 0.000001);
+
+    }
+
+
     /* For some reason this test doesn't get the same score always.
     @Test
     public void scoreGraph() throws Exception {
