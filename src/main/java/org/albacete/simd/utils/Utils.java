@@ -289,6 +289,10 @@ public class Utils {
 
     public static double scoreGraph(Graph graph, DataSet dataSet) {
 
+        if (graph == null){
+            return Double.NEGATIVE_INFINITY;
+        }
+
         // Setting up Scorer
         List<String> _varNames = dataSet.getVariableNames();
 
