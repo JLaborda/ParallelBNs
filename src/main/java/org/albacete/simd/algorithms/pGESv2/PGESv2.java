@@ -130,9 +130,7 @@ public class PGESv2
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem
      */
     public void splitArcs(){
-
         this.subSets = Utils.split(listOfArcs, nThreads, seed);
-
     }
 
 
@@ -304,7 +302,8 @@ public class PGESv2
 
         // Checking if the score has improved
         if (fusionScore > currentScore) {
-            return (Dag) fusionGraph;
+            this.currentGraph = fusionGraph;
+            return (Dag) currentGraph;
         }
 
 

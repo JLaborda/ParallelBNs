@@ -268,7 +268,7 @@ public class UtilsTest {
 
         double score = Utils.scoreGraph(g, data);
 
-        assertEquals(Double.MIN_VALUE, score, 0.000001);
+        assertEquals(Double.NEGATIVE_INFINITY, score, 0.000001);
 
     }
 
