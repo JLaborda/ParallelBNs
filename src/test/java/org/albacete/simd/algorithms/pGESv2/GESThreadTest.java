@@ -2,9 +2,6 @@ package org.albacete.simd.algorithms.pGESv2;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.algorithms.pGESv2.GESThread;
-import org.albacete.simd.algorithms.pGESv2.ThFES;
-import org.albacete.simd.algorithms.pGESv2.TupleNode;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -511,7 +508,7 @@ public class GESThreadTest {
                 {0,1,0,0,1}};
 
         // Act
-        GESThread.setCases(data);
+        GESThread.setProblem(data);
         int[][] resultCases = GESThread.cases;
         int[] resultNValues = GESThread.nValues;
 

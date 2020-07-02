@@ -43,7 +43,7 @@ public class GES {
         this.data = dataSet;
         this.varNames = _varNames.toArray(new String[0]);
         this.variables = dataSet.getVariables();
-        GESThread.setCases(data);
+        GESThread.setProblem(data);
 
         // Getting the complete set of arc combinations.
         TupleNode[] arcs = Utils.calculateArcs(data);

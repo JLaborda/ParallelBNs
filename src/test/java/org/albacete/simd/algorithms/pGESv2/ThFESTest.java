@@ -3,9 +3,6 @@ package org.albacete.simd.algorithms.pGESv2;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
-import org.albacete.simd.algorithms.pGESv2.GESThread;
-import org.albacete.simd.algorithms.pGESv2.ThFES;
-import org.albacete.simd.algorithms.pGESv2.TupleNode;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -60,7 +57,7 @@ public class ThFESTest {
      * Constructor of the test. It initializes the subsets.
      */
     public ThFESTest(){
-        GESThread.setCases(dataset);
+        GESThread.setProblem(dataset);
         initializeSubsets();
     }
 
@@ -225,7 +222,7 @@ public class ThFESTest {
         ArrayList<TupleNode> subset1 = subsets[0];
         ArrayList<TupleNode> subset2 = subsets[1];
 
-        GESThread.setCases(alarmDataset);
+        GESThread.setProblem(alarmDataset);
         ThFES thread1 = new ThFES(alarmDataset, subset1, 100);
         ThFES thread2 = new ThFES(alarmDataset, subset2, 100);
 

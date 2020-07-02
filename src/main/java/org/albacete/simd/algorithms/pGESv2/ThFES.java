@@ -25,12 +25,14 @@ public class ThFES extends GESThread{
     private static int threadCounter = 1;
 
     public ThFES(DataSet dataSet,Graph initialDag, ArrayList<TupleNode> subset,int maxIt) {
-        setDataSet(dataSet);
+
+        if (data == null) {
+            setDataSet(dataSet);
+            GESThread.setProblem(dataSet);
+        }
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
         setMaxIt(maxIt);
-        setStructurePrior(0.001);
-        setSamplePrior(10.0);
         this.id = threadCounter;
         threadCounter++;
     }
@@ -42,12 +44,13 @@ public class ThFES extends GESThread{
      * @param maxIt maximum number of iterations allowed in the fes stage
      */
     public ThFES(DataSet dataSet, ArrayList<TupleNode> subset,int maxIt) {
-        setDataSet(dataSet);
+        if (data == null) {
+            setDataSet(dataSet);
+            GESThread.setProblem(dataSet);
+        }
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
         setMaxIt(maxIt);
-        setStructurePrior(0.001);
-        setSamplePrior(10.0);
         this.id = threadCounter;
         threadCounter++;
     }

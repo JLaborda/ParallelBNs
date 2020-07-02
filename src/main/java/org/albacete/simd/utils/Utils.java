@@ -20,16 +20,6 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
-
-    private static final LocalScoreCache localScoreCache = new LocalScoreCache();
-
-    private static int[][] cases;
-    private static int[] nValues;
-    private static String varNames[];
-    public static double samplePrior = 10.0;
-    public static double structurePrior = 0.001;
-
-
     /**
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem.
      * @param listOfArcs Array of {@link TupleNode TupleNode} of all the possible edges for the actual problem.
@@ -286,7 +276,7 @@ public class Utils {
         return result;
 
     }
-
+/*
     public static double scoreGraph(Graph graph, DataSet dataSet) {
 
         if (graph == null){
@@ -335,12 +325,14 @@ public class Utils {
                     }
                 }
             }
-            score += localBdeuScore(nextIndex, parentIndices);
+            score += Utils.localBdeuScore(nextIndex, parentIndices);
         }
         return score;
     }
+*/
 
-    protected static double localBdeuScore(int nNode, int[] nParents) {
+/*
+    public static double localBdeuScore(int nNode, int[] nParents) {
         //numTotalCalls++;
         double oldScore = localScoreCache.get(nNode, nParents);
         if (!Double.isNaN(oldScore)) {
@@ -401,7 +393,7 @@ public class Utils {
         localScoreCache.add(nNode, nParents, fLogScore);
         return fLogScore;
     }
-
+*/
 
     /**
      * Transforms a graph to a DAG, and removes any possible inconsistency found throughout its structure.
