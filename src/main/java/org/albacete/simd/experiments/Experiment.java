@@ -5,6 +5,7 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
+import org.albacete.simd.algorithms.pGESv2.GESThread;
 import org.albacete.simd.algorithms.pGESv2.PGESv2;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
@@ -136,7 +137,7 @@ public class Experiment {
             this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
             this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
             this.nIterations = alg.getIterations();
-            this.score = Utils.scoreGraph(alg.getCurrentGraph(), dataSet); //alg.getFinalScore();
+            this.score = GESThread.scoreGraph(alg.getCurrentGraph()); //alg.getFinalScore();
 
             printResults();
 

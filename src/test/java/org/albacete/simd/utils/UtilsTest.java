@@ -260,6 +260,7 @@ public class UtilsTest {
         assertNull(n2);
     }
 
+    /*
     @Test
     public void scoreGraph(){
         String path = "./res/networks/BBDD/cancer.xbif50000_.csv";
@@ -271,7 +272,7 @@ public class UtilsTest {
         assertEquals(Double.NEGATIVE_INFINITY, score, 0.000001);
 
     }
-
+*/
 
     /* For some reason this test doesn't get the same score always.
     @Test

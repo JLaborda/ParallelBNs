@@ -294,11 +294,13 @@ public class PGESv2
         Graph fusionGraph = fusion.union();
 
         // Getting Scores
-        double fusionScore = Utils.scoreGraph(fusionGraph,this.data);
-        double currentScore = Utils.scoreGraph(currentGraph, this.data);
+        double fusionScore = GESThread.scoreGraph(fusionGraph);
+        double currentScore = GESThread.scoreGraph(currentGraph);
 
         System.out.println("Fusion Score: " + fusionScore);
         System.out.println("Current Score: " + currentScore);
+
+
 
         // Checking if the score has improved
         if (fusionScore > currentScore) {
@@ -310,42 +312,52 @@ public class PGESv2
         // If the score has not improved, then we check what edges added in the FES stage improve the score
         ArrayList<Node> order = new ArrayList<Node>(this.currentGraph.getTierOrdering());
 
-        // Applying ancestral order into the graphs.
-        for(Dag g: this.graphs) {
-            for(Edge e:g.getEdges()) {
+        // Applying ancestral order into the graphs. (SOLO EL FUSION GRAPH)
 
-                if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW)) continue;
+        for(Edge e: fusionGraph.getEdges()) {
 
-                if((order.indexOf(e.getNode1()) > order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.ARROW && e.getEndpoint2()==Endpoint.TAIL)) continue;
+            if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW)) continue;
 
-                if(e.getEndpoint1()==Endpoint.TAIL) e.setEndpoint1(Endpoint.ARROW); else e.setEndpoint1(Endpoint.TAIL);
+            if((order.indexOf(e.getNode1()) > order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.ARROW && e.getEndpoint2()==Endpoint.TAIL)) continue;
 
-                if(e.getEndpoint2()==Endpoint.TAIL) e.setEndpoint2(Endpoint.ARROW); else e.setEndpoint2(Endpoint.TAIL);
+            if(e.getEndpoint1()==Endpoint.TAIL) e.setEndpoint1(Endpoint.ARROW); else e.setEndpoint1(Endpoint.TAIL);
 
-            }
+            if(e.getEndpoint2()==Endpoint.TAIL) e.setEndpoint2(Endpoint.ARROW); else e.setEndpoint2(Endpoint.TAIL);
 
         }
+        // APLICAR BEST FIRST Y SOLO CON LA FUSION
 
-        for(Dag g : this.graphs){
-            for(Edge e: g.getEdges()){
-                // If an edge has been added in the fes stage that was not in the current graph we check if it improves the score
-                if(!currentGraph.containsEdge(e)){
-                    // Copying graph
-                    Dag aux = new Dag(currentGraph);
-                    // Adding edge into the copy
-                    aux.addEdge(e);
+        List<Edge> candidates = new ArrayList<>();
+        for (Edge e: fusionGraph.getEdges()){
+            if(!currentGraph.containsEdge(e)){
+                candidates.add(e);
+            }
+        }
 
-                    // Geeting scores
-                    fusionScore = Utils.scoreGraph(aux,this.data);
-                    currentScore = Utils.scoreGraph(currentGraph, this.data);
+        Edge addEdge;
+        do{
+            double max = 0;
+            addEdge = null;
+            for(Edge e: candidates){
+                Node x = e.getNode1();
+                Node y = e.getNode2();
+                Set<Node> parents1 = new HashSet<>(currentGraph.getParents(x));
+                Set<Node> parents2 = new HashSet<>(parents1);
+                parents2.add(y);
+                double delta = GESThread.scoreGraphChange(x, parents1, parents2, currentGraph);
 
-                    // If there is an improvement, we add the edge into the currentGraph
-                    if(fusionScore > currentScore){
-                        currentGraph.addEdge(e);
-                    }
+                if (delta > max){
+                    max = delta;
+                    addEdge = e;
                 }
             }
-        }
+            if (addEdge != null) {
+                currentGraph.addEdge(addEdge);
+                candidates.remove(addEdge);
+            }
+        }while(addEdge != null);
+
+
         return (Dag) currentGraph;
     }
 
@@ -443,7 +455,7 @@ public class PGESv2
     public void search(){
 
         // Initial Configuration: Cases
-        GESThread.setCases(this.data);
+        GESThread.setProblem(this.data);
 
         // 1. Calculating Edges
         this.listOfArcs = Utils.calculateArcs(this.data);

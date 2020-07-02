@@ -22,7 +22,10 @@ public class ThBES extends GESThread {
      * @param subset subset of edges the fes stage will try to add to the resulting graph
      */
     public ThBES(DataSet dataSet, Graph initialDag, ArrayList<TupleNode> subset) {
-        setDataSet(dataSet);
+        if (data == null) {
+            setDataSet(dataSet);
+            GESThread.setProblem(dataSet);
+        }
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
 

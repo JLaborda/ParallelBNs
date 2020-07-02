@@ -4,10 +4,6 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 
-import org.albacete.simd.algorithms.pGESv2.GESThread;
-import org.albacete.simd.algorithms.pGESv2.ThBES;
-import org.albacete.simd.algorithms.pGESv2.ThFES;
-import org.albacete.simd.algorithms.pGESv2.TupleNode;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -67,7 +63,7 @@ public class ThBESTest {
      * This method initializes the subsets, splitting the nodes in what is expected to happen when the seed is 42
      */
     public ThBESTest(){
-        GESThread.setCases(dataset);
+        GESThread.setProblem(dataset);
         initializeSubsets();
     }
 

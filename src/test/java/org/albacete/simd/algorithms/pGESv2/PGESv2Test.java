@@ -359,7 +359,7 @@ public class PGESv2Test
         // Creating main
         PGESv2 pGESv2 = new PGESv2(path, 2);
         // Initial Configuration: Cases
-        GESThread.setCases(pGESv2.getData());
+        GESThread.setProblem(pGESv2.getData());
 
         pGESv2.calculateArcs();
         pGESv2.splitArcs();
