@@ -308,7 +308,7 @@ public class PGESv2
             return (Dag) currentGraph;
         }
 
-
+        System.out.println("Greedy para obtener la Fusion: ");
         // If the score has not improved, then we check what edges added in the FES stage improve the score
         ArrayList<Node> order = new ArrayList<Node>(this.currentGraph.getTierOrdering());
 
@@ -325,38 +325,57 @@ public class PGESv2
             if(e.getEndpoint2()==Endpoint.TAIL) e.setEndpoint2(Endpoint.ARROW); else e.setEndpoint2(Endpoint.TAIL);
 
         }
-        // APLICAR BEST FIRST Y SOLO CON LA FUSION
+        //        APLICAR BEST FIRST Y SOLO CON LA FUSION
 
         List<Edge> candidates = new ArrayList<>();
         for (Edge e: fusionGraph.getEdges()){
-            if(!currentGraph.containsEdge(e)){
-                candidates.add(e);
-            }
+            if(currentGraph.getEdge(e.getNode1(), e.getNode2())!=null || currentGraph.getEdge(e.getNode2(),e.getNode1())!=null ) continue;
+            candidates.add(new Edge(e.getNode1(),e.getNode2(),e.getEndpoint1(),e.getEndpoint2()));
+            //           candidates.add(new Edge(e.getNode1(),e.getNode2(),e.getEndpoint2(),e.getEndpoint1()));
         }
 
+
         Edge addEdge;
+        double score = currentScore;
+        double scoreEval = 0;
         do{
-            double max = 0;
-            addEdge = null;
+            double max = score;
+            Node _x= null;
+            Node _y= null;
+            addEdge= null;
             for(Edge e: candidates){
+
                 Node x = e.getNode1();
                 Node y = e.getNode2();
-                Set<Node> parents1 = new HashSet<>(currentGraph.getParents(x));
-                Set<Node> parents2 = new HashSet<>(parents1);
-                parents2.add(y);
-                double delta = GESThread.scoreGraphChange(x, parents1, parents2, currentGraph);
+                if(e.getEndpoint1() == Endpoint.TAIL) { y = e.getNode1(); x = e.getNode2();}
 
-                if (delta > max){
-                    max = delta;
+                if(currentGraph.existsDirectedPathFromTo(y, x)) continue;
+
+                currentGraph.addDirectedEdge(y, x);
+                scoreEval = GESThread.scoreGraph(currentGraph);
+                currentGraph.removeEdge(y, x);
+
+//        Set<Node> parents1 = new HashSet<>(currentGraph.getParents(x));
+//        Set<Node> parents2 = new HashSet<>(parents1);
+//        parents2.add(y);
+//        double delta = GESThread.scoreGraphChange(x, parents1, parents2, currentGraph);
+//        System.out.println("probando: "+e.toString()+" "+" "+scoreEval+" "+max);
+//        double scoreEval = score + delta;
+                if (scoreEval > max){
+                    max = scoreEval;
+                    _x = x;
+                    _y = y;
                     addEdge = e;
                 }
+
             }
-            if (addEdge != null) {
-                currentGraph.addEdge(addEdge);
+            if (addEdge!= null) {
+                currentGraph.addDirectedEdge(_y, _x);
+                System.out.println(" "+addEdge.toString()+"  "+max+" "+GESThread.scoreGraph(currentGraph));
                 candidates.remove(addEdge);
+                score = max;
             }
         }while(addEdge != null);
-
 
         return (Dag) currentGraph;
     }
