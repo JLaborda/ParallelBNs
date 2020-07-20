@@ -137,7 +137,7 @@ public class Experiment {
             this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
             this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
             this.nIterations = alg.getIterations();
-            this.score = GESThread.scoreGraph(alg.getCurrentGraph()); //alg.getFinalScore();
+            this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem()); //alg.getFinalScore();
 
             printResults();
 

@@ -20,8 +20,8 @@ public class PGESv2
     /**
      * {@link DataSet DataSet}DataSet containing the values of the variables of the problem in hand.
      */
-    private final DataSet data;
-
+    //private final DataSet data;
+    private Problem problem;
     /**
      * The number of threads the algorithm is going to use.
      */
@@ -90,7 +90,7 @@ public class PGESv2
      * @param nThreads Number of threads used in the problem.
      */
     public PGESv2(DataSet data, int nThreads){
-        this.data = data;
+        this.problem = new Problem(data);
         initialize(nThreads);
     }
 
@@ -100,8 +100,7 @@ public class PGESv2
      * @param nThreads number of threads of the problem
      */
     public PGESv2(String path, int nThreads){
-        this.data = Utils.readData(path);
-        initialize(nThreads);
+        this(Utils.readData(path),nThreads);
     }
 
 
@@ -117,14 +116,14 @@ public class PGESv2
         this.subSets = new ArrayList[this.nThreads];
 
         //The total number of arcs of a graph is n*(n-1)/2, where n is the number of nodes in the graph.
-        this.listOfArcs = new TupleNode[this.data.getNumColumns() * (this.data.getNumColumns() -1) / 2];
+        this.listOfArcs = new TupleNode[this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1) / 2];
     }
 
     /**
      * Calculates the amount of possible arcs between the variables of the dataset and stores it.
      */
     public void calculateArcs(){
-        this.listOfArcs = Utils.calculateArcs(this.data);
+        this.listOfArcs = Utils.calculateArcs(this.problem.getData());
     }
     /**
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem
@@ -142,15 +141,18 @@ public class PGESv2
         // Initializing Graphs structure
         this.graphs = new ArrayList<>();
 
+        // Rebuilding hashIndex
+        problem.buildIndexing(currentGraph);
+
         // Creating each ThFES runnable
         if (this.currentGraph == null) {
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new ThFES(this.data, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new ThFES(this.problem, this.subSets[i], this.nFESItInterleaving);
             }
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new ThFES(this.data, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new ThFES(this.problem, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
             }
         }
 
@@ -242,10 +244,13 @@ public class PGESv2
         this.graphs = new ArrayList<>();
         this.gesThreads = new GESThread[this.nThreads];
 
+        // Rebuilding hashIndex
+        problem.buildIndexing(currentGraph);
+
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
         ArrayList<TupleNode>[] subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads, this.seed);
         for (int i = 0; i < this.nThreads; i++) {
-            this.gesThreads[i] = new ThBES(this.data, this.currentGraph, subsets_BES[i]);
+            this.gesThreads[i] = new ThBES(this.problem, this.currentGraph, subsets_BES[i]);
         }
 
         // Initializing thread config
@@ -294,8 +299,8 @@ public class PGESv2
         Graph fusionGraph = fusion.union();
 
         // Getting Scores
-        double fusionScore = GESThread.scoreGraph(fusionGraph);
-        double currentScore = GESThread.scoreGraph(currentGraph);
+        double fusionScore = GESThread.scoreGraph(fusionGraph, problem);
+        double currentScore = GESThread.scoreGraph(currentGraph, problem);
 
         System.out.println("Fusion Score: " + fusionScore);
         System.out.println("Current Score: " + currentScore);
@@ -351,8 +356,9 @@ public class PGESv2
 
                 if(currentGraph.existsDirectedPathFromTo(y, x)) continue;
 
+
                 currentGraph.addDirectedEdge(y, x);
-                scoreEval = GESThread.scoreGraph(currentGraph);
+                scoreEval = GESThread.scoreGraph(currentGraph, problem);
                 currentGraph.removeEdge(y, x);
 
 //        Set<Node> parents1 = new HashSet<>(currentGraph.getParents(x));
@@ -371,7 +377,7 @@ public class PGESv2
             }
             if (addEdge!= null) {
                 currentGraph.addDirectedEdge(_y, _x);
-                System.out.println(" "+addEdge.toString()+"  "+max+" "+GESThread.scoreGraph(currentGraph));
+                System.out.println(" "+addEdge.toString()+"  "+max+" "+GESThread.scoreGraph(currentGraph, problem));
                 candidates.remove(addEdge);
                 score = max;
             }
@@ -474,10 +480,10 @@ public class PGESv2
     public void search(){
 
         // Initial Configuration: Cases
-        GESThread.setProblem(this.data);
+        //GESThread.setProblem(this.data);
 
         // 1. Calculating Edges
-        this.listOfArcs = Utils.calculateArcs(this.data);
+        this.listOfArcs = Utils.calculateArcs(this.problem.getData());
 
         do {
             System.out.println("============================");
@@ -592,7 +598,7 @@ public class PGESv2
      * @return {@link DataSet DataSet} with the data of the problem.
      */
     public DataSet getData() {
-        return data;
+        return problem.getData();
     }
 
     /**
@@ -643,6 +649,9 @@ public class PGESv2
         return it;
     }
 
+    public Problem getProblem() {
+        return problem;
+    }
 
     /**
      * Example of the algorithm running for the cancer problem.

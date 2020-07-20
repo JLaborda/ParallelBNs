@@ -5,10 +5,7 @@ import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
 import edu.cmu.tetrad.search.LocalScoreCache;
-import org.albacete.simd.algorithms.pGESv2.GESThread;
-import org.albacete.simd.algorithms.pGESv2.ThBES;
-import org.albacete.simd.algorithms.pGESv2.ThFES;
-import org.albacete.simd.algorithms.pGESv2.TupleNode;
+import org.albacete.simd.algorithms.pGESv2.*;
 import org.albacete.simd.utils.Utils;
 
 import java.util.*;
@@ -18,38 +15,23 @@ public class GES {
     private ThFES fes;
     private ThBES bes;
     private Graph initialDag;
-    private DataSet data;
-    protected String[] varNames;
-    protected List<Node> variables;
-    protected static int[] nValues;
-    protected final LocalScoreCache localScoreCache = new LocalScoreCache();
     private long elapsedTime;
     private double modelBDeu;
 
-    protected double samplePrior = 10.0;
-    protected double structurePrior = 0.001;
-    protected int numTotalCalls=0;
-    protected int numNonCachedCalls=0;
     private int maxIt = 15;
     private ArrayList<TupleNode> combinations = new ArrayList<>();
     private Graph graph;
-
+    private Problem problem;
 
 
     public GES(DataSet dataSet){
 
-        List<String> _varNames = dataSet.getVariableNames();
-
-        this.data = dataSet;
-        this.varNames = _varNames.toArray(new String[0]);
-        this.variables = dataSet.getVariables();
-        GESThread.setProblem(data);
-
+        problem = new Problem(dataSet);
         // Getting the complete set of arc combinations.
-        TupleNode[] arcs = Utils.calculateArcs(data);
+        TupleNode[] arcs = Utils.calculateArcs(problem.getData());
         Collections.addAll(combinations, arcs);
 
-        this.initialDag = new EdgeListGraph(new LinkedList<>(variables));
+        this.initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
 
     }
 
@@ -76,14 +58,14 @@ public class GES {
 
         // Doing forward search
         System.out.println("FES stage: ");
-        fes = new ThFES(data, combinations,100);
+        fes = new ThFES(problem, combinations,100);
         fes.run();
         graph = fes.getCurrentGraph();
 
 
         // Doing backward search
         System.out.println("BES stage: ");
-        bes = new ThBES(data, graph, combinations);
+        bes = new ThBES(problem, graph, combinations);
         bes.run();
         graph = bes.getCurrentGraph();
         score = bes.getScoreBDeu();
@@ -108,5 +90,7 @@ public class GES {
         return this.graph;
     }
 
-
+    public Problem getProblem() {
+        return problem;
+    }
 }

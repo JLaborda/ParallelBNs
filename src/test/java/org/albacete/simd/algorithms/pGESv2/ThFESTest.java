@@ -53,12 +53,14 @@ public class ThFESTest {
      */
     final ArrayList<TupleNode> subset2 = new ArrayList<>();
 
+    private Problem problem;
+
+
     /**
      * Constructor of the test. It initializes the subsets.
      */
     public ThFESTest(){
-        GESThread.setProblem(dataset);
-        initializeSubsets();
+        problem = new Problem(dataset);
     }
 
     /**
@@ -118,11 +120,11 @@ public class ThFESTest {
     @Test
     public void constructorTest() throws InterruptedException{
         // Arrange
-        ThFES thread1 = new ThFES(dataset, subset1, 15);
+        ThFES thread1 = new ThFES(problem, subset1, 15);
         thread1.run();
         Graph graph = thread1.getCurrentGraph();
         // Act
-        ThFES thread2 = new ThFES(dataset, graph, subset1, 15);
+        ThFES thread2 = new ThFES(problem, graph, subset1, 15);
         // Arrange
         assertNotNull(thread1);
         assertNotNull(thread2);
@@ -138,8 +140,8 @@ public class ThFESTest {
     public void searchTwoThreadsTest() throws InterruptedException {
 
         // ThFES objects
-        ThFES thread1 = new ThFES(dataset, subset1, 15);
-        ThFES thread2 = new ThFES(dataset, subset2, 15);
+        ThFES thread1 = new ThFES(problem, subset1, 15);
+        ThFES thread2 = new ThFES(problem, subset2, 15);
 
         // Expectation
         List<Edge> expected1 = new ArrayList<>();
@@ -179,7 +181,7 @@ public class ThFESTest {
     public void noMoreEdgesToAddInFESTest(){
 
         // ThFES objects
-        ThFES thread1 = new ThFES(dataset, subset1, 1000);
+        ThFES thread1 = new ThFES(problem, subset1, 1000);
 
         //Act
         thread1.run();
@@ -196,7 +198,7 @@ public class ThFESTest {
     @Test
     public void maximumNumberOfEdgesReachedTest() throws InterruptedException {
         // ThFES objects
-        ThFES thread1 = new ThFES(dataset, subset1, 1000);
+        ThFES thread1 = new ThFES(problem, subset1, 1000);
         thread1.setMaxNumEdges(2);
 
         //Act
@@ -222,9 +224,9 @@ public class ThFESTest {
         ArrayList<TupleNode> subset1 = subsets[0];
         ArrayList<TupleNode> subset2 = subsets[1];
 
-        GESThread.setProblem(alarmDataset);
-        ThFES thread1 = new ThFES(alarmDataset, subset1, 100);
-        ThFES thread2 = new ThFES(alarmDataset, subset2, 100);
+        Problem pAlarm = new Problem(alarmDataset);
+        ThFES thread1 = new ThFES(pAlarm, subset1, 100);
+        ThFES thread2 = new ThFES(pAlarm, subset2, 100);
 
 
         //Act
@@ -252,7 +254,7 @@ public class ThFESTest {
         S.add(tuple1);
         S.add(tuple2);
 
-        ThFES fes = new ThFES(dataset, S, 100);
+        ThFES fes = new ThFES(problem, S, 100);
         Thread tFES = new Thread(fes);
 
         // Act
@@ -278,7 +280,7 @@ public class ThFESTest {
      */
     @Test
     public void isAggressivelyPreventCyclesTest(){
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         assertFalse(thfes.isAggressivelyPreventCycles());
     }
     /**
@@ -288,7 +290,7 @@ public class ThFESTest {
     @Test
     public void setAggresivelyPreventCyclesTest(){
         // Arrange
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         // Act
         thfes.setAggressivelyPreventCycles(true);
         // Assert
@@ -302,7 +304,7 @@ public class ThFESTest {
     @Test
     public void getCurrentGraphTest() throws InterruptedException {
         // Arrange
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         // Act
         thfes.run();
         Graph result = thfes.getCurrentGraph();
@@ -316,7 +318,7 @@ public class ThFESTest {
     @Test
     public void getFlagTest() throws InterruptedException {
         // Arrange
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         // Act
         thfes.run();
         boolean result = thfes.getFlag();
@@ -330,7 +332,7 @@ public class ThFESTest {
     @Test
     public void resetFlagTest() throws InterruptedException {
         // Arrange
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         // Act
         thfes.run();
         thfes.resetFlag();
@@ -346,7 +348,7 @@ public class ThFESTest {
     @Test
     public void getBDeuScoreTest(){
         // Arrange
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         double expected = -10591.313506863182;
         // Act
         thfes.run();
@@ -363,7 +365,7 @@ public class ThFESTest {
     @Test
     public void setterAndGetterOfInitialGraphTest() throws InterruptedException {
         // Arrange
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         // Act
         thfes.run();
         Graph expected = thfes.getCurrentGraph();
@@ -382,7 +384,7 @@ public class ThFESTest {
     @Test
     public void setterAndGetterOfStructurePriorTest(){
         // Arrange
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         // Act
         double expected = 2.3;
         thfes.setStructurePrior(expected);
@@ -398,7 +400,7 @@ public class ThFESTest {
     @Test
     public void setterAndGetterOfSamplePriorTest(){
         // Arrange
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         // Act
         double expected = 2.3;
         thfes.setSamplePrior(expected);
@@ -415,7 +417,7 @@ public class ThFESTest {
     @Test
     public void setterAndGetterOfElapsedTimeTest(){
         // Arrange
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         // Act
         long expected = 23;
         thfes.setElapsedTime(expected);
@@ -431,7 +433,7 @@ public class ThFESTest {
     @Test
     public void setterAndGetterOfMaxNumEdges(){
         // Arrange
-        ThFES thfes = new ThFES(dataset, subset1, 15);
+        ThFES thfes = new ThFES(problem, subset1, 15);
         // Act
         int expected = 23;
         thfes.setMaxNumEdges(expected);

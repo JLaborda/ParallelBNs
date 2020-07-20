@@ -17,15 +17,13 @@ public class ThBES extends GESThread {
 
     /**
      * Constructor of ThFES with an initial DAG
-     * @param dataSet data of the problem
+     * @param problem object containing information of the problem such as data or variables.
      * @param initialDag initial DAG with which the FES stage starts with.
      * @param subset subset of edges the fes stage will try to add to the resulting graph
      */
-    public ThBES(DataSet dataSet, Graph initialDag, ArrayList<TupleNode> subset) {
-        if (data == null) {
-            setDataSet(dataSet);
-            GESThread.setProblem(dataSet);
-        }
+    public ThBES(Problem problem, Graph initialDag, ArrayList<TupleNode> subset) {
+
+        this.problem = problem;
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
 
@@ -53,13 +51,13 @@ public class ThBES extends GESThread {
         long startTime = System.currentTimeMillis();
         numTotalCalls=0;
         numNonCachedCalls=0;
-        localScoreCache.clear();
+        //localScoreCache.clear();
 
         Graph graph = new EdgeListGraph(this.initialDag);
-        buildIndexing(graph);
+        //buildIndexing(graph);
 
         // Method 1-- original.
-        double score = scoreGraph(graph);
+        double score = scoreGraph(graph, problem);
 
         // Do backward search.
         score = bes(graph, score);

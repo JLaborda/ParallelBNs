@@ -11,6 +11,7 @@ import edu.cmu.tetrad.util.NumberFormatUtil;
 import edu.cmu.tetrad.util.ProbUtils;
 import org.albacete.simd.utils.Utils;
 
+import javax.swing.*;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -24,10 +25,11 @@ public abstract class GESThread implements Runnable{
      * Tuple of Nodes that will be checked by this thread in the FES method
      */
     protected ArrayList<TupleNode> S;
+
     /**
-     * Dataset of the problem in hands
+     * Problem the thread is solving
      */
-    protected static DataSet data = null;
+    protected Problem problem = null;
 
     /**
      * Initial DAG this thread starts with. It can be null or a resulting DAG of an iteration.
@@ -43,40 +45,11 @@ public abstract class GESThread implements Runnable{
      */
     protected boolean flag = false;
 
-    /**
-     * For discrete data scoring, the structure prior.
-     */
-    protected static double structurePrior;
-
-    /**
-     * For discrete data scoring, the sample prior.
-     */
-    protected static double samplePrior;
-
-    /**
-     * Map from variables to their column indices in the data set.
-     */
-    protected HashMap<Node, Integer> hashIndices;
-
-    /**
-     * Array of variable names from the data set, in order.
-     */
-    protected static String[] varNames;
-
-    /**
-     * List of variables in the data set, in order.
-     */
-    protected static List<Node> variables;
 
     /**
      * For formatting printed numbers.
      */
     protected final NumberFormat nf = NumberFormatUtil.getInstance().getNumberFormat();
-
-    /**
-     * Caches scores for discrete search.
-     */
-    protected static LocalScoreCacheConcurrent localScoreCache = new LocalScoreCacheConcurrent();
 
     /**
      * Total calls done
@@ -108,16 +81,6 @@ public abstract class GESThread implements Runnable{
      * Score of the bdeu model.
      */
     protected double modelBDeu;
-
-    /**
-     * Cases for each variable of the problem.
-     */
-    protected static int[][] cases;
-
-    /**
-     * Number of values a variable can take.
-     */
-    protected static int[] nValues;
 
     /**
      * Maximum number of iterations.
@@ -165,6 +128,15 @@ public abstract class GESThread implements Runnable{
 
     private String log = "";
 
+/*
+    public GESThread(LocalScoreCacheConcurrent cache, HashMap<Node,Integer> hashIndices ){
+        this.localScoreCache = cache;
+        this.hashIndices = hashIndices;
+    }
+*/
+
+
+
 
     /**
      * Evaluate the Insert(X, Y, T) operator (@see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf"> Definition 12 from Chickering 2002</a>,
@@ -182,7 +154,7 @@ public abstract class GESThread implements Runnable{
         set1.addAll(graph.getParents(y));
         Set<Node> set2 = new HashSet<>(set1);
         set1.add(x);
-        return scoreGraphChange(y, set1, set2);
+        return scoreGraphChange(y, set1, set2, graph, problem);
     }
 
     /**
@@ -245,7 +217,7 @@ public abstract class GESThread implements Runnable{
         Set<Node> set2 = new HashSet<>(set1);
         set1.remove(x);
         set2.add(x);
-        return scoreGraphChange(y, set1, set2);
+        return scoreGraphChange(y, set1, set2, graph, problem);
     }
 
     /**
@@ -359,33 +331,8 @@ public abstract class GESThread implements Runnable{
         rules.orientImplied(graph);
     }
 
-    /**
-     * Sets the data for the thread and all of its related variables.
-     * @param dataSet {@link DataSet DataSet} of the problem.
-     */
-    protected static void setDataSet(DataSet dataSet) {
-        List<String> _varNames = dataSet.getVariableNames();
 
-        data = dataSet;
-        varNames = _varNames.toArray(new String[0]);
-        variables = dataSet.getVariables();
-    }
 
-    /**
-     * Builds the indexing structure for the Graph passed as an argument.
-     * @param graph Graph being indexed.
-     */
-    protected void buildIndexing(Graph graph) {
-        this.hashIndices = new HashMap<>();
-        for (Node next : graph.getNodes()) {
-            for (int i = 0; i < varNames.length; i++) {
-                if (varNames[i].equals(next.getName())) {
-                    hashIndices.put(next, i);
-                    break;
-                }
-            }
-        }
-    }
 
     //===========================SCORING METHODS===========================//
 
@@ -394,7 +341,7 @@ public abstract class GESThread implements Runnable{
      * @param graph DAG graph being evaluated
      * @return score of the graph.
      */
-    public static double scoreGraph(Graph graph) {
+    public static double scoreGraph(Graph graph, Problem problem) {
 
         if (graph == null){
             return Double.NEGATIVE_INFINITY;
@@ -408,7 +355,8 @@ public abstract class GESThread implements Runnable{
         for (Node next : dag.getNodes()) {
             Collection<Node> parents = dag.getParents(next);
             int nextIndex = -1;
-            for (int i = 0; i < variables.size(); i++) {
+            for (int i = 0; i < problem.getVariables().size(); i++) {
+                String[] varNames = problem.getVarNames();
                 if (varNames[i].equals(next.getName())) {
                     nextIndex = i;
                     break;
@@ -419,14 +367,15 @@ public abstract class GESThread implements Runnable{
             int count = 0;
             while (pi.hasNext()) {
                 Node nextParent = pi.next();
-                for (int i = 0; i < variables.size(); i++) {
+                for (int i = 0; i < problem.getVariables().size(); i++) {
+                    String[] varNames = problem.getVarNames();
                     if (varNames[i].equals(nextParent.getName())) {
                         parentIndices[count++] = i;
                         break;
                     }
                 }
             }
-            score += localBdeuScore(nextIndex, parentIndices);
+            score += localBdeuScore(nextIndex, parentIndices, problem);
         }
         return score;
     }
@@ -438,40 +387,10 @@ public abstract class GESThread implements Runnable{
      * @param parents2 Set of {@link Node Node} of the second set of parents.
      * @return Score difference between both possibilities.
      */
-    protected double scoreGraphChange(Node y, Set<Node> parents1,
-                                    Set<Node> parents2) {
-        // Getting indexes
-        int yIndex = hashIndices.get(y);
-        int[] parentIndices1 = new int[parents1.size()];
-
-        int count = 0;
-        for (Node aParents1 : parents1) {
-            parentIndices1[count++] = (hashIndices.get(aParents1));
-        }
-
-        int[] parentIndices2 = new int[parents2.size()];
-
-        int count2 = 0;
-        for (Node aParents2 : parents2) {
-            parentIndices2[count2++] = (hashIndices.get(aParents2));
-        }
-
-        // Calculating the scores of both possibilities and returning the difference
-        double score1 = localBdeuScore(yIndex, parentIndices1);
-        double score2 = localBdeuScore(yIndex, parentIndices2);
-        return score1 - score2;
-    }
-
-    /**
-     * Score difference of the node y when it is associated as child with one set of parents and when it is associated with another one.
-     * @param y {@link Node Node} being considered for the score.
-     * @param parents1 Set of {@link Node Node} of the first set of parents.
-     * @param parents2 Set of {@link Node Node} of the second set of parents.
-     * @return Score difference between both possibilities.
-     */
     public static double scoreGraphChange(Node y, Set<Node> parents1,
-                                   Set<Node> parents2, Graph graph) {
+                                   Set<Node> parents2, Graph graph, Problem problem) {
 
+        /*
         // Creating hashindeces map
         HashMap<Node, Integer> index = new HashMap<>();
 
@@ -484,6 +403,8 @@ public abstract class GESThread implements Runnable{
                 }
             }
         }
+        */
+
 /*
         System.out.println("DEBUG Score Graph Change of:");
         System.out.println("Node: " + y);
@@ -492,6 +413,14 @@ public abstract class GESThread implements Runnable{
         System.out.println("HashIndices: " + index);
         System.out.println("-------------------------------");
 */
+
+        HashMap<Node, Integer> index = problem.getHashIndices();
+
+        if(index == null){
+            problem.buildIndexing(graph);
+            index = problem.getHashIndices();
+        }
+
         // Getting indexes
         int yIndex = index.get(y);
         int[] parentIndices1 = new int[parents1.size()];
@@ -509,8 +438,8 @@ public abstract class GESThread implements Runnable{
         }
 
         // Calculating the scores of both possibilities and returning the difference
-        double score1 = localBdeuScore(yIndex, parentIndices1);
-        double score2 = localBdeuScore(yIndex, parentIndices2);
+        double score1 = localBdeuScore(yIndex, parentIndices1, problem);
+        double score2 = localBdeuScore(yIndex, parentIndices2, problem);
         return score1 - score2;
     }
 
@@ -523,22 +452,29 @@ public abstract class GESThread implements Runnable{
      * @return The Bdeu score of the combination.
      */
 
-    protected static double localBdeuScore(int nNode, int[] nParents) {
+    protected static double localBdeuScore(int nNode, int[] nParents, Problem problem) {
         numTotalCalls++;
+
+        LocalScoreCacheConcurrent localScoreCache = problem.getLocalScoreCache();
+
         double oldScore =localScoreCache.get(nNode, nParents);
         if (!Double.isNaN(oldScore)) {
             return oldScore;
         }
         numNonCachedCalls++;
+        int[] nValues = problem.getnValues();
+        int[][] cases = problem.getCases();
+
         int numValues=nValues[nNode];
         int numParents=nParents.length;
 
-        double ess= getSamplePrior();
-        double kappa= getStructurePrior();
+        double ess= problem.getSamplePrior();
+        double kappa= problem.getStructurePrior();
 
         int[] numValuesParents=new int[nParents.length];
         int cardinality=1;
         for(int i=0;i<numValuesParents.length;i++) {
+
             numValuesParents[i]=nValues[nParents[i]];
             cardinality*=numValuesParents[i];
         }
@@ -585,27 +521,6 @@ public abstract class GESThread implements Runnable{
         return fLogScore;
     }
 
-    public static void setProblem(DataSet dataSet){
-
-        //Setting dataset
-        setDataSet(dataSet);
-
-        // Starting cases
-        cases=new int[dataSet.getNumRows()][dataSet.getNumColumns()];
-        for(int i=0;i<dataSet.getNumRows();i++) {
-            for (int j = 0; j < dataSet.getNumColumns(); j++) {
-                cases[i][j] = dataSet.getInt(i, j);
-            }
-        }
-        // Initializing nValues
-        nValues=new int[dataSet.getNumColumns()];
-        for(int i=0;i<dataSet.getNumColumns();i++)
-            nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
-
-        //Initializing SamplePrior
-        structurePrior = 0.001;
-        samplePrior = 10.0;
-    }
 
 
     //==========================SETTERS AND GETTERS=========================//
@@ -631,23 +546,23 @@ public abstract class GESThread implements Runnable{
      * @return list of Nodes of the problem's DataSet
      */
     public List<Node> getVariables() {
-        return variables;
+        return problem.getVariables();
     }
 
     /**
      * Gets the structurePrior
      * @return the structurePrior
      */
-    public static double getStructurePrior() {
-        return structurePrior;
+    public double getStructurePrior() {
+        return problem.getStructurePrior();
     }
 
     /**
      * Gets the samplePrior
      * @return the samplePrior
      */
-    public static double getSamplePrior() {
-        return samplePrior;
+    public double getSamplePrior() {
+        return problem.getSamplePrior();
     }
 
     /**
@@ -655,7 +570,7 @@ public abstract class GESThread implements Runnable{
      * @param structurePrior the structurePrior to be set
      */
     public void setStructurePrior(double structurePrior) {
-        this.structurePrior = structurePrior;
+        this.problem.setStructurePrior(structurePrior);
     }
 
     /**
@@ -663,7 +578,7 @@ public abstract class GESThread implements Runnable{
      * @param samplePrior the samplePrior of the thread
      */
     public void setSamplePrior(double samplePrior) {
-        this.samplePrior = samplePrior;
+        this.problem.setSamplePrior(samplePrior);
     }
 
     /**
@@ -818,7 +733,7 @@ public abstract class GESThread implements Runnable{
         return this.log;
     }
 
-    public static LocalScoreCacheConcurrent getLocalScoreCache() {
-        return localScoreCache;
+    public LocalScoreCacheConcurrent getLocalScoreCache() {
+        return problem.getLocalScoreCache();
     }
 }

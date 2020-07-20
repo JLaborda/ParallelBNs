@@ -58,13 +58,17 @@ public class ThBESTest {
      */
     final ArrayList<TupleNode> subset2 = new ArrayList<>();
 
+    Problem problem;
+
 
     /**
      * This method initializes the subsets, splitting the nodes in what is expected to happen when the seed is 42
      */
     public ThBESTest(){
-        GESThread.setProblem(dataset);
-        initializeSubsets();
+        //GESThread.setProblem(dataset);
+        //initializeSubsets();
+        problem = new Problem(dataset);
+
     }
 
     /**
@@ -125,11 +129,11 @@ public class ThBESTest {
     @Test
     public void constructorTest() throws InterruptedException{
         // Arrange
-        ThFES thread1 = new ThFES(dataset, subset1, 15);
+        ThFES thread1 = new ThFES(problem, subset1, 15);
         thread1.run();
         Graph graph = thread1.getCurrentGraph();
         // Act
-        ThBES thread2 = new ThBES(dataset, graph, subset1);
+        ThBES thread2 = new ThBES(problem, graph, subset1);
         // Arrange
         assertNotNull(thread2);
     }
@@ -162,7 +166,7 @@ public class ThBESTest {
         System.out.println(fusionGraph);
 
 
-        ThBES thread1 = new ThBES(dataset, fusionGraph, subset1);
+        ThBES thread1 = new ThBES(problem, fusionGraph, subset1);
 
         List<Edge> expected = new ArrayList<>();
         expected.add(new Edge(cancer,xray,Endpoint.TAIL, Endpoint.ARROW));
