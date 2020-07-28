@@ -61,6 +61,7 @@ public class ThFESTest {
      */
     public ThFESTest(){
         problem = new Problem(dataset);
+        initializeSubsets();
     }
 
     /**

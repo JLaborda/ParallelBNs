@@ -213,7 +213,7 @@ public class ThFES extends GESThread{
             while (tSubsets.hasMoreElements()) {
                 SubSet tSubset = tSubsets.nextElement();
 
-                double insertEval = insertEval(_x, _y, tSubset, graph);
+                double insertEval = insertEval(_x, _y, tSubset, graph, problem);
                 double evalScore = score + insertEval;
 
                 if (!(evalScore > bestScore && evalScore > score)) {

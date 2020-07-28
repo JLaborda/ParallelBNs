@@ -66,9 +66,8 @@ public class ThBESTest {
      */
     public ThBESTest(){
         //GESThread.setProblem(dataset);
-        //initializeSubsets();
         problem = new Problem(dataset);
-
+        initializeSubsets();
     }
 
     /**

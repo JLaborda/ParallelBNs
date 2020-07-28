@@ -147,7 +147,7 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage.
      * @return Score difference of the insertion.
      */
-    public double insertEval(Node x, Node y, Set<Node> t, Graph graph) {
+    public static double insertEval(Node x, Node y, Set<Node> t, Graph graph, Problem problem) {
         // set1 contains x; set2 does not.
         Set<Node> set1 = new HashSet<>(findNaYX(x, y, graph));
         set1.addAll(t);
@@ -415,12 +415,13 @@ public abstract class GESThread implements Runnable{
 */
 
         HashMap<Node, Integer> index = problem.getHashIndices();
-
+/*
         if(index == null){
+            System.out.println("REBUILDING HASHINDECES IN GRAPHSCORESCHANGE");
             problem.buildIndexing(graph);
             index = problem.getHashIndices();
         }
-
+*/
         // Getting indexes
         int yIndex = index.get(y);
         int[] parentIndices1 = new int[parents1.size()];

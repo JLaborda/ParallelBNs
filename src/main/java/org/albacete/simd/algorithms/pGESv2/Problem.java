@@ -8,6 +8,7 @@ import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.utils.Utils;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Problem {
@@ -30,12 +31,12 @@ public class Problem {
     /**
      * For discrete data scoring, the structure prior.
      */
-    protected double structurePrior = 0.001;
+    protected double structurePrior;
 
     /**
      * For discrete data scoring, the sample prior.
      */
-    protected double samplePrior = 10.0;
+    protected double samplePrior;
 
     /**
      * Cases for each variable of the problem.
@@ -50,7 +51,7 @@ public class Problem {
     /**
      * Map from variables to their column indices in the data set.
      */
-    protected  HashMap<Node, Integer> hashIndices;
+    protected  HashMap<Node, Integer> hashIndices = null;
 
     /**
      * Caches scores for discrete search.
@@ -83,6 +84,10 @@ public class Problem {
         //Initializing SamplePrior
         structurePrior = 0.001;
         samplePrior = 10.0;
+
+        //building index
+        Graph graph = new EdgeListGraph(new LinkedList(this.variables));
+        buildIndexing(graph);
     }
 
 
@@ -95,10 +100,7 @@ public class Problem {
      * Builds the indexing structure for the Graph passed as an argument.
      * @param g Graph being indexed.
      */
-    public void buildIndexing(Graph g) {
-        if (g == null){
-            return;
-        }
+    private void buildIndexing(Graph g) {
         Graph graph = new EdgeListGraph(g);
         this.hashIndices = new HashMap<>();
         for (Node next : graph.getNodes()) {

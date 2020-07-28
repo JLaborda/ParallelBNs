@@ -142,7 +142,7 @@ public class PGESv2
         this.graphs = new ArrayList<>();
 
         // Rebuilding hashIndex
-        problem.buildIndexing(currentGraph);
+        //problem.buildIndexing(currentGraph);
 
         // Creating each ThFES runnable
         if (this.currentGraph == null) {
@@ -224,6 +224,7 @@ public class PGESv2
         this.fesFlag = checkWorkingStatus();
 
         //Printing localScoreMap
+        /*
         for (GESThread thread: gesThreads) {
             System.out.println("---------------------------");
             System.out.println("ThFES " + thread.getId());
@@ -231,6 +232,7 @@ public class PGESv2
             System.out.println(thread.getLocalScoreCache());
             System.out.println("---------------------------");
         }
+         */
 
     }
 
@@ -245,7 +247,7 @@ public class PGESv2
         this.gesThreads = new GESThread[this.nThreads];
 
         // Rebuilding hashIndex
-        problem.buildIndexing(currentGraph);
+        //problem.buildIndexing(currentGraph);
 
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
         ArrayList<TupleNode>[] subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads, this.seed);
@@ -277,6 +279,7 @@ public class PGESv2
         besFlag = checkWorkingStatus();
 
         //Printing localScoreMap
+        /*
         for (GESThread thread: gesThreads) {
             System.out.println("---------------------------");
             System.out.println("ThBES " + thread.getId());
@@ -284,6 +287,7 @@ public class PGESv2
             System.out.println(thread.getLocalScoreCache());
             System.out.println("---------------------------");
         }
+         */
 
     }
 
@@ -349,35 +353,83 @@ public class PGESv2
             Node _y= null;
             addEdge= null;
             for(Edge e: candidates){
+                //Getting tail in x and head in y
+                Node x = Edges.getDirectedEdgeTail(e);
+                Node y = Edges.getDirectedEdgeHead(e);
+                //if(e.getEndpoint1() == Endpoint.TAIL) { y = e.getNode1(); x = e.getNode2();}
 
-                Node x = e.getNode1();
-                Node y = e.getNode2();
-                if(e.getEndpoint1() == Endpoint.TAIL) { y = e.getNode1(); x = e.getNode2();}
+                // Checking there is no path from tail (x) to head (x)
+                if(currentGraph.existsDirectedPathFromTo(x, y)) continue;
 
-                if(currentGraph.existsDirectedPathFromTo(y, x)) continue;
-
-
+                //MAL: ERROR EN ALGUN LADO
+                /*
                 currentGraph.addDirectedEdge(y, x);
                 scoreEval = GESThread.scoreGraph(currentGraph, problem);
                 currentGraph.removeEdge(y, x);
+                */
+                //parents1 contains x, parents2 does not.
+                //Set<Node> parents1 = new HashSet<>();
+                //Set<Node> parents1 = new HashSet<>(GESThread.findNaYX(x,y,currentGraph));
+                //parents1.addAll(currentGraph.getParents(y));
+                //Set<Node> parents2 = new HashSet<>(parents1);
+                //parents1.add(x);
+                //double delta = GESThread.scoreGraphChange(y, parents1, parents2, currentGraph, problem);
 
-//        Set<Node> parents1 = new HashSet<>(currentGraph.getParents(x));
-//        Set<Node> parents2 = new HashSet<>(parents1);
-//        parents2.add(y);
-//        double delta = GESThread.scoreGraphChange(x, parents1, parents2, currentGraph);
-//        System.out.println("probando: "+e.toString()+" "+" "+scoreEval+" "+max);
-//        double scoreEval = score + delta;
+
+                //double delta = GESThread.insertEval(x,y,new HashSet<>(),currentGraph, problem);
+
+                //DEBUG // Las puntuaciones no coinciden...
+                //problem.buildIndexing(currentGraph);
+
+
+                /*
+                Set<Node> set1 = new HashSet<>();
+                set1.addAll(currentGraph.getParents(y));
+                Set<Node> set2 = new HashSet<>(set1);
+                set1.add(x);
+                double delta1 =  GESThread.scoreGraphChange(y, set1, set2, currentGraph, problem);
+
+
+                scoreEval1 = score + delta1;
+
+
+                double scoreEval2 = GESThread.scoreGraph(currentGraph, problem);
+                //currentGraph.addDirectedEdge(y, x);
+                currentGraph.addDirectedEdge(x,y);
+                double scoreEval3 = GESThread.scoreGraph(currentGraph, problem);
+                currentGraph.removeEdge(x,y);
+                //currentGraph.removeEdge(y, x);
+
+
+
+                System.out.println("Score with graph change: " + scoreEval1 + "\tScore with scoreGraph (Without added edge):" +scoreEval2 + "\t Score with scoreGraph (Added edge): " + scoreEval3);
+
+                double delta2 = scoreEval3 - scoreEval2;
+                System.out.println("Delta1(ScoreGraphChange): " + delta1 + "\tDelta2(ScoreGraphs): \t" + delta2 + "\tDelta3 (InsertEval)" + delta3 );
+                //DEBUG////
+                */
+                //System.out.println("probando: "+e.toString()+String.format("\tscoreEval: %.2f\tmax: %.2f\tdelta:%.2f", scoreEval, max, delta));
+
+
+                double delta = GESThread.insertEval(x,y, new HashSet<>(), currentGraph, problem);
+                scoreEval = score + delta;
+
+
+
                 if (scoreEval > max){
                     max = scoreEval;
                     _x = x;
                     _y = y;
                     addEdge = e;
+                    System.out.println("añadiendo: " + addEdge.toString() + "max=" + max);
+
                 }
 
             }
             if (addEdge!= null) {
-                currentGraph.addDirectedEdge(_y, _x);
-                System.out.println(" "+addEdge.toString()+"  "+max+" "+GESThread.scoreGraph(currentGraph, problem));
+                //currentGraph.addDirectedEdge(_y, _x);
+                currentGraph.addDirectedEdge(_x,_y);
+                System.out.println(" "+_x+" --> " + _y + "\t +max: "+ max);//+GESThread.scoreGraph(currentGraph, problem));
                 candidates.remove(addEdge);
                 score = max;
             }
@@ -493,16 +545,16 @@ public class PGESv2
             // 2 Random Repartitioning
             this.subSets = Utils.split(listOfArcs, nThreads, seed);
 
-            System.out.println("----------------------------");
-            System.out.println("Splits: ");
-            int i = 1;
-            for( ArrayList<TupleNode> s : subSets){
-                System.out.println("Split " + i);
-                i++;
-                for(TupleNode t : s){
-                    System.out.println(t);
-                }
-            }
+            //System.out.println("----------------------------");
+            //System.out.println("Splits: ");
+            //int i = 1;
+            //for( ArrayList<TupleNode> s : subSets){
+            //    System.out.println("Split " + i);
+            //    i++;
+            //    for(TupleNode t : s){
+            //        System.out.println(t);
+            //    }
+            //}
             System.out.println("----------------------------");
             System.out.println("FES STAGE");
             // 3. FES
@@ -514,19 +566,19 @@ public class PGESv2
             }
 
             // Printing
-            System.out.println("Results of FES: ");
-            i = 1;
-            for (Dag dag : this.graphs) {
-                System.out.println("Thread " + i);
-                System.out.println(dag);
-                i++;
-            }
+            //System.out.println("Results of FES: ");
+            //i = 1;
+            //for (Dag dag : this.graphs) {
+            //    System.out.println("Thread " + i);
+            //    System.out.println(dag);
+            //   i++;
+            //}
 
             // 4. Fusion
             this.currentGraph = fusion();
             System.out.println("----------------------------");
             System.out.println("FES-Fusion Graph");
-            System.out.println(this.currentGraph);
+            //System.out.println(this.currentGraph);
             System.out.println("----------------------------");
 
 
@@ -539,14 +591,14 @@ public class PGESv2
                 e.printStackTrace();
             }
             // Printing
-            System.out.println("Results of BES: ");
+            //System.out.println("Results of BES: ");
 
-            i = 1;
-            for (Dag dag : this.graphs) {
-                System.out.println("Thread " + i);
-                System.out.println(dag);
-                i++;
-            }
+            //i = 1;
+            //for (Dag dag : this.graphs) {
+            //    System.out.println("Thread " + i);
+            //    System.out.println(dag);
+            //    i++;
+            //}
             // 6. Intersection Fusion
             System.out.println("----------------------------");
             System.out.println("BES-Fusion Graph");
