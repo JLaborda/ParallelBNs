@@ -158,25 +158,26 @@ public class Utils {
     private static void ensureVariables(ArrayList<Dag> setofbns){
 
         List<Node> nodes = setofbns.get(0).getNodes();
-        System.out.println("Nodes: " + nodes);
+        //System.out.println("Nodes: " + nodes);
         for(int i = 1 ; i< setofbns.size(); i++){
             Dag oldDag = setofbns.get(i);
             List<Edge> oldEdges = oldDag.getEdges();
             Dag newdag = new Dag(nodes);
             for(Edge e: oldEdges){
+                /*
                 System.out.println("Node1");
                 System.out.println(e.getNode1());
                 System.out.println("Node2");
                 System.out.println(e.getNode2());
-
+                */
                 //int tailIndex = nodes.indexOf(e.getNode1());
                 //int headIndex = nodes.indexOf(e.getNode2());
 
                 int tailIndex = getIndexOfNodeByName(nodes, e.getNode1().getName());
                 int headIndex = getIndexOfNodeByName(nodes, e.getNode2().getName());
 
-                System.out.println("tail: " + tailIndex);
-                System.out.println("head: "  + headIndex);
+                //System.out.println("tail: " + tailIndex);
+                //System.out.println("head: "  + headIndex);
                 Edge newEdge = new Edge(nodes.get(tailIndex),nodes.get(headIndex), Endpoint.TAIL, Endpoint.ARROW);
                 newdag.addEdge(newEdge);
             }

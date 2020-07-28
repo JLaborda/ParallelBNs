@@ -446,14 +446,16 @@ public class GESThreadTest {
         assertFalse(result);
     }
 
+
     /**
      * Testing that a buildingIndexing is built when asked to.
      * @result Test should be true
      */
+    /*
     @Test
     public void buildIndexingNotBuiltTest(){
         // Arrange
-        GESThread thread = new ThFES(dataset, subset1, 15);
+        GESThread thread = new ThFES(problem, subset1, 15);
         thread.varNames = new String[0];
 
         // Act
@@ -462,7 +464,7 @@ public class GESThreadTest {
         // Assert
         assertTrue(thread.hashIndices.isEmpty());
     }
-
+    */
 
     /**
      * Tests that the maximum number of edges is modified.
@@ -471,7 +473,8 @@ public class GESThreadTest {
     @Test
     public void setMaxNumEdgesNormalTest(){
         // Arrange
-        GESThread thread = new ThFES(dataset, subset1, 15);
+        Problem problem = new Problem(dataset);
+        GESThread thread = new ThFES(problem, subset1, 15);
 
         // Act
         thread.setMaxNumEdges(5);
@@ -487,7 +490,8 @@ public class GESThreadTest {
     @Test(expected = IllegalArgumentException.class)
     public void setMaxNumEdgesErrorTest(){
         // Arrange
-        GESThread thread = new ThFES(dataset, subset1, 15);
+        Problem problem = new Problem(dataset);
+        GESThread thread = new ThFES(problem, subset1, 15);
 
         // Act
         thread.setMaxNumEdges(-2);
@@ -496,6 +500,7 @@ public class GESThreadTest {
         fail();
     }
 
+   /*
     @Test
     public void setCasesTest(){
         // Arrange
@@ -508,9 +513,9 @@ public class GESThreadTest {
                 {0,1,0,0,1}};
 
         // Act
-        GESThread.setProblem(data);
-        int[][] resultCases = GESThread.cases;
-        int[] resultNValues = GESThread.nValues;
+        //GESThread.setProblem(data);
+        //int[][] resultCases = GESThread.cases;
+        //int[] resultNValues = GESThread.nValues;
 
         // Assert
         assertEquals(expNValues.length, resultNValues.length);
@@ -525,8 +530,7 @@ public class GESThreadTest {
         }
 
     }
-
-
+*/
 }
 
     // Not working. Make Issue for this test

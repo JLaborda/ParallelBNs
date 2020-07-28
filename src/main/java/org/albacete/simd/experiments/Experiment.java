@@ -113,10 +113,10 @@ public class Experiment {
 
             // Metrics
             this.elapsedTime = endTime - startTime;
-            System.out.println("Original DAG:");
-            System.out.println(bn2.getDag());
-            System.out.println("Total Nodes Original DAG:");
-            System.out.println(bn2.getDag().getNodes().size());
+            //System.out.println("Original DAG:");
+            //System.out.println(bn2.getDag());
+            //System.out.println("Total Nodes Original DAG:");
+            //System.out.println(bn2.getDag().getNodes().size());
 
             /*
             List<Node> nodes_original = bn2.getDag().getNodes();
@@ -137,9 +137,9 @@ public class Experiment {
             this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
             this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
             this.nIterations = alg.getIterations();
-            this.score = GESThread.scoreGraph(alg.getCurrentGraph()); //alg.getFinalScore();
+            this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem());
 
-            printResults();
+            //printResults();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,9 +149,9 @@ public class Experiment {
 
     public void printResults() {
         // Report
-        System.out.println("Current DAG:");
+        System.out.println("Resulting DAG:");
         System.out.println(alg.getCurrentGraph());
-        System.out.println("Total Nodes Current DAG");
+        System.out.println("Total Nodes of Resulting DAG");
         System.out.println(alg.getCurrentGraph().getNodes().size());
         System.out.println("-------------------------\nMetrics: ");
 

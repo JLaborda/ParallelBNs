@@ -24,12 +24,8 @@ public class ThFES extends GESThread{
 
     private static int threadCounter = 1;
 
-    public ThFES(DataSet dataSet,Graph initialDag, ArrayList<TupleNode> subset,int maxIt) {
-
-        if (data == null) {
-            setDataSet(dataSet);
-            GESThread.setProblem(dataSet);
-        }
+    public ThFES(Problem problem,Graph initialDag, ArrayList<TupleNode> subset,int maxIt) {
+        this.problem = problem;
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
         setMaxIt(maxIt);
@@ -39,15 +35,12 @@ public class ThFES extends GESThread{
 
     /**
      * Constructor of ThFES with an initial DataSet
-     * @param dataSet data of the problem.
+     * @param problem object containing information of the problem such as data or variables.
      * @param subset subset of edges the fes stage will try to add to the resulting graph
      * @param maxIt maximum number of iterations allowed in the fes stage
      */
-    public ThFES(DataSet dataSet, ArrayList<TupleNode> subset,int maxIt) {
-        if (data == null) {
-            setDataSet(dataSet);
-            GESThread.setProblem(dataSet);
-        }
+    public ThFES(Problem problem, ArrayList<TupleNode> subset,int maxIt) {
+        this.problem = problem;
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
         setMaxIt(maxIt);
@@ -84,13 +77,13 @@ public class ThFES extends GESThread{
         long startTime = System.currentTimeMillis();
         numTotalCalls=0;
         numNonCachedCalls=0;
-        localScoreCache.clear();
+        //localScoreCache.clear();
 
         Graph graph = new EdgeListGraph(this.initialDag);
-        buildIndexing(graph);
+        //buildIndexing(graph);
 
         // Method 1-- original.
-        double score = scoreGraph(graph);
+        double score = scoreGraph(graph, problem);
 
         // Do forward search.
         score = fes(graph, score);
@@ -220,7 +213,7 @@ public class ThFES extends GESThread{
             while (tSubsets.hasMoreElements()) {
                 SubSet tSubset = tSubsets.nextElement();
 
-                double insertEval = insertEval(_x, _y, tSubset, graph);
+                double insertEval = insertEval(_x, _y, tSubset, graph, problem);
                 double evalScore = score + insertEval;
 
                 if (!(evalScore > bestScore && evalScore > score)) {

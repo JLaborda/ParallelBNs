@@ -54,8 +54,24 @@ public class LocalScoreCacheConcurrentTest {
         LocalScoreCacheConcurrent cache = new LocalScoreCacheConcurrent();
         int [] parents = {1,2,3,4,5};
         cache.add(0, parents, 5);
+
+        cache.clear();
+
+        double score = cache.get(0,parents);
+
+        assertEquals(Double.NaN, score, 0.000001);
+    }
+
+    @Test
+    public void toStringTest(){
+        LocalScoreCacheConcurrent cache = new LocalScoreCacheConcurrent();
+        int [] parents = {1,2,3,4,5};
         cache.add(0, parents, 5);
 
+        String result = cache.toString();
+        String expected = "LocalScoreCacheConcurrent{map={(0, [1, 2, 3, 4, 5])=5.0}}";
+
+        assertEquals(expected, result);
 
     }
 

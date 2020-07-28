@@ -20,8 +20,8 @@ public class PGESv2
     /**
      * {@link DataSet DataSet}DataSet containing the values of the variables of the problem in hand.
      */
-    private final DataSet data;
-
+    //private final DataSet data;
+    private Problem problem;
     /**
      * The number of threads the algorithm is going to use.
      */
@@ -90,7 +90,7 @@ public class PGESv2
      * @param nThreads Number of threads used in the problem.
      */
     public PGESv2(DataSet data, int nThreads){
-        this.data = data;
+        this.problem = new Problem(data);
         initialize(nThreads);
     }
 
@@ -100,8 +100,7 @@ public class PGESv2
      * @param nThreads number of threads of the problem
      */
     public PGESv2(String path, int nThreads){
-        this.data = Utils.readData(path);
-        initialize(nThreads);
+        this(Utils.readData(path),nThreads);
     }
 
 
@@ -117,14 +116,14 @@ public class PGESv2
         this.subSets = new ArrayList[this.nThreads];
 
         //The total number of arcs of a graph is n*(n-1)/2, where n is the number of nodes in the graph.
-        this.listOfArcs = new TupleNode[this.data.getNumColumns() * (this.data.getNumColumns() -1) / 2];
+        this.listOfArcs = new TupleNode[this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1) / 2];
     }
 
     /**
      * Calculates the amount of possible arcs between the variables of the dataset and stores it.
      */
     public void calculateArcs(){
-        this.listOfArcs = Utils.calculateArcs(this.data);
+        this.listOfArcs = Utils.calculateArcs(this.problem.getData());
     }
     /**
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem
@@ -142,15 +141,18 @@ public class PGESv2
         // Initializing Graphs structure
         this.graphs = new ArrayList<>();
 
+        // Rebuilding hashIndex
+        //problem.buildIndexing(currentGraph);
+
         // Creating each ThFES runnable
         if (this.currentGraph == null) {
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new ThFES(this.data, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new ThFES(this.problem, this.subSets[i], this.nFESItInterleaving);
             }
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new ThFES(this.data, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new ThFES(this.problem, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
             }
         }
 
@@ -222,6 +224,7 @@ public class PGESv2
         this.fesFlag = checkWorkingStatus();
 
         //Printing localScoreMap
+        /*
         for (GESThread thread: gesThreads) {
             System.out.println("---------------------------");
             System.out.println("ThFES " + thread.getId());
@@ -229,6 +232,7 @@ public class PGESv2
             System.out.println(thread.getLocalScoreCache());
             System.out.println("---------------------------");
         }
+         */
 
     }
 
@@ -242,10 +246,13 @@ public class PGESv2
         this.graphs = new ArrayList<>();
         this.gesThreads = new GESThread[this.nThreads];
 
+        // Rebuilding hashIndex
+        //problem.buildIndexing(currentGraph);
+
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
         ArrayList<TupleNode>[] subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads, this.seed);
         for (int i = 0; i < this.nThreads; i++) {
-            this.gesThreads[i] = new ThBES(this.data, this.currentGraph, subsets_BES[i]);
+            this.gesThreads[i] = new ThBES(this.problem, this.currentGraph, subsets_BES[i]);
         }
 
         // Initializing thread config
@@ -272,6 +279,7 @@ public class PGESv2
         besFlag = checkWorkingStatus();
 
         //Printing localScoreMap
+        /*
         for (GESThread thread: gesThreads) {
             System.out.println("---------------------------");
             System.out.println("ThBES " + thread.getId());
@@ -279,6 +287,7 @@ public class PGESv2
             System.out.println(thread.getLocalScoreCache());
             System.out.println("---------------------------");
         }
+         */
 
     }
 
@@ -294,8 +303,8 @@ public class PGESv2
         Graph fusionGraph = fusion.union();
 
         // Getting Scores
-        double fusionScore = GESThread.scoreGraph(fusionGraph);
-        double currentScore = GESThread.scoreGraph(currentGraph);
+        double fusionScore = GESThread.scoreGraph(fusionGraph, problem);
+        double currentScore = GESThread.scoreGraph(currentGraph, problem);
 
         System.out.println("Fusion Score: " + fusionScore);
         System.out.println("Current Score: " + currentScore);
@@ -308,7 +317,7 @@ public class PGESv2
             return (Dag) currentGraph;
         }
 
-
+        System.out.println("Greedy para obtener la Fusion: ");
         // If the score has not improved, then we check what edges added in the FES stage improve the score
         ArrayList<Node> order = new ArrayList<Node>(this.currentGraph.getTierOrdering());
 
@@ -325,38 +334,106 @@ public class PGESv2
             if(e.getEndpoint2()==Endpoint.TAIL) e.setEndpoint2(Endpoint.ARROW); else e.setEndpoint2(Endpoint.TAIL);
 
         }
-        // APLICAR BEST FIRST Y SOLO CON LA FUSION
+        //        APLICAR BEST FIRST Y SOLO CON LA FUSION
 
         List<Edge> candidates = new ArrayList<>();
         for (Edge e: fusionGraph.getEdges()){
-            if(!currentGraph.containsEdge(e)){
-                candidates.add(e);
-            }
+            if(currentGraph.getEdge(e.getNode1(), e.getNode2())!=null || currentGraph.getEdge(e.getNode2(),e.getNode1())!=null ) continue;
+            candidates.add(new Edge(e.getNode1(),e.getNode2(),e.getEndpoint1(),e.getEndpoint2()));
+            //           candidates.add(new Edge(e.getNode1(),e.getNode2(),e.getEndpoint2(),e.getEndpoint1()));
         }
 
-        Edge addEdge;
-        do{
-            double max = 0;
-            addEdge = null;
-            for(Edge e: candidates){
-                Node x = e.getNode1();
-                Node y = e.getNode2();
-                Set<Node> parents1 = new HashSet<>(currentGraph.getParents(x));
-                Set<Node> parents2 = new HashSet<>(parents1);
-                parents2.add(y);
-                double delta = GESThread.scoreGraphChange(x, parents1, parents2, currentGraph);
 
-                if (delta > max){
-                    max = delta;
+        Edge addEdge;
+        double score = currentScore;
+        double scoreEval = 0;
+        do{
+            double max = score;
+            Node _x= null;
+            Node _y= null;
+            addEdge= null;
+            for(Edge e: candidates){
+                //Getting tail in x and head in y
+                Node x = Edges.getDirectedEdgeTail(e);
+                Node y = Edges.getDirectedEdgeHead(e);
+                //if(e.getEndpoint1() == Endpoint.TAIL) { y = e.getNode1(); x = e.getNode2();}
+
+                // Checking there is no path from tail (x) to head (x)
+                if(currentGraph.existsDirectedPathFromTo(x, y)) continue;
+
+                //MAL: ERROR EN ALGUN LADO
+                /*
+                currentGraph.addDirectedEdge(y, x);
+                scoreEval = GESThread.scoreGraph(currentGraph, problem);
+                currentGraph.removeEdge(y, x);
+                */
+                //parents1 contains x, parents2 does not.
+                //Set<Node> parents1 = new HashSet<>();
+                //Set<Node> parents1 = new HashSet<>(GESThread.findNaYX(x,y,currentGraph));
+                //parents1.addAll(currentGraph.getParents(y));
+                //Set<Node> parents2 = new HashSet<>(parents1);
+                //parents1.add(x);
+                //double delta = GESThread.scoreGraphChange(y, parents1, parents2, currentGraph, problem);
+
+
+                //double delta = GESThread.insertEval(x,y,new HashSet<>(),currentGraph, problem);
+
+                //DEBUG // Las puntuaciones no coinciden...
+                //problem.buildIndexing(currentGraph);
+
+
+                /*
+                Set<Node> set1 = new HashSet<>();
+                set1.addAll(currentGraph.getParents(y));
+                Set<Node> set2 = new HashSet<>(set1);
+                set1.add(x);
+                double delta1 =  GESThread.scoreGraphChange(y, set1, set2, currentGraph, problem);
+
+
+                scoreEval1 = score + delta1;
+
+
+                double scoreEval2 = GESThread.scoreGraph(currentGraph, problem);
+                //currentGraph.addDirectedEdge(y, x);
+                currentGraph.addDirectedEdge(x,y);
+                double scoreEval3 = GESThread.scoreGraph(currentGraph, problem);
+                currentGraph.removeEdge(x,y);
+                //currentGraph.removeEdge(y, x);
+
+
+
+                System.out.println("Score with graph change: " + scoreEval1 + "\tScore with scoreGraph (Without added edge):" +scoreEval2 + "\t Score with scoreGraph (Added edge): " + scoreEval3);
+
+                double delta2 = scoreEval3 - scoreEval2;
+                System.out.println("Delta1(ScoreGraphChange): " + delta1 + "\tDelta2(ScoreGraphs): \t" + delta2 + "\tDelta3 (InsertEval)" + delta3 );
+                //DEBUG////
+                */
+                //System.out.println("probando: "+e.toString()+String.format("\tscoreEval: %.2f\tmax: %.2f\tdelta:%.2f", scoreEval, max, delta));
+
+
+                double delta = GESThread.insertEval(x,y, new HashSet<>(), currentGraph, problem);
+                scoreEval = score + delta;
+
+
+
+                if (scoreEval > max){
+                    max = scoreEval;
+                    _x = x;
+                    _y = y;
                     addEdge = e;
+                    System.out.println("añadiendo: " + addEdge.toString() + "max=" + max);
+
                 }
+
             }
-            if (addEdge != null) {
-                currentGraph.addEdge(addEdge);
+            if (addEdge!= null) {
+                //currentGraph.addDirectedEdge(_y, _x);
+                currentGraph.addDirectedEdge(_x,_y);
+                System.out.println(" "+_x+" --> " + _y + "\t +max: "+ max);//+GESThread.scoreGraph(currentGraph, problem));
                 candidates.remove(addEdge);
+                score = max;
             }
         }while(addEdge != null);
-
 
         return (Dag) currentGraph;
     }
@@ -455,10 +532,10 @@ public class PGESv2
     public void search(){
 
         // Initial Configuration: Cases
-        GESThread.setProblem(this.data);
+        //GESThread.setProblem(this.data);
 
         // 1. Calculating Edges
-        this.listOfArcs = Utils.calculateArcs(this.data);
+        this.listOfArcs = Utils.calculateArcs(this.problem.getData());
 
         do {
             System.out.println("============================");
@@ -468,16 +545,16 @@ public class PGESv2
             // 2 Random Repartitioning
             this.subSets = Utils.split(listOfArcs, nThreads, seed);
 
-            System.out.println("----------------------------");
-            System.out.println("Splits: ");
-            int i = 1;
-            for( ArrayList<TupleNode> s : subSets){
-                System.out.println("Split " + i);
-                i++;
-                for(TupleNode t : s){
-                    System.out.println(t);
-                }
-            }
+            //System.out.println("----------------------------");
+            //System.out.println("Splits: ");
+            //int i = 1;
+            //for( ArrayList<TupleNode> s : subSets){
+            //    System.out.println("Split " + i);
+            //    i++;
+            //    for(TupleNode t : s){
+            //        System.out.println(t);
+            //    }
+            //}
             System.out.println("----------------------------");
             System.out.println("FES STAGE");
             // 3. FES
@@ -489,19 +566,19 @@ public class PGESv2
             }
 
             // Printing
-            System.out.println("Results of FES: ");
-            i = 1;
-            for (Dag dag : this.graphs) {
-                System.out.println("Thread " + i);
-                System.out.println(dag);
-                i++;
-            }
+            //System.out.println("Results of FES: ");
+            //i = 1;
+            //for (Dag dag : this.graphs) {
+            //    System.out.println("Thread " + i);
+            //    System.out.println(dag);
+            //   i++;
+            //}
 
             // 4. Fusion
             this.currentGraph = fusion();
             System.out.println("----------------------------");
             System.out.println("FES-Fusion Graph");
-            System.out.println(this.currentGraph);
+            //System.out.println(this.currentGraph);
             System.out.println("----------------------------");
 
 
@@ -514,14 +591,14 @@ public class PGESv2
                 e.printStackTrace();
             }
             // Printing
-            System.out.println("Results of BES: ");
+            //System.out.println("Results of BES: ");
 
-            i = 1;
-            for (Dag dag : this.graphs) {
-                System.out.println("Thread " + i);
-                System.out.println(dag);
-                i++;
-            }
+            //i = 1;
+            //for (Dag dag : this.graphs) {
+            //    System.out.println("Thread " + i);
+            //    System.out.println(dag);
+            //    i++;
+            //}
             // 6. Intersection Fusion
             System.out.println("----------------------------");
             System.out.println("BES-Fusion Graph");
@@ -573,7 +650,7 @@ public class PGESv2
      * @return {@link DataSet DataSet} with the data of the problem.
      */
     public DataSet getData() {
-        return data;
+        return problem.getData();
     }
 
     /**
@@ -624,6 +701,9 @@ public class PGESv2
         return it;
     }
 
+    public Problem getProblem() {
+        return problem;
+    }
 
     /**
      * Example of the algorithm running for the cancer problem.
