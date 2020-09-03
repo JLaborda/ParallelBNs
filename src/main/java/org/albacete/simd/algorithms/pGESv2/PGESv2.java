@@ -3,6 +3,7 @@ package org.albacete.simd.algorithms.pGESv2;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import consensusBN.ConsensusUnion;
+import javafx.collections.transformation.SortedList;
 import org.albacete.simd.utils.Utils;
 
 import java.util.*;
@@ -519,6 +520,51 @@ public class PGESv2
         it++;
         return false;
     }
+
+    private ArrayList<TupleNode> maxSpanningTree(){
+        // Kruskal's Algorithm
+        // Initialize an empty edge set T
+        // Sort all graph edges by the descending order of their weight values
+        // foreach edge in the sorted edge list
+        //      Check whether it will create a cycle with the edges inside T.
+        //      If the edge doesn't introduce any cycles, add it into T.
+        //      If T has (V-1) edges, exit the loop.
+        // return T
+
+        ArrayList<TupleNode> result = new ArrayList<>();
+        List<TupleNode> sortedEdges = Arrays.asList(listOfArcs);
+        sortedEdges.sort(new Comparator<TupleNode>() {
+            @Override
+            public int compare(TupleNode o1, TupleNode o2) {
+                //
+                if (o1.score() > o2.score()){
+                    return 1;
+                }
+                if (o1.score() < o2.score()){
+                    return -1;
+                }
+                else
+                    return 0;
+            }
+        });
+
+        for (TupleNode tupleNode : sortedEdges){
+            if(!hasCycle(result, tupleNode))
+                result.add(tupleNode);
+
+            if(result.size() >= (this.getProblem().getVariables().size() -1 ))
+                break;
+        }
+        
+        return result;
+
+    }
+
+    private boolean hasCycle(ArrayList<TupleNode> maxSpanTree, TupleNode newEdge){
+        //TODO: Implement cycly detection with a Deep First Search algorithm
+        return true;
+    }
+
 
     /**
      * Executes the algorithm. It has 7 steps. The first step is to calculate the arcs ({@link Utils calculateArcs} calculateArcs),

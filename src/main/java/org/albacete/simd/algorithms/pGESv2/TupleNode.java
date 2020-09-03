@@ -26,6 +26,12 @@ public class TupleNode {
         this.y = y;
     }
 
+
+    public double score(){
+        //TODO: Implement distance score for each edge
+        return 0;
+    }
+
     /**
      * Checks if two TupleNodes are equal or not
      * @param obj The other TupleNode that we are checking for equivalence.
