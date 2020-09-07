@@ -293,7 +293,7 @@ public class PGESv2Test
         pGESv2.calculateArcs();
         pGESv2.splitArcs();
         pGESv2.fesStage();
-        Dag result = pGESv2.fusion();
+        Dag result = pGESv2.fusionFES();
         System.out.println(result);
 
         // Assert Nodes
@@ -365,7 +365,7 @@ public class PGESv2Test
         pGESv2.calculateArcs();
         pGESv2.splitArcs();
         pGESv2.fesStage();
-        pGESv2.fusion();
+        pGESv2.fusionFES();
 
         // Act
         pGESv2.besStage();

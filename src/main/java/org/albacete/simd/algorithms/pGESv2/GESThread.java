@@ -283,24 +283,47 @@ public abstract class GESThread implements Runnable{
         if (y == x) {
             return false;
         }
-
-        for (Node node1 : graph.getNodes()) {
-            if (node1 == y || marked.contains(node1)) {
-                continue;
-            }
-
-            if (graph.isAdjacentTo(y, node1) && !graph.isParentOf(node1, y)) {
-                marked.add(node1);
-
-                if (!isSemiDirectedBlocked(x, node1, naYXT, graph, marked)) {
-                    return false;
-                }
-
-                marked.remove(node1);
-            }
+        
+//        // nueva forma de calcular los caminos semidirigidos.
+//        
+        Graph aux = new EdgeListGraph(graph);
+        aux.removeNodes(naYXT);
+        
+        LinkedList<Node> open = new LinkedList<Node>();
+        HashMap<String,Node> close = new HashMap<String,Node>();
+        open.add(y);
+        
+        while(!open.isEmpty()) {
+        	Node a = open.getFirst();
+        	if(a.equals(x)) return false;
+        	open.remove(a);
+        	close.put(a.toString(), a);
+        	List<Node> nb = aux.getAdjacentNodes(a);
+        	for(Node n: nb) {
+        		Edge e = aux.getEdge(a,n);
+        		if (close.get(n.toString()) == null && !e.pointsTowards(a) && !open.contains(n)) 
+        			open.addLast(n);
+        	}
         }
-
         return true;
+
+//        for (Node node1 : graph.getNodes()) {
+//            if (node1 == y || marked.contains(node1)) {
+//                continue;
+//            }
+//
+//            if (graph.isAdjacentTo(y, node1) && !graph.isParentOf(node1, y)) {
+//                marked.add(node1);
+//
+//                if (!isSemiDirectedBlocked(x, node1, naYXT, graph, marked)) {
+//                    return false;
+//                }
+//
+//                marked.remove(node1);
+//            }
+//        }
+//
+//        return true;
     }
 
     /**
