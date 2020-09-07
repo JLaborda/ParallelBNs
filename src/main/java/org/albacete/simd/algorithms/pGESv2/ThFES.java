@@ -180,9 +180,9 @@ public class ThFES extends GESThread{
 
         double bestScore = score;
         PowerSetFabric.setMode(PowerSetFabric.MODE_FES);
-        x_i=null;
-        y_i=null;
-        t_0 = null;
+        x_i= null;
+        y_i= null;
+        t_0= null;
 
         List<Edge> edges = new ArrayList<>();
 
@@ -208,68 +208,108 @@ public class ThFES extends GESThread{
             }
 // ---------------------------- Checking and evaluating an edge between _x and _y-----------
             List<Node> tNeighbors = getSubsetOfNeighbors(_x, _y, graph);
-            PowerSet tSubsets = PowerSetFabric.getPowerSet(_x, _y, tNeighbors);
+//            PowerSet tSubsets = PowerSetFabric.getPowerSet(_x, _y, tNeighbors);
+            
+            SubSet tSubset = new SubSet();
+			double insertEval = insertEval(_x, _y, tSubset, graph, problem);
+			double evalScore = score + insertEval;
+			if (evalScore <= score) {
+				continue;
+			}
+            
+			if (!(evalScore > bestScore && evalScore > score)) {
+                continue;
+            }
+                   
 
-            while (tSubsets.hasMoreElements()) {
-                SubSet tSubset = tSubsets.nextElement();
-
-                double insertEval = insertEval(_x, _y, tSubset, graph, problem);
-                double evalScore = score + insertEval;
-
-                if (!(evalScore > bestScore && evalScore > score)) {
+            List<Node> naYXT = new LinkedList<>(tSubset);
+            List<Node> naYX = findNaYX(_x, _y, graph);
+            naYXT.addAll(naYX);
+            
+            // START TEST 1
+            if (tSubset.firstTest == SubSet.TEST_NOT_EVALUATED) {
+                if (!isClique(naYXT, graph)) {
                     continue;
                 }
-
-                List<Node> naYXT = new LinkedList<>(tSubset);
-                naYXT.addAll(findNaYX(_x, _y, graph));
-
-                // START TEST 1
-                if (tSubset.firstTest == SubSet.TEST_NOT_EVALUATED) {
-                    if (!isClique(naYXT, graph)) {
-                        continue;
-                    }
-                } else if (tSubset.firstTest == SubSet.TEST_FALSE) {
+            } else if (tSubset.firstTest == SubSet.TEST_FALSE) {
+                continue;
+            }
+            // END TEST 1
+            
+            // START TEST 2
+            if (tSubset.secondTest == SubSet.TEST_NOT_EVALUATED) {
+                if (!isSemiDirectedBlocked(_x, _y, naYXT, graph, new HashSet<>())) {
                     continue;
                 }
-                // END TEST 1
+            } else if (tSubset.secondTest == SubSet.TEST_FALSE) { // This can't happen
+                continue;
+            }
+            
+            double greedyScore = evalScore;
+            int bestNodeIndex;
+            Node bestNode = null;
+            int subsetTsize = 0;
+            
+            do {
+            	bestNodeIndex = -1;
+            	for (int k = 0; k < tNeighbors.size(); k++) {
+					Node node = tNeighbors.get(k);
+					SubSet newT = new SubSet(tSubset);
+					newT.add(node);
+					insertEval = insertEval(_x, _y, newT, graph, problem);
+					evalScore = score + insertEval;
 
-                // START TEST 2
-                if (tSubset.secondTest == SubSet.TEST_NOT_EVALUATED) {
-                    if (!isSemiDirectedBlocked(_x, _y, naYXT, graph, new HashSet<>())) {
-                        continue;
-                    }
-                } else if (tSubset.secondTest == SubSet.TEST_FALSE) { // This can't happen
-                    continue;
-                }
-                // END TEST 2
+					if (evalScore <= greedyScore) {
+						continue;
+					}
 
-                bestScore = evalScore;
-                x_i = _x;
-                y_i = _y;
-                t_0 = tSubset;
+					naYXT = new LinkedList<Node>(newT);
+					naYXT.addAll(naYX);
+					
+					// START TEST 1
+		            if (tSubset.firstTest == SubSet.TEST_NOT_EVALUATED) {
+		                if (!isClique(naYXT, graph)) {
+		                    continue;
+		                }
+		            } else if (tSubset.firstTest == SubSet.TEST_FALSE) {
+		                continue;
+		            }
+		            // END TEST 1
+		            
+//		            // START TEST 2
+		            if (tSubset.secondTest == SubSet.TEST_NOT_EVALUATED) {
+		                if (!isSemiDirectedBlocked(_x, _y, naYXT, graph, new HashSet<>())) {
+		                    continue;
+		                }
+		            } else if (tSubset.secondTest == SubSet.TEST_FALSE) { // This can't happen
+		                continue;
+		            }
+					
+		            bestNodeIndex = k;
+					bestNode = node;
+					greedyScore = evalScore;
+            	}
+            	if (bestNodeIndex != -1) {
+					tSubset.add(bestNode);
+					tNeighbors.remove(bestNodeIndex);
+					subsetTsize++;
+				}
+            	
+            }while ((bestNodeIndex !=-1)&&(subsetTsize <= 1));
+            
+            if(greedyScore > bestScore) {
+            	bestScore = greedyScore;
+            	x_i = _x;
+            	y_i = _y;
+            	t_0 = tSubset;
             }
 
             //.......................... an edge is evaluated until here.
-
         }
-
 
         return bestScore;
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -293,10 +293,10 @@ public class PGESv2
 
 
     /**
-     * Joins the Dags of either the FES or BES stage.
+     * Joins the Dags of the FES stage.
      * @return Dag with the fusion consensus of the graphs of the previous stage
      */
-    public Dag fusion(){
+    public Dag fusionFES(){
 
         // Applying ConsensusUnion fusion
         ConsensusUnion fusion = new ConsensusUnion(this.graphs);
@@ -304,7 +304,7 @@ public class PGESv2
 
         // Getting Scores
         double fusionScore = GESThread.scoreGraph(fusionGraph, problem);
-        double currentScore = GESThread.scoreGraph(currentGraph, problem);
+        double currentScore = GESThread.scoreGraph(this.currentGraph, problem);
 
         System.out.println("Fusion Score: " + fusionScore);
         System.out.println("Current Score: " + currentScore);
@@ -314,128 +314,35 @@ public class PGESv2
         // Checking if the score has improved
         if (fusionScore > currentScore) {
             this.currentGraph = fusionGraph;
-            return (Dag) currentGraph;
+            return (Dag) this.currentGraph;
         }
 
-        System.out.println("Greedy para obtener la Fusion: ");
-        // If the score has not improved, then we check what edges added in the FES stage improve the score
-        ArrayList<Node> order = new ArrayList<Node>(this.currentGraph.getTierOrdering());
+        System.out.println("FES to obtain the fusion: ");
+ 
 
-        // Applying ancestral order into the graphs. (SOLO EL FUSION GRAPH)
-
-        for(Edge e: fusionGraph.getEdges()) {
-
-            if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW)) continue;
-
-            if((order.indexOf(e.getNode1()) > order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.ARROW && e.getEndpoint2()==Endpoint.TAIL)) continue;
-
-            if(e.getEndpoint1()==Endpoint.TAIL) e.setEndpoint1(Endpoint.ARROW); else e.setEndpoint1(Endpoint.TAIL);
-
-            if(e.getEndpoint2()==Endpoint.TAIL) e.setEndpoint2(Endpoint.ARROW); else e.setEndpoint2(Endpoint.TAIL);
-
-        }
-        //        APLICAR BEST FIRST Y SOLO CON LA FUSION
-
-        List<Edge> candidates = new ArrayList<>();
+        ArrayList<TupleNode> candidates = new ArrayList<TupleNode>();
+        
+        
         for (Edge e: fusionGraph.getEdges()){
-            if(currentGraph.getEdge(e.getNode1(), e.getNode2())!=null || currentGraph.getEdge(e.getNode2(),e.getNode1())!=null ) continue;
-            candidates.add(new Edge(e.getNode1(),e.getNode2(),e.getEndpoint1(),e.getEndpoint2()));
-            //           candidates.add(new Edge(e.getNode1(),e.getNode2(),e.getEndpoint2(),e.getEndpoint1()));
+            if(this.currentGraph.getEdge(e.getNode1(), e.getNode2())!=null || this.currentGraph.getEdge(e.getNode2(),e.getNode1())!=null ) continue;
+            candidates.add(new TupleNode(e.getNode1(),e.getNode2()));
         }
 
+        
+        ThFES fuse = new ThFES(this.problem,this.currentGraph,candidates,candidates.size());
+        
+        fuse.run();
+        
+        try {
+			this.currentGraph = fuse.getCurrentGraph();
+			System.out.println("Score Fusion: "+ ThFES.scoreGraph(this.currentGraph, problem));
+			this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+			System.out.println("Score Fusion sin inconsistencias: "+ ThFES.scoreGraph(this.currentGraph, problem));
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 
-        Edge addEdge;
-        double score = currentScore;
-        double scoreEval = 0;
-        do{
-            double max = score;
-            Node _x= null;
-            Node _y= null;
-            addEdge= null;
-            for(Edge e: candidates){
-                //Getting tail in x and head in y
-                Node x = Edges.getDirectedEdgeTail(e);
-                Node y = Edges.getDirectedEdgeHead(e);
-                //if(e.getEndpoint1() == Endpoint.TAIL) { y = e.getNode1(); x = e.getNode2();}
-
-                // Checking there is no path from tail (x) to head (x)
-                if(currentGraph.existsDirectedPathFromTo(x, y)) continue;
-
-                //MAL: ERROR EN ALGUN LADO
-                /*
-                currentGraph.addDirectedEdge(y, x);
-                scoreEval = GESThread.scoreGraph(currentGraph, problem);
-                currentGraph.removeEdge(y, x);
-                */
-                //parents1 contains x, parents2 does not.
-                //Set<Node> parents1 = new HashSet<>();
-                //Set<Node> parents1 = new HashSet<>(GESThread.findNaYX(x,y,currentGraph));
-                //parents1.addAll(currentGraph.getParents(y));
-                //Set<Node> parents2 = new HashSet<>(parents1);
-                //parents1.add(x);
-                //double delta = GESThread.scoreGraphChange(y, parents1, parents2, currentGraph, problem);
-
-
-                //double delta = GESThread.insertEval(x,y,new HashSet<>(),currentGraph, problem);
-
-                //DEBUG // Las puntuaciones no coinciden...
-                //problem.buildIndexing(currentGraph);
-
-
-                /*
-                Set<Node> set1 = new HashSet<>();
-                set1.addAll(currentGraph.getParents(y));
-                Set<Node> set2 = new HashSet<>(set1);
-                set1.add(x);
-                double delta1 =  GESThread.scoreGraphChange(y, set1, set2, currentGraph, problem);
-
-
-                scoreEval1 = score + delta1;
-
-
-                double scoreEval2 = GESThread.scoreGraph(currentGraph, problem);
-                //currentGraph.addDirectedEdge(y, x);
-                currentGraph.addDirectedEdge(x,y);
-                double scoreEval3 = GESThread.scoreGraph(currentGraph, problem);
-                currentGraph.removeEdge(x,y);
-                //currentGraph.removeEdge(y, x);
-
-
-
-                System.out.println("Score with graph change: " + scoreEval1 + "\tScore with scoreGraph (Without added edge):" +scoreEval2 + "\t Score with scoreGraph (Added edge): " + scoreEval3);
-
-                double delta2 = scoreEval3 - scoreEval2;
-                System.out.println("Delta1(ScoreGraphChange): " + delta1 + "\tDelta2(ScoreGraphs): \t" + delta2 + "\tDelta3 (InsertEval)" + delta3 );
-                //DEBUG////
-                */
-                //System.out.println("probando: "+e.toString()+String.format("\tscoreEval: %.2f\tmax: %.2f\tdelta:%.2f", scoreEval, max, delta));
-
-
-                double delta = GESThread.insertEval(x,y, new HashSet<>(), currentGraph, problem);
-                scoreEval = score + delta;
-
-
-
-                if (scoreEval > max){
-                    max = scoreEval;
-                    _x = x;
-                    _y = y;
-                    addEdge = e;
-                    System.out.println("añadiendo: " + addEdge.toString() + "max=" + max);
-
-                }
-
-            }
-            if (addEdge!= null) {
-                //currentGraph.addDirectedEdge(_y, _x);
-                currentGraph.addDirectedEdge(_x,_y);
-                System.out.println(" "+_x+" --> " + _y + "\t +max: "+ max);//+GESThread.scoreGraph(currentGraph, problem));
-                candidates.remove(addEdge);
-                score = max;
-            }
-        }while(addEdge != null);
-
-        return (Dag) currentGraph;
+        return (Dag) this.currentGraph;
     }
 
 
@@ -471,16 +378,16 @@ public class PGESv2
 
         }
 
-
+        Graph graph = new EdgeListGraph(this.currentGraph);
         // Looping over each edge of the currentGraph and checking if it has been deleted in any of the resulting graphs of the BES stage.
         // If it has been deleted, then it is removed from the currentGraph.
-        for(Edge e: this.currentGraph.getEdges()) {
+        for(Edge e: graph.getEdges()) {
 
             for(Dag g: this.graphs)
 
                 if(!g.containsEdge(e)) {
 
-                    this.currentGraph.removeEdge(e);
+                    graph.removeEdge(e);
 
                     break;
 
@@ -490,7 +397,7 @@ public class PGESv2
 
         }
 
-        return (Dag) this.currentGraph;
+        return new Dag(graph);
 
     }
 
@@ -523,10 +430,10 @@ public class PGESv2
     /**
      * Executes the algorithm. It has 7 steps. The first step is to calculate the arcs ({@link Utils calculateArcs} calculateArcs),
      * next, it enters a loop where at the start of each iteration a random repartition is done ({@link #splitArcs()} splitArcs),
-     * then, the {@link #fesStage() fesStage} is executed. Once it has finished, a {@link #fusion() fusion} is done, joining
+     * then, the {@link #fesStage() fesStage} is executed. Once it has finished, a {@link #fusionFES() fusion} is done, joining
      * all of the DAGs obtained in the previous stage. The next step is the {@link #besStage() besStage}, in each subset,
      * a {@link ThBES ThBES} runs a BES algorithm, deleting any misplaced edge from the previous steps. Once all of the threads
-     * have finished, then another {@link #fusion() fusion} is done. Finally, we check if there has been a convergence, and
+     * have finished, then another {@link #fusionFES() fusion} is done. Finally, we check if there has been a convergence, and
      * repeat the process.
      */
     public void search(){
@@ -575,7 +482,7 @@ public class PGESv2
             //}
 
             // 4. Fusion
-            this.currentGraph = fusion();
+            this.currentGraph = fusionFES();
             System.out.println("----------------------------");
             System.out.println("FES-Fusion Graph");
             //System.out.println(this.currentGraph);
@@ -590,6 +497,9 @@ public class PGESv2
                 System.err.println("Error in BES Stage");
                 e.printStackTrace();
             }
+            
+            this.currentGraph = fusionBES();
+            
             // Printing
             //System.out.println("Results of BES: ");
 
@@ -602,7 +512,6 @@ public class PGESv2
             // 6. Intersection Fusion
             System.out.println("----------------------------");
             System.out.println("BES-Fusion Graph");
-            this.currentGraph = fusionIntersection();
 
             // Results of the iteration
             System.out.println("Graph ITERATION " + "("+ it + ")");
@@ -613,7 +522,52 @@ public class PGESv2
         }while(!convergence());
     }
 
-    /**
+    private Graph fusionBES() {
+    
+        Dag fusionGraph = this.fusionIntersection();
+
+        // Getting Scores
+        double fusionScore = GESThread.scoreGraph(fusionGraph, problem);
+        double currentScore = GESThread.scoreGraph(this.currentGraph, problem);
+
+        System.out.println("Fusion Score: " + fusionScore);
+        System.out.println("Current Score: " + currentScore);
+
+
+        // Checking if the score has improved
+        if (fusionScore > currentScore) {
+            this.currentGraph = fusionGraph;
+            return (Dag) this.currentGraph;
+        }
+
+        System.out.println("BES to obtain the fusion: ");
+
+        ArrayList<TupleNode> candidates = new ArrayList<TupleNode>();
+        
+        for (Edge e: this.currentGraph.getEdges()){
+            if(fusionGraph.getEdge(e.getNode1(), e.getNode2())==null && fusionGraph.getEdge(e.getNode2(),e.getNode1())==null ) {
+            	candidates.add(new TupleNode(e.getNode1(),e.getNode2()));
+            }
+        }
+
+     
+        
+        ThBES fuse = new ThBES(this.problem,this.currentGraph,candidates);
+        
+        fuse.run();
+        
+        try {
+			this.currentGraph = fuse.getCurrentGraph();
+			System.out.println("Resultado del BES de la fusion: "+ThBES.scoreGraph(this.currentGraph, problem));
+			this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} 
+
+        return (Dag) this.currentGraph;
+	}
+
+	/**
      * Sets the seed for the random generator.
      * @param seed seed used for the random number generator.
      */
@@ -711,10 +665,11 @@ public class PGESv2
      */
     public static void main(String[] args){
         // 1. Read Data
-        String path = "src/test/resources/cancer.xbif_.csv";
-
+        String path = "src/test/resources/alarm1000000_.csv";
+        DataSet ds = Utils.readData(path);
+ 
         // 2. Configuring algorithm
-        PGESv2 pGESv2 = new PGESv2(path, 2);
+        PGESv2 pGESv2 = new PGESv2(ds, 2);
         int maxIteration = 15;
         pGESv2.setMaxIterations(maxIteration);
         pGESv2.setNFESItInterleaving(5);
