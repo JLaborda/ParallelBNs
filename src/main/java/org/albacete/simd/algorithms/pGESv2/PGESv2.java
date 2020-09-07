@@ -665,7 +665,7 @@ public class PGESv2
      */
     public static void main(String[] args){
         // 1. Read Data
-        String path = "src/test/resources/alarm1000000_.csv";
+        String path = "src/test/resources/alarm.xbif_.csv";
         DataSet ds = Utils.readData(path);
  
         // 2. Configuring algorithm
