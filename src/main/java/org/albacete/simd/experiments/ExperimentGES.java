@@ -6,7 +6,7 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
 import org.albacete.simd.algorithms.GES.GES;
-import org.albacete.simd.algorithms.pGESv2.GESThread;
+import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;

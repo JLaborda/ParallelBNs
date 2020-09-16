@@ -5,7 +5,7 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
-import org.albacete.simd.algorithms.pGESv2.GESThread;
+import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.algorithms.pGESv2.PGESv2;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
@@ -31,7 +31,7 @@ public class Experiment {
     protected String bbdd_path;
     protected String net_name;
     protected String bbdd_name;
-    private int nThreads;
+    protected int nThreads;
     //private String fusion_consensus;
     private int nItInterleaving;
     private int maxIterations = 15;
@@ -340,47 +340,6 @@ public class Experiment {
     }
 
         public static void main(String[] args) {
-            /*
-            String netFolder = "res/networks/";
-            String bbddFolder = "res/networks/BBDD/";
-            ArrayList<String> net_paths = getNetworkPaths(netFolder);
-            ArrayList<String> bbdd_paths = getBBDDPaths(bbddFolder);
-
-
-
-            System.out.println("net_names: " + net_paths);
-            System.out.println("bbdd_names: " + bbdd_paths);
-
-            map =  hashNetworks(net_paths, bbdd_paths);
-
-            System.out.println("Values in Map:");
-            for (String key: map.keySet()) {
-                HashMap<String, String> aux = map.get(key);
-                for(String k : aux.keySet()) {
-                    System.out.println("BBDD_Number: " + key);
-                    System.out.println("Key: " + k);
-                    System.out.println("Value: " + aux.get(k));
-                    System.out.println("******************");
-
-                }
-            }
-            */
-            //Problems with:
-            /*
-             * -----------------------------------------
-            Net Name: barley
-            BBDD Name: barley.xbif_
-            Fusion Consensus: ConsensusBES
-            nThreads: 2
-            nItInterleaving: 15
-            -----------------------------------------
-            Net_path: networks/barley.xbif
-            BBDD_path: networks/BBDD/barley.xbif_.csv
-             * */
-
-
-            // Running Single Experiment
-            //Experiments experiment = new Experiments("res/networks/win95pts.xbif", "res/networks/BBDD/win95pts.xbif_.csv", 2, 5);
 
             String netPath = "";
             String bbddPath = "";

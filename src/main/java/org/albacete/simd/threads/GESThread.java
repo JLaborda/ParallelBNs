@@ -1,17 +1,15 @@
-package org.albacete.simd.algorithms.pGESv2;
+package org.albacete.simd.threads;
 
 import consensusBN.SubSet;
-import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
-import edu.cmu.tetrad.search.LocalScoreCache;
 import edu.cmu.tetrad.search.MeekRules;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.NumberFormatUtil;
 import edu.cmu.tetrad.util.ProbUtils;
-import org.albacete.simd.utils.Utils;
+import org.albacete.simd.utils.LocalScoreCacheConcurrent;
+import org.albacete.simd.utils.Problem;
+import org.albacete.simd.utils.TupleNode;
 
-import javax.swing.*;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -643,7 +641,7 @@ public abstract class GESThread implements Runnable{
 
 
     /**
-     * Sets the maximum iterations the thread can do. This is used in {@link ThFES ThFES} threads.
+     * Sets the maximum iterations the thread can do. This is used in {@link FESThread ThFES} threads.
      * @param maxIt the maximum number of iterations
      */
     public void setMaxIt(int maxIt) {

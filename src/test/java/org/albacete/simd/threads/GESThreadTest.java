@@ -1,7 +1,11 @@
-package org.albacete.simd.algorithms.pGESv2;
+package org.albacete.simd.threads;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
+import org.albacete.simd.threads.GESThread;
+import org.albacete.simd.threads.FESThread;
+import org.albacete.simd.utils.Problem;
+import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -474,7 +478,7 @@ public class GESThreadTest {
     public void setMaxNumEdgesNormalTest(){
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new ThFES(problem, subset1, 15);
+        GESThread thread = new FESThread(problem, subset1, 15);
 
         // Act
         thread.setMaxNumEdges(5);
@@ -491,7 +495,7 @@ public class GESThreadTest {
     public void setMaxNumEdgesErrorTest(){
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new ThFES(problem, subset1, 15);
+        GESThread thread = new FESThread(problem, subset1, 15);
 
         // Act
         thread.setMaxNumEdges(-2);

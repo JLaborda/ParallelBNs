@@ -1,23 +1,22 @@
-package org.albacete.simd.algorithms.pGESv2;
+package org.albacete.simd.threads;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
-
+import org.albacete.simd.utils.Problem;
+import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
+
 import org.junit.Test;
+import static org.junit.Assert.*;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+public class BackwardsHillClimbingThreadTest {
 
-/**
- * Tests that the ThBES class works as expected.
- */
-public class ThBESTest {
     /**
      * String containing the path to the data used in the test. The data used in these tests is made by sampling the
      * cancer Bayesian Network @see
@@ -58,16 +57,38 @@ public class ThBESTest {
      */
     final ArrayList<TupleNode> subset2 = new ArrayList<>();
 
-    Problem problem;
+    private Problem problem;
 
+
+    /**
+     * Constructor of the test. It initializes the subsets.
+     */
+    public BackwardsHillClimbingThreadTest(){
+        problem = new Problem(dataset);
+        initializeSubsets();
+    }
 
     /**
      * This method initializes the subsets, splitting the nodes in what is expected to happen when the seed is 42
      */
-    public ThBESTest(){
-        //GESThread.setProblem(dataset);
-        problem = new Problem(dataset);
-        initializeSubsets();
+    private void initializeSubsets(){
+        // Seed used for arc split is 42
+
+        // Subset 1:
+        subset1.add(new TupleNode(dyspnoea, cancer));
+        subset1.add(new TupleNode(dyspnoea, smoker));
+        subset1.add(new TupleNode(xray, pollution));
+        subset1.add(new TupleNode(xray, cancer));
+        subset1.add(new TupleNode(cancer, pollution));
+
+
+        //Subset 2:
+        subset2.add(new TupleNode(pollution, smoker));
+        subset2.add(new TupleNode(cancer, smoker));
+        subset2.add(new TupleNode(dyspnoea, pollution));
+        subset2.add(new TupleNode(xray, smoker));
+        subset2.add(new TupleNode(xray, dyspnoea));
+
     }
 
     /**
@@ -96,61 +117,27 @@ public class ThBESTest {
         return graph;
     }
 
-    /**
-     * This method initializes the subsets, splitting the nodes in what is expected to happen when the seed is 42
-     */
-    private void initializeSubsets(){
-        // Seed used for arc split is 42
-
-        // Subset 1:
-        subset1.add(new TupleNode(dyspnoea, cancer));
-        subset1.add(new TupleNode(dyspnoea, smoker));
-        subset1.add(new TupleNode(xray, pollution));
-        subset1.add(new TupleNode(xray, cancer));
-        subset1.add(new TupleNode(cancer, pollution));
-
-
-        //Subset 2:
-        subset2.add(new TupleNode(pollution, smoker));
-        subset2.add(new TupleNode(cancer, smoker));
-        subset2.add(new TupleNode(dyspnoea, pollution));
-        subset2.add(new TupleNode(xray, smoker));
-        subset2.add(new TupleNode(xray, dyspnoea));
-
-    }
-
-
-    /**
-     * Checks that the constructor works perfectly
-     * @result  Both constructors create a ThBES object.
-     * @throws InterruptedException Exception caused by thread interruption
-     */
     @Test
     public void constructorTest() throws InterruptedException{
         // Arrange
-        ThFES thread1 = new ThFES(problem, subset1, 15);
+        BackwardsHillClimbingThread thread1 = new BackwardsHillClimbingThread(problem, subset1);
         thread1.run();
         Graph graph = thread1.getCurrentGraph();
         // Act
-        ThBES thread2 = new ThBES(problem, graph, subset1);
+        BackwardsHillClimbingThread thread2 = new BackwardsHillClimbingThread(problem, graph, subset1);
         // Arrange
+        assertNotNull(thread1);
         assertNotNull(thread2);
     }
 
     /**
-     * Checks that the BES stage works as expected
-     * @result All edges are in the expected result.
-     * @throws InterruptedException Interruption caused by external forces.
+     * Checks the first iteration of the Cancer problem for the BHC stage
+     * @result Each expected node is in the resulting graph after executing the first iteration of FES stage
+     * @throws InterruptedException Exception caused by thread interruption
      */
     @Test
     public void searchTwoThreadsTest() throws InterruptedException {
-        //Arrange
-        /*
-        Dag [] fesGraphs = fesStageExperiment();
-        ArrayList<Dag> graphs = new ArrayList<>();
-        Collections.addAll(graphs,fesGraphs);
-        Dag fusionGraph = (new ConsensusUnion(graphs)).union();
-        */
+
         List<Node> nodes = Arrays.asList(cancer, xray, dyspnoea, pollution, smoker);
         Graph fusionGraph = new EdgeListGraph(nodes);
         fusionGraph.addDirectedEdge(cancer, dyspnoea);
@@ -161,37 +148,38 @@ public class ThBESTest {
         fusionGraph.addDirectedEdge(pollution, smoker);
 
 
-        System.out.println("Initial Graph");
-        System.out.println(fusionGraph);
+        //System.out.println("Initial Graph");
+        //System.out.println(fusionGraph);
 
+        // Threads objects
+        BackwardsHillClimbingThread thread1 = new BackwardsHillClimbingThread(problem, fusionGraph, subset1);
 
-        ThBES thread1 = new ThBES(problem, fusionGraph, subset1);
-
+        // Expectation
         List<Edge> expected = new ArrayList<>();
-        expected.add(new Edge(cancer,xray,Endpoint.TAIL, Endpoint.ARROW));
-        expected.add(new Edge(pollution,cancer,Endpoint.TAIL, Endpoint.ARROW));
-        expected.add(new Edge(smoker,cancer,Endpoint.TAIL, Endpoint.ARROW));
-        expected.add(new Edge(smoker,pollution,Endpoint.TAIL, Endpoint.ARROW));
-        expected.add(new Edge(xray,dyspnoea,Endpoint.TAIL, Endpoint.ARROW));
+        expected.add(new Edge(cancer, xray, Endpoint.TAIL, Endpoint.ARROW));
+        expected.add(new Edge(pollution, cancer, Endpoint.TAIL, Endpoint.ARROW));
+        expected.add(new Edge(pollution, smoker, Endpoint.TAIL, Endpoint.ARROW));
+        expected.add(new Edge(smoker, cancer, Endpoint.TAIL, Endpoint.ARROW));
+        expected.add(new Edge(xray, dyspnoea, Endpoint.TAIL, Endpoint.ARROW));
 
-        // Act
+
+
+        //Act
         thread1.run();
         Graph g1 = thread1.getCurrentGraph();
 
-        // Getting dag
+        System.out.println(g1);
+
+        // Getting dags
         Dag gdag1 = new Dag(removeInconsistencies(g1));
 
-        System.out.println("ThBES");
-        System.out.println(gdag1);
 
-        // Asserting
         for(Edge edge : expected){
             assertTrue(gdag1.getEdges().contains(edge));
         }
 
+
     }
-
-
 
 
 

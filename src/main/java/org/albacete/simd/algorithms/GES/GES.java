@@ -3,17 +3,18 @@ package org.albacete.simd.algorithms.GES;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
-import edu.cmu.tetrad.graph.Node;
-import edu.cmu.tetrad.search.LocalScoreCache;
-import org.albacete.simd.algorithms.pGESv2.*;
+import org.albacete.simd.threads.BESThread;
+import org.albacete.simd.threads.FESThread;
+import org.albacete.simd.utils.Problem;
+import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
 
 import java.util.*;
 
 public class GES {
 
-    private ThFES fes;
-    private ThBES bes;
+    private FESThread fes;
+    private BESThread bes;
     private Graph initialDag;
     private long elapsedTime;
     private double modelBDeu;
@@ -58,14 +59,14 @@ public class GES {
 
         // Doing forward search
         System.out.println("FES stage: ");
-        fes = new ThFES(problem, combinations,100);
+        fes = new FESThread(problem, combinations,100);
         fes.run();
         graph = fes.getCurrentGraph();
 
 
         // Doing backward search
         System.out.println("BES stage: ");
-        bes = new ThBES(problem, graph, combinations);
+        bes = new BESThread(problem, graph, combinations);
         bes.run();
         graph = bes.getCurrentGraph();
         score = bes.getScoreBDeu();

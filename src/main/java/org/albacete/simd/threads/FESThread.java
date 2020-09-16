@@ -1,30 +1,30 @@
-package org.albacete.simd.algorithms.pGESv2;
+package org.albacete.simd.threads;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import consensusBN.SubSet;
-import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
+import org.albacete.simd.utils.Problem;
+import org.albacete.simd.utils.TupleNode;
 
 @SuppressWarnings("DuplicatedCode")
-public class ThFES extends GESThread{
+public class FESThread extends GESThread{
+
+
+    private static int threadCounter = 1;
 
     /**
-     * Constructor of ThFES with an initial DAG
-     * @param dataSet data of the problem
+     * Constructor of FESThread with an initial DAG
+     * @param problem object containing all the information of the problem
      * @param initialDag initial DAG with which the FES stage starts with, if it's null, use the other constructor
      * @param subset subset of edges the fes stage will try to add to the resulting graph
      * @param maxIt maximum number of iterations allowed in the fes stage
      */
-
-    private static int threadCounter = 1;
-
-    public ThFES(Problem problem,Graph initialDag, ArrayList<TupleNode> subset,int maxIt) {
+    public FESThread(Problem problem, Graph initialDag, ArrayList<TupleNode> subset, int maxIt) {
         this.problem = problem;
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
@@ -34,12 +34,12 @@ public class ThFES extends GESThread{
     }
 
     /**
-     * Constructor of ThFES with an initial DataSet
+     * Constructor of FESThread with an initial DataSet
      * @param problem object containing information of the problem such as data or variables.
      * @param subset subset of edges the fes stage will try to add to the resulting graph
      * @param maxIt maximum number of iterations allowed in the fes stage
      */
-    public ThFES(Problem problem, ArrayList<TupleNode> subset,int maxIt) {
+    public FESThread(Problem problem, ArrayList<TupleNode> subset, int maxIt) {
         this.problem = problem;
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);

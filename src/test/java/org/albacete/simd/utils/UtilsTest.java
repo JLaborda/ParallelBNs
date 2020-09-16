@@ -3,7 +3,6 @@ package org.albacete.simd.utils;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.algorithms.pGESv2.TupleNode;
 import org.junit.Test;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;

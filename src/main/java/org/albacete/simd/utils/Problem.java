@@ -1,11 +1,10 @@
-package org.albacete.simd.algorithms.pGESv2;
+package org.albacete.simd.utils;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
-import org.albacete.simd.utils.Utils;
 
 import java.util.HashMap;
 import java.util.LinkedList;

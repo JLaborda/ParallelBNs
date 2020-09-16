@@ -3,6 +3,11 @@ package org.albacete.simd.algorithms.pGESv2;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import consensusBN.ConsensusUnion;
+import org.albacete.simd.threads.GESThread;
+import org.albacete.simd.threads.BESThread;
+import org.albacete.simd.threads.FESThread;
+import org.albacete.simd.utils.Problem;
+import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
 
 import java.util.*;
@@ -44,7 +49,7 @@ public class PGESv2
 
     /**
      * The {@link GESThread GESThread} array that will be executed in each stage.
-     * They can either be {@link ThFES ThFES} or {@link ThBES ThBES} threads.
+     * They can either be {@link FESThread ThFES} or {@link BESThread ThBES} threads.
      */
     private GESThread[] gesThreads = null;
 
@@ -111,7 +116,7 @@ public class PGESv2
     @SuppressWarnings("unchecked")
     private void initialize(int nThreads){
         this.nThreads = nThreads;
-        this.gesThreads = new ThFES[this.nThreads];
+        this.gesThreads = new FESThread[this.nThreads];
         this.threads = new Thread[this.nThreads];
         this.subSets = new ArrayList[this.nThreads];
 
@@ -147,12 +152,12 @@ public class PGESv2
         // Creating each ThFES runnable
         if (this.currentGraph == null) {
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new ThFES(this.problem, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new FESThread(this.problem, this.subSets[i], this.nFESItInterleaving);
             }
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new ThFES(this.problem, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new FESThread(this.problem, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
             }
         }
 
@@ -238,7 +243,7 @@ public class PGESv2
 
     /**
      * Configures the {@link #besStage() besStage}. It first replaces the {@link GESThread gesThreads} with
-     * {@link ThBES ThBES} threads. Then it resets the execution flag for each thread and creates a new
+     * {@link BESThread ThBES} threads. Then it resets the execution flag for each thread and creates a new
      * {@link Thread Thread} with the previous constructed gesThreads.
      */
     private void besConfig(){
@@ -252,7 +257,7 @@ public class PGESv2
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
         ArrayList<TupleNode>[] subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads, this.seed);
         for (int i = 0; i < this.nThreads; i++) {
-            this.gesThreads[i] = new ThBES(this.problem, this.currentGraph, subsets_BES[i]);
+            this.gesThreads[i] = new BESThread(this.problem, this.currentGraph, subsets_BES[i]);
         }
 
         // Initializing thread config
@@ -264,7 +269,7 @@ public class PGESv2
     }
 
     /**
-     * Executes a BES algorithm for each subset of edges. This is done by creating a {@link ThBES ThBES} thread for each
+     * Executes a BES algorithm for each subset of edges. This is done by creating a {@link BESThread ThBES} thread for each
      * subset of arcs, and then executing them all in parallel.
      * @throws InterruptedException Interruption caused by an external interruption.
      */
@@ -329,15 +334,15 @@ public class PGESv2
         }
 
         
-        ThFES fuse = new ThFES(this.problem,this.currentGraph,candidates,candidates.size());
+        FESThread fuse = new FESThread(this.problem,this.currentGraph,candidates,candidates.size());
         
         fuse.run();
         
         try {
 			this.currentGraph = fuse.getCurrentGraph();
-			System.out.println("Score Fusion: "+ ThFES.scoreGraph(this.currentGraph, problem));
+			System.out.println("Score Fusion: "+ FESThread.scoreGraph(this.currentGraph, problem));
 			this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-			System.out.println("Score Fusion sin inconsistencias: "+ ThFES.scoreGraph(this.currentGraph, problem));
+			System.out.println("Score Fusion sin inconsistencias: "+ FESThread.scoreGraph(this.currentGraph, problem));
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
@@ -432,7 +437,7 @@ public class PGESv2
      * next, it enters a loop where at the start of each iteration a random repartition is done ({@link #splitArcs()} splitArcs),
      * then, the {@link #fesStage() fesStage} is executed. Once it has finished, a {@link #fusionFES() fusion} is done, joining
      * all of the DAGs obtained in the previous stage. The next step is the {@link #besStage() besStage}, in each subset,
-     * a {@link ThBES ThBES} runs a BES algorithm, deleting any misplaced edge from the previous steps. Once all of the threads
+     * a {@link BESThread ThBES} runs a BES algorithm, deleting any misplaced edge from the previous steps. Once all of the threads
      * have finished, then another {@link #fusionFES() fusion} is done. Finally, we check if there has been a convergence, and
      * repeat the process.
      */
@@ -552,13 +557,13 @@ public class PGESv2
 
      
         
-        ThBES fuse = new ThBES(this.problem,this.currentGraph,candidates);
+        BESThread fuse = new BESThread(this.problem,this.currentGraph,candidates);
         
         fuse.run();
         
         try {
 			this.currentGraph = fuse.getCurrentGraph();
-			System.out.println("Resultado del BES de la fusion: "+ThBES.scoreGraph(this.currentGraph, problem));
+			System.out.println("Resultado del BES de la fusion: "+ BESThread.scoreGraph(this.currentGraph, problem));
 			this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
@@ -624,8 +629,8 @@ public class PGESv2
     }
 
     /**
-     * Sets the maximum number of iterations for each {@link ThFES ThFES}.
-     * @param nFESItInterleaving maximum number of iterations used in each {@link ThFES ThFES}.
+     * Sets the maximum number of iterations for each {@link FESThread ThFES}.
+     * @param nFESItInterleaving maximum number of iterations used in each {@link FESThread ThFES}.
      */
     public void setNFESItInterleaving(int nFESItInterleaving) {
         this.nFESItInterleaving = nFESItInterleaving;
