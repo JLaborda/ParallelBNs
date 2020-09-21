@@ -6,6 +6,7 @@ import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.TupleNode;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -101,6 +102,7 @@ public class ForwardHillClimbingThread extends GESThread {
             Node bestX = null;
             Node bestY = null;
             Edge bestEdge = null;
+            SubSet bestSubSet = null;
             for(Edge edge : edges) {
 
                 if (graph.containsEdge(edge))
@@ -112,8 +114,12 @@ public class ForwardHillClimbingThread extends GESThread {
                 if (graph.isAdjacentTo(_x, _y)) {
                     continue;
                 }
-
+                // Dos fallos, mirar cuaderno
+                // Selecting parents of the head (_y)
                 SubSet subset = new SubSet();
+                subset.addAll((graph.getParents(_y)));
+                subset.remove(_x);
+
                 double insertEval = insertEval(_x, _y, subset, graph, problem);
                 double evalScore = score + insertEval;
 
@@ -123,13 +129,17 @@ public class ForwardHillClimbingThread extends GESThread {
                     bestY = _y;
                     bestEdge = edge;
                     bestScore = evalScore;
+                    bestSubSet = subset;
                     improvement = true;
                 }
             }
 
             if(improvement){
-                insert(bestX, bestY, new SubSet(), graph);
-                this.flag = true;
+                // Checking directed cycles
+                if(!graph.existsDirectedPathFromTo(bestX, bestY)) {
+                    insert(bestX, bestY, bestSubSet, graph);
+                    this.flag = true;
+                }
                 edges.remove(bestEdge);
             }
 

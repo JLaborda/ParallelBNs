@@ -98,6 +98,7 @@ public class BackwardsHillClimbingThread extends GESThread {
             Node bestX = null;
             Node bestY = null;
             Edge bestEdge = null;
+            SubSet bestSubSet = null;
             for (Edge edge : edges) {
 
                 if (!graph.containsEdge(edge))
@@ -106,22 +107,26 @@ public class BackwardsHillClimbingThread extends GESThread {
                 Node _x = Edges.getDirectedEdgeTail(edge);
                 Node _y = Edges.getDirectedEdgeHead(edge);
 
+                //  Set of parents except _y
                 SubSet subset = new SubSet();
+                subset.addAll(graph.getParents(_y));
+                subset.remove(_x);
+
                 double deleteEval = deleteEval(_x, _y, subset, graph);
                 double evalScore = score + deleteEval;
 
                 if (evalScore > bestScore) {
-                    //insert(_x, _y, subset, graph);
                     bestX = _x;
                     bestY = _y;
                     bestEdge = edge;
                     bestScore = evalScore;
+                    bestSubSet = subset;
                     improvement = true;
                 }
             }
 
             if (improvement) {
-                delete(bestX, bestY, new SubSet(), graph);
+                delete(bestX, bestY, bestSubSet, graph);
                 this.flag = true;
                 edges.remove(bestEdge);
 

@@ -157,7 +157,7 @@ public class ParallelHillClimbingSearch {
             this.currentGraph = fusionFHC();
 
 
-            // 5. BES
+            // 5. BHC
             try {
                 System.out.println("----------------------------");
                 System.out.println("BHC STAGE");
@@ -432,7 +432,8 @@ public class ParallelHillClimbingSearch {
                 candidates.add(new TupleNode(e.getNode1(),e.getNode2()));
             }
         }
-
+        // Quizás sea mejor poner el BES
+        //BESThread fuse = new BESThread(this.problem, this.currentGraph, candidates);
         BackwardsHillClimbingThread fuse = new BackwardsHillClimbingThread(this.problem,this.currentGraph,candidates);
 
         fuse.run();
