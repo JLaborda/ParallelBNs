@@ -5,9 +5,7 @@ import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.TupleNode;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class BackwardsHillClimbingThread extends GESThread {
     private static int threadCounter = 1;
@@ -48,6 +46,18 @@ public class BackwardsHillClimbingThread extends GESThread {
     @Override
     public void run() {
         this.currentGraph = search();
+    }
+
+
+    @Override
+    protected double deleteEval(Node x, Node y, Set<Node> h, Graph graph) {
+        Set<Node> set1 = new HashSet<>();
+        set1.removeAll(h);
+        set1.addAll(graph.getParents(y));
+        Set<Node> set2 = new HashSet<>(set1);
+        set1.remove(x);
+        set2.add(x);
+        return scoreGraphChange(y, set1, set2, graph, problem);
     }
 
     private Graph search() {
@@ -111,6 +121,7 @@ public class BackwardsHillClimbingThread extends GESThread {
                 SubSet subset = new SubSet();
                 subset.addAll(graph.getParents(_y));
                 subset.remove(_x);
+
 
                 double deleteEval = deleteEval(_x, _y, subset, graph);
                 double evalScore = score + deleteEval;

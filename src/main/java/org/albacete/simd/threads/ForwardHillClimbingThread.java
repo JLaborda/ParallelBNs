@@ -5,10 +5,7 @@ import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.TupleNode;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ForwardHillClimbingThread extends GESThread {
 
@@ -75,7 +72,6 @@ public class ForwardHillClimbingThread extends GESThread {
 
     }
 
-
     private double fhc(Graph graph, double score){
 
 
@@ -97,6 +93,7 @@ public class ForwardHillClimbingThread extends GESThread {
 
         // Hillclimbing algorithm
         boolean improvement = false;
+        int iteration = 1;
         do{
             improvement = false;
             Node bestX = null;
@@ -108,19 +105,25 @@ public class ForwardHillClimbingThread extends GESThread {
                 if (graph.containsEdge(edge))
                     continue;
 
+
                 Node _x = Edges.getDirectedEdgeTail(edge);
                 Node _y = Edges.getDirectedEdgeHead(edge);
 
                 if (graph.isAdjacentTo(_x, _y)) {
                     continue;
                 }
-                // Dos fallos, mirar cuaderno
+
+                // Comprobar ciclos dirigidos aquí?
+                //if(graph.existsDirectedPathFromTo(_x, _y)) {
+                //    continue;
+                //}
+
                 // Selecting parents of the head (_y)
                 SubSet subset = new SubSet();
                 subset.addAll((graph.getParents(_y)));
                 subset.remove(_x);
 
-                double insertEval = insertEval(_x, _y, subset, graph, problem);
+                double insertEval = insertEval(_x, _y, subset, graph, problem, false);
                 double evalScore = score + insertEval;
 
                 if (evalScore > bestScore) {
@@ -142,9 +145,9 @@ public class ForwardHillClimbingThread extends GESThread {
                 }
                 edges.remove(bestEdge);
             }
-
+        iteration++;
         }
-        while(improvement);
+        while(improvement || iteration <= this.maxIt);
 
         return bestScore;
     }
