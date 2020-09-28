@@ -147,7 +147,7 @@ public class ForwardHillClimbingThread extends GESThread {
             }
         iteration++;
         }
-        while(improvement || iteration <= this.maxIt);
+        while(improvement && iteration <= this.maxIt);
 
         return bestScore;
     }
