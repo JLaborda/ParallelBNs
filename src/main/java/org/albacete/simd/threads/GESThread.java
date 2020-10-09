@@ -147,7 +147,13 @@ public abstract class GESThread implements Runnable{
      */
     public static double insertEval(Node x, Node y, Set<Node> t, Graph graph, Problem problem) {
         // set1 contains x; set2 does not.
-        Set<Node> set1 = new HashSet<>(findNaYX(x, y, graph));
+        Set<Node> set1;
+        if(t.isEmpty()){
+            set1 = new HashSet<>();
+        }
+        else{
+            set1 = new HashSet<>(findNaYX(x, y, graph));
+        }
         set1.addAll(t);
         set1.addAll(graph.getParents(y));
         Set<Node> set2 = new HashSet<>(set1);
@@ -155,29 +161,7 @@ public abstract class GESThread implements Runnable{
         return scoreGraphChange(y, set1, set2, graph, problem);
     }
 
-    /**
-     * Evaluate the Insert(X, Y, T) operator (@see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf"> Definition 12 from Chickering 2002</a>,
-     * ).
-     * @param x First {@link Node Node} of the edge being considered to insert the graph.
-     * @param y Second {@link Node Node} of the edge being considered to insert the graph.
-     * @param t Set of {@link Node Nodes} to be considered when making the insertion.
-     * @param graph Current {@link Graph Graph} of the stage.
-     * @param isEquivalenceSearch Specifies if the equivalence search space is to be used or not
-     * @return Score difference of the insertion.
-     */
-    public static double insertEval(Node x, Node y, Set<Node> t, Graph graph, Problem problem, boolean isEquivalenceSearch) {
-        // set1 contains x; set2 does not.
-        if(isEquivalenceSearch)
-            return insertEval(x, y, t, graph, problem);
-        else {
-            Set<Node> set1 = new HashSet<>();
-            set1.addAll(t);
-            set1.addAll(graph.getParents(y));
-            Set<Node> set2 = new HashSet<>(set1);
-            set1.add(x);
-            return scoreGraphChange(y, set1, set2, graph, problem);
-        }
-    }
+
 
     /**
      * Do an actual insertion of an edge.
@@ -211,6 +195,7 @@ public abstract class GESThread implements Runnable{
         graph.removeEdges(x, y);
 
         for (Node aSubset : subset) {
+            System.out.println("Deleting Edges in subset");
             if (!graph.isParentOf(aSubset, x) && !graph.isParentOf(x, aSubset)) {
                 System.out.println("Delete: " + x + " -- " + aSubset);
                 graph.removeEdge(x, aSubset);

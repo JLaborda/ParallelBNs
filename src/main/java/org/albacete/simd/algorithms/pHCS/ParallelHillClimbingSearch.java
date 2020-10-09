@@ -3,6 +3,7 @@ package org.albacete.simd.algorithms.pHCS;
 import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.threads.*;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.TupleNode;
@@ -31,6 +32,12 @@ public class ParallelHillClimbingSearch {
      * The maximum number of iterations allowed for the algorithm.
      */
     private int maxIterations = 15;
+
+    /**
+     * Number of iterations allowed inside the FES stage. This is a hyperparameter used in experimentation.
+     */
+    private int nItInterleaving = 5;
+
 
     /**
      * The {@link GESThread GESThread} array that will be executed in each stage.
@@ -82,6 +89,12 @@ public class ParallelHillClimbingSearch {
 
     public ParallelHillClimbingSearch(String path, int nThreads){
         this(Utils.readData(path),nThreads);
+    }
+
+    public ParallelHillClimbingSearch(DataSet data, int nThreads, int maxIterations, int nItInterleaving){
+        this(data, nThreads);
+        this.maxIterations = maxIterations;
+        this.nItInterleaving = nItInterleaving;
     }
 
 
@@ -205,12 +218,12 @@ public class ParallelHillClimbingSearch {
         if (this.currentGraph == null) {
             for (int i = 0; i < this.nThreads; i++) {
                 //System.out.println("Index: " + i);
-                this.gesThreads[i] = new ForwardHillClimbingThread(this.problem,this.subSets[i], this.maxIterations);
+                this.gesThreads[i] = new ForwardHillClimbingThread(this.problem,this.subSets[i], this.nItInterleaving);
             }
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new ForwardHillClimbingThread(this.problem, this.currentGraph, this.subSets[i], this.maxIterations);
+                this.gesThreads[i] = new ForwardHillClimbingThread(this.problem, this.currentGraph, this.subSets[i], this.nItInterleaving);
             }
         }
 
@@ -442,6 +455,8 @@ public class ParallelHillClimbingSearch {
             this.currentGraph = fuse.getCurrentGraph();
             System.out.println("Resultado del BHC de la fusion: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
             this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+            System.out.println("Resultado del BHC de la fusion tras removeInconsistencies: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
+
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }

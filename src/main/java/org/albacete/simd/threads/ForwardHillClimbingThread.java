@@ -24,7 +24,7 @@ public class ForwardHillClimbingThread extends GESThread {
         this.problem = problem;
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
-        setMaxIt(maxIt);
+        this.maxIt = maxIt;
         this.id = threadCounter;
         threadCounter++;
     }
@@ -40,7 +40,7 @@ public class ForwardHillClimbingThread extends GESThread {
         this.problem = problem;
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
-        setMaxIt(maxIt);
+        this.maxIt = maxIt;
         this.id = threadCounter;
         threadCounter++;
     }
@@ -90,26 +90,32 @@ public class ForwardHillClimbingThread extends GESThread {
             edges.add(Edges.directedEdge(_y, _x));
         }
 
+        System.out.println("[FHC " + getId() + "]" + " Number of edges to check: " + edges.size());
 
         // Hillclimbing algorithm
-        boolean improvement = false;
+        boolean improvement;
         int iteration = 1;
         do{
+            System.out.println("[FHC " + getId() + "]" + "iteration: " + iteration);
             improvement = false;
             Node bestX = null;
             Node bestY = null;
             Edge bestEdge = null;
             SubSet bestSubSet = null;
             for(Edge edge : edges) {
+                //System.out.println("[FHC " + getId() + "]" + "Checking edge: " + edge);
 
-                if (graph.containsEdge(edge))
+                if (graph.containsEdge(edge)) {
+                    //System.out.println("[FHC " + getId() + "]" + " contains" + edge);
                     continue;
+                }
 
 
                 Node _x = Edges.getDirectedEdgeTail(edge);
                 Node _y = Edges.getDirectedEdgeHead(edge);
 
                 if (graph.isAdjacentTo(_x, _y)) {
+                    //System.out.println("[FHC " + getId() + "]" + edge + " is already adjacent to the graph.");
                     continue;
                 }
 
@@ -120,11 +126,9 @@ public class ForwardHillClimbingThread extends GESThread {
 
                 // Selecting parents of the head (_y)
                 SubSet subset = new SubSet();
-                subset.addAll((graph.getParents(_y)));
-                subset.remove(_x);
 
-                double insertEval = insertEval(_x, _y, subset, graph, problem, false);
-                double evalScore = score + insertEval;
+                double insertEval = insertEval(_x, _y, subset, graph, problem);
+                double evalScore = bestScore + insertEval;
 
                 if (evalScore > bestScore) {
                     //insert(_x, _y, subset, graph);
@@ -139,15 +143,21 @@ public class ForwardHillClimbingThread extends GESThread {
 
             if(improvement){
                 // Checking directed cycles
-                if(!graph.existsDirectedPathFromTo(bestX, bestY)) {
+                if(!graph.existsDirectedPathFromTo(bestY, bestX)) {
+                    // Inserting edge
+                    System.out.println("Thread FHC " + getId() + " inserting: (" + bestX + ", " + bestY + ", " + bestSubSet+ ")");
                     insert(bestX, bestY, bestSubSet, graph);
+                    System.out.println("[FHC "+getId() + "] Score: " + nf.format(bestScore) + "\tOperator: " + graph.getEdge(bestX, bestY));
+                    // Rebuilding pattern from cpdag to pdag
+                    //rebuildPattern(graph);
+
                     this.flag = true;
+                    //Updating score
                 }
                 edges.remove(bestEdge);
             }
-        iteration++;
-        }
-        while(improvement && iteration <= this.maxIt);
+            iteration++;
+        }while(improvement && iteration <= this.maxIt);
 
         return bestScore;
     }

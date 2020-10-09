@@ -33,8 +33,8 @@ public class Experiment {
     protected String bbdd_name;
     protected int nThreads;
     //private String fusion_consensus;
-    private int nItInterleaving;
-    private int maxIterations = 15;
+    protected int nItInterleaving;
+    protected int maxIterations = 15;
     private PGESv2 alg;
     private static HashMap<String, HashMap<String,String>> map;
 
@@ -47,7 +47,7 @@ public class Experiment {
     private String log = "";
 
 
-    public Experiment(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
+    public Experiment(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
         this.net_path = net_path;
         this.bbdd_path = bbdd_path;
         Pattern pattern = Pattern.compile("/(.*)\\.");
@@ -68,14 +68,19 @@ public class Experiment {
 
 
         this.nThreads = nThreads;
+        this.maxIterations = maxIterations;
         this.nItInterleaving = nItInterleaving;
+    }
+
+    public Experiment(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
+        this(net_path, bbdd_path, nThreads, 15, nItInterleaving);
     }
 
 
 
 
 
-    public void runExperiment() {
+        public void runExperiment() {
         try {
             System.out.println("Starting Experiment:");
             System.out.println("-----------------------------------------");
@@ -328,7 +333,7 @@ public class Experiment {
                         System.out.println("BBDD_Path: " + bbdd_path);
 
                         // Running Experiment
-                        Experiment experiment = new Experiment(net_path, bbdd_path, nThread, nInterleaving);
+                        Experiment experiment = new Experiment(net_path, bbdd_path, nThread, 15, nInterleaving);
                         experiment.runExperiment();
                         //Saving Experiment
                         experiment.saveExperiment();
@@ -351,7 +356,7 @@ public class Experiment {
                 bbddPath = args[1];
                 nThreads = Integer.parseInt(args[2]);
                 nInterleaving = Integer.parseInt(args[3]);
-                experiment = new Experiment(netPath, bbddPath, nThreads, nInterleaving);
+                experiment = new Experiment(netPath, bbddPath, nThreads, 15, nInterleaving);
 
             }
             else if(args.length == 2){

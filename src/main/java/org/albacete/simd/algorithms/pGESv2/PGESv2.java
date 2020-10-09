@@ -99,6 +99,12 @@ public class PGESv2
         initialize(nThreads);
     }
 
+    public PGESv2(DataSet data, int nThreads, int maxIterations, int nFESItInterleaving){
+        this(data, nThreads);
+        this.maxIterations = maxIterations;
+        this.nFESItInterleaving = nFESItInterleaving;
+    }
+
     /**
      * Constructor of Main that uses the path to the csv file.
      * @param path path to the csv file
@@ -107,6 +113,12 @@ public class PGESv2
     public PGESv2(String path, int nThreads){
         this(Utils.readData(path),nThreads);
     }
+
+
+    public PGESv2(String path, int nThreads, int maxIterations, int nFESItInterleaving){
+        this(Utils.readData(path),nThreads, maxIterations, nFESItInterleaving);
+    }
+
 
 
     /**

@@ -402,6 +402,7 @@ public class Utils {
         Node nodeT, nodeH;
         for (Edge e : g.getEdges()){
             if(!e.isDirected()) continue;
+            //System.out.println("Undirected Edge: " + e);
             Endpoint endpoint1 = e.getEndpoint1();
             if (endpoint1.equals(Endpoint.ARROW)){
                 nodeT = e.getNode1();
@@ -410,7 +411,10 @@ public class Utils {
                 nodeT = e.getNode2();
                 nodeH = e.getNode1();
             }
-            if(g.existsDirectedPathFromTo(nodeT, nodeH)) g.removeEdge(e);
+            if(g.existsDirectedPathFromTo(nodeT, nodeH)){
+                System.out.println("Directed path from " + nodeT + " to " + nodeH +"\t Deleting Edge...");
+                g.removeEdge(e);
+            }
         }
         // Adding graph from each thread to the graphs array
         return new Dag(g);

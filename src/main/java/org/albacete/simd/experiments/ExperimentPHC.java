@@ -26,6 +26,10 @@ public class ExperimentPHC extends Experiment {
     private long elapsedTime;
     private int nIterations;
 
+    public ExperimentPHC(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
+        super(net_path, bbdd_path, nThreads, maxIterations, nItInterleaving);
+    }
+
     public ExperimentPHC(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
         super(net_path, bbdd_path, nThreads, nItInterleaving);
     }
@@ -56,7 +60,7 @@ public class ExperimentPHC extends Experiment {
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new ParallelHillClimbingSearch(dataSet, nThreads);
+            this.alg = new ParallelHillClimbingSearch(dataSet, nThreads, maxIterations, nItInterleaving);
 
             // Search is executed
             alg.search();

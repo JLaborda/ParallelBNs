@@ -9,7 +9,7 @@ public class SimpleExperiment {
         //String fileName = "outputs/output_cancer_ges.txt";
         //PrintStream fileStream = new PrintStream(fileName);
         //System.setOut(fileStream);
-        Experiment experiment = new ExperimentPHC("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv", 4, 8);
+        Experiment experiment = new ExperimentPHC("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv", 4, 5);
         experiment.runExperiment();
         experiment.printResults();
     }

@@ -101,9 +101,14 @@ public class BackwardsHillClimbingThread extends GESThread {
         }
 
 
+        System.out.println("[BHC " + getId() + "]" + " Number of edges to check: " + edges.size());
+
+
         // Hillclimbing algorithm
-        boolean improvement = false;
+        boolean improvement;
+        int iteration = 1;
         do {
+            System.out.println("[BHC " + getId() + "]" + "iteration: " + iteration);
             improvement = false;
             Node bestX = null;
             Node bestY = null;
@@ -119,12 +124,9 @@ public class BackwardsHillClimbingThread extends GESThread {
 
                 //  Set of parents except _y
                 SubSet subset = new SubSet();
-                subset.addAll(graph.getParents(_y));
-                subset.remove(_x);
-
 
                 double deleteEval = deleteEval(_x, _y, subset, graph);
-                double evalScore = score + deleteEval;
+                double evalScore = bestScore + deleteEval;
 
                 if (evalScore > bestScore) {
                     bestX = _x;
@@ -137,12 +139,15 @@ public class BackwardsHillClimbingThread extends GESThread {
             }
 
             if (improvement) {
+                System.out.println("Thread BHC " + getId() + " deleting: (" + bestX + ", " + bestY + ", " + bestSubSet+ ")");
                 delete(bestX, bestY, bestSubSet, graph);
+                System.out.println("[BHC "+getId() + "] Score: " + nf.format(bestScore) + "\tDeleting: " + graph.getEdge(bestX, bestY));
+
                 this.flag = true;
                 edges.remove(bestEdge);
 
             }
-
+            iteration++;
         }
         while (improvement);
 
