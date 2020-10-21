@@ -160,7 +160,7 @@ public class BackwardsHillClimbingThreadTest {
         expected.add(new Edge(pollution, cancer, Endpoint.TAIL, Endpoint.ARROW));
         expected.add(new Edge(pollution, smoker, Endpoint.TAIL, Endpoint.ARROW));
         expected.add(new Edge(smoker, cancer, Endpoint.TAIL, Endpoint.ARROW));
-        expected.add(new Edge(dyspnoea, xray, Endpoint.TAIL, Endpoint.ARROW));
+        expected.add(new Edge(xray, dyspnoea, Endpoint.TAIL, Endpoint.ARROW));
 
 
 

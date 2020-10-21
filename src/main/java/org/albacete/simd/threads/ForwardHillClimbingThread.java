@@ -120,15 +120,15 @@ public class ForwardHillClimbingThread extends GESThread {
                 }
 
                 // Comprobar ciclos dirigidos aquí?
-                //if(graph.existsDirectedPathFromTo(_x, _y)) {
-                //    continue;
-                //}
+                if(graph.existsDirectedPathFromTo(_y, _x)) {
+                    continue;
+                }
 
                 // Selecting parents of the head (_y)
                 SubSet subset = new SubSet();
 
                 double insertEval = insertEval(_x, _y, subset, graph, problem);
-                double evalScore = bestScore + insertEval;
+                double evalScore = score + insertEval;
 
                 if (evalScore > bestScore) {
                     //insert(_x, _y, subset, graph);
@@ -147,6 +147,7 @@ public class ForwardHillClimbingThread extends GESThread {
                     // Inserting edge
                     System.out.println("Thread FHC " + getId() + " inserting: (" + bestX + ", " + bestY + ", " + bestSubSet+ ")");
                     insert(bestX, bestY, bestSubSet, graph);
+                    score = bestScore;
                     System.out.println("[FHC "+getId() + "] Score: " + nf.format(bestScore) + "\tOperator: " + graph.getEdge(bestX, bestY));
                     // Rebuilding pattern from cpdag to pdag
                     //rebuildPattern(graph);

@@ -148,12 +148,12 @@ public abstract class GESThread implements Runnable{
     public static double insertEval(Node x, Node y, Set<Node> t, Graph graph, Problem problem) {
         // set1 contains x; set2 does not.
         Set<Node> set1;
-        if(t.isEmpty()){
-            set1 = new HashSet<>();
-        }
-        else{
+//        if(t.isEmpty()){
+//            set1 = new HashSet<>();
+//        }
+//        else{
             set1 = new HashSet<>(findNaYX(x, y, graph));
-        }
+//        }
         set1.addAll(t);
         set1.addAll(graph.getParents(y));
         Set<Node> set2 = new HashSet<>(set1);

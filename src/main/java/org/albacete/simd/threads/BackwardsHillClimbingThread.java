@@ -126,7 +126,7 @@ public class BackwardsHillClimbingThread extends GESThread {
                 SubSet subset = new SubSet();
 
                 double deleteEval = deleteEval(_x, _y, subset, graph);
-                double evalScore = bestScore + deleteEval;
+                double evalScore = score + deleteEval;
 
                 if (evalScore > bestScore) {
                     bestX = _x;
@@ -141,6 +141,7 @@ public class BackwardsHillClimbingThread extends GESThread {
             if (improvement) {
                 System.out.println("Thread BHC " + getId() + " deleting: (" + bestX + ", " + bestY + ", " + bestSubSet+ ")");
                 delete(bestX, bestY, bestSubSet, graph);
+                score = bestScore;
                 System.out.println("[BHC "+getId() + "] Score: " + nf.format(bestScore) + "\tDeleting: " + graph.getEdge(bestX, bestY));
 
                 this.flag = true;

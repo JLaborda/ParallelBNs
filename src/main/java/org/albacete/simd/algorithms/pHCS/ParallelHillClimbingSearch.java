@@ -372,13 +372,13 @@ public class ParallelHillClimbingSearch {
         try {
             this.currentGraph = fuse.getCurrentGraph();
             System.out.println("Score Fusion: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
-            this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-            System.out.println("Score Fusion sin inconsistencias: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
+            //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+            //System.out.println("Score Fusion sin inconsistencias: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }
 
-        return (Dag) this.currentGraph;
+        return new Dag(this.currentGraph);
     }
 
     public Dag fusionIntersection(){
@@ -454,14 +454,14 @@ public class ParallelHillClimbingSearch {
         try {
             this.currentGraph = fuse.getCurrentGraph();
             System.out.println("Resultado del BHC de la fusion: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
-            this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-            System.out.println("Resultado del BHC de la fusion tras removeInconsistencies: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
+            //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+            //System.out.println("Resultado del BHC de la fusion tras removeInconsistencies: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
 
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }
 
-        return (Dag) this.currentGraph;
+        return new Dag(this.currentGraph);
     }
 
 
