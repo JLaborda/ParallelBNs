@@ -353,13 +353,13 @@ public class PGESv2
         try {
 			this.currentGraph = fuse.getCurrentGraph();
 			System.out.println("Score Fusion: "+ FESThread.scoreGraph(this.currentGraph, problem));
-			//this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-			//System.out.println("Score Fusion sin inconsistencias: "+ FESThread.scoreGraph(this.currentGraph, problem));
+			this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+			System.out.println("Score Fusion sin inconsistencias: "+ FESThread.scoreGraph(this.currentGraph, problem));
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
 
-        return (Dag) this.currentGraph;
+        return new Dag(this.currentGraph);
     }
 
 
@@ -576,12 +576,13 @@ public class PGESv2
         try {
 			this.currentGraph = fuse.getCurrentGraph();
 			System.out.println("Resultado del BES de la fusion: "+ BESThread.scoreGraph(this.currentGraph, problem));
-			//this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+			this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+            System.out.println("Score Fusion sin inconsistencias: "+ BESThread.scoreGraph(this.currentGraph, problem));
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		} 
 
-        return (Dag) this.currentGraph;
+        return new Dag(this.currentGraph);
 	}
 
 	/**
