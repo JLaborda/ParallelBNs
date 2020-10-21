@@ -1,4 +1,4 @@
-package org.albacete.simd.algorithms.GES;
+package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.EdgeListGraph;

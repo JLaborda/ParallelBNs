@@ -1,10 +1,11 @@
-package org.albacete.simd.algorithms.GES;
+package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
+import org.albacete.simd.algorithms.GES;
 import org.junit.Test;
 
 import java.io.File;

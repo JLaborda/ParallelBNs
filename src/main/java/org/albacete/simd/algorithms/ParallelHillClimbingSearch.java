@@ -1,4 +1,4 @@
-package org.albacete.simd.algorithms.pHCS;
+package org.albacete.simd.algorithms;
 
 import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.data.DataSet;

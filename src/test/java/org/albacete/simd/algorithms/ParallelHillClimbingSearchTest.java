@@ -1,7 +1,8 @@
-package org.albacete.simd.algorithms.pHCS;
+package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
+import org.albacete.simd.algorithms.ParallelHillClimbingSearch;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
