@@ -411,6 +411,8 @@ public class Utils {
                 nodeT = e.getNode2();
                 nodeH = e.getNode1();
             }
+
+
             if(g.existsDirectedPathFromTo(nodeT, nodeH)){
                 System.out.println("Directed path from " + nodeT + " to " + nodeH +"\t Deleting Edge...");
                 g.removeEdge(e);
