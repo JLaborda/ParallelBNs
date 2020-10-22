@@ -677,6 +677,15 @@ public class PGESv2
         return problem;
     }
 
+
+    public int getnThreads() {
+        return nThreads;
+    }
+
+    public int getnFESItInterleaving() {
+        return nFESItInterleaving;
+    }
+
     /**
      * Example of the algorithm running for the cancer problem.
      * @param args not used

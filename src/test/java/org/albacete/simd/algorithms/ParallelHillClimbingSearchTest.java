@@ -65,29 +65,57 @@ public class ParallelHillClimbingSearchTest {
      * @result Both objects should have the same dataset stored in it.
      */
     @Test
-    public void constructorTest(){
+    public void constructorAndGettersTest(){
         // Arrange
         int num_cols = 5;
 
         // Act
-        ParallelHillClimbingSearch alg1 = new ParallelHillClimbingSearch(path, 1);
-        ParallelHillClimbingSearch alg2 = new ParallelHillClimbingSearch(dataset, 1);
-        //ParallelHillClimbingSearch alg3 = new ParallelHillClimbingSearch(path, 1, 30, 15);
-        //ParallelHillClimbingSearch alg4 = new ParallelHillClimbingSearch(dataset, 1, 30, 15);
-        DataSet data1 = alg1.getData();
-        DataSet data2 = alg2.getData();
-        //DataSet data3 = alg3.getData();
-        //DataSet data4 = alg4.getData();
+        ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(path, 1);
+        ParallelHillClimbingSearch phc2 = new ParallelHillClimbingSearch(dataset, 2);
+        ParallelHillClimbingSearch phc3 = new ParallelHillClimbingSearch(path,4, 30, 8);
+        ParallelHillClimbingSearch phc4 = new ParallelHillClimbingSearch(dataset,8, 35, 10);
+
+        DataSet data1 = phc1.getData();
+        DataSet data2 = phc2.getData();
+        DataSet data3 = phc3.getData();
+        DataSet data4 = phc4.getData();
+
+        int threads1 = phc1.getnThreads();
+        int threads2 = phc2.getnThreads();
+        int threads3 = phc3.getnThreads();
+        int threads4 = phc4.getnThreads();
+
+        int maxIterations1 = phc1.getMaxIterations();
+        int maxIterations2 = phc2.getMaxIterations();
+        int maxIterations3 = phc3.getMaxIterations();
+        int maxIterations4 = phc4.getMaxIterations();
+
+        int interleaving1 = phc1.getnItInterleaving();
+        int interleaving2 = phc2.getnItInterleaving();
+        int interleaving3 = phc3.getnItInterleaving();
+        int interleaving4 = phc4.getnItInterleaving();
 
         // Assert
-        assertNotNull(alg1);
-        assertNotNull(alg2);
-        //assertNotNull(alg3);
-        //assertNotNull(alg4);
+        assertNotNull(phc1);
+        assertNotNull(phc2);
+        assertNotNull(phc3);
+        assertNotNull(phc4);
         assertEquals(num_cols, data1.getNumColumns());
         assertEquals(num_cols, data2.getNumColumns());
-        //assertEquals(num_cols, data3.getNumColumns());
-        //assertEquals(num_cols, data4.getNumColumns());
+        assertEquals(num_cols, data3.getNumColumns());
+        assertEquals(num_cols, data4.getNumColumns());
+        assertEquals(1, threads1);
+        assertEquals(2, threads2);
+        assertEquals(4, threads3);
+        assertEquals(8, threads4);
+        assertEquals(15, maxIterations1);
+        assertEquals(15, maxIterations2);
+        assertEquals(30, maxIterations3);
+        assertEquals(35, maxIterations4);
+        assertEquals(5, interleaving1);
+        assertEquals(5, interleaving2);
+        assertEquals(8, interleaving3);
+        assertEquals(10, interleaving4);
     }
 
     /**
@@ -183,10 +211,19 @@ public class ParallelHillClimbingSearchTest {
 
     }
 
-    /**
-     * Executes the main function in order to see that everything is working, and that no exceptions are being thrown.
-     * @result No exception is thrown.
-     */
+
+    @Test
+    public void gettersTest(){
+        ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(dataset, 1);
+
+        assertEquals(5*4/2, phc1.getListOfArcs().length);
+        assertEquals(1, phc1.getSubSets().length);
+        assertNull(phc1.getGraphs());
+        assertEquals(1, phc1.getIterations());
+        assertEquals(dataset, phc1.getProblem().getData());
+
+
+    }
 
 
 }

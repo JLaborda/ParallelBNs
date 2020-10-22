@@ -88,21 +88,57 @@ public class PGESv2Test
      * @result Both objects should have the same dataset stored in it.
      */
     @Test
-    public void constructorTest(){
+    public void constructorAndGettersTest(){
         // Arrange
         int num_cols = 5;
 
         // Act
         PGESv2 PGESv21 = new PGESv2(path, 1);
-        PGESv2 PGESv22 = new PGESv2(dataset, 1);
+        PGESv2 PGESv22 = new PGESv2(dataset, 2);
+        PGESv2 PGESv23 = new PGESv2(path,4, 30, 8);
+        PGESv2 PGESv24 = new PGESv2(dataset,8, 35, 10);
+
         DataSet data1 = PGESv21.getData();
         DataSet data2 = PGESv22.getData();
+        DataSet data3 = PGESv23.getData();
+        DataSet data4 = PGESv24.getData();
+
+        int threads1 = PGESv21.getnThreads();
+        int threads2 = PGESv22.getnThreads();
+        int threads3 = PGESv23.getnThreads();
+        int threads4 = PGESv24.getnThreads();
+
+        int maxIterations1 = PGESv21.getMaxIterations();
+        int maxIterations2 = PGESv22.getMaxIterations();
+        int maxIterations3 = PGESv23.getMaxIterations();
+        int maxIterations4 = PGESv24.getMaxIterations();
+
+        int interleaving1 = PGESv21.getnFESItInterleaving();
+        int interleaving2 = PGESv22.getnFESItInterleaving();
+        int interleaving3 = PGESv23.getnFESItInterleaving();
+        int interleaving4 = PGESv24.getnFESItInterleaving();
 
         // Assert
         assertNotNull(PGESv21);
         assertNotNull(PGESv22);
+        assertNotNull(PGESv23);
+        assertNotNull(PGESv24);
         assertEquals(num_cols, data1.getNumColumns());
         assertEquals(num_cols, data2.getNumColumns());
+        assertEquals(num_cols, data3.getNumColumns());
+        assertEquals(num_cols, data4.getNumColumns());
+        assertEquals(1, threads1);
+        assertEquals(2, threads2);
+        assertEquals(4, threads3);
+        assertEquals(8, threads4);
+        assertEquals(15, maxIterations1);
+        assertEquals(15, maxIterations2);
+        assertEquals(30, maxIterations3);
+        assertEquals(35, maxIterations4);
+        assertEquals(5, interleaving1);
+        assertEquals(5, interleaving2);
+        assertEquals(8, interleaving3);
+        assertEquals(10, interleaving4);
     }
 
     /**

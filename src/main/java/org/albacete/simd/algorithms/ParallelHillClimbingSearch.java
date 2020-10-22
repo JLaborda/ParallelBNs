@@ -74,7 +74,7 @@ public class ParallelHillClimbingSearch {
     /**
      * {@link TupleNode TupleNode} array containing the possible list of edges of the resulting bayesian network.
      */
-    private TupleNode[] listOfArcs;
+    private TupleNode[] listOfArcs = null;
 
     private boolean fhcFlag = false;
 
@@ -92,6 +92,12 @@ public class ParallelHillClimbingSearch {
     }
 
     public ParallelHillClimbingSearch(DataSet data, int nThreads, int maxIterations, int nItInterleaving){
+        this(data, nThreads);
+        this.maxIterations = maxIterations;
+        this.nItInterleaving = nItInterleaving;
+    }
+
+    public ParallelHillClimbingSearch(String data, int nThreads, int maxIterations, int nItInterleaving){
         this(data, nThreads);
         this.maxIterations = maxIterations;
         this.nItInterleaving = nItInterleaving;
@@ -574,12 +580,11 @@ public class ParallelHillClimbingSearch {
         return problem;
     }
 
+    public int getnThreads() {
+        return nThreads;
+    }
 
-
-
-
-
-
-
-
+    public int getnItInterleaving() {
+        return nItInterleaving;
+    }
 }

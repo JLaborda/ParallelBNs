@@ -4,6 +4,7 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.threads.FESThread;
+import org.albacete.simd.utils.LocalScoreCacheConcurrent;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
@@ -503,6 +504,30 @@ public class GESThreadTest {
         //Assert
         fail();
     }
+
+    @Test
+    public void getLogTest(){
+        // Arrange
+        Problem problem = new Problem(dataset);
+        GESThread thread = new FESThread(problem, subset1, 15);
+
+        String result = thread.getLog();
+
+        assertEquals("", result);
+
+    }
+
+    @Test
+    public void getCacheTest(){
+        // Arrange
+        Problem problem = new Problem(dataset);
+        GESThread thread = new FESThread(problem, subset1, 15);
+
+        LocalScoreCacheConcurrent result = thread.getLocalScoreCache();
+        assertNotNull(result);
+
+    }
+
 
    /*
     @Test
