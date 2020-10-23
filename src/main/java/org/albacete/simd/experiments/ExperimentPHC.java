@@ -5,7 +5,7 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
-import org.albacete.simd.algorithms.GES;
+import org.albacete.simd.algorithms.ParallelHillClimbingSearch;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
@@ -14,39 +14,34 @@ import weka.classifiers.bayes.net.BIFReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
 
-public class ExperimentGES extends Experiment{
-
-
-
+public class ExperimentPHC extends Experiment {
 
     private int maxIterations = 15;
-    private GES alg;
-    private static HashMap<String, HashMap<String,String>> map;
-
+    private ParallelHillClimbingSearch alg;
     private int shd = Integer.MAX_VALUE;
     private double score;
     private double [] dfmm;
     private long elapsedTime;
     private int nIterations;
 
-
-    public ExperimentGES(String net_path, String bbdd_path) {
-        super(net_path, bbdd_path, 0, 0);
+    public ExperimentPHC(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
+        super(net_path, bbdd_path, nThreads, maxIterations, nItInterleaving);
     }
 
-
-
+    public ExperimentPHC(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
+        super(net_path, bbdd_path, nThreads, nItInterleaving);
+    }
 
     @Override
-    public void runExperiment() {
+    public void runExperiment(){
         try {
-            System.out.println("Starting GES Experiment:");
+            System.out.println("Starting Parallel Hill Climbing Search Experiment:");
             System.out.println("-----------------------------------------");
             System.out.println("\tNet Name: " + net_name);
             System.out.println("\tBBDD Name: " + bbdd_name);
             //System.out.println("\tFusion Consensus: " + fusion_consensus);
+            System.out.println("\tNumber of Threads: " + nThreads);
             System.out.println("-----------------------------------------");
 
             System.out.println("Net_path: " + net_path);
@@ -64,7 +59,7 @@ public class ExperimentGES extends Experiment{
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new GES(dataSet);
+            this.alg = new ParallelHillClimbingSearch(dataSet, nThreads, maxIterations, nItInterleaving);
 
             // Search is executed
             alg.search();
@@ -109,7 +104,7 @@ public class ExperimentGES extends Experiment{
     }
     @Override
     public void printResults(){
-        try {
+        //try {
             // Report
             System.out.println("Current DAG:");
             System.out.println(alg.getCurrentGraph());
@@ -124,10 +119,10 @@ public class ExperimentGES extends Experiment{
             System.out.println("dfMM: " + dfmm[0]);
             System.out.println("dfMM plus: " + dfmm[1]);
             System.out.println("dfMM minus: " + dfmm[2]);
-        }
-        catch(InterruptedException e){
-            e.printStackTrace();
-        }
+        //}
+        //catch(InterruptedException e){
+        //    e.printStackTrace();
+        //}
 
     }
 
@@ -177,56 +172,4 @@ public class ExperimentGES extends Experiment{
 
     }
 
-
-
-
-
-
-    public static void main(String[] args) {
-        String netFolder = "res/networks/";
-        String bbddFolder = "res/networks/BBDD/";
-        ArrayList<String> net_paths = getNetworkPaths(netFolder);
-        ArrayList<String> bbdd_paths = getBBDDPaths(bbddFolder);
-
-
-
-        System.out.println("net_names: " + net_paths);
-        System.out.println("bbdd_names: " + bbdd_paths);
-
-        map =  hashNetworks(net_paths, bbdd_paths);
-
-        System.out.println("Values in Map:");
-        for (String key: map.keySet()) {
-            HashMap<String, String> aux = map.get(key);
-            for(String k : aux.keySet()) {
-                System.out.println("BBDD_Number: " + key);
-                System.out.println("Key: " + k);
-                System.out.println("Value: " + aux.get(k));
-                System.out.println("******************");
-
-            }
-        }
-
-
-        // Running Single Experiment
-        //Experiments experiment = new Experiments("res/networks/win95pts.xbif", "res/networks/BBDD/win95pts.xbif_.csv", 2, 5);
-        //org.albacete.simd.experiments.Experiment experiment = new org.albacete.simd.experiments.Experiment("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv", 2, 5);
-        ExperimentGES experiment = new ExperimentGES("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv");
-
-        experiment.runExperiment();
-        //Saving Experiment
-        experiment.saveExperiment();
-
-
-        // Running all the experiments
-        //runAllExperiments();
-
-    }
-
-
-
-
 }
-
-
-

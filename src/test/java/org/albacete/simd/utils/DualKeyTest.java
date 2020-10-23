@@ -1,5 +1,6 @@
-package org.albacete.simd.algorithms.pGESv2;
+package org.albacete.simd.utils;
 
+import org.albacete.simd.utils.DualKey;
 import org.junit.Test;
 
 import java.util.HashSet;

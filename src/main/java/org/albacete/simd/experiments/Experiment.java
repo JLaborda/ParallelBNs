@@ -5,8 +5,8 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
-import org.albacete.simd.algorithms.pGESv2.GESThread;
-import org.albacete.simd.algorithms.pGESv2.PGESv2;
+import org.albacete.simd.threads.GESThread;
+import org.albacete.simd.algorithms.PGESv2;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
@@ -31,10 +31,10 @@ public class Experiment {
     protected String bbdd_path;
     protected String net_name;
     protected String bbdd_name;
-    private int nThreads;
+    protected int nThreads;
     //private String fusion_consensus;
-    private int nItInterleaving;
-    private int maxIterations = 15;
+    protected int nItInterleaving;
+    protected int maxIterations = 15;
     private PGESv2 alg;
     private static HashMap<String, HashMap<String,String>> map;
 
@@ -47,7 +47,7 @@ public class Experiment {
     private String log = "";
 
 
-    public Experiment(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
+    public Experiment(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
         this.net_path = net_path;
         this.bbdd_path = bbdd_path;
         Pattern pattern = Pattern.compile("/(.*)\\.");
@@ -68,14 +68,19 @@ public class Experiment {
 
 
         this.nThreads = nThreads;
+        this.maxIterations = maxIterations;
         this.nItInterleaving = nItInterleaving;
+    }
+
+    public Experiment(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
+        this(net_path, bbdd_path, nThreads, 15, nItInterleaving);
     }
 
 
 
 
 
-    public void runExperiment() {
+        public void runExperiment() {
         try {
             System.out.println("Starting Experiment:");
             System.out.println("-----------------------------------------");
@@ -328,7 +333,7 @@ public class Experiment {
                         System.out.println("BBDD_Path: " + bbdd_path);
 
                         // Running Experiment
-                        Experiment experiment = new Experiment(net_path, bbdd_path, nThread, nInterleaving);
+                        Experiment experiment = new Experiment(net_path, bbdd_path, nThread, 15, nInterleaving);
                         experiment.runExperiment();
                         //Saving Experiment
                         experiment.saveExperiment();
@@ -340,47 +345,6 @@ public class Experiment {
     }
 
         public static void main(String[] args) {
-            /*
-            String netFolder = "res/networks/";
-            String bbddFolder = "res/networks/BBDD/";
-            ArrayList<String> net_paths = getNetworkPaths(netFolder);
-            ArrayList<String> bbdd_paths = getBBDDPaths(bbddFolder);
-
-
-
-            System.out.println("net_names: " + net_paths);
-            System.out.println("bbdd_names: " + bbdd_paths);
-
-            map =  hashNetworks(net_paths, bbdd_paths);
-
-            System.out.println("Values in Map:");
-            for (String key: map.keySet()) {
-                HashMap<String, String> aux = map.get(key);
-                for(String k : aux.keySet()) {
-                    System.out.println("BBDD_Number: " + key);
-                    System.out.println("Key: " + k);
-                    System.out.println("Value: " + aux.get(k));
-                    System.out.println("******************");
-
-                }
-            }
-            */
-            //Problems with:
-            /*
-             * -----------------------------------------
-            Net Name: barley
-            BBDD Name: barley.xbif_
-            Fusion Consensus: ConsensusBES
-            nThreads: 2
-            nItInterleaving: 15
-            -----------------------------------------
-            Net_path: networks/barley.xbif
-            BBDD_path: networks/BBDD/barley.xbif_.csv
-             * */
-
-
-            // Running Single Experiment
-            //Experiments experiment = new Experiments("res/networks/win95pts.xbif", "res/networks/BBDD/win95pts.xbif_.csv", 2, 5);
 
             String netPath = "";
             String bbddPath = "";
@@ -392,7 +356,7 @@ public class Experiment {
                 bbddPath = args[1];
                 nThreads = Integer.parseInt(args[2]);
                 nInterleaving = Integer.parseInt(args[3]);
-                experiment = new Experiment(netPath, bbddPath, nThreads, nInterleaving);
+                experiment = new Experiment(netPath, bbddPath, nThreads, 15, nInterleaving);
 
             }
             else if(args.length == 2){

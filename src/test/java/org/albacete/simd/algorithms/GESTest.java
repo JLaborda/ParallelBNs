@@ -1,10 +1,12 @@
-package org.albacete.simd.algorithms.GES;
+package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
+import org.albacete.simd.algorithms.GES;
+import org.albacete.simd.utils.Problem;
 import org.junit.Test;
 
 import java.io.File;
@@ -47,6 +49,25 @@ public class GESTest {
         ges1.search();
         Graph g = ges1.getCurrentGraph();
         assertNotNull(g);
+
+    }
+
+    @Test
+    public void getProblemTest() throws IOException {
+
+        DataReader reader = new DataReader();
+        reader.setDelimiter(DelimiterType.COMMA);
+        reader.setMaxIntegralDiscrete(100);
+
+        // Creating GES with the first constructor
+        DataSet dataSet = reader.parseTabular(new File("res/networks/BBDD/cancer.xbif_.csv"));
+        Problem expected = new Problem(dataSet);
+
+        GES ges1 = new GES(dataSet);
+
+        assertEquals(expected.getData(), ges1.getProblem().getData());
+
+
 
     }
 

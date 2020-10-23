@@ -1,16 +1,17 @@
-package org.albacete.simd.algorithms.pGESv2;
+package org.albacete.simd.threads;
 
 import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
 import consensusBN.SubSet;
-import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
+import org.albacete.simd.utils.Problem;
+import org.albacete.simd.utils.TupleNode;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("DuplicatedCode")
-public class ThBES extends GESThread {
+public class BESThread extends GESThread {
 
 
     private static int threadCounter = 1;
@@ -21,7 +22,7 @@ public class ThBES extends GESThread {
      * @param initialDag initial DAG with which the FES stage starts with.
      * @param subset subset of edges the fes stage will try to add to the resulting graph
      */
-    public ThBES(Problem problem, Graph initialDag, ArrayList<TupleNode> subset) {
+    public BESThread(Problem problem, Graph initialDag, ArrayList<TupleNode> subset) {
 
         this.problem = problem;
         setInitialGraph(initialDag);
@@ -120,11 +121,11 @@ public class ThBES extends GESThread {
                 break;
             }
 
-            // Indicating that the thread has added an edge to the graph
-            this.flag = true;
-
             // Executing BS function to calculate the best edge to be added
             bestDelete = bs(graph,bestScore);
+
+            // Indicating that the thread has deleted an edge to the graph
+            this.flag = true;
 
         }
         return bestScore;

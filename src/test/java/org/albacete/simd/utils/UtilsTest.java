@@ -3,7 +3,6 @@ package org.albacete.simd.utils;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.algorithms.pGESv2.TupleNode;
 import org.junit.Test;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
@@ -259,6 +258,65 @@ public class UtilsTest {
         assertNotNull(n);
         assertNull(n2);
     }
+
+    @Test
+    public void getIndexOfNodesByNameTest() throws Exception {
+        BIFReader bf = new BIFReader();
+        bf.processFile("res/networks/cancer.xbif");
+        BayesNet bn = (BayesNet) bf;
+        System.out.println("Numero de variables: "+bn.getNrOfNodes());
+        MlBayesIm bn2 = new MlBayesIm(bn);
+
+        Dag dag = bn2.getDag();
+        List<Node> nodes = dag.getNodes();
+
+        int result1 = Utils.getIndexOfNodeByName(nodes, "Pollution");
+        int result2 = Utils.getIndexOfNodeByName(nodes, "");
+
+        assertEquals(3, result1);
+        assertEquals(-1, result2);
+
+    }
+
+    @Test
+    public void removeInconsistenciesTest(){
+        Graph g1 = new EdgeListGraph();
+        Graph g2 = new EdgeListGraph();
+        Node n1 = new GraphNode("Node1");
+        Node n2 = new GraphNode("Node2");
+        Node n3 = new GraphNode("Node3");
+        g1.addNode(n1);
+        g1.addNode(n2);
+        g1.addNode(n3);
+        g2.addNode(n1);
+        g2.addNode(n2);
+        g2.addNode(n3);
+
+        Edge e1 = Edges.directedEdge(n1, n2);
+        Edge e2 = Edges.directedEdge(n2, n3);
+        Edge e3 = Edges.directedEdge(n3, n1);
+
+        g1.addEdge(e1);
+        g1.addEdge(e2);
+        g2.addEdge(e1);
+        g2.addEdge(e2);
+        g2.addEdge(e3);
+
+        Dag result1 = Utils.removeInconsistencies(g1);
+        Dag result2 = Utils.removeInconsistencies(g2);
+
+        assertTrue(result1.containsEdge(e1));
+        assertTrue(result1.containsEdge(e2));
+        assertFalse(result1.containsEdge(e3));
+
+        assertFalse(result2.containsEdge(e1));
+        assertTrue(result2.containsEdge(e2));
+        assertTrue(result2.containsEdge(e3));
+
+
+    }
+
+
 
     /*
     @Test

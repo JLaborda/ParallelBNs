@@ -1,4 +1,4 @@
-package org.albacete.simd.algorithms.pGESv2;
+package org.albacete.simd.utils;
 
 import java.util.Objects;
 

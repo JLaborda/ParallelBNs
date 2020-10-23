@@ -1,6 +1,4 @@
-package org.albacete.simd.algorithms.pGESv2;
-
-import org.apache.commons.collections.map.MultiKeyMap;
+package org.albacete.simd.utils;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,22 +1,15 @@
 package org.albacete.simd.utils;
 
-import consensusBN.ConsensusBES;
 import consensusBN.PairWiseConsensusBES;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
-import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
-import edu.cmu.tetrad.search.LocalScoreCache;
 import edu.cmu.tetrad.search.SearchGraphUtils;
-import edu.cmu.tetrad.util.ProbUtils;
-import org.albacete.simd.algorithms.pGESv2.TupleNode;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Utils {
 
@@ -409,6 +402,7 @@ public class Utils {
         Node nodeT, nodeH;
         for (Edge e : g.getEdges()){
             if(!e.isDirected()) continue;
+            //System.out.println("Undirected Edge: " + e);
             Endpoint endpoint1 = e.getEndpoint1();
             if (endpoint1.equals(Endpoint.ARROW)){
                 nodeT = e.getNode1();
@@ -417,7 +411,12 @@ public class Utils {
                 nodeT = e.getNode2();
                 nodeH = e.getNode1();
             }
-            if(g.existsDirectedPathFromTo(nodeT, nodeH)) g.removeEdge(e);
+
+
+            if(g.existsDirectedPathFromTo(nodeT, nodeH)){
+                System.out.println("Directed path from " + nodeT + " to " + nodeH +"\t Deleting Edge...");
+                g.removeEdge(e);
+            }
         }
         // Adding graph from each thread to the graphs array
         return new Dag(g);

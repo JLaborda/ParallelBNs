@@ -1,17 +1,15 @@
-package org.albacete.simd.algorithms.pGESv2;
+package org.albacete.simd.threads;
 
 import consensusBN.SubSet;
-import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
-import edu.cmu.tetrad.search.LocalScoreCache;
 import edu.cmu.tetrad.search.MeekRules;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.NumberFormatUtil;
 import edu.cmu.tetrad.util.ProbUtils;
-import org.albacete.simd.utils.Utils;
+import org.albacete.simd.utils.LocalScoreCacheConcurrent;
+import org.albacete.simd.utils.Problem;
+import org.albacete.simd.utils.TupleNode;
 
-import javax.swing.*;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -149,13 +147,21 @@ public abstract class GESThread implements Runnable{
      */
     public static double insertEval(Node x, Node y, Set<Node> t, Graph graph, Problem problem) {
         // set1 contains x; set2 does not.
-        Set<Node> set1 = new HashSet<>(findNaYX(x, y, graph));
+        Set<Node> set1;
+//        if(t.isEmpty()){
+//            set1 = new HashSet<>();
+//        }
+//        else{
+            set1 = new HashSet<>(findNaYX(x, y, graph));
+//        }
         set1.addAll(t);
         set1.addAll(graph.getParents(y));
         Set<Node> set2 = new HashSet<>(set1);
         set1.add(x);
         return scoreGraphChange(y, set1, set2, graph, problem);
     }
+
+
 
     /**
      * Do an actual insertion of an edge.
@@ -189,6 +195,7 @@ public abstract class GESThread implements Runnable{
         graph.removeEdges(x, y);
 
         for (Node aSubset : subset) {
+            System.out.println("Deleting Edges in subset");
             if (!graph.isParentOf(aSubset, x) && !graph.isParentOf(x, aSubset)) {
                 System.out.println("Delete: " + x + " -- " + aSubset);
                 graph.removeEdge(x, aSubset);
@@ -643,7 +650,7 @@ public abstract class GESThread implements Runnable{
 
 
     /**
-     * Sets the maximum iterations the thread can do. This is used in {@link ThFES ThFES} threads.
+     * Sets the maximum iterations the thread can do. This is used in {@link FESThread ThFES} threads.
      * @param maxIt the maximum number of iterations
      */
     public void setMaxIt(int maxIt) {
