@@ -302,9 +302,7 @@ public class UtilsTest {
         g2.addEdge(e2);
         g2.addEdge(e3);
 
-        System.out.println("Graph1");
         Dag result1 = Utils.removeInconsistencies(g1);
-        System.out.println("Graph2");
         Dag result2 = Utils.removeInconsistencies(g2);
 
         assertTrue(result1.containsEdge(e1));
