@@ -43,15 +43,16 @@ public class UtilsTest {
         Node n1 = new GraphNode("n1");
         Node n2 = new GraphNode("n2");
         Node n3 = new GraphNode("n3");
-        TupleNode[] tupleNodes = {new TupleNode(n1,n2), new TupleNode(n1,n3)};
+        List<Edge> edges = Arrays.asList(Edges.directedEdge(n1,n2), Edges.directedEdge(n1,n3));
         int seed = 42;
         int expectedSize = 2;
 
         //Act
-        ArrayList<TupleNode>[] result = Utils.split(tupleNodes, 2, seed);
+        Utils.setSeed(seed);
+        List<List<Edge>> result = Utils.split(edges, 2);
 
         //Assert
-        assertEquals(expectedSize, result.length);
+        assertEquals(expectedSize, result.size());
 
     }
 
@@ -72,31 +73,12 @@ public class UtilsTest {
         int expectedSize = 2;
 
         //Act
-        ArrayList<TupleNode>[] result = Utils.split(edges, 2, seed);
+        Utils.setSeed(42);
+        List<List<Edge>> result = Utils.split(edges, 2);
 
         //Assert
-        assertEquals(expectedSize, result.length);
+        assertEquals(expectedSize, result.size());
 
-    }
-
-    /**
-     * Tests that checks that an Edge is transformed to a TupleNode by using the method edgeToTupleNode.
-     * @result Node1 is equal to Node x, and Node2 is equal to Node y from the Edge transformed and the resulting
-     * TupleNode.
-     */
-    @Test
-    public void edgeToTupleNodeTest(){
-        // Arrange
-        Node n1 = new GraphNode("n1");
-        Node n2 = new GraphNode("n2");
-        Edge edge = new Edge(n1, n2, Endpoint.TAIL, Endpoint.ARROW);
-
-        // Act
-        TupleNode result = Utils.edgeToTupleNode(edge);
-
-        // Assert
-        assertEquals(n1, result.x);
-        assertEquals(n2, result.y);
     }
 
     /**

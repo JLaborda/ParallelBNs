@@ -5,7 +5,6 @@ import consensusBN.PowerSetFabric;
 import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.TupleNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,7 @@ public class BESThread extends GESThread {
      * @param initialDag initial DAG with which the FES stage starts with.
      * @param subset subset of edges the fes stage will try to add to the resulting graph
      */
-    public BESThread(Problem problem, Graph initialDag, ArrayList<TupleNode> subset) {
+    public BESThread(Problem problem, Graph initialDag, List<Edge> subset) {
 
         this.problem = problem;
         setInitialGraph(initialDag);
@@ -149,8 +148,9 @@ public class BESThread extends GESThread {
         x_d = y_d = null;
         h_0 = null;
 
-        List<Edge> edges = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>(S);
 
+/*
         for (TupleNode tupleNode : this.S) {
             Node _x = tupleNode.x;
             Node _y = tupleNode.y;
@@ -160,7 +160,7 @@ public class BESThread extends GESThread {
             edges.add(Edges.directedEdge(_y, _x));
 
         }
-
+*/
         for (Edge edge : edges) {
 
             // Checking if the edge is actually inside the graph

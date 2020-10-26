@@ -3,7 +3,6 @@ package org.albacete.simd.threads;
 import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.TupleNode;
 
 import java.util.*;
 
@@ -20,7 +19,7 @@ public class ForwardHillClimbingThread extends GESThread {
      * @param subset     subset of edges the fes stage will try to add to the resulting graph
      * @param maxIt      maximum number of iterations allowed in the fes stage
      */
-    public ForwardHillClimbingThread(Problem problem, Graph initialDag, ArrayList<TupleNode> subset, int maxIt) {
+    public ForwardHillClimbingThread(Problem problem, Graph initialDag, List<Edge> subset, int maxIt) {
         this.problem = problem;
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
@@ -36,7 +35,7 @@ public class ForwardHillClimbingThread extends GESThread {
      * @param subset  subset of edges the fes stage will try to add to the resulting graph
      * @param maxIt   maximum number of iterations allowed in the fes stage
      */
-    public ForwardHillClimbingThread(Problem problem, ArrayList<TupleNode> subset, int maxIt) {
+    public ForwardHillClimbingThread(Problem problem, List<Edge> subset, int maxIt) {
         this.problem = problem;
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
@@ -76,19 +75,9 @@ public class ForwardHillClimbingThread extends GESThread {
 
 
         double bestScore = score;
-        List<Edge> edges = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>(S);
 
-        for(TupleNode tupleNode : this.S){
-            Node _x = tupleNode.x;
-            Node _y = tupleNode.y;
 
-            if(_x == _y)
-                continue;
-
-            // Adding Edges to check
-            edges.add(Edges.directedEdge(_x, _y));
-            edges.add(Edges.directedEdge(_y, _x));
-        }
 
         System.out.println("[FHC " + getId() + "]" + " Number of edges to check: " + edges.size());
 

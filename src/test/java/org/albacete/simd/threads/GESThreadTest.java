@@ -2,11 +2,8 @@ package org.albacete.simd.threads;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.threads.GESThread;
-import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.utils.LocalScoreCacheConcurrent;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -57,11 +54,11 @@ public class GESThreadTest {
     /**
      * Subset1 of pairs of nodes or variables.
      */
-    final ArrayList<TupleNode> subset1 = new ArrayList<>();
+    final List<Edge> subset1 = new ArrayList<>();
     /**
      * Subset2 of pairs of nodes or variables.
      */
-    final ArrayList<TupleNode> subset2 = new ArrayList<>();
+    final List<Edge> subset2 = new ArrayList<>();
 
 
     /**
@@ -74,22 +71,33 @@ public class GESThreadTest {
     /**
      * This method initializes the subsets, splitting the nodes in what is expected to happen when the seed is 42
      */
-    private void initializeSubsets() {
+    private void initializeSubsets(){
         // Seed used for arc split is 42
 
         // Subset 1:
-        subset1.add(new TupleNode(dyspnoea, cancer));
-        subset1.add(new TupleNode(dyspnoea, smoker));
-        subset1.add(new TupleNode(xray, pollution));
-        subset1.add(new TupleNode(xray, cancer));
-        subset1.add(new TupleNode(cancer, pollution));
+        subset1.add(Edges.directedEdge(dyspnoea, cancer));
+        subset1.add(Edges.directedEdge(cancer, dyspnoea));
+        subset1.add(Edges.directedEdge(dyspnoea, smoker));
+        subset1.add(Edges.directedEdge(smoker, dyspnoea));
+        subset1.add(Edges.directedEdge(xray, pollution));
+        subset1.add(Edges.directedEdge(pollution, xray));
+        subset1.add(Edges.directedEdge(xray , cancer));
+        subset1.add(Edges.directedEdge(cancer, xray));
+        subset1.add(Edges.directedEdge(cancer, pollution));
+        subset1.add(Edges.directedEdge(pollution, cancer));
 
         //Subset 2:
-        subset2.add(new TupleNode(pollution, smoker));
-        subset2.add(new TupleNode(cancer, smoker));
-        subset2.add(new TupleNode(dyspnoea, pollution));
-        subset2.add(new TupleNode(xray, smoker));
-        subset2.add(new TupleNode(xray, dyspnoea));
+        subset2.add(Edges.directedEdge(pollution, smoker));
+        subset2.add(Edges.directedEdge(smoker, pollution));
+        subset2.add(Edges.directedEdge(cancer, smoker));
+        subset2.add(Edges.directedEdge(smoker, cancer));
+        subset2.add(Edges.directedEdge(dyspnoea, pollution));
+        subset2.add(Edges.directedEdge(pollution, dyspnoea));
+        subset2.add(Edges.directedEdge(xray, smoker));
+        subset2.add(Edges.directedEdge(smoker, xray));
+        subset2.add(Edges.directedEdge(xray, dyspnoea));
+        subset2.add(Edges.directedEdge(dyspnoea, xray));
+
     }
 
     /**
