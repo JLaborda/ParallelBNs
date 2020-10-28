@@ -7,13 +7,10 @@ import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
 
 import java.util.*;
 
-
-// TAMBIÉN HAY QUE QUITAR LAS DEPENDENCIAS DE TETRAD NORMAL (4.4)
 
 /**
  * @author Jorge Daniel Laborda
@@ -59,9 +56,9 @@ public class PGESv2
     private Thread[] threads = null;
 
     /**
-     * Subset of {@link TupleNode TupleNodes}. Each subset will be assigned to {@link GESThread GESThread}
+     * Subset of {@link Edge Edges}. Each subset will be assigned to {@link GESThread GESThread}
      */
-    private ArrayList<TupleNode>[] subSets = null;
+    private List<List<Edge>> subSets = null;
 
     /**
      * {@link ArrayList ArrayList} of graphs. This contains the list of {@link Graph graphs} created for each stage,
@@ -80,9 +77,9 @@ public class PGESv2
     private int it = 1;
 
     /**
-     * {@link TupleNode TupleNode} array containing the possible list of edges of the resulting bayesian network.
+     * {@link Edge Edge} array containing the possible list of edges of the resulting bayesian network.
      */
-    private TupleNode[] listOfArcs;
+    private List<Edge> listOfArcs;
 
     private boolean fesFlag = false;
 
@@ -130,10 +127,10 @@ public class PGESv2
         this.nThreads = nThreads;
         this.gesThreads = new FESThread[this.nThreads];
         this.threads = new Thread[this.nThreads];
-        this.subSets = new ArrayList[this.nThreads];
+        this.subSets = new ArrayList(this.nThreads);
 
-        //The total number of arcs of a graph is n*(n-1)/2, where n is the number of nodes in the graph.
-        this.listOfArcs = new TupleNode[this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1) / 2];
+        //The total number of arcs of a graph is n*(n-1), where n is the number of nodes in the graph.
+        this.listOfArcs = new ArrayList<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1));
     }
 
     /**
@@ -146,7 +143,7 @@ public class PGESv2
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem
      */
     public void splitArcs(){
-        this.subSets = Utils.split(listOfArcs, nThreads, seed);
+        this.subSets = Utils.split(listOfArcs, nThreads);
     }
 
 
@@ -164,12 +161,12 @@ public class PGESv2
         // Creating each ThFES runnable
         if (this.currentGraph == null) {
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new FESThread(this.problem, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new FESThread(this.problem, this.subSets.get(i), this.nFESItInterleaving);
             }
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new FESThread(this.problem, this.currentGraph, this.subSets[i], this.nFESItInterleaving);
+                this.gesThreads[i] = new FESThread(this.problem, this.currentGraph, this.subSets.get(i), this.nFESItInterleaving);
             }
         }
 
@@ -267,9 +264,9 @@ public class PGESv2
         //problem.buildIndexing(currentGraph);
 
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
-        ArrayList<TupleNode>[] subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads, this.seed);
+        List<List<Edge>> subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads);
         for (int i = 0; i < this.nThreads; i++) {
-            this.gesThreads[i] = new BESThread(this.problem, this.currentGraph, subsets_BES[i]);
+            this.gesThreads[i] = new BESThread(this.problem, this.currentGraph, subsets_BES.get(i));
         }
 
         // Initializing thread config
@@ -337,12 +334,13 @@ public class PGESv2
         System.out.println("FES to obtain the fusion: ");
  
 
-        ArrayList<TupleNode> candidates = new ArrayList<TupleNode>();
+        List<Edge> candidates = new ArrayList<>();
         
         
         for (Edge e: fusionGraph.getEdges()){
             if(this.currentGraph.getEdge(e.getNode1(), e.getNode2())!=null || this.currentGraph.getEdge(e.getNode2(),e.getNode1())!=null ) continue;
-            candidates.add(new TupleNode(e.getNode1(),e.getNode2()));
+            candidates.add(Edges.directedEdge(e.getNode1(),e.getNode2()));
+            candidates.add(Edges.directedEdge(e.getNode2(),e.getNode1()));
         }
 
         
@@ -467,7 +465,7 @@ public class PGESv2
             System.out.println("============================");
 
             // 2 Random Repartitioning
-            this.subSets = Utils.split(listOfArcs, nThreads, seed);
+            this.subSets = Utils.split(listOfArcs, nThreads);
 
             //System.out.println("----------------------------");
             //System.out.println("Splits: ");
@@ -559,11 +557,12 @@ public class PGESv2
 
         System.out.println("BES to obtain the fusion: ");
 
-        ArrayList<TupleNode> candidates = new ArrayList<TupleNode>();
+        List<Edge> candidates = new ArrayList<>();
         
         for (Edge e: this.currentGraph.getEdges()){
             if(fusionGraph.getEdge(e.getNode1(), e.getNode2())==null && fusionGraph.getEdge(e.getNode2(),e.getNode1())==null ) {
-            	candidates.add(new TupleNode(e.getNode1(),e.getNode2()));
+            	candidates.add(Edges.directedEdge(e.getNode1(),e.getNode2()));
+            	candidates.add(Edges.directedEdge(e.getNode2(),e.getNode1()));
             }
         }
 
@@ -591,6 +590,7 @@ public class PGESv2
      */
     public void setSeed(long seed) {
         this.seed = seed;
+        Utils.setSeed(seed);
     }
 
     /**
@@ -603,17 +603,17 @@ public class PGESv2
 
     /**
      * Gets the list of possible edges of the problem
-     * @return array of {@link TupleNode TupleNode} representing all the possible edges of the problem.
+     * @return List of {@link Edge Edges} representing all the possible edges of the problem.
      */
-    public TupleNode[] getListOfArcs() {
+    public List<Edge> getListOfArcs() {
         return listOfArcs;
     }
 
     /**
      * Gets the current subsets of edges.
-     * @return array of ArrayList of {@link TupleNode TupleNode} containing the edges of each subset.
+     * @return List of Lists of {@link Edge Edges} containing the edges of each subset.
      */
-    public ArrayList<TupleNode>[] getSubSets() {
+    public List<List<Edge>> getSubSets() {
         return subSets;
     }
 

@@ -2,8 +2,6 @@ package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.algorithms.PGESv2;
-import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -53,11 +51,11 @@ public class PGESv2Test
     /**
      * Subset1 of pairs of nodes or variables.
      */
-    final ArrayList<TupleNode> subset1 = new ArrayList<>();
+    final ArrayList<Edge> subset1 = new ArrayList<>();
     /**
      * Subset2 of pairs of nodes or variables.
      */
-    final ArrayList<TupleNode> subset2 = new ArrayList<>();
+    final ArrayList<Edge> subset2 = new ArrayList<>();
 
 
     /**
@@ -67,19 +65,28 @@ public class PGESv2Test
         // Seed used for arc split is 42
 
         // Subset 1:
-        subset1.add(new TupleNode(dyspnoea, cancer));
-        subset1.add(new TupleNode(dyspnoea, smoker));
-        subset1.add(new TupleNode(xray, pollution));
-        subset1.add(new TupleNode(xray, cancer));
-        subset1.add(new TupleNode(cancer, pollution));
-
+        subset1.add(Edges.directedEdge(dyspnoea, cancer));
+        subset1.add(Edges.directedEdge(cancer, dyspnoea));
+        subset1.add(Edges.directedEdge(dyspnoea, smoker));
+        subset1.add(Edges.directedEdge(smoker, dyspnoea));
+        subset1.add(Edges.directedEdge(xray, pollution));
+        subset1.add(Edges.directedEdge(pollution, xray));
+        subset1.add(Edges.directedEdge(xray , cancer));
+        subset1.add(Edges.directedEdge(cancer, xray));
+        subset1.add(Edges.directedEdge(cancer, pollution));
+        subset1.add(Edges.directedEdge(pollution, cancer));
 
         //Subset 2:
-        subset2.add(new TupleNode(pollution, smoker));
-        subset2.add(new TupleNode(cancer, smoker));
-        subset2.add(new TupleNode(dyspnoea, pollution));
-        subset2.add(new TupleNode(xray, smoker));
-        subset2.add(new TupleNode(xray, dyspnoea));
+        subset2.add(Edges.directedEdge(pollution, smoker));
+        subset2.add(Edges.directedEdge(smoker, pollution));
+        subset2.add(Edges.directedEdge(cancer, smoker));
+        subset2.add(Edges.directedEdge(smoker, cancer));
+        subset2.add(Edges.directedEdge(dyspnoea, pollution));
+        subset2.add(Edges.directedEdge(pollution, dyspnoea));
+        subset2.add(Edges.directedEdge(xray, smoker));
+        subset2.add(Edges.directedEdge(smoker, xray));
+        subset2.add(Edges.directedEdge(xray, dyspnoea));
+        subset2.add(Edges.directedEdge(dyspnoea, xray));
 
     }
 
@@ -183,21 +190,26 @@ public class PGESv2Test
         // Arrange
         PGESv2 pGESv2 = new PGESv2(path, 1);
 
-        TupleNode[] expected = new TupleNode[]{new TupleNode(xray, dyspnoea), new TupleNode(xray, cancer), new TupleNode(xray, pollution), new TupleNode(xray, smoker),
-                new TupleNode(dyspnoea, cancer), new TupleNode(dyspnoea, pollution), new TupleNode(dyspnoea, smoker),
-                new TupleNode(cancer, pollution), new TupleNode(cancer, smoker),
-                new TupleNode(pollution, smoker)};
+        List<Edge> expected = Arrays.asList(Edges.directedEdge(xray, dyspnoea), Edges.directedEdge(xray, cancer), Edges.directedEdge(xray, pollution), Edges.directedEdge(xray, smoker),
+                Edges.directedEdge(dyspnoea, cancer), Edges.directedEdge(dyspnoea, pollution), Edges.directedEdge(dyspnoea, smoker),
+                Edges.directedEdge(cancer, pollution), Edges.directedEdge(cancer, smoker),
+                Edges.directedEdge(pollution, smoker),
+                Edges.directedEdge(dyspnoea, xray), Edges.directedEdge(cancer, xray), Edges.directedEdge(pollution, xray), Edges.directedEdge(smoker, xray),
+                Edges.directedEdge(cancer, dyspnoea), Edges.directedEdge(pollution, dyspnoea), Edges.directedEdge(smoker, dyspnoea),
+                Edges.directedEdge(pollution, cancer), Edges.directedEdge(smoker, cancer),
+                Edges.directedEdge(smoker, pollution)
+        );
         // Act
         pGESv2.calculateArcs();
-        TupleNode[] result =  pGESv2.getListOfArcs();
+        List<Edge> result =  pGESv2.getListOfArcs();
 
         // Assert
         // Asserting size
-        assertEquals(expected.length, result.length);
-        for (TupleNode tupleNode1 : expected) {
+        assertEquals(expected.size(), result.size());
+        for (Edge edge1 : expected) {
             boolean isEqual = false;
-            for (TupleNode tupleNode2 : result) {
-                if (tupleNode1.equals(tupleNode2)) {
+            for (Edge edge2 : result) {
+                if (edge1.equals(edge2)) {
                     isEqual = true;
                     break;
                 }
@@ -218,14 +230,14 @@ public class PGESv2Test
         // Act
         pGESv2.calculateArcs();
         pGESv2.splitArcs();
-        TupleNode[] arcs = pGESv2.getListOfArcs();
-        ArrayList<TupleNode>[] subsets = pGESv2.getSubSets();
+        List<Edge> arcs = pGESv2.getListOfArcs();
+        List<List<Edge>> subsets = pGESv2.getSubSets();
 
         // Assert
         // Checking that each arc is in fact in a subset, and that it is only once in it.
-        for (TupleNode edge : arcs) {
+        for (Edge edge : arcs) {
             int counter = 0;
-            for (ArrayList<TupleNode> subset : subsets){
+            for (List<Edge> subset : subsets){
                 counter += Collections.frequency(subset, edge);
             }
             // Double pairs
@@ -234,12 +246,6 @@ public class PGESv2Test
     }
 
 
-    /**
-     * Tests the fes stage for two threads with the subsets of cancer divided into two, with a seed equal to 42.
-     * @throws InterruptedException Exception caused by interruption of the threads.
-     * @result The FES stage executes correctly, and the resulting graphs are the same all the times.
-     *
-     */
     /*
     @Test
     public void fesStageTest() throws InterruptedException {
@@ -314,7 +320,7 @@ public class PGESv2Test
     public void fusionTest() throws InterruptedException {
         // Arrange
         PGESv2 pGESv2 = new PGESv2(path, 2);
-
+        Utils.setSeed(42);
         List<Node> nodes = new ArrayList<>();
         nodes.add(cancer);
         nodes.add(dyspnoea);
@@ -324,7 +330,7 @@ public class PGESv2Test
         Dag expected = new Dag(nodes);
         expected.addDirectedEdge(cancer, dyspnoea);
         expected.addDirectedEdge(cancer, xray);
-        expected.addDirectedEdge(pollution, cancer);
+        expected.addDirectedEdge(cancer, pollution);
         expected.addDirectedEdge(smoker, cancer);
 
         // Act
@@ -353,7 +359,7 @@ public class PGESv2Test
         // Assert Edges
         List<Edge> resultingEdges = result.getEdges();
         for(Edge resEdge : resultingEdges){
-            Node node1 = resEdge.getNode1();
+            /*Node node1 = resEdge.getNode1();
             Node node2 = resEdge.getNode2();
 
             // System.out.println("Node1: " + node1.getName());
@@ -361,11 +367,7 @@ public class PGESv2Test
 
             if(node1.getName().equals("Cancer")){
                 String node2Name = node2.getName();
-                assertTrue(((node2Name.equals("Dyspnoea")) || (node2Name.equals("Xray")) ));
-                continue;
-            }
-            if(node1.getName().equals("Pollution")){
-                assertEquals("Cancer", node2.getName());
+                assertTrue(((node2Name.equals("Dyspnoea")) || (node2Name.equals("Xray")) || (node2Name.equals("Pollution")) ));
                 continue;
             }
             if(node1.getName().equals("Smoker")){
@@ -374,7 +376,8 @@ public class PGESv2Test
             }
             // If node1 i not any of these nodes, then assert error
             fail("Node1 is not in the expected range.");
-
+            */
+            assertTrue(expected.containsEdge(resEdge));
         }
 
     }
@@ -392,7 +395,7 @@ public class PGESv2Test
         List<Edge> expected = new ArrayList<>();
         expected.add(new Edge(cancer, dyspnoea, Endpoint.TAIL, Endpoint.ARROW));
         expected.add(new Edge(cancer, xray, Endpoint.TAIL, Endpoint.ARROW));
-        expected.add(new Edge(pollution, cancer, Endpoint.TAIL, Endpoint.ARROW));
+        expected.add(new Edge(cancer, pollution, Endpoint.TAIL, Endpoint.ARROW));
         expected.add(new Edge(smoker, cancer, Endpoint.TAIL, Endpoint.ARROW));
 
         // Creating main

@@ -8,7 +8,6 @@ import edu.cmu.tetrad.util.NumberFormatUtil;
 import edu.cmu.tetrad.util.ProbUtils;
 import org.albacete.simd.utils.LocalScoreCacheConcurrent;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.TupleNode;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -22,7 +21,7 @@ public abstract class GESThread implements Runnable{
     /**
      * Tuple of Nodes that will be checked by this thread in the FES method
      */
-    protected ArrayList<TupleNode> S;
+    protected List<Edge> S;
 
     /**
      * Problem the thread is solving
@@ -125,14 +124,6 @@ public abstract class GESThread implements Runnable{
     protected int id = -1;
 
     private String log = "";
-
-/*
-    public GESThread(LocalScoreCacheConcurrent cache, HashMap<Node,Integer> hashIndices ){
-        this.localScoreCache = cache;
-        this.hashIndices = hashIndices;
-    }
-*/
-
 
 
 
@@ -659,9 +650,9 @@ public abstract class GESThread implements Runnable{
 
     /**
      * Sets the subset that is searched by the thread.
-     * @param subset Subset of {@link TupleNode TupleNode}.
+     * @param subset Subset of {@link Edge Edges}.
      */
-    public void setSubSetSearch(ArrayList<TupleNode> subset) {
+    public void setSubSetSearch(List<Edge> subset) {
         this.S=subset;
 
     }

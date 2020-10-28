@@ -199,9 +199,9 @@ public class ParallelHillClimbingSearchTest {
         List<Node> nodes = Arrays.asList(cancer, dyspnoea, pollution, xray, smoker);
         EdgeListGraph expectation = new EdgeListGraph(nodes);
         expectation.addDirectedEdge(cancer, dyspnoea);
-        expectation.addDirectedEdge(cancer, pollution);
+        expectation.addDirectedEdge(pollution, cancer);
         expectation.addDirectedEdge(cancer, smoker);
-        expectation.addDirectedEdge(xray, cancer);
+        expectation.addDirectedEdge(cancer, xray);
 
         // Act
         pGESv2.search();
@@ -211,18 +211,52 @@ public class ParallelHillClimbingSearchTest {
 
     }
 
+    @Test
+    public void searchAlarmTest(){
+        //Arrange
+        String alarmPath = "src/test/resources/alarm.xbif_.csv";
+        ParallelHillClimbingSearch pGESv2 = new ParallelHillClimbingSearch(alarmPath, 2);
+
+        // Act
+        pGESv2.search();
+
+        //Assert
+        assertNotEquals(null, pGESv2.getCurrentGraph());
+        assertNotEquals(1, pGESv2.getIterations());
+    }
+
 
     @Test
     public void gettersTest(){
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(dataset, 1);
-
-        assertEquals(5*4/2, phc1.getListOfArcs().length);
-        assertEquals(1, phc1.getSubSets().length);
-        assertNull(phc1.getGraphs());
-        assertEquals(1, phc1.getIterations());
+        phc1.search();
+        assertEquals(5*4, phc1.getListOfArcs().size());
+        assertEquals(1, phc1.getSubSets().size());
+        assertEquals(1,phc1.getGraphs().size());
+        assertNotEquals(1, phc1.getIterations());
         assertEquals(dataset, phc1.getProblem().getData());
 
 
+    }
+    @Test
+    public void convergenceTest(){
+        //Arrange
+        DataSet datasetAlarm = Utils.readData("src/test/resources/alarm.xbif_.csv");
+        ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
+        phc1.setMaxIterations(2);
+        //Act
+        phc1.search();
+        //Assert
+        assertEquals(2,phc1.getIterations());
+
+    }
+
+    @Test
+    public void interruptedExceptionTest(){
+        DataSet datasetAlarm = Utils.readData("src/test/resources/alarm.xbif_.csv");
+        ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
+        phc1.setMaxIterations(30);
+        phc1.search();
     }
 
 

@@ -3,9 +3,7 @@ package org.albacete.simd.threads;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
-import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -50,11 +48,11 @@ public class FESThreadTest {
     /**
      * Subset1 of pairs of nodes or variables.
      */
-    final ArrayList<TupleNode> subset1 = new ArrayList<>();
+    final List<Edge> subset1 = new ArrayList<>();
     /**
      * Subset2 of pairs of nodes or variables.
      */
-    final ArrayList<TupleNode> subset2 = new ArrayList<>();
+    final List<Edge> subset2 = new ArrayList<>();
 
     private Problem problem;
 
@@ -100,19 +98,28 @@ public class FESThreadTest {
         // Seed used for arc split is 42
 
         // Subset 1:
-        subset1.add(new TupleNode(dyspnoea, cancer));
-        subset1.add(new TupleNode(dyspnoea, smoker));
-        subset1.add(new TupleNode(xray, pollution));
-        subset1.add(new TupleNode(xray, cancer));
-        subset1.add(new TupleNode(cancer, pollution));
-
+        subset1.add(Edges.directedEdge(dyspnoea, cancer));
+        subset1.add(Edges.directedEdge(cancer, dyspnoea));
+        subset1.add(Edges.directedEdge(dyspnoea, smoker));
+        subset1.add(Edges.directedEdge(smoker, dyspnoea));
+        subset1.add(Edges.directedEdge(xray, pollution));
+        subset1.add(Edges.directedEdge(pollution, xray));
+        subset1.add(Edges.directedEdge(xray , cancer));
+        subset1.add(Edges.directedEdge(cancer, xray));
+        subset1.add(Edges.directedEdge(cancer, pollution));
+        subset1.add(Edges.directedEdge(pollution, cancer));
 
         //Subset 2:
-        subset2.add(new TupleNode(pollution, smoker));
-        subset2.add(new TupleNode(cancer, smoker));
-        subset2.add(new TupleNode(dyspnoea, pollution));
-        subset2.add(new TupleNode(xray, smoker));
-        subset2.add(new TupleNode(xray, dyspnoea));
+        subset2.add(Edges.directedEdge(pollution, smoker));
+        subset2.add(Edges.directedEdge(smoker, pollution));
+        subset2.add(Edges.directedEdge(cancer, smoker));
+        subset2.add(Edges.directedEdge(smoker, cancer));
+        subset2.add(Edges.directedEdge(dyspnoea, pollution));
+        subset2.add(Edges.directedEdge(pollution, dyspnoea));
+        subset2.add(Edges.directedEdge(xray, smoker));
+        subset2.add(Edges.directedEdge(smoker, xray));
+        subset2.add(Edges.directedEdge(xray, dyspnoea));
+        subset2.add(Edges.directedEdge(dyspnoea, xray));
 
     }
 
@@ -223,10 +230,11 @@ public class FESThreadTest {
         // ThFES objects
         String alarmPath = "src/test/resources/alarm.xbif_.csv";
         DataSet alarmDataset = Utils.readData(alarmPath);
-        TupleNode[] listOfArcs = Utils.calculateArcs(alarmDataset);
-        ArrayList<TupleNode>[] subsets = Utils.split(listOfArcs,2,42);
-        ArrayList<TupleNode> subset1 = subsets[0];
-        ArrayList<TupleNode> subset2 = subsets[1];
+        List<Edge> listOfArcs = Utils.calculateArcs(alarmDataset);
+        Utils.setSeed(42);
+        List<List<Edge>> subsets = Utils.split(listOfArcs,2);
+        List<Edge> subset1 = subsets.get(0);
+        List<Edge> subset2 = subsets.get(1);
 
         Problem pAlarm = new Problem(alarmDataset);
         FESThread thread1 = new FESThread(pAlarm, subset1, 100);
@@ -251,12 +259,12 @@ public class FESThreadTest {
     @Test
     public void xAndYAreEqualShouldContinueTest() throws InterruptedException {
         // Arrange
-        TupleNode tuple1 = new TupleNode(this.cancer,this.cancer);
-        TupleNode tuple2 = new TupleNode(this.cancer, this.smoker);
+        Edge edge1 = Edges.directedEdge(this.cancer,this.cancer);
+        Edge edge2 = Edges.directedEdge(this.cancer, this.smoker);
 
-        ArrayList<TupleNode> S = new ArrayList<>();
-        S.add(tuple1);
-        S.add(tuple2);
+        List<Edge> S = new ArrayList<>();
+        S.add(edge1);
+        S.add(edge2);
 
         FESThread fes = new FESThread(problem, S, 100);
         Thread tFES = new Thread(fes);

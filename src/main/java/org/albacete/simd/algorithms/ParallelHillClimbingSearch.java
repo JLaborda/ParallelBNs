@@ -3,13 +3,12 @@ package org.albacete.simd.algorithms;
 import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.threads.*;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ParallelHillClimbingSearch {
 
@@ -51,9 +50,9 @@ public class ParallelHillClimbingSearch {
     private Thread[] threads = null;
 
     /**
-     * Subset of {@link TupleNode TupleNodes}. Each subset will be assigned to {@link GESThread GESThread}
+     * Subsets of {@link Edge Edges}. Each subset will be assigned to {@link GESThread GESThread}
      */
-    private ArrayList<TupleNode>[] subSets = null;
+    private List<List<Edge>> subSets = null;
 
     /**
      * {@link ArrayList ArrayList} of graphs. This contains the list of {@link Graph graphs} created for each stage,
@@ -72,9 +71,9 @@ public class ParallelHillClimbingSearch {
     private int it = 1;
 
     /**
-     * {@link TupleNode TupleNode} array containing the possible list of edges of the resulting bayesian network.
+     * List of {@link Edge Edges} containing the list of all the possible edges for the resulting bayesian network.
      */
-    private TupleNode[] listOfArcs = null;
+    private List<Edge> listOfArcs = null;
 
     private boolean fhcFlag = false;
 
@@ -113,10 +112,10 @@ public class ParallelHillClimbingSearch {
         this.nThreads = nThreads;
         this.gesThreads = new GESThread[this.nThreads];
         this.threads = new Thread[this.nThreads];
-        this.subSets = new ArrayList[this.nThreads];
+        this.subSets = new ArrayList<>(this.nThreads);
 
         //The total number of arcs of a graph is n*(n-1)/2, where n is the number of nodes in the graph.
-        this.listOfArcs = new TupleNode[this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1) / 2];
+        this.listOfArcs = new ArrayList<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1));
     }
 
 
@@ -127,17 +126,17 @@ public class ParallelHillClimbingSearch {
 
         // Initial Configuration: Cases
         //GESThread.setProblem(this.data);
-
         // 1. Calculating Edges
         this.listOfArcs = Utils.calculateArcs(this.problem.getData());
 
         do {
+            try {
             System.out.println("============================");
             System.out.println("Iteration: " + (it));
             System.out.println("============================");
 
             // 2 Random Repartitioning
-            this.subSets = Utils.split(listOfArcs, nThreads, seed);
+            this.subSets = Utils.split(listOfArcs, nThreads);
 
             //System.out.println("----------------------------");
             //System.out.println("Splits: ");
@@ -153,12 +152,8 @@ public class ParallelHillClimbingSearch {
             System.out.println("FHC STAGE");
             System.out.println("----------------------------");
             // 3. FHC
-            try {
-                fhcStage();
-            } catch (InterruptedException e) {
-                System.err.println("Error in FHC Stage");
-                e.printStackTrace();
-            }
+            fhcStage();
+
 
             // Printing
             //System.out.println("Results of FES: ");
@@ -175,17 +170,12 @@ public class ParallelHillClimbingSearch {
             System.out.println("----------------------------");
             this.currentGraph = fusionFHC();
 
-
             // 5. BHC
-            try {
-                System.out.println("----------------------------");
-                System.out.println("BHC STAGE");
-                System.out.println("----------------------------");
-                bhcStage();
-            } catch (InterruptedException e) {
-                System.err.println("Error in BHC Stage");
-                e.printStackTrace();
-            }
+            System.out.println("----------------------------");
+            System.out.println("BHC STAGE");
+            System.out.println("----------------------------");
+            bhcStage();
+
             // 6. BHC Fusion
             System.out.println("----------------------------");
             System.out.println("BHC-Fusion Graph");
@@ -209,6 +199,10 @@ public class ParallelHillClimbingSearch {
             System.out.println(this.currentGraph);
             System.out.println("----------------------------");
 
+            } catch (InterruptedException e) {
+                System.err.println("Interrupted Exception in iteration " + it);
+                e.printStackTrace();
+            }
             // 7. Checking convergence and preparing configurations for the next iteration
         }while(!convergence());
     }
@@ -224,12 +218,12 @@ public class ParallelHillClimbingSearch {
         if (this.currentGraph == null) {
             for (int i = 0; i < this.nThreads; i++) {
                 //System.out.println("Index: " + i);
-                this.gesThreads[i] = new ForwardHillClimbingThread(this.problem,this.subSets[i], this.nItInterleaving);
+                this.gesThreads[i] = new ForwardHillClimbingThread(this.problem,this.subSets.get(i), this.nItInterleaving);
             }
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new ForwardHillClimbingThread(this.problem, this.currentGraph, this.subSets[i], this.nItInterleaving);
+                this.gesThreads[i] = new ForwardHillClimbingThread(this.problem, this.currentGraph, this.subSets.get(i), this.nItInterleaving);
             }
         }
 
@@ -255,9 +249,9 @@ public class ParallelHillClimbingSearch {
         //problem.buildIndexing(currentGraph);
 
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
-        ArrayList<TupleNode>[] subsets_BHC = Utils.split(this.currentGraph.getEdges(), this.nThreads, this.seed);
+        List<List<Edge>> subsets_BHC = Utils.split(this.currentGraph.getEdges(), this.nThreads);
         for (int i = 0; i < this.nThreads; i++) {
-            this.gesThreads[i] = new BackwardsHillClimbingThread(this.problem, this.currentGraph, subsets_BHC[i]);
+            this.gesThreads[i] = new BackwardsHillClimbingThread(this.problem, this.currentGraph, subsets_BHC.get(i));
         }
 
         // Initializing thread config
@@ -338,7 +332,7 @@ public class ParallelHillClimbingSearch {
 
     }
 
-    private Dag fusionFHC(){
+    private Dag fusionFHC() throws InterruptedException{
         // Applying ConsensusUnion fusion
         ConsensusUnion fusion = new ConsensusUnion(this.graphs);
         Graph fusionGraph = fusion.union();
@@ -361,12 +355,13 @@ public class ParallelHillClimbingSearch {
         System.out.println("FHC to obtain the fusion: ");
 
 
-        ArrayList<TupleNode> candidates = new ArrayList<TupleNode>();
+        List<Edge> candidates = new ArrayList<>();
 
 
         for (Edge e: fusionGraph.getEdges()){
             if(this.currentGraph.getEdge(e.getNode1(), e.getNode2())!=null || this.currentGraph.getEdge(e.getNode2(),e.getNode1())!=null ) continue;
-            candidates.add(new TupleNode(e.getNode1(),e.getNode2()));
+            candidates.add(Edges.directedEdge(e.getNode1(),e.getNode2()));
+            candidates.add(Edges.directedEdge(e.getNode2(),e.getNode1()));
         }
 
 
@@ -375,20 +370,18 @@ public class ParallelHillClimbingSearch {
 
         fuse.run();
 
-        try {
-            this.currentGraph = fuse.getCurrentGraph();
-            System.out.println("Score Fusion: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
-            //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-            //System.out.println("Score Fusion sin inconsistencias: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
+
+        this.currentGraph = fuse.getCurrentGraph();
+        System.out.println("Score Fusion: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
+        //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+        //System.out.println("Score Fusion sin inconsistencias: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
+
 
         return new Dag(this.currentGraph);
     }
 
     public Dag fusionIntersection(){
-        ArrayList<Node> order = new ArrayList<Node>(this.currentGraph.getTierOrdering());
+        ArrayList<Node> order = new ArrayList<>(this.currentGraph.getTierOrdering());
         for(Dag g: this.graphs) {
             for(Edge e:g.getEdges()) {
                 if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW))
@@ -424,7 +417,7 @@ public class ParallelHillClimbingSearch {
     }
 
 
-    private Graph fusionBHC() {
+    private Graph fusionBHC()  throws InterruptedException{
 
         Dag fusionGraph = this.fusionIntersection();
 
@@ -444,11 +437,12 @@ public class ParallelHillClimbingSearch {
 
         System.out.println("BHC to obtain the fusion: ");
 
-        ArrayList<TupleNode> candidates = new ArrayList<TupleNode>();
+        List<Edge> candidates = new ArrayList<>();
 
         for (Edge e: this.currentGraph.getEdges()){
             if(fusionGraph.getEdge(e.getNode1(), e.getNode2())==null && fusionGraph.getEdge(e.getNode2(),e.getNode1())==null ) {
-                candidates.add(new TupleNode(e.getNode1(),e.getNode2()));
+                candidates.add(Edges.directedEdge(e.getNode1(),e.getNode2()));
+                candidates.add(Edges.directedEdge(e.getNode2(),e.getNode1()));
             }
         }
         // Quizás sea mejor poner el BES
@@ -457,15 +451,10 @@ public class ParallelHillClimbingSearch {
 
         fuse.run();
 
-        try {
-            this.currentGraph = fuse.getCurrentGraph();
-            System.out.println("Resultado del BHC de la fusion: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
-            //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-            //System.out.println("Resultado del BHC de la fusion tras removeInconsistencies: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
-
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
+        this.currentGraph = fuse.getCurrentGraph();
+        System.out.println("Resultado del BHC de la fusion: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
+        //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+        //System.out.println("Resultado del BHC de la fusion tras removeInconsistencies: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
 
         return new Dag(this.currentGraph);
     }
@@ -501,6 +490,7 @@ public class ParallelHillClimbingSearch {
      */
     public void setSeed(long seed) {
         this.seed = seed;
+        Utils.setSeed(seed);
     }
 
     /**
@@ -513,17 +503,17 @@ public class ParallelHillClimbingSearch {
 
     /**
      * Gets the list of possible edges of the problem
-     * @return array of {@link TupleNode TupleNode} representing all the possible edges of the problem.
+     * @return List of {@link Edge Edges} representing all the possible edges of the problem.
      */
-    public TupleNode[] getListOfArcs() {
+    public List<Edge> getListOfArcs() {
         return listOfArcs;
     }
 
     /**
      * Gets the current subsets of edges.
-     * @return array of ArrayList of {@link TupleNode TupleNode} containing the edges of each subset.
+     * @return List of Lists of {@link Edge Edges} containing the edges of each subset.
      */
-    public ArrayList<TupleNode>[] getSubSets() {
+    public List<List<Edge>> getSubSets() {
         return subSets;
     }
 

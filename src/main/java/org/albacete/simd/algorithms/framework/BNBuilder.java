@@ -2,15 +2,16 @@ package org.albacete.simd.algorithms.framework;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 // Ideas para el futuro
 public abstract class BNBuilder {
@@ -46,9 +47,9 @@ public abstract class BNBuilder {
     private Thread[] threads = null;
 
     /**
-     * Subset of {@link TupleNode TupleNodes}. Each subset will be assigned to {@link GESThread GESThread}
+     * Subset of {@link Edge Edges}. Each subset will be assigned to {@link GESThread GESThread}
      */
-    private ArrayList<TupleNode>[] subSets = null;
+    private List<List<Edge>> subSets = null;
 
     /**
      * {@link ArrayList ArrayList} of graphs. This contains the list of {@link Graph graphs} created for each stage,
@@ -67,9 +68,9 @@ public abstract class BNBuilder {
     private int it = 1;
 
     /**
-     * {@link TupleNode TupleNode} array containing the possible list of edges of the resulting bayesian network.
+     * {@link Edge Edge} list containing the possible list of edges of the resulting bayesian network.
      */
-    private TupleNode[] listOfArcs;
+    private List<Edge> listOfArcs;
 
     private ArrayList<Stage> stages;
 
@@ -89,10 +90,10 @@ public abstract class BNBuilder {
         this.nThreads = nThreads;
         this.gesThreads = new FESThread[this.nThreads];
         this.threads = new Thread[this.nThreads];
-        this.subSets = new ArrayList[this.nThreads];
+        this.subSets = new ArrayList(this.nThreads);
 
         //The total number of arcs of a graph is n*(n-1)/2, where n is the number of nodes in the graph.
-        this.listOfArcs = new TupleNode[this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1) / 2];
+        this.listOfArcs = new ArrayList<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1));
     }
 
     private boolean convergence(){

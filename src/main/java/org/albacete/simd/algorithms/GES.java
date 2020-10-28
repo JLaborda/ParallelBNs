@@ -1,12 +1,12 @@
 package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
+import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.TupleNode;
 import org.albacete.simd.utils.Utils;
 
 import java.util.*;
@@ -20,18 +20,15 @@ public class GES {
     private double modelBDeu;
 
     private int maxIt = 15;
-    private ArrayList<TupleNode> combinations = new ArrayList<>();
+    private List<Edge> combinations;
     private Graph graph;
     private Problem problem;
 
 
     public GES(DataSet dataSet){
 
-        problem = new Problem(dataSet);
-        // Getting the complete set of arc combinations.
-        TupleNode[] arcs = Utils.calculateArcs(problem.getData());
-        Collections.addAll(combinations, arcs);
-
+        this.problem = new Problem(dataSet);
+        this.combinations = Utils.calculateArcs(problem.getData());
         this.initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
 
     }

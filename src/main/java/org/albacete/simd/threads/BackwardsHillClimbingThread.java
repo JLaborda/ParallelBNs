@@ -3,7 +3,6 @@ package org.albacete.simd.threads;
 import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.TupleNode;
 
 import java.util.*;
 
@@ -18,7 +17,7 @@ public class BackwardsHillClimbingThread extends GESThread {
      * @param initialDag initial DAG with which the FES stage starts with, if it's null, use the other constructor
      * @param subset     subset of edges the fes stage will try to add to the resulting graph
      */
-    public BackwardsHillClimbingThread(Problem problem, Graph initialDag, ArrayList<TupleNode> subset) {
+    public BackwardsHillClimbingThread(Problem problem, Graph initialDag, List<Edge> subset) {
         this.problem = problem;
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
@@ -33,7 +32,7 @@ public class BackwardsHillClimbingThread extends GESThread {
      * @param problem object containing information of the problem such as data or variables.
      * @param subset  subset of edges the fes stage will try to add to the resulting graph
      */
-    public BackwardsHillClimbingThread(Problem problem, ArrayList<TupleNode> subset) {
+    public BackwardsHillClimbingThread(Problem problem, List<Edge> subset) {
         this.problem = problem;
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
@@ -86,19 +85,8 @@ public class BackwardsHillClimbingThread extends GESThread {
 
 
         double bestScore = score;
-        List<Edge> edges = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>(this.S);
 
-        for (TupleNode tupleNode : this.S) {
-            Node _x = tupleNode.x;
-            Node _y = tupleNode.y;
-
-            if (_x == _y)
-                continue;
-
-            // Adding Edges to check
-            edges.add(Edges.directedEdge(_x, _y));
-            edges.add(Edges.directedEdge(_y, _x));
-        }
 
 
         System.out.println("[BHC " + getId() + "]" + " Number of edges to check: " + edges.size());
