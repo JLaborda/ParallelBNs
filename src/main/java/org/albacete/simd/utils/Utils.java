@@ -71,11 +71,9 @@ public class Utils {
         //2. Iterate over variables and save pairs
         for(int i=0; i<data.getNumColumns()-1; i++){
             for(int j=i+1; j<data.getNumColumns(); j++){
-                // Getting pair of variables
+                // Getting pair of variables (Each variable is different)
                 Node var_A = variables.get(i);
                 Node var_B = variables.get(j);
-                if(var_A == var_B)
-                    continue;
 
                 //3. Storing both pairs
                 listOfArcs.add(Edges.directedEdge(var_A,var_B));

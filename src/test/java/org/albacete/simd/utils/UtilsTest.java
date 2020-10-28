@@ -17,6 +17,17 @@ import java.util.*;
 public class UtilsTest {
 
 
+    final String path1 = "src/test/resources/repeatedNames.csv";
+    final String path2 = "src/test/resources/cancer.xbif_.csv";
+    /**
+     * Dataset created from the data file1
+     */
+    //final DataSet datasetRepeated = Utils.readData(path1);
+    final DataSet dataset = Utils.readData(path2);
+
+
+
+
     /**
      * Tests that a Utils object can be created
      * @result  Utils object not null
@@ -38,7 +49,7 @@ public class UtilsTest {
      * @result An ArrayList with two subset of TupleNode
      */
     @Test
-    public void splitTupleNodesTest(){
+    public void splitTest(){
         //Arrange
         Node n1 = new GraphNode("n1");
         Node n2 = new GraphNode("n2");
@@ -56,30 +67,6 @@ public class UtilsTest {
 
     }
 
-
-    /**
-     * Tests that the method split for edges splits a List of Edges into two subsets correctly.
-     * @result An ArrayList with two subset of TupleNode
-     */
-    @Test
-    public void splitEdgesTest(){
-        //Arrange
-        Node n1 = new GraphNode("n1");
-        Node n2 = new GraphNode("n2");
-        Node n3 = new GraphNode("n3");
-        List<Edge> edges = Arrays.asList(new Edge(n1, n2, Endpoint.TAIL, Endpoint.ARROW),
-                new Edge(n1, n3, Endpoint.TAIL, Endpoint.ARROW));
-        int seed = 42;
-        int expectedSize = 2;
-
-        //Act
-        Utils.setSeed(42);
-        List<List<Edge>> result = Utils.split(edges, 2);
-
-        //Assert
-        assertEquals(expectedSize, result.size());
-
-    }
 
     /**
      * Tests that the method readData loads data correctly into a DataSet.
@@ -295,6 +282,34 @@ public class UtilsTest {
         assertTrue(result2.containsEdge(e2));
         assertTrue(result2.containsEdge(e3));
 
+
+    }
+
+    @Test
+    public void calculateArcsTest(){
+
+        // Checking cancer dataset
+        //Arrange
+        Node xray = dataset.getVariable("Xray");
+        Node cancer = dataset.getVariable("Cancer");
+        Node pollution = dataset.getVariable("Pollution");
+        Node smoker = dataset.getVariable("Smoker");
+        Node dypnoea = dataset.getVariable("Dyspnoea");
+
+        List<Edge> expected = Arrays.asList(
+                Edges.directedEdge(xray, smoker), Edges.directedEdge(xray, cancer), Edges.directedEdge(xray, pollution), Edges.directedEdge(xray, dypnoea),
+                Edges.directedEdge(smoker, xray), Edges.directedEdge(cancer, xray), Edges.directedEdge(pollution, xray), Edges.directedEdge(dypnoea, xray),
+                Edges.directedEdge(smoker, cancer), Edges.directedEdge(smoker, pollution), Edges.directedEdge(smoker, dypnoea),
+                Edges.directedEdge(cancer, smoker), Edges.directedEdge(pollution, smoker), Edges.directedEdge(dypnoea, smoker),
+                Edges.directedEdge(cancer, pollution), Edges.directedEdge(cancer, dypnoea),
+                Edges.directedEdge(pollution, cancer), Edges.directedEdge(dypnoea, cancer),
+                Edges.directedEdge(pollution, dypnoea), Edges.directedEdge(dypnoea, pollution)
+        );
+        //Act
+        List<Edge> result = Utils.calculateArcs(dataset);
+        for(Edge e: result){
+            assertTrue(expected.contains(e));
+        }
 
     }
 

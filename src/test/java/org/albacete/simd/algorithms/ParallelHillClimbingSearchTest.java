@@ -211,6 +211,20 @@ public class ParallelHillClimbingSearchTest {
 
     }
 
+    @Test
+    public void searchAlarmTest(){
+        //Arrange
+        String alarmPath = "src/test/resources/alarm.xbif_.csv";
+        ParallelHillClimbingSearch pGESv2 = new ParallelHillClimbingSearch(alarmPath, 2);
+
+        // Act
+        pGESv2.search();
+
+        //Assert
+        assertNotEquals(null, pGESv2.getCurrentGraph());
+        assertNotEquals(1, pGESv2.getIterations());
+    }
+
 
     @Test
     public void gettersTest(){
@@ -223,6 +237,26 @@ public class ParallelHillClimbingSearchTest {
         assertEquals(dataset, phc1.getProblem().getData());
 
 
+    }
+    @Test
+    public void convergenceTest(){
+        //Arrange
+        DataSet datasetAlarm = Utils.readData("src/test/resources/alarm.xbif_.csv");
+        ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
+        phc1.setMaxIterations(2);
+        //Act
+        phc1.search();
+        //Assert
+        assertEquals(2,phc1.getIterations());
+
+    }
+
+    @Test
+    public void interruptedExceptionTest(){
+        DataSet datasetAlarm = Utils.readData("src/test/resources/alarm.xbif_.csv");
+        ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
+        phc1.setMaxIterations(30);
+        phc1.search();
     }
 
 

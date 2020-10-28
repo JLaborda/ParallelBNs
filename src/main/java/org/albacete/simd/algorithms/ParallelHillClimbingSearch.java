@@ -130,6 +130,7 @@ public class ParallelHillClimbingSearch {
         this.listOfArcs = Utils.calculateArcs(this.problem.getData());
 
         do {
+            try {
             System.out.println("============================");
             System.out.println("Iteration: " + (it));
             System.out.println("============================");
@@ -151,12 +152,8 @@ public class ParallelHillClimbingSearch {
             System.out.println("FHC STAGE");
             System.out.println("----------------------------");
             // 3. FHC
-            try {
-                fhcStage();
-            } catch (InterruptedException e) {
-                System.err.println("Error in FHC Stage");
-                e.printStackTrace();
-            }
+            fhcStage();
+
 
             // Printing
             //System.out.println("Results of FES: ");
@@ -173,17 +170,12 @@ public class ParallelHillClimbingSearch {
             System.out.println("----------------------------");
             this.currentGraph = fusionFHC();
 
-
             // 5. BHC
-            try {
-                System.out.println("----------------------------");
-                System.out.println("BHC STAGE");
-                System.out.println("----------------------------");
-                bhcStage();
-            } catch (InterruptedException e) {
-                System.err.println("Error in BHC Stage");
-                e.printStackTrace();
-            }
+            System.out.println("----------------------------");
+            System.out.println("BHC STAGE");
+            System.out.println("----------------------------");
+            bhcStage();
+
             // 6. BHC Fusion
             System.out.println("----------------------------");
             System.out.println("BHC-Fusion Graph");
@@ -207,6 +199,10 @@ public class ParallelHillClimbingSearch {
             System.out.println(this.currentGraph);
             System.out.println("----------------------------");
 
+            } catch (InterruptedException e) {
+                System.err.println("Interrupted Exception in iteration " + it);
+                e.printStackTrace();
+            }
             // 7. Checking convergence and preparing configurations for the next iteration
         }while(!convergence());
     }
@@ -336,7 +332,7 @@ public class ParallelHillClimbingSearch {
 
     }
 
-    private Dag fusionFHC(){
+    private Dag fusionFHC() throws InterruptedException{
         // Applying ConsensusUnion fusion
         ConsensusUnion fusion = new ConsensusUnion(this.graphs);
         Graph fusionGraph = fusion.union();
@@ -374,20 +370,18 @@ public class ParallelHillClimbingSearch {
 
         fuse.run();
 
-        try {
-            this.currentGraph = fuse.getCurrentGraph();
-            System.out.println("Score Fusion: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
-            //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-            //System.out.println("Score Fusion sin inconsistencias: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
+
+        this.currentGraph = fuse.getCurrentGraph();
+        System.out.println("Score Fusion: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
+        //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+        //System.out.println("Score Fusion sin inconsistencias: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
+
 
         return new Dag(this.currentGraph);
     }
 
     public Dag fusionIntersection(){
-        ArrayList<Node> order = new ArrayList<Node>(this.currentGraph.getTierOrdering());
+        ArrayList<Node> order = new ArrayList<>(this.currentGraph.getTierOrdering());
         for(Dag g: this.graphs) {
             for(Edge e:g.getEdges()) {
                 if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW))
@@ -423,7 +417,7 @@ public class ParallelHillClimbingSearch {
     }
 
 
-    private Graph fusionBHC() {
+    private Graph fusionBHC()  throws InterruptedException{
 
         Dag fusionGraph = this.fusionIntersection();
 
@@ -457,15 +451,10 @@ public class ParallelHillClimbingSearch {
 
         fuse.run();
 
-        try {
-            this.currentGraph = fuse.getCurrentGraph();
-            System.out.println("Resultado del BHC de la fusion: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
-            //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-            //System.out.println("Resultado del BHC de la fusion tras removeInconsistencies: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
-
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
+        this.currentGraph = fuse.getCurrentGraph();
+        System.out.println("Resultado del BHC de la fusion: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
+        //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+        //System.out.println("Resultado del BHC de la fusion tras removeInconsistencies: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
 
         return new Dag(this.currentGraph);
     }
