@@ -1,4 +1,4 @@
-package org.albacete.simd.algorithms.framework;
+package org.albacete.simd.algorithms.framework.stages;
 
 
 import edu.cmu.tetrad.graph.Dag;
