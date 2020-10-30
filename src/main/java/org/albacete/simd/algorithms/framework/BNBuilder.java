@@ -96,7 +96,7 @@ public abstract class BNBuilder {
         this.nThreads = nThreads;
         this.gesThreads = new FESThread[this.nThreads];
         this.threads = new Thread[this.nThreads];
-        this.subSets = new ArrayList(this.nThreads);
+        this.subSets = new ArrayList<>(this.nThreads);
 
         //The total number of arcs of a graph is n*(n-1)/2, where n is the number of nodes in the graph.
         this.listOfArcs = new ArrayList<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1));

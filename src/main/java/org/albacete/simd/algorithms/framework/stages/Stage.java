@@ -2,32 +2,44 @@ package org.albacete.simd.algorithms.framework.stages;
 
 
 import edu.cmu.tetrad.graph.Dag;
-import org.albacete.simd.threads.BESThread;
-import org.albacete.simd.threads.FESThread;
-import org.albacete.simd.threads.GESThread;
+import edu.cmu.tetrad.graph.Graph;
+import org.albacete.simd.utils.Problem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // IDEAS para el futuro
 public abstract class Stage {
 
+    protected Problem problem;
+
+    protected Graph currentGraph;
 
     /**
-     * The {@link GESThread GESThread} array that will be executed in each stage.
-     * They can either be {@link FESThread ThFES} or {@link BESThread ThBES} threads.
+     * {@link ArrayList ArrayList} of graphs. This contains the list of {@link Graph graphs} created for each stage,
+     * just before the fusion is done.
      */
-    private GESThread[] gesThreads = null;
+    protected ArrayList<Dag> graphs = null;
 
-    /**
-     * The {@link Thread Thread} array that encapsulate the {@link GESThread GESThread} for each stage.
-     */
-    private Thread[] threads = null;
+    public Stage(Problem problem){
+        this.problem = problem;
+        this.currentGraph = null;
+    }
 
-
-
-    public boolean flag = false;
-
-    public abstract Dag run();
-
+    public Stage(Problem problem, Graph currentGraph){
+        this.problem = problem;
+        this.currentGraph = currentGraph;
+    }
 
 
+    public abstract boolean run() throws InterruptedException;
 
+
+    public ArrayList<Dag> getGraphs() {
+        return graphs;
+    }
+
+    public Graph getCurrentGraph(){
+        return currentGraph;
+    }
 }
