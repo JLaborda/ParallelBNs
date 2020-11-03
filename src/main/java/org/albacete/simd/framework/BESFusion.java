@@ -1,25 +1,21 @@
-package org.albacete.simd.algorithms.framework.stages;
+package org.albacete.simd.framework;
 
-import edu.cmu.tetrad.graph.Dag;
-import edu.cmu.tetrad.graph.Edge;
-import edu.cmu.tetrad.graph.Edges;
-import edu.cmu.tetrad.graph.Graph;
-import org.albacete.simd.threads.BackwardsHillClimbingThread;
+import edu.cmu.tetrad.graph.*;
+import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
+import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BHCFusion extends FusionStage{
-
-    public BHCFusion(Problem problem, Graph currentGraph, ArrayList<Dag> graphs) {
+public class BESFusion extends FusionStage{
+    public BESFusion(Problem problem, Graph currentGraph, ArrayList<Dag> graphs) {
         super(problem, currentGraph, graphs);
     }
 
     @Override
-    protected Dag fusion() throws InterruptedException {
-
+    protected Dag fusion() {
         Dag fusionGraph = this.fusionIntersection();
 
         // Getting Scores
@@ -36,7 +32,7 @@ public class BHCFusion extends FusionStage{
             return (Dag) this.currentGraph;
         }
 
-        System.out.println("BHC to obtain the fusion: ");
+        System.out.println("BES to obtain the fusion: ");
 
         List<Edge> candidates = new ArrayList<>();
 
@@ -46,18 +42,22 @@ public class BHCFusion extends FusionStage{
                 candidates.add(Edges.directedEdge(e.getNode2(),e.getNode1()));
             }
         }
-        // Quizás sea mejor poner el BES
-        //BESThread fuse = new BESThread(this.problem, this.currentGraph, candidates);
-        BackwardsHillClimbingThread fuse = new BackwardsHillClimbingThread(this.problem,this.currentGraph,candidates);
+
+
+
+        BESThread fuse = new BESThread(this.problem,this.currentGraph,candidates);
 
         fuse.run();
 
-        this.currentGraph = fuse.getCurrentGraph();
-        System.out.println("Resultado del BHC de la fusion: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
-        //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-        //System.out.println("Resultado del BHC de la fusion tras removeInconsistencies: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
+        try {
+            this.currentGraph = fuse.getCurrentGraph();
+            System.out.println("Resultado del BES de la fusion: "+ BESThread.scoreGraph(this.currentGraph, problem));
+            this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+            System.out.println("Score Fusion sin inconsistencias: "+ BESThread.scoreGraph(this.currentGraph, problem));
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
 
         return new Dag(this.currentGraph);
-
     }
 }

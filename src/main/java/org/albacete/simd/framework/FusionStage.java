@@ -1,11 +1,9 @@
-package org.albacete.simd.algorithms.framework.stages;
+package org.albacete.simd.framework;
 
 import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.algorithms.framework.stages.Stage;
 import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public abstract class FusionStage extends Stage {
 

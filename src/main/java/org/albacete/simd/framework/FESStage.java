@@ -1,10 +1,8 @@
-package org.albacete.simd.algorithms.framework.stages;
+package org.albacete.simd.framework;
 
-import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.threads.FESThread;
-import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;

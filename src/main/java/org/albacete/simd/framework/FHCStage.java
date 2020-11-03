@@ -1,22 +1,20 @@
-package org.albacete.simd.algorithms.framework.stages;
+package org.albacete.simd.framework;
 
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
-import org.albacete.simd.threads.BackwardsHillClimbingThread;
-import org.albacete.simd.threads.GESThread;
+import org.albacete.simd.threads.ForwardHillClimbingThread;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BHCStage extends ThreadStage {
+public class FHCStage extends ThreadStage {
 
-    public BHCStage(Problem problem, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
+    public FHCStage(Problem problem, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
         super(problem, nThreads, itInterleaving, subsets);
     }
 
-    public BHCStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
+    public FHCStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
         super(problem, currentGraph, nThreads, itInterleaving, subsets);
     }
 
@@ -24,20 +22,26 @@ public class BHCStage extends ThreadStage {
     protected void config() {
         // Initializing Graphs structure
         this.graphs = new ArrayList<>();
-        this.gesThreads = new GESThread[this.nThreads];
 
         // Rebuilding hashIndex
         //problem.buildIndexing(currentGraph);
 
-        // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
-        List<List<Edge>> subsets_BHC = Utils.split(this.currentGraph.getEdges(), this.nThreads);
-        for (int i = 0; i < this.nThreads; i++) {
-            this.gesThreads[i] = new BackwardsHillClimbingThread(this.problem, this.currentGraph, subsets_BHC.get(i));
+        // Creating each ThFES runnable
+        if (this.currentGraph == null) {
+            for (int i = 0; i < this.nThreads; i++) {
+                //System.out.println("Index: " + i);
+                this.gesThreads[i] = new ForwardHillClimbingThread(this.problem,this.subsets.get(i), this.itInterleaving);
+            }
+        }
+        else{
+            for (int i = 0; i < this.nThreads; i++) {
+                this.gesThreads[i] = new ForwardHillClimbingThread(this.problem, this.currentGraph, this.subsets.get(i), this.itInterleaving);
+            }
         }
 
         // Initializing thread config
         for(int i = 0 ; i< this.nThreads; i++){
-            // Resetting the  search flag
+            // Resetting the search flag
             this.gesThreads[i].resetFlag();
             this.threads[i] = new Thread(this.gesThreads[i]);
         }

@@ -1,4 +1,4 @@
-package org.albacete.simd.algorithms.framework;
+package org.albacete.simd.framework;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Dag;

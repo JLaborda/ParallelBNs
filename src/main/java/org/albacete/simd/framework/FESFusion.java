@@ -1,4 +1,4 @@
-package org.albacete.simd.algorithms.framework.stages;
+package org.albacete.simd.framework;
 
 import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.graph.Dag;

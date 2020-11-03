@@ -1,9 +1,8 @@
-package org.albacete.simd.algorithms.framework.stages;
+package org.albacete.simd.framework;
 
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
-import org.albacete.simd.algorithms.GES;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.threads.GESThread;
@@ -43,6 +42,7 @@ public abstract class ThreadStage extends Stage{
 
     public ThreadStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
         super(problem, currentGraph);
+        this.currentGraph = currentGraph;
         this.nThreads = nThreads;
         this.threads = new Thread[nThreads];
         this.gesThreads = new GESThread[nThreads];

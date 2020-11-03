@@ -2,7 +2,7 @@ package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
-import org.albacete.simd.algorithms.framework.BNBuilder;
+import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.threads.BackwardsHillClimbingThread;
 import org.albacete.simd.threads.ForwardHillClimbingThread;
 import org.albacete.simd.utils.Utils;

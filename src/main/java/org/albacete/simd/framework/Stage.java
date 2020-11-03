@@ -1,4 +1,4 @@
-package org.albacete.simd.algorithms.framework.stages;
+package org.albacete.simd.framework;
 
 
 import edu.cmu.tetrad.graph.Dag;
@@ -6,14 +6,13 @@ import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;
-import java.util.List;
 
 // IDEAS para el futuro
 public abstract class Stage {
 
     protected Problem problem;
 
-    protected Graph currentGraph;
+    Graph currentGraph;
 
     /**
      * {@link ArrayList ArrayList} of graphs. This contains the list of {@link Graph graphs} created for each stage,

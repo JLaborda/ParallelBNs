@@ -1,17 +1,8 @@
 package org.albacete.simd.algorithms;
 
-import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.algorithms.framework.BNBuilder;
-import org.albacete.simd.algorithms.framework.stages.*;
-import org.albacete.simd.threads.BESThread;
-import org.albacete.simd.threads.ForwardHillClimbingThread;
-import org.albacete.simd.threads.GESThread;
+import org.albacete.simd.framework.*;
 import org.albacete.simd.utils.Utils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ParallelFHCBES extends BNBuilder {
 
