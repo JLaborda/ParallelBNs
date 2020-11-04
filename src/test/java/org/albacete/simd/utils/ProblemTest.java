@@ -41,6 +41,8 @@ public class ProblemTest {
         List<Node> variables = problem.getVariables();
         DataSet data = problem.getData();
         LocalScoreCacheConcurrent cache = problem.getLocalScoreCache();
+        problem.setSamplePrior(20);
+        problem.setStructurePrior(0.002);
         double samplePrior = problem.getSamplePrior();
         double structurePrior = problem.getStructurePrior();
         int [][] cases = problem.getCases();
@@ -98,11 +100,29 @@ public class ProblemTest {
         }
 
         //Checking samplePrior
-        assertEquals(10.0, samplePrior, 0.0001);
+        assertEquals(20.0, samplePrior, 0.0001);
         //Checking structurePrior
 
-        assertEquals(0.001, structurePrior, 0.0001);
+        assertEquals(0.002, structurePrior, 0.0001);
 
     }
+
+    @Test
+    public void equalsTest(){
+        String path1 = "src/test/resources/cancer.xbif_.csv";
+        String path2 = "src/test/resources/alarm.xbif_.csv";
+        Problem p = new Problem(path1);
+        Problem p2 = new Problem(path2);
+        Problem p3 = p;
+        Problem p4 = new Problem(path1);
+        Object obj1 = new Object();
+        assertTrue(p.equals(p3));
+        assertFalse(p.equals(p2));
+        assertFalse(p.equals(null));
+        assertTrue(p.equals(p4));
+        assertFalse(p.equals(obj1));
+
+    }
+
 
 }
