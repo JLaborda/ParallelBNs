@@ -135,18 +135,6 @@ public abstract class BNBuilder {
         }while(!convergence());
     }
 
-    public boolean checkWorkingStatus() throws InterruptedException {
-        for (GESThread g: gesThreads) {
-            if (g.getFlag() ){
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-
-
     /**
      * Sets the seed for the random generator.
      * @param seed seed used for the random number generator.
@@ -206,10 +194,10 @@ public abstract class BNBuilder {
 
     /**
      * Sets the maximum number of iterations for each {@link FESThread ThFES}.
-     * @param nFESItInterleaving maximum number of iterations used in each {@link FESThread ThFES}.
+     * @param nItInterleaving maximum number of iterations used in each {@link FESThread ThFES}.
      */
-    public void setNFESItInterleaving(int nFESItInterleaving) {
-        this.nItInterleaving = nFESItInterleaving;
+    public void setnItInterleaving(int nItInterleaving) {
+        this.nItInterleaving = nItInterleaving;
     }
 
     /**
