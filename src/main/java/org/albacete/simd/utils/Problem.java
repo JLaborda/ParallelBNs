@@ -112,6 +112,21 @@ public class Problem {
         }
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj){
+            return true;
+        }
+        if (obj == null){
+            return false;
+        }
+        if (obj instanceof Problem){
+            Problem p = (Problem) obj;
+            return data.equals(p.getData());
+        }
+        return false;
+
+    }
 
     public DataSet getData() {
         return data;
