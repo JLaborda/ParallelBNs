@@ -89,7 +89,7 @@ public class ExperimentSmallMediumSet {
         int[] nThreads = {1,2,4,8};
         int[] nInterleavings = {5, 10, 15};
 
-        Experiment.runAllExperiments(nThreads, nInterleavings, map);
+        //Experiment.runAllExperiments(nThreads, nInterleavings, map);
     }
 
 
