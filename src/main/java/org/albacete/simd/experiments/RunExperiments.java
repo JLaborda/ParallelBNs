@@ -64,8 +64,8 @@ public class RunExperiments {
             String netPath = networksFolder + net + endingNetwork;
             String bbddPath50k = bbddFolder + net + endingbbdd50k;
             String bbddPath10k = bbddFolder + net + endingbbdd10k;
-            for(int nThread: threads){
-                for(int interleaving : interleavings){
+            for(int interleaving: interleavings){
+                for(int nThread : threads){
                     //pges
                     experiment = new ExperimentPGES(netPath, bbddPath50k, nThread, maxIterations, interleaving);
                     runAndSaveExperiment(experiment);
@@ -83,13 +83,13 @@ public class RunExperiments {
                     runAndSaveExperiment(experiment);
                     experiment = new ExperimentPFHCBES(netPath, bbddPath10k, nThread, maxIterations, interleaving);
                     runAndSaveExperiment(experiment);
-
-                    // hc
-                    experiment = new ExperimentHC(netPath, bbddPath50k, nThread, maxIterations, interleaving);
-                    runAndSaveExperiment(experiment);
-                    experiment = new ExperimentHC(netPath, bbddPath10k, nThread, maxIterations, interleaving);
-                    runAndSaveExperiment(experiment);
                 }
+
+                // hc
+                experiment = new ExperimentHC(netPath, bbddPath50k, 0, maxIterations, interleaving);
+                runAndSaveExperiment(experiment);
+                experiment = new ExperimentHC(netPath, bbddPath10k, 0, maxIterations, interleaving);
+                runAndSaveExperiment(experiment);
             }
             //ges
             experiment = new ExperimentGES(netPath, bbddPath50k);
@@ -103,7 +103,7 @@ public class RunExperiments {
 
     public static void main(String[] args) throws FileNotFoundException {
 
-        String net_name = "water";
+        String net_name = "alarm";
         String fileName = "outputs/output_experiments_" + net_name + ".txt";
         PrintStream fileStream = new PrintStream(fileName);
         System.setOut(fileStream);

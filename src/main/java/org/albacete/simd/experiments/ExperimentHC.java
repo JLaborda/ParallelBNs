@@ -57,7 +57,7 @@ public class ExperimentHC extends Experiment {
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new HillClimbingSearch(dataSet, nThreads, maxIterations, nItInterleaving);
+            this.alg = new HillClimbingSearch(dataSet, maxIterations, nItInterleaving);
 
             // Search is executed
             alg.search();
