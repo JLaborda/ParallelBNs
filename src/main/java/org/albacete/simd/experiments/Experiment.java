@@ -297,50 +297,9 @@ public abstract class Experiment {
         return nIterations;
     }
 
-//
-//    public static void main(String[] args) {
-//
-//            String netPath = "";
-//            String bbddPath = "";
-//            int nThreads = 0;
-//            int nInterleaving = 0;
-//            Experiment experiment = null;
-//            if (args.length == 4) {
-//                netPath = args[0];
-//                bbddPath = args[1];
-//                nThreads = Integer.parseInt(args[2]);
-//                nInterleaving = Integer.parseInt(args[3]);
-//
-//                experiment = new Experiment(netPath, bbddPath, nThreads, 15, nInterleaving);
-//
-//            }
-//            else if(args.length == 2){
-//                netPath = args[0];
-//                bbddPath = args[1];
-//                experiment = new ExperimentGES(netPath, bbddPath);
-//
-//            }
-//            else{
-//                System.err.println("Error, the number of arguments is incorrect. Use 4 (netPath, bbddPath, nThreads, nInterleaving) if you want to test the pGESv2 algorithm, or 2 (netPath, bbddPath) if you want to test the control GES algorithm");
-//                System.exit(-1);
-//            }
-//            //Experiment experiment = new Experiment("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv", 2, 5);
-//
-//            if(netPath.equals("") || bbddPath.equals("") ){
-//                System.err.println("Error, netPath or bbddPath has not been initialized.");
-//                System.exit(-1);
-//            }
-//            System.out.println("Arguments length: " + args.length);
-//            System.out.println("net: " + netPath);
-//            System.out.println("bbdd: " + bbddPath);
-//
-//            // Running Experiment
-//            experiment.runExperiment();
-//            //Saving Experiment
-//            experiment.saveExperiment();
-//
-//
-//    }
+    public int getnItInterleaving() {
+        return nItInterleaving;
+    }
 
     public String getAlgName() {
         return algName;

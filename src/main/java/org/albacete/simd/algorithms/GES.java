@@ -38,13 +38,16 @@ public class GES {
         this.initialDag = initialDag;
     }
 
-    /**
+/*
+    */
+/**
      * Greedy equivalence search: Start from the empty graph, add edges till
      * model is significant. Then start deleting edges till a minimum is
      * achieved.
      *
      * @return the resulting Pattern.
-     */
+     *//*
+
     public Graph search() throws InterruptedException {
         long startTime = System.currentTimeMillis();
 
@@ -79,6 +82,50 @@ public class GES {
 
         return graph;
     }
+*/
+
+    /**
+     * Greedy equivalence search: Start from the empty graph, add edges till
+     * model is significant. Then start deleting edges till a minimum is
+     * achieved.
+     *
+     * @return the resulting Pattern.
+     */
+    public Graph search(int interleaving) throws InterruptedException {
+        long startTime = System.currentTimeMillis();
+
+
+        //buildIndexing(graph);
+
+        // Method 1-- original.
+        double score = 0;
+
+        // Doing forward search
+        System.out.println("FES stage: ");
+        fes = new FESThread(problem, combinations, interleaving);
+        fes.run();
+        graph = fes.getCurrentGraph();
+
+
+        // Doing backward search
+        System.out.println("BES stage: ");
+        bes = new BESThread(problem, graph, combinations);
+        bes.run();
+        graph = bes.getCurrentGraph();
+        score = bes.getScoreBDeu();
+
+        // Transforming the resulting graph into a DAG
+        graph = Utils.removeInconsistencies(graph);
+
+        // Measuring stats
+        long endTime = System.currentTimeMillis();
+        this.elapsedTime = endTime - startTime;
+        this.modelBDeu = score;
+
+
+        return graph;
+    }
+
 
 
     public synchronized Graph getCurrentGraph() throws InterruptedException {

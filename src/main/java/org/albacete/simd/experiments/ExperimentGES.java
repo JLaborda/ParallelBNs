@@ -21,10 +21,15 @@ public class ExperimentGES extends Experiment{
 
     private GES alg;
 
-    public ExperimentGES(String net_path, String bbdd_path) {
-        super(net_path, bbdd_path, 0, 0);
+    public ExperimentGES(String net_path, String bbdd_path, int nItInterleaving){
+        super(net_path, bbdd_path, 0, nItInterleaving);
         algName = "ges";
     }
+
+    public ExperimentGES(String net_path, String bbdd_path) {
+        this(net_path, bbdd_path, 100);
+    }
+
 
 
 
@@ -57,8 +62,8 @@ public class ExperimentGES extends Experiment{
             this.alg = new GES(dataSet);
 
             // Search is executed
-            alg.search();
-
+            //alg.search();
+            alg.search(getnItInterleaving());
             // Measuring time
             long endTime = System.currentTimeMillis();
 

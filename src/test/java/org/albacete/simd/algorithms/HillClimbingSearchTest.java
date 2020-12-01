@@ -12,8 +12,8 @@ public class HillClimbingSearchTest {
     public void constructorTest(){
         String path = "src/test/resources/alarm.xbif_.csv";
         Problem problem = new Problem(path);
-        HillClimbingSearch hc1 = new HillClimbingSearch(path,2,15,5);
-        HillClimbingSearch hc2 = new HillClimbingSearch(problem.getData(), 2, 15, 5);
+        HillClimbingSearch hc1 = new HillClimbingSearch(path,15,5);
+        HillClimbingSearch hc2 = new HillClimbingSearch(problem.getData(), 15, 5);
 
         assertNotNull(hc1);
         assertNotNull(hc2);
@@ -29,7 +29,7 @@ public class HillClimbingSearchTest {
     @Test
     public void searchTest(){
         String path = "src/test/resources/alarm.xbif_.csv";
-        HillClimbingSearch hc1 = new HillClimbingSearch(path,2,15,5);
+        HillClimbingSearch hc1 = new HillClimbingSearch(path,15,5);
 
         hc1.search();
 
@@ -40,7 +40,7 @@ public class HillClimbingSearchTest {
     @Test
     public void convergenceTest(){
         String path = "src/test/resources/alarm.xbif_.csv";
-        HillClimbingSearch hc1 = new HillClimbingSearch(path,2,1,5);
+        HillClimbingSearch hc1 = new HillClimbingSearch(path,1,5);
 
         hc1.search();
 

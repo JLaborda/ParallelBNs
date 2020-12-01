@@ -103,7 +103,7 @@ public class RunExperiments {
 
     public static void main(String[] args) throws FileNotFoundException {
 
-        String net_name = "alarm";
+        String net_name = "barley";
         String fileName = "outputs/output_experiments_" + net_name + ".txt";
         PrintStream fileStream = new PrintStream(fileName);
         System.setOut(fileStream);
