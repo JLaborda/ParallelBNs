@@ -14,11 +14,11 @@ public class HillClimbingSearch extends BNBuilder {
     boolean bhcFlag = false;
 
     public HillClimbingSearch(String path, int maxIterations, int nItInterleaving) {
-        super(path, 0, maxIterations, nItInterleaving);
+        super(path, 1, maxIterations, nItInterleaving);
     }
 
     public HillClimbingSearch(DataSet data, int maxIterations, int nItInterleaving) {
-        super(data, 0, maxIterations, nItInterleaving);
+        super(data, 1, maxIterations, nItInterleaving);
     }
 
 
