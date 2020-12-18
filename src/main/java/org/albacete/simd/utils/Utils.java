@@ -1,9 +1,12 @@
 package org.albacete.simd.utils;
 
 import consensusBN.PairWiseConsensusBES;
+import edu.cmu.tetrad.bayes.BayesIm;
+import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
+import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 
@@ -170,6 +173,58 @@ public class Utils {
         int hmd =  kl.getHammingDistance();
         return hmd;
     }
+
+    public static int SHD (Dag bn1, Dag bn2) {
+
+        ArrayList<Dag> dags = new ArrayList<>();
+        dags.add(bn1);
+        dags.add(bn2);
+        ensureVariables(dags);
+
+        Graph g1 = new EdgeListGraph(dags.get(0));
+        Graph g2 = new EdgeListGraph(dags.get(1));
+
+        for(Node n: dags.get(0).getNodes()) {
+            List<Node> p = dags.get(0).getParents(n);
+            for (int i=0; i<p.size()-1;i++)
+                for(int j=i+1; j<p.size();j++) {
+                    Edge e1 = g1.getEdge(p.get(i), p.get(j));
+                    Edge e2 = g1.getEdge(p.get(j), p.get(i));
+                    if(e1==null && e2 == null) {
+                        Edge e = new Edge(p.get(i),p.get(j),Endpoint.TAIL,Endpoint.TAIL);
+                        g1.addEdge(e);
+                    }
+                }
+        }
+
+        for(Node n: dags.get(1).getNodes()) {
+            List<Node> p = dags.get(1).getParents(n);
+            for (int i=0; i<p.size()-1;i++)
+                for(int j=i+1; j<p.size();j++) {
+                    Edge e1 = g2.getEdge(p.get(i), p.get(j));
+                    Edge e2 = g2.getEdge(p.get(j), p.get(i));
+                    if(e1==null && e2 == null) {
+                        Edge e = new Edge(p.get(i),p.get(j),Endpoint.TAIL,Endpoint.TAIL);
+                        g2.addEdge(e);
+                    }
+                }
+        }
+
+        int sum = 0;
+        for(Edge e: g1.getEdges()) {
+            Edge e2 = g2.getEdge(e.getNode1(), e.getNode2());
+            Edge e3 = g2.getEdge(e.getNode2(), e.getNode1());
+            if(e2 == null && e3 == null) sum++;
+        }
+
+        for(Edge e: g2.getEdges()) {
+            Edge e2 = g1.getEdge(e.getNode1(), e.getNode2());
+            Edge e3 = g1.getEdge(e.getNode2(), e.getNode1());
+            if(e2 == null && e3 == null) sum++;
+        }
+        return sum;
+    }
+
 
 
     public static List<Node> getMarkovBlanket(Dag bn, Node n){
@@ -404,5 +459,130 @@ public class Utils {
 
     }
 
+    public static double LL(BayesIm bn, DataSet data) {
 
+        BayesIm bayesIm;
+
+        int[][][] observedCounts;
+
+        Graph graph = bn.getDag();
+        Node[] nodes = new Node[graph.getNumNodes()];
+
+        observedCounts = new int[nodes.length][][];
+
+        int[][] observedCountsRowSum = new int[nodes.length][];
+
+        bayesIm = new MlBayesIm(bn);
+
+        for (int i = 0; i < nodes.length; i++) {
+
+            int numRows = bayesIm.getNumRows(i);
+            observedCounts[i] = new int[numRows][];
+
+            observedCountsRowSum[i] = new int[numRows];
+
+            for (int j = 0; j < numRows; j++) {
+
+                observedCountsRowSum[i][j] = 0;
+
+                int numCols = bayesIm.getNumColumns(i);
+                observedCounts[i][j] = new int[numCols];
+            }
+        }
+
+        //At this point set values in observedCounts
+
+        for (int j = 0; j < data.getNumColumns(); j++) {
+            DiscreteVariable var = (DiscreteVariable) data.getVariables().get(j);
+            String varName = var.getName();
+            Node varNode = bn.getDag().getNode(varName);
+            int varIndex = bayesIm.getNodeIndex(varNode);
+
+            int[] parentVarIndices = bayesIm.getParents(varIndex);
+
+            if (parentVarIndices.length == 0) {
+                //System.out.println("No parents");
+                for (int col = 0; col < var.getNumCategories(); col++) {
+                    observedCounts[varIndex][0][col] = 0;
+                }
+
+                for (int i = 0; i < data.getNumRows(); i++) {
+
+                    observedCounts[varIndex][0][data.getInt(i, j)] += 1.0;
+
+
+                }
+
+            }
+            else {    //For variables with parents:
+                int numRows = bayesIm.getNumRows(varIndex);
+
+                for (int row = 0; row < numRows; row++) {
+                    int[] parValues = bayesIm.getParentValues(varIndex, row);
+
+                    for (int col = 0; col < var.getNumCategories(); col++) {
+                        observedCounts[varIndex][row][col] = 0;
+                    }
+
+                    for (int i = 0; i < data.getNumRows(); i++) {
+                        //for a case where the parent values = parValues increment the estCount
+
+                        boolean parentMatch = true;
+
+                        for (int p = 0; p < parentVarIndices.length; p++) {
+                            if (parValues[p] != data.getInt(i, parentVarIndices[p])) {
+                                parentMatch = false;
+                                break;
+                            }
+                        }
+
+                        if (!parentMatch) {
+                            continue;  //Not a matching case; go to next.
+                        }
+
+                        observedCounts[varIndex][row][data.getInt(i, j)] += 1;
+                    }
+
+                }
+
+            }
+
+
+        }
+
+
+        for (int i = 0; i < nodes.length; i++) {
+            for (int j = 0; j < bayesIm.getNumRows(i); j++) {
+                for (int k = 0; k < bayesIm.getNumColumns(i); k++) {
+                    observedCountsRowSum[i][j] += observedCounts[i][j][k];
+                }
+            }
+        }
+
+        double sum = 0.0;
+
+        int n = nodes.length;
+
+        for (int i = 0; i < n; i++) {
+            int qi = bayesIm.getNumRows(i);
+            for (int j = 0; j < qi; j++) {
+                int ri = bayesIm.getNumColumns(i);
+                for (int k = 0; k < ri; k++) {
+                    try {
+                        double p1 = observedCounts[i][j][k];
+                        double p2 = observedCountsRowSum[i][j];
+                        double p3 = Math.log(p1/p2);
+                        if(p1 != 0.0) sum += p1 * p3;
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+        }
+
+        return sum/data.getNumRows()/data.getNumColumns();
+    }
 }
