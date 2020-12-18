@@ -119,7 +119,7 @@ public class ExperimentsTest {
         experiment.saveExperiment();
 
         //Assert: Checking if the file has been saved
-        String path = "./experiments/networks/cancer/cancer.xbif_T2_I5_global_results.csv";
+        String path = "./experiments/networks/cancer/pges/cancer.xbif_T2_I5_global_results.csv";
 
         File temp = new File(path);
 
