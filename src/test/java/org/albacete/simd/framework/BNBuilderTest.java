@@ -34,7 +34,7 @@ public class BNBuilderTest {
         assertNull(algorithm.getCurrentGraph());
         assertEquals(1, algorithm.getIterations());
         assertEquals(problem, algorithm.getProblem());
-        assertEquals(2, algorithm.getnThreads());
+        assertEquals(1, algorithm.getnThreads());
 
 
     }
