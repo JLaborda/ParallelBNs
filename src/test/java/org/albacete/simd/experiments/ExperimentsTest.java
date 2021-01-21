@@ -19,7 +19,7 @@ public class ExperimentsTest {
         int nThreads = 2;
         int nItInterleaving = 5;
 
-        Experiment exp = new Experiment(net_path, bbdd_path, nThreads, nItInterleaving);
+        Experiment exp = new ExperimentPGES(net_path, bbdd_path, nThreads, nItInterleaving);
 
         //Asserting
         assertNotNull(exp);
@@ -35,7 +35,7 @@ public class ExperimentsTest {
         int nThreads = 2;
         int nItInterleaving = 5;
 
-        Experiment exp = new Experiment(net_path, bbdd_path, nThreads, nItInterleaving);
+        Experiment exp = new ExperimentPGES(net_path, bbdd_path, nThreads, nItInterleaving);
         exp.runExperiment();
 
         assertNotEquals(0.0, exp.getScore(), 0.000001);
@@ -112,14 +112,14 @@ public class ExperimentsTest {
     @Test
     public void saveExperimentTest(){
         //Arrange: Creating Experiment
-        Experiment experiment = new Experiment("res/networks/cancer.xbif", "res/networks/BBDD/cancer.xbif_.csv", 2, 5);
+        Experiment experiment = new ExperimentPGES("res/networks/cancer.xbif", "res/networks/BBDD/cancer.xbif_.csv", 2, 5);
         experiment.runExperiment();
 
         //Act: Saving Experiment
         experiment.saveExperiment();
 
         //Assert: Checking if the file has been saved
-        String path = "./experiments/networks/cancer/cancer.xbif_T2_I5_global_results.csv";
+        String path = "./experiments/networks/cancer/pges/cancer.xbif_T2_I5_global_results.csv";
 
         File temp = new File(path);
 

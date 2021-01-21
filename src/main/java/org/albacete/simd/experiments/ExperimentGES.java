@@ -19,22 +19,17 @@ import java.util.*;
 public class ExperimentGES extends Experiment{
 
 
-
-
-    private int maxIterations = 15;
     private GES alg;
-    private static HashMap<String, HashMap<String,String>> map;
 
-    private int shd = Integer.MAX_VALUE;
-    private double score;
-    private double [] dfmm;
-    private long elapsedTime;
-    private int nIterations;
-
+    public ExperimentGES(String net_path, String bbdd_path, int nItInterleaving){
+        super(net_path, bbdd_path, 0, nItInterleaving);
+        algName = "ges";
+    }
 
     public ExperimentGES(String net_path, String bbdd_path) {
-        super(net_path, bbdd_path, 0, 0);
+        this(net_path, bbdd_path, 100);
     }
+
 
 
 
@@ -67,8 +62,8 @@ public class ExperimentGES extends Experiment{
             this.alg = new GES(dataSet);
 
             // Search is executed
-            alg.search();
-
+            //alg.search();
+            alg.search(getnItInterleaving());
             // Measuring time
             long endTime = System.currentTimeMillis();
 
@@ -111,6 +106,7 @@ public class ExperimentGES extends Experiment{
     public void printResults(){
         try {
             // Report
+            System.out.println(this);
             System.out.println("Current DAG:");
             System.out.println(alg.getCurrentGraph());
             System.out.println("Total Nodes Current DAG");
@@ -136,7 +132,7 @@ public class ExperimentGES extends Experiment{
         try {
             // Saving paths
             //String path_iters = "experiments/" + this.net_name + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_" + this.fusion_consensus + "_iteratation_results.csv";
-            String path_global = "experiments/" + this.net_name + "/" + this.bbdd_name + "_ges" + "_global_results.csv";
+            String path_global = "experiments/" + this.net_name + "/" + this.algName + "/" + this.bbdd_name  + "_global_results.csv";
 
             // Files
             //File file_iters = new File(path_iters);
@@ -178,52 +174,10 @@ public class ExperimentGES extends Experiment{
     }
 
 
-
-
-
-
-    public static void main(String[] args) {
-        String netFolder = "res/networks/";
-        String bbddFolder = "res/networks/BBDD/";
-        ArrayList<String> net_paths = getNetworkPaths(netFolder);
-        ArrayList<String> bbdd_paths = getBBDDPaths(bbddFolder);
-
-
-
-        System.out.println("net_names: " + net_paths);
-        System.out.println("bbdd_names: " + bbdd_paths);
-
-        map =  hashNetworks(net_paths, bbdd_paths);
-
-        System.out.println("Values in Map:");
-        for (String key: map.keySet()) {
-            HashMap<String, String> aux = map.get(key);
-            for(String k : aux.keySet()) {
-                System.out.println("BBDD_Number: " + key);
-                System.out.println("Key: " + k);
-                System.out.println("Value: " + aux.get(k));
-                System.out.println("******************");
-
-            }
-        }
-
-
-        // Running Single Experiment
-        //Experiments experiment = new Experiments("res/networks/win95pts.xbif", "res/networks/BBDD/win95pts.xbif_.csv", 2, 5);
-        //org.albacete.simd.experiments.Experiment experiment = new org.albacete.simd.experiments.Experiment("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv", 2, 5);
-        ExperimentGES experiment = new ExperimentGES("res/networks/alarm.xbif", "res/networks/BBDD/alarm.xbif_.csv");
-
-        experiment.runExperiment();
-        //Saving Experiment
-        experiment.saveExperiment();
-
-
-        // Running all the experiments
-        //runAllExperiments();
-
+    @Override
+    public String toString() {
+        return "-----------------------\nExperiment " + algName + "\n-----------------------\nNet Name: " + net_name + "\tDatabase: " + bbdd_name;
     }
-
-
 
 
 }

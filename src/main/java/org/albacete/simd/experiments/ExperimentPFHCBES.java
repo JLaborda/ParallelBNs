@@ -19,21 +19,17 @@ import java.io.IOException;
 
 public class ExperimentPFHCBES extends Experiment {
 
-    private int maxIterations = 15;
     private ParallelFHCBES alg;
-    private int shd = Integer.MAX_VALUE;
-    private double score;
-    private double [] dfmm;
-    private long elapsedTime;
-    private int nIterations;
 
 
     public ExperimentPFHCBES(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
         super(net_path, bbdd_path, nThreads, maxIterations, nItInterleaving);
+        this.algName="pfhcbes";
     }
 
     public ExperimentPFHCBES(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
         super(net_path, bbdd_path, nThreads, nItInterleaving);
+        this.algName="pfhcbes";
     }
 
     @Override
@@ -95,10 +91,9 @@ public class ExperimentPFHCBES extends Experiment {
 
             this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
             this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
-            //this.nIterations = alg.getIterations();
+            this.nIterations = alg.getIterations();
             this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem()); //alg.getFinalScore();
 
-            printResults();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,6 +104,7 @@ public class ExperimentPFHCBES extends Experiment {
     public void printResults(){
         //try {
         // Report
+        System.out.println(this);
         System.out.println("Current DAG:");
         System.out.println(alg.getCurrentGraph());
         System.out.println("Total Nodes Current DAG");
@@ -128,52 +124,4 @@ public class ExperimentPFHCBES extends Experiment {
         //}
 
     }
-
-    @Override
-    public void saveExperiment() {
-        try {
-            // Saving paths
-            //String path_iters = "experiments/" + this.net_name + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_" + this.fusion_consensus + "_iteratation_results.csv";
-            String path_global = "experiments/" + this.net_name + "/" + this.bbdd_name + "_ges" + "_global_results.csv";
-
-            // Files
-            //File file_iters = new File(path_iters);
-            //file_iters.getParentFile().mkdirs();
-            File file_global = new File(path_global);
-            file_global.getParentFile().mkdirs();
-
-            // File Writers
-            //FileWriter csvWriter_iters = new FileWriter(file_iters);
-            FileWriter csvWriter_global = new FileWriter(file_global);
-
-
-
-            // Saving global results
-            csvWriter_global.append("SHD");
-            csvWriter_global.append(",");
-            csvWriter_global.append("BDeu Score");
-            csvWriter_global.append(",");
-            csvWriter_global.append("dfMM");
-            csvWriter_global.append(",");
-            csvWriter_global.append("dfMM plus");
-            csvWriter_global.append(",");
-            csvWriter_global.append("dfMM minus");
-            csvWriter_global.append(",");
-            csvWriter_global.append("Total time(s)");
-            csvWriter_global.append("\n");
-
-            String row = this.shd + "," + this.score + "," + this.dfmm[0] + "," + this.dfmm[1] + "," + this.dfmm[2] +  ","  + elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
-            csvWriter_global.append(row);
-
-            csvWriter_global.flush();
-            csvWriter_global.close();
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    }
-
-
 }

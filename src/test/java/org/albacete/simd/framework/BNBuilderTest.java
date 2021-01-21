@@ -15,7 +15,7 @@ public class BNBuilderTest {
     @Test
     public void settersAndGettersTest(){
         String path = "src/test/resources/alarm.xbif_.csv";
-        BNBuilder algorithm = new HillClimbingSearch(path, 2, 15, 5);
+        BNBuilder algorithm = new HillClimbingSearch(path, 15, 5);
         Problem problem = new Problem(path);
         List<Edge> arcs = Utils.calculateArcs(problem.getData());
 
@@ -34,7 +34,7 @@ public class BNBuilderTest {
         assertNull(algorithm.getCurrentGraph());
         assertEquals(1, algorithm.getIterations());
         assertEquals(problem, algorithm.getProblem());
-        assertEquals(2, algorithm.getnThreads());
+        assertEquals(1, algorithm.getnThreads());
 
 
     }

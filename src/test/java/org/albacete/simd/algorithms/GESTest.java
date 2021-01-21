@@ -46,7 +46,7 @@ public class GESTest {
         DataSet dataSet = reader.parseTabular(new File("res/networks/BBDD/cancer.xbif_.csv"));
         GES ges1 = new GES(dataSet);
 
-        ges1.search();
+        ges1.search(100);
         Graph g = ges1.getCurrentGraph();
         assertNotNull(g);
 
