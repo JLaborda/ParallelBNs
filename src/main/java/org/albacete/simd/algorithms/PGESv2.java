@@ -432,7 +432,7 @@ public class PGESv2
      * have finished, then another {@link #fusionFES() fusion} is done. Finally, we check if there has been a convergence, and
      * repeat the process.
      */
-    public void search(){
+    public Graph search(){
 
         // Initial Configuration: Cases
         //GESThread.setProblem(this.data);
@@ -516,6 +516,8 @@ public class PGESv2
 
             // 7. Checking convergence and preparing configurations for the next iteration
         }while(!convergence());
+
+        return this.currentGraph;
     }
 
     private Graph fusionBES() {

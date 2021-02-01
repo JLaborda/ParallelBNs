@@ -5,21 +5,17 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
-import org.albacete.simd.algorithms.HillClimbingSearch;
 import org.albacete.simd.algorithms.ParallelFHCBES;
-import org.albacete.simd.algorithms.ParallelHillClimbingSearch;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class ExperimentPFHCBES extends Experiment {
 
-    private ParallelFHCBES alg;
+    private ParallelFHCBES algorithm;
 
 
     public ExperimentPFHCBES(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
@@ -58,10 +54,10 @@ public class ExperimentPFHCBES extends Experiment {
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new ParallelFHCBES(dataSet, nThreads, maxIterations, nItInterleaving);
+            this.algorithm = new ParallelFHCBES(dataSet, nThreads, maxIterations, nItInterleaving);
 
             // Search is executed
-            alg.search();
+            algorithm.search();
 
             // Measuring time
             long endTime = System.currentTimeMillis();
@@ -88,11 +84,12 @@ public class ExperimentPFHCBES extends Experiment {
             // System.out.println(cond);
 
 
-
-            this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
-            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
-            this.nIterations = alg.getIterations();
-            this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem()); //alg.getFinalScore();
+            //Metrics
+            this.shd = Utils.SHD(bn2.getDag(),(Dag) algorithm.getCurrentGraph());
+            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            this.nIterations = algorithm.getIterations();
+            this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
+            this.LLscore = Utils.LL((Dag)algorithm.getCurrentGraph(), test_dataset);
 
 
         } catch (Exception e) {
@@ -106,9 +103,9 @@ public class ExperimentPFHCBES extends Experiment {
         // Report
         System.out.println(this);
         System.out.println("Current DAG:");
-        System.out.println(alg.getCurrentGraph());
+        System.out.println(algorithm.getCurrentGraph());
         System.out.println("Total Nodes Current DAG");
-        System.out.println(alg.getCurrentGraph().getNodes().size());
+        System.out.println(algorithm.getCurrentGraph().getNodes().size());
         System.out.println("-------------------------\nMetrics: ");
 
         System.out.println("SHD: " + shd);

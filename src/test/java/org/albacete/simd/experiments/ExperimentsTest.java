@@ -56,6 +56,8 @@ public class ExperimentsTest {
         assertTrue(net_paths.contains(netFolder + "munin.xbif"));
         assertFalse(net_paths.contains(netFolder + "munin1.net"));
     }
+
+    /*
     @Test
     public void getBBDDPathsTest(){
         // Arrange
@@ -63,16 +65,17 @@ public class ExperimentsTest {
         // Act
         ArrayList<String> bbdd_paths = Experiment.getBBDDPaths(bbddFolder);
         // Assert
-        assertTrue(bbdd_paths.contains(bbddFolder + "alarm.xbif50000_.csv"));
+        assertTrue(bbdd_paths.contains(bbddFolder + "alarm.xbif50001_.csv"));
         assertFalse(bbdd_paths.contains(bbdd_paths + "munin1.net"));
     }
+
 
     @Test
     public void hashNetworksTest(){
 
         //TEST: Hashing correctly bbdd paths and net paths.
         //Arrange
-        List<String> bbddPaths = Arrays.asList("res/networks/BBDD/alarm.xbif50000_.csv");
+        List<String> bbddPaths = Arrays.asList("res/networks/BBDD/alarm.xbif50001_.csv");
         List<String> netPaths = Arrays.asList("res/networks/alarm.xbif");
 
 
@@ -107,7 +110,7 @@ public class ExperimentsTest {
         result2 = result.get("xbif50000_");
         assertTrue(result2.isEmpty());
     }
-
+*/
 
     @Test
     public void saveExperimentTest(){

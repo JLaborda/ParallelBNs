@@ -1,15 +1,7 @@
 package org.albacete.simd.experiments;
 
-import edu.cmu.tetrad.bayes.MlBayesIm;
-import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.data.DelimiterType;
-import edu.cmu.tetrad.graph.Dag;
-import org.albacete.simd.threads.GESThread;
-import org.albacete.simd.algorithms.PGESv2;
 import org.albacete.simd.utils.Utils;
-import weka.classifiers.bayes.BayesNet;
-import weka.classifiers.bayes.net.BIFReader;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,6 +23,9 @@ public abstract class Experiment {
     protected String bbdd_path;
     protected String net_name;
     protected String bbdd_name;
+    protected String test_path;
+    protected DataSet test_dataset;
+
     protected int nThreads;
     protected int nItInterleaving;
     protected int maxIterations = 15;
@@ -41,6 +36,8 @@ public abstract class Experiment {
     protected double [] dfmm;
     protected long elapsedTime;
     protected int nIterations;
+    protected double LLscore;
+
 
     protected String log = "";
     protected String algName = "";
@@ -68,18 +65,23 @@ public abstract class Experiment {
         this.nThreads = nThreads;
         this.maxIterations = maxIterations;
         this.nItInterleaving = nItInterleaving;
-        this.algName = "pges";
     }
 
-    public Experiment(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
+    public Experiment(String net_path, String bbdd_path,  int nThreads, int nItInterleaving) {
         this(net_path, bbdd_path, nThreads, 15, nItInterleaving);
     }
 
+    public Experiment(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving, long partition_seed) {
+        this(net_path, bbdd_path, nThreads, maxIterations, nItInterleaving);
+        Utils.setSeed(partition_seed);
+    }
 
 
 
 
-    public abstract void runExperiment();
+
+
+        public abstract void runExperiment();
 //    {
 //        try {
 //            System.out.println("Starting Experiment:");
@@ -152,6 +154,7 @@ public abstract class Experiment {
 //
 //    }
 
+
     public abstract void printResults();
 
     public void saveExperiment()
@@ -159,6 +162,7 @@ public abstract class Experiment {
         try {
             // Saving paths
             //String path_iters = "experiments/" + this.net_name + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_" + this.fusion_consensus + "_iteratation_results.csv";
+            String className = this.getClass().getSimpleName();
             String path_global = "experiments/" + this.net_name + "/" + this.algName + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving +  "_global_results.csv";
 
             // Files
@@ -172,9 +176,10 @@ public abstract class Experiment {
             FileWriter csvWriter_global = new FileWriter(file_global);
 
 
-
             // Saving global results
             csvWriter_global.append("SHD");
+            csvWriter_global.append(",");
+            csvWriter_global.append("LL Score");
             csvWriter_global.append(",");
             csvWriter_global.append("BDeu Score");
             csvWriter_global.append(",");
@@ -189,7 +194,7 @@ public abstract class Experiment {
             csvWriter_global.append("Total time(s)");
             csvWriter_global.append("\n");
 
-            String row = this.shd + "," + this.score + "," + this.dfmm[0] + "," + this.dfmm[1] + "," + this.dfmm[2] + "," + this.nIterations + ","  + elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
+            String row = this.shd + "," + this.LLscore + "," + this.score + "," + this.dfmm[0] + "," + this.dfmm[1] + "," + this.dfmm[2] + "," + this.nIterations + ","  + elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
             csvWriter_global.append(row);
 
             csvWriter_global.flush();
@@ -231,6 +236,7 @@ public abstract class Experiment {
     }
 
     //public static HashMap<String, ArrayList<String>> hashNetworks(ArrayList<String> net_paths, ArrayList<String> bbdd_paths){
+    /*
     public static HashMap<String, HashMap<String, String>> hashNetworks(List<String> net_paths, List<String> bbdd_paths){
 
         HashMap<String, HashMap<String,String>> result = new HashMap<String,HashMap<String,String>>();
@@ -274,7 +280,7 @@ public abstract class Experiment {
         }
         return result;
     }
-
+    */
 
 
     public double[] getDfmm() {

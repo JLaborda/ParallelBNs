@@ -14,12 +14,11 @@ import weka.classifiers.bayes.net.BIFReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
 
 public class ExperimentGES extends Experiment{
 
 
-    private GES alg;
+    private GES algorithm;
 
     public ExperimentGES(String net_path, String bbdd_path, int nItInterleaving){
         super(net_path, bbdd_path, 0, nItInterleaving);
@@ -27,7 +26,7 @@ public class ExperimentGES extends Experiment{
     }
 
     public ExperimentGES(String net_path, String bbdd_path) {
-        this(net_path, bbdd_path, 100);
+        this(net_path, bbdd_path, Integer.MAX_VALUE);
     }
 
 
@@ -59,11 +58,11 @@ public class ExperimentGES extends Experiment{
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new GES(dataSet);
+            this.algorithm = new GES(dataSet);
 
             // Search is executed
             //alg.search();
-            alg.search(getnItInterleaving());
+            algorithm.search();
             // Measuring time
             long endTime = System.currentTimeMillis();
 
@@ -90,10 +89,12 @@ public class ExperimentGES extends Experiment{
 
 
 
-            this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
-            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
-            //this.nIterations = alg.getIterations();
-            this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem()); //alg.getFinalScore();
+            //Metrics
+            this.shd = Utils.SHD(bn2.getDag(),(Dag) algorithm.getCurrentGraph());
+            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            //this.nIterations = algorithm.getIterations();
+            this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
+            this.LLscore = Utils.LL((Dag)algorithm.getCurrentGraph(), test_dataset);
 
             printResults();
 
@@ -105,21 +106,21 @@ public class ExperimentGES extends Experiment{
     @Override
     public void printResults(){
         try {
-            // Report
             System.out.println(this);
-            System.out.println("Current DAG:");
-            System.out.println(alg.getCurrentGraph());
-            System.out.println("Total Nodes Current DAG");
-            System.out.println(alg.getCurrentGraph().getNodes().size());
+            System.out.println("Resulting DAG:");
+            System.out.println(algorithm.getCurrentGraph());
+            System.out.println("Total Nodes of Resulting DAG");
+            System.out.println(algorithm.getCurrentGraph().getNodes().size());
             System.out.println("-------------------------\nMetrics: ");
 
-            System.out.println("SHD: " + shd);
-            System.out.println("Final BDeu: " + this.score);
-            System.out.println("Total execution time (s): " + elapsedTime / 1000);
+            System.out.println("SHD: "+shd);
+            System.out.println("LLScore: " + this.LLscore);
+            System.out.println("Final BDeu: " +this.score);
+            System.out.println("Total execution time (s): " + elapsedTime/1000);
             System.out.println("Total number of Iterations: " + this.nIterations);
-            System.out.println("dfMM: " + dfmm[0]);
-            System.out.println("dfMM plus: " + dfmm[1]);
-            System.out.println("dfMM minus: " + dfmm[2]);
+            System.out.println("dfMM: "+ dfmm[0]);
+            System.out.println("dfMM plus: "+ dfmm[1]);
+            System.out.println("dfMM minus: "+ dfmm[2]);
         }
         catch(InterruptedException e){
             e.printStackTrace();

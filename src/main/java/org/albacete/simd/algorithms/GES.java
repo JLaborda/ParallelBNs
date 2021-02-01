@@ -11,14 +11,14 @@ import org.albacete.simd.utils.Utils;
 
 import java.util.*;
 
-public class GES {
+public class GES{
 
     private FESThread fes;
     private BESThread bes;
     private Graph initialDag;
     private long elapsedTime;
     private double modelBDeu;
-
+    private int interleaving = Integer.MAX_VALUE;
     private int maxIt = 15;
     private List<Edge> combinations;
     private Graph graph;
@@ -26,16 +26,24 @@ public class GES {
 
 
     public GES(DataSet dataSet){
-
         this.problem = new Problem(dataSet);
         this.combinations = Utils.calculateArcs(problem.getData());
         this.initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
-
     }
 
     public GES(DataSet dataSet, Graph initialDag){
         this(dataSet);
         this.initialDag = initialDag;
+    }
+
+    public GES(DataSet dataSet, int interleaving){
+        this(dataSet);
+        this.interleaving = interleaving;
+    }
+
+    public GES(DataSet dataSet, Graph initialDag, int interleaving){
+        this(dataSet, initialDag);
+        this.interleaving = interleaving;
     }
 
 /*
@@ -91,7 +99,7 @@ public class GES {
      *
      * @return the resulting Pattern.
      */
-    public Graph search(int interleaving) throws InterruptedException {
+    public Graph search() throws InterruptedException {
         long startTime = System.currentTimeMillis();
 
 

@@ -1,5 +1,6 @@
 package org.albacete.simd.experiments;
 
+import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
@@ -20,16 +21,37 @@ import java.util.regex.Pattern;
 
 public class ExperimentPGES extends Experiment{
 
-    private PGESv2 alg;
+
+    private PGESv2 algorithm;
 
     public ExperimentPGES(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
         super(net_path,bbdd_path,nThreads,maxIterations,nItInterleaving);
         this.algName = "pges";
+
     }
 
     public ExperimentPGES(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
-        this(net_path, bbdd_path, nThreads, 15, nItInterleaving);
+        this(net_path, bbdd_path,  nThreads, 15, nItInterleaving);
     }
+
+    public ExperimentPGES(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving) {
+        super(net_path,bbdd_path,nThreads,maxIterations,nItInterleaving);
+        this.algName = "pges";
+        this.test_path = test_path;
+        this.test_dataset  = Utils.readData(test_path);
+    }
+
+    public ExperimentPGES(String net_path, String bbdd_path, String test_path, int nThreads, int nItInterleaving) {
+        this(net_path, bbdd_path,test_path,  nThreads, 15, nItInterleaving);
+    }
+
+    public ExperimentPGES(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving, long seed) {
+        super(net_path,bbdd_path, nThreads,maxIterations,nItInterleaving, seed);
+        this.algName = "pges";
+        this.test_path = test_path;
+        this.test_dataset  = Utils.readData(test_path);
+    }
+
 
 
 
@@ -61,12 +83,12 @@ public class ExperimentPGES extends Experiment{
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new PGESv2(dataSet,this.nThreads);
-            this.alg.setMaxIterations(this.maxIterations);
-            this.alg.setNFESItInterleaving(this.nItInterleaving);
+            this.algorithm = new PGESv2(dataSet,this.nThreads);
+            this.algorithm.setMaxIterations(this.maxIterations);
+            this.algorithm.setNFESItInterleaving(this.nItInterleaving);
 
             // Search is executed
-            alg.search();
+            algorithm.search();
 
             // Measuring time
             long endTime = System.currentTimeMillis();
@@ -93,13 +115,13 @@ public class ExperimentPGES extends Experiment{
             // System.out.println(cond);
 
 
+            //Metrics
+            this.shd = Utils.SHD(bn2.getDag(),(Dag) algorithm.getCurrentGraph());
+            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            this.nIterations = algorithm.getIterations();
+            this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
+            this.LLscore = Utils.LL((Dag)algorithm.getCurrentGraph(), test_dataset);
 
-            this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
-            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
-            this.nIterations = alg.getIterations();
-            this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem());
-
-            //printResults();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,12 +133,13 @@ public class ExperimentPGES extends Experiment{
         // Report
         System.out.println(this);
         System.out.println("Resulting DAG:");
-        System.out.println(alg.getCurrentGraph());
+        System.out.println(algorithm.getCurrentGraph());
         System.out.println("Total Nodes of Resulting DAG");
-        System.out.println(alg.getCurrentGraph().getNodes().size());
+        System.out.println(algorithm.getCurrentGraph().getNodes().size());
         System.out.println("-------------------------\nMetrics: ");
 
         System.out.println("SHD: "+shd);
+        System.out.println("LLScore: " + this.LLscore);
         System.out.println("Final BDeu: " +this.score);
         System.out.println("Total execution time (s): " + elapsedTime/1000);
         System.out.println("Total number of Iterations: " + this.nIterations);
@@ -126,6 +149,7 @@ public class ExperimentPGES extends Experiment{
 
     }
 
+    /*
     @Override
     public void saveExperiment() {
         try {
@@ -172,7 +196,7 @@ public class ExperimentPGES extends Experiment{
         }
 
     }
-
+*/
     public static ArrayList<String> getNetworkPaths(String netFolder){
         // Getting networks
 

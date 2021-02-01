@@ -17,7 +17,7 @@ import java.io.IOException;
 
 public class ExperimentPHC extends Experiment {
 
-    private ParallelHillClimbingSearch alg;
+    private ParallelHillClimbingSearch algorithm;
 
     public ExperimentPHC(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
         super(net_path, bbdd_path, nThreads, maxIterations, nItInterleaving);
@@ -55,10 +55,10 @@ public class ExperimentPHC extends Experiment {
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new ParallelHillClimbingSearch(dataSet, nThreads, maxIterations, nItInterleaving);
+            this.algorithm = new ParallelHillClimbingSearch(dataSet, nThreads, maxIterations, nItInterleaving);
 
             // Search is executed
-            alg.search();
+            algorithm.search();
 
             // Measuring time
             long endTime = System.currentTimeMillis();
@@ -86,10 +86,12 @@ public class ExperimentPHC extends Experiment {
 
 
 
-            this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
-            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
-            this.nIterations = alg.getIterations();
-            this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem()); //alg.getFinalScore();
+            //Metrics
+            this.shd = Utils.SHD(bn2.getDag(),(Dag) algorithm.getCurrentGraph());
+            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            this.nIterations = algorithm.getIterations();
+            this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
+            this.LLscore = Utils.LL((Dag)algorithm.getCurrentGraph(), test_dataset);
 
 
         } catch (Exception e) {
@@ -102,12 +104,13 @@ public class ExperimentPHC extends Experiment {
         // Report
         System.out.println(this);
         System.out.println("Resulting DAG:");
-        System.out.println(alg.getCurrentGraph());
+        System.out.println(algorithm.getCurrentGraph());
         System.out.println("Total Nodes of Resulting DAG");
-        System.out.println(alg.getCurrentGraph().getNodes().size());
+        System.out.println(algorithm.getCurrentGraph().getNodes().size());
         System.out.println("-------------------------\nMetrics: ");
 
         System.out.println("SHD: "+shd);
+        System.out.println("LLScore: " + this.LLscore);
         System.out.println("Final BDeu: " +this.score);
         System.out.println("Total execution time (s): " + elapsedTime/1000);
         System.out.println("Total number of Iterations: " + this.nIterations);

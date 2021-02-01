@@ -118,7 +118,7 @@ public abstract class BNBuilder {
     protected abstract void backwardFusion() throws InterruptedException;
 
 
-    public void search(){
+    public Graph search(){
         initialConfig();
 
         do{
@@ -133,6 +133,8 @@ public abstract class BNBuilder {
                 e.printStackTrace();
             }
         }while(!convergence());
+
+        return this.currentGraph;
     }
 
     /**

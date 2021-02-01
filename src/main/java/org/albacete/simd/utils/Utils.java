@@ -2,6 +2,7 @@ package org.albacete.simd.utils;
 
 import consensusBN.PairWiseConsensusBES;
 import edu.cmu.tetrad.bayes.BayesIm;
+import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
@@ -585,4 +586,11 @@ public class Utils {
 
         return sum/data.getNumRows()/data.getNumColumns();
     }
+
+    public static double LL(Dag g, DataSet data){
+        BayesPm bnaux = new BayesPm(g);
+        MlBayesIm bnOut = new MlBayesIm(bnaux, MlBayesIm.MANUAL);
+        return LL(bnOut, data);
+    }
+
 }
