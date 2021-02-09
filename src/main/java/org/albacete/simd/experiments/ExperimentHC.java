@@ -18,15 +18,11 @@ public class ExperimentHC extends Experiment {
     private HillClimbingSearch algorithm;
 
 
-    public ExperimentHC(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
-        super(net_path, bbdd_path, nThreads, maxIterations, nItInterleaving);
+    public ExperimentHC(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving, long partition_seed) {
+        super(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving, partition_seed);
         this.algName = "hc";
     }
 
-    public ExperimentHC(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
-        super(net_path, bbdd_path, nThreads, nItInterleaving);
-        this.algName = "hc";
-    }
 
     @Override
     public void runExperiment(){

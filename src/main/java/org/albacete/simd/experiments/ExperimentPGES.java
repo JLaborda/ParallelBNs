@@ -24,37 +24,11 @@ public class ExperimentPGES extends Experiment{
 
     private PGESv2 algorithm;
 
-    public ExperimentPGES(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
-        super(net_path,bbdd_path,nThreads,maxIterations,nItInterleaving);
+    public ExperimentPGES(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving, long partition_seed) {
+        super(net_path,bbdd_path, test_path, nThreads,maxIterations,nItInterleaving, partition_seed);
         this.algName = "pges";
 
     }
-
-    public ExperimentPGES(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
-        this(net_path, bbdd_path,  nThreads, 15, nItInterleaving);
-    }
-
-    public ExperimentPGES(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving) {
-        super(net_path,bbdd_path,nThreads,maxIterations,nItInterleaving);
-        this.algName = "pges";
-        this.test_path = test_path;
-        this.test_dataset  = Utils.readData(test_path);
-    }
-
-    public ExperimentPGES(String net_path, String bbdd_path, String test_path, int nThreads, int nItInterleaving) {
-        this(net_path, bbdd_path,test_path,  nThreads, 15, nItInterleaving);
-    }
-
-    public ExperimentPGES(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving, long seed) {
-        super(net_path,bbdd_path, nThreads,maxIterations,nItInterleaving, seed);
-        this.algName = "pges";
-        this.test_path = test_path;
-        this.test_dataset  = Utils.readData(test_path);
-    }
-
-
-
-
 
 
     public void runExperiment() {

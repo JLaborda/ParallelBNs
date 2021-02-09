@@ -19,13 +19,8 @@ public class ExperimentPHC extends Experiment {
 
     private ParallelHillClimbingSearch algorithm;
 
-    public ExperimentPHC(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
-        super(net_path, bbdd_path, nThreads, maxIterations, nItInterleaving);
-        this.algName="phc";
-    }
-
-    public ExperimentPHC(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
-        super(net_path, bbdd_path, nThreads, nItInterleaving);
+    public ExperimentPHC(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving, long partition_seed) {
+        super(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving, partition_seed);
         this.algName="phc";
     }
 

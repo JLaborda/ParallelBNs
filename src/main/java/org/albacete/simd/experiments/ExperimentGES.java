@@ -20,13 +20,13 @@ public class ExperimentGES extends Experiment{
 
     private GES algorithm;
 
-    public ExperimentGES(String net_path, String bbdd_path, int nItInterleaving){
-        super(net_path, bbdd_path, 0, nItInterleaving);
+    public ExperimentGES(String net_path, String bbdd_path, String test_path, int nItInterleaving){
+        super(net_path, bbdd_path, test_path, 0, 0,nItInterleaving);
         algName = "ges";
     }
 
-    public ExperimentGES(String net_path, String bbdd_path) {
-        this(net_path, bbdd_path, Integer.MAX_VALUE);
+    public ExperimentGES(String net_path, String bbdd_path, String test_path) {
+        this(net_path, bbdd_path, test_path, Integer.MAX_VALUE);
     }
 
 
@@ -58,7 +58,7 @@ public class ExperimentGES extends Experiment{
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.algorithm = new GES(dataSet);
+            this.algorithm = new GES(dataSet, this.nItInterleaving);
 
             // Search is executed
             //alg.search();
@@ -96,7 +96,7 @@ public class ExperimentGES extends Experiment{
             this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
             this.LLscore = Utils.LL((Dag)algorithm.getCurrentGraph(), test_dataset);
 
-            printResults();
+            //printResults();
 
         } catch (Exception e) {
             e.printStackTrace();

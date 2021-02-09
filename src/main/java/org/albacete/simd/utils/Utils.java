@@ -18,7 +18,7 @@ import java.util.*;
 public class Utils {
 
 
-    private static Random random = new Random(42);
+    private static Random random = new Random();
 
     /**
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem.

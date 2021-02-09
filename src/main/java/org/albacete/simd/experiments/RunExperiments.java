@@ -1,3 +1,4 @@
+/*
 package org.albacete.simd.experiments;
 
 import java.awt.*;
@@ -57,6 +58,7 @@ public class RunExperiments {
         experiment.printResults();
         experiment.saveExperiment();
     }
+
 
     public static void createAndRunExperiments(String[] networks, int[] threads, int[] interleavings, int maxIterations ){
         Experiment experiment;
@@ -129,3 +131,4 @@ public class RunExperiments {
 
     }
 }
+*/

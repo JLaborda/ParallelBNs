@@ -11,15 +11,19 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class ExperimentsTest {
+    String net_path = "./res/networks/alarm.xbif";
+    String bbdd_path = "./res/networks/BBDD/alarm.xbif50001_.csv";
+    String test_path = "./res/networks/BBDD/tests/alarm_test.csv";
+    int nThreads = 2;
+    int nItInterleaving = 5;
+    int seed = 42;
+    int maxIterations = 15;
+
 
     @Test
     public void ExperimentsConstructorTest(){
-        String net_path = "./res/networks/cancer.xbif";
-        String bbdd_path = "./res/networks/BBDD/cancer.xbif50000_.csv";
-        int nThreads = 2;
-        int nItInterleaving = 5;
 
-        Experiment exp = new ExperimentPGES(net_path, bbdd_path, nThreads, nItInterleaving);
+        Experiment exp = new ExperimentPGES(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving, seed);
 
         //Asserting
         assertNotNull(exp);
@@ -30,12 +34,7 @@ public class ExperimentsTest {
 
     @Test
     public void runExperiment(){
-        String net_path = "./res/networks/cancer.xbif";
-        String bbdd_path = "./res/networks/BBDD/cancer.xbif50000_.csv";
-        int nThreads = 2;
-        int nItInterleaving = 5;
-
-        Experiment exp = new ExperimentPGES(net_path, bbdd_path, nThreads, nItInterleaving);
+        Experiment exp = new ExperimentPGES(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving, seed);
         exp.runExperiment();
 
         assertNotEquals(0.0, exp.getScore(), 0.000001);
@@ -115,14 +114,14 @@ public class ExperimentsTest {
     @Test
     public void saveExperimentTest(){
         //Arrange: Creating Experiment
-        Experiment experiment = new ExperimentPGES("res/networks/cancer.xbif", "res/networks/BBDD/cancer.xbif_.csv", 2, 5);
+        Experiment experiment = new ExperimentPGES(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving, seed);
         experiment.runExperiment();
 
         //Act: Saving Experiment
         experiment.saveExperiment();
 
         //Assert: Checking if the file has been saved
-        String path = "./experiments/networks/cancer/pges/cancer.xbif_T2_I5_global_results.csv";
+        String path = "./experiments/res/networks/alarm/pges/alarm.xbif50001_T2_I5_global_results.csv";
 
         File temp = new File(path);
 
