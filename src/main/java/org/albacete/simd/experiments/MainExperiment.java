@@ -30,7 +30,7 @@ public class MainExperiment{
                 experiment = new ExperimentPGES(netPath, bbddPath, testPath, nThreads, maxIterations, nInterleaving, seed);
                 break;
             case "hc":
-                experiment = new ExperimentHC(netPath, bbddPath, testPath,  nThreads, maxIterations, nInterleaving, seed);
+                experiment = new ExperimentHC(netPath, bbddPath, testPath, maxIterations, nInterleaving);
                 break;
             case "phc":
                 experiment = new ExperimentPHC(netPath, bbddPath, testPath,  nThreads, maxIterations, nInterleaving, seed);

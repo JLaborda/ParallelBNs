@@ -127,7 +127,7 @@ public class ExperimentGES extends Experiment{
         }
 
     }
-
+/*
     @Override
     public void saveExperiment() {
         try {
@@ -173,7 +173,7 @@ public class ExperimentGES extends Experiment{
         }
 
     }
-
+*/
 
     @Override
     public String toString() {

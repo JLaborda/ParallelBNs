@@ -41,6 +41,7 @@ public abstract class Experiment {
 
     protected String log = "";
     protected String algName = "";
+    protected long seed = -1;
 
     public Experiment(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving) {
         this.net_path = net_path;
@@ -58,8 +59,8 @@ public abstract class Experiment {
         pattern = Pattern.compile(".*/(.*).csv");
         matcher = pattern.matcher(this.bbdd_path);
         if (matcher.find()) {
-            System.out.println("Match!");
-            System.out.println(matcher.group(1));
+            //System.out.println("Match!");
+            //System.out.println(matcher.group(1));
             bbdd_name = matcher.group(1);
         }
 
@@ -71,6 +72,7 @@ public abstract class Experiment {
 
     public Experiment(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving, long partition_seed) {
         this(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving);
+        this.seed = partition_seed;
         Utils.setSeed(partition_seed);
     }
 
@@ -160,8 +162,14 @@ public abstract class Experiment {
         try {
             // Saving paths
             //String path_iters = "experiments/" + this.net_name + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_" + this.fusion_consensus + "_iteratation_results.csv";
+            String path_global;
             String className = this.getClass().getSimpleName();
-            String path_global = "experiments/" + this.net_name + "/" + this.algName + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving +  "_global_results.csv";
+            if(seed == -1) {
+                path_global = "./experiments/" + this.net_name + "/" + this.algName + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_global_results.csv";
+            }
+            else{
+                path_global = "./experiments/" + this.net_name + "/" + this.algName + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_S" + this.seed+ "_global_results.csv";
+            }
             // Files
             //File file_iters = new File(path_iters);
             //file_iters.getParentFile().mkdirs();
@@ -306,6 +314,23 @@ public abstract class Experiment {
 
     public String getAlgName() {
         return algName;
+    }
+
+    public String getResults(){
+        return  this.algName + ","
+                + this.net_name + ","
+                + this.bbdd_name + ","
+                + this.nThreads + ","
+                + this.nItInterleaving + ","
+                + this.seed + ","
+                + this.shd + ","
+                + this.LLscore + ","
+                + this.score + ","
+                + this.dfmm[0] + ","
+                + this.dfmm[1] + ","
+                + this.dfmm[2] + ","
+                + this.nIterations + ","
+                + elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
     }
 
     @Override
