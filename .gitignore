@@ -27,16 +27,21 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-#idea
+# idea
 .idea/
 
-#other settings
+# other settings
 .settings/
 target/
 
-#experiment folder
+# Experiment folder
 experiments/
-#thread errors
+
+# Thread errors
 *.log
-parallel-error
-parallel-output
+*-error
+*-output
+
+# Large Datasets
+*10k.csv
+*50k.csv
