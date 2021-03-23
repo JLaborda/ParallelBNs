@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class MainExperiment{
 
-    public static final String EXPERIMENTS_FOLDER = "/home/jorlabs/projects/ParallelBNs-git/ParallelBNs/experiments/galgo/";
+    public static final String EXPERIMENTS_FOLDER = "./";//"/home/jorlabs/projects/ParallelBNs-git/ParallelBNs/experiments/galgo/";
 
 
     // Caos con los argunmentos

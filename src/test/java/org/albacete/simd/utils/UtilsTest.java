@@ -318,7 +318,7 @@ public class UtilsTest {
     /*
     @Test
     public void scoreGraph(){
-        String path = "./res/networks/BBDD/cancer.xbif50000_.csv";
+        String path = "./res/networks/BBDD/cancer_test.csv";
         DataSet data = Utils.readData(path);
         Graph g = null;
 
@@ -333,7 +333,7 @@ public class UtilsTest {
     @Test
     public void scoreGraph() throws Exception {
         //TEST: Empty graph should give back a score of 0
-        String path = "./res/networks/BBDD/cancer.xbif50000_.csv";
+        String path = "./res/networks/BBDD/cancer_test.csv";
         DataSet data = Utils.readData(path);
         Graph g = new EdgeListGraph();
 

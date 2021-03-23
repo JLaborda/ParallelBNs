@@ -1,5 +1,5 @@
 #!/bin/sh
-HOME_FOLDER="/home/jorlabs/projects/ParallelBNs-git/ParallelBNs/"
+HOME_FOLDER="/Users/jdls/developer/projects/ParallelBNs/"
 NETWORKS_FOLDER=${HOME_FOLDER}"res/networks/";
 BBDD_FOLDER=${NETWORKS_FOLDER}"BBDD/";
 TEST_FOLDER=${NETWORKS_FOLDER}"BBDD/tests/";
@@ -65,14 +65,14 @@ do
                 do
                     if [ $alg == "ges" ]
                     then    
-                        echo ${net_names[$i]} $alg $netPath $dataPath $testPath $nItInterleaving >> experiments_${net_names[$i]}.txt
+                        echo ${net_names[$i]} $alg $netPath $dataPath $testPath $nItInterleaving >> experiments_params/experiments_${net_names[$i]}.txt
                     elif [ $alg == "hc" ]
                         then
-                            echo ${net_names[$i]} $alg $netPath $dataPath $testPath $nItInterleaving $maxIterations >> experiments_${net_names[$i]}.txt
+                            echo ${net_names[$i]} $alg $netPath $dataPath $testPath $nItInterleaving $maxIterations >> experiments_params/experiments_${net_names[$i]}.txt
                     else
                         for seed in ${seeds[@]};
                         do
-                            echo ${net_names[$i]} $alg $netPath $dataPath $testPath $nItInterleaving $nthread $maxIterations $seed >> experiments_${net_names[$i]}.txt
+                            echo ${net_names[$i]} $alg $netPath $dataPath $testPath $nItInterleaving $nthread $maxIterations $seed >> experiments_params/experiments_${net_names[$i]}.txt
                         done
                     fi
                 done

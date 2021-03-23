@@ -95,7 +95,7 @@ public class ExperimentsTest {
 
         //TEST: When a bbdd path and a net path don't share the same name, they should not be assigned together.
         //Arrange
-        bbddPaths = Arrays.asList("res/networks/BBDD/munin.xbif50000_.csv");
+        bbddPaths = Arrays.asList("res/networks/BBDD/munin_test.csv");
         netPaths = Arrays.asList("res/networks/alarm.net");
 
         //Act

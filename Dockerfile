@@ -1,10 +1,10 @@
-FROM openjdk:8
-
+FROM maven:3.6.3-jdk-8
 MAINTAINER Jorge D. Laborda <jorgedaniel.laborda@uclm.es>
-
-ADD ./target/ParallelBNs-1.0-SNAPSHOT.jar pbn-demo.jar
-
-CMD java -jar pbn-demo.jar
+#ADD ./target/ParallelBNs-1.0-SNAPSHOT.jar pbn-demo.jar
+COPY . /parallelbns
+WORKDIR /parallelbns
+RUN mvn compile
+ENTRYPOINT ./scripts/experiments.bash
 
 # COPY . /ParallelBNs
 # WORKDIR /ParallelBNs

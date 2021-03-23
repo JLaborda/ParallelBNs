@@ -2,10 +2,7 @@
 package org.albacete.simd.experiments;
 
 import java.awt.*;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +13,11 @@ public class RunExperiments {
     public static final String NET_FOLDER = "./res/networks/";
     public static final String BBDD_FOLDER = "./res/networks/BBDD/";
     public static final String TEST_FOLDER = "./res/networks/BBDD/tests/";
-    public static final String[] NET_NAMES = {"alarm"};/*,
-            "andes", "barley", "cancer", "child", "earthquake",
+    // Redes pequeñas - medianas (20-50 nodos)
+    public static final String[] NET_NAMES = {"alarm", "child", "insurance", "water", "hailfinder", "hepar2", "win95pts", "link", "pigs"};/*,
+            {"alarm","andes", "barley", "cancer", "child", "earthquake",
     "hailfinder", "hepar2", "insurance", "link", "mildew", "munin", "pigs", "water", "win95pts"};*/
+    // barley da problemas (OutOfMemoryError)
     public static final String EXPERIMENTS_FOLDER = "./experiments/MACJorge/";
 
 
@@ -53,19 +52,23 @@ public class RunExperiments {
 
     public static void main(String[] args) throws FileNotFoundException {
         try {
-            String savePath = EXPERIMENTS_FOLDER  + "total/experiments.csv";
-            FileWriter csvWriter = new FileWriter(savePath);
-
+            String savePathBase = EXPERIMENTS_FOLDER  + "total/experiments_";
             // Initial variables
             int[] threads = {1, 2, 4, 6, 8};
             int maxIterations = 100;
             int[] interleavings = {5, 10, 15};
             int[] seeds = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
-            String header = "algorith, network, bbdd, thread, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, Total iterations, Total time(s)\n";
-            csvWriter.append(header);
+
             //StringBuilder result = new StringBuilder(header);
             Experiment experiment;
             for (String netName : NET_NAMES){
+                String savePath = savePathBase + netName + ".csv";
+                File file = new File(savePath);
+                FileWriter csvWriter = new FileWriter(file,true);
+                if(file.length() == 0) {
+                    String header = "algorithm, network, bbdd, thread, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, Total iterations, Total time(s)\n";
+                    csvWriter.append(header);
+                }
                 // Creating Experiments
                 //List<Experiment> experiments = new ArrayList<Experiment>();
                 String netPath = createNetworkPath(netName);
@@ -113,13 +116,10 @@ public class RunExperiments {
                         }
                     }
                 }
-
+                //Saving and closing writer
+                csvWriter.flush();
+                csvWriter.close();
             }
-
-            // Saving experiments
-
-            csvWriter.flush();
-            csvWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

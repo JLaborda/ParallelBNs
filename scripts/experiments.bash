@@ -9,7 +9,7 @@
 #cd $PBS_O_WORKDIR
 
 MAIN_PATH="/home/jorlabs/projects/ParallelBNs-git/ParallelBNs"
-PARAMS=${params} #"${MAIN_PATH}/experiments/params/alarm/experiments_alarm.txt"
+PARAMS=$2 #${params} #"${MAIN_PATH}/experiments/params/alarm/experiments_alarm.txt"
 JAVA_BIN="/home/jorlabs/java/jdk1.8.0_251/bin/java"
 LIB_PATH="${MAIN_PATH}/src/lib/"
 SOURCE_PATH="${LIB_PATH}colt.jar:${LIB_PATH}commons-collections-3.1.jar:${LIB_PATH}f2jutil.jar:${LIB_PATH}fusion.jar:${LIB_PATH}Jama-1.0.2.jar:${LIB_PATH}jdepend.jar:${LIB_PATH}jh.jar:${LIB_PATH}junit.jar:${LIB_PATH}jxl.jar:${LIB_PATH}mrjtoolkitstubs.jar:${LIB_PATH}mtj.jar:${LIB_PATH}opt77.jar:${LIB_PATH}pal-1.4.jar:${LIB_PATH}weka.jar:${LIB_PATH}xom-1.1.jar"
@@ -21,7 +21,7 @@ CLASSPATH="${MAIN_PATH}/target/classes/"
 #echo ${PARAMS}
 
 ## Load parameters:
-Y="$PBS_ARRAY_INDEX" # This was the original
+Y=$1 #"$PBS_ARRAY_INDEX" # This was the original
 #Y=41
 
 #echo "PBS_ARRAY_INDEX = $PBS_ARRAY_INDEX"
