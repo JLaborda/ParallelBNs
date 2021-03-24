@@ -44,7 +44,7 @@
       <artifactId>f2jutil</artifactId>
       <scope>system</scope>
       <version>1.0</version>
-      <systemPath>${basedir}/libs/f2jutil.jar</systemPath>
+      <systemPath>${basedir}/src/lib/f2jutil.jar</systemPath>
     </dependency>
 
     <dependency>
@@ -83,7 +83,7 @@
       <artifactId>fusion</artifactId>
       <scope>system</scope>
       <version>2.0</version>
-      <systemPath>${basedir}/libs/fusion.jar</systemPath>
+      <systemPath>${basedir}/src/lib/fusion.jar</systemPath>
     </dependency>
 
     <dependency>
@@ -91,7 +91,7 @@
       <artifactId>opt</artifactId>
       <scope>system</scope>
       <version>7.7</version>
-      <systemPath>${basedir}/libs/opt77.jar</systemPath>
+      <systemPath>${basedir}/src/lib/opt77.jar</systemPath>
     </dependency>
 
     <dependency>
@@ -99,7 +99,7 @@
       <artifactId>pal</artifactId>
       <scope>system</scope>
       <version>1.4</version>
-      <systemPath>${basedir}/libs/pal-1.4.jar</systemPath>
+      <systemPath>${basedir}/src/lib/pal-1.4.jar</systemPath>
     </dependency>
 <!--
     <dependency>
