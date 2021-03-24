@@ -8,5 +8,5 @@ for net in ${net_names[@]}; do
     for suffix in ${suffixes[@]}; do
         PARAMS="${PARAMS_FOLDER}${net}/${net}_params_${suffix}"
         LENGTH=$(cat ${PARAMS} | wc -l)
-        qsub -v PARAMS=${PARAMS} -N "ParallelBNs-${net}" -J 1-$LENGTH
+        qsub -v PARAMS=${PARAMS} -N "ParallelBNs-${net}" -J 1-$LENGTH $SCRIPT
         done

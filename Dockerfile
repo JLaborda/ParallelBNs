@@ -1,4 +1,4 @@
-FROM maven:3.6.3-jdk-8
+FROM maven:3.6.3-jdk-8-slim
 MAINTAINER Jorge D. Laborda <jorgedaniel.laborda@uclm.es>
 #ADD ./target/ParallelBNs-1.0-SNAPSHOT.jar pbn-demo.jar
 COPY . /parallelbns
