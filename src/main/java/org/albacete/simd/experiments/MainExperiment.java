@@ -1,5 +1,6 @@
 package org.albacete.simd.experiments;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,6 +13,7 @@ public class MainExperiment{
 
     // Caos con los argunmentos
     public static void main(String[] args) {
+        System.out.println("Numero de hilos: " + Thread.getAllStackTraces().keySet().size());
         // Reading arguments
         String netName = args[0].toLowerCase();
         String algorithmName = args[1].toLowerCase();
@@ -33,10 +35,18 @@ public class MainExperiment{
             seed = Integer.parseInt(args[8]);
         }
 
+
+        System.out.println("Len PARAMS: " + args.length);
+
         System.out.print("PARAMS: " );
         for(String arg: args){
             System.out.print(arg + ", ");
         }
+        System.out.println();
+        System.out.println("VARIABLES: ");
+        System.out.println(netName + ", " + algorithmName + ", " +
+        netPath + ", " + bbddPath + ", " + testPath + ", " + nThreads + 
+        ", " + nInterleaving + ", " +  maxIterations + ", " + seed);
         System.out.println();
 
         Experiment experiment = null;
@@ -69,12 +79,14 @@ public class MainExperiment{
             String results = experiment.getResults();
             String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + ".csv";
             File file = new File(savePath);
-            FileWriter csvWriter = new FileWriter(savePath, true);
+            BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
+            //FileWriter csvWriter = new FileWriter(savePath, true);
             if(file.length() == 0) {
                 String header = "algorithm, network, bbdd, thread, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, Total iterations, Total time(s)\n";
                 csvWriter.append(header);
             }
             csvWriter.append(results);
+
             csvWriter.flush();
             csvWriter.close();
             System.out.println("Results saved at: " + savePath);
