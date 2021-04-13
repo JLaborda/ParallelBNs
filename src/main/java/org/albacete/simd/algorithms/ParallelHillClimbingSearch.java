@@ -107,7 +107,6 @@ public class ParallelHillClimbingSearch {
      * Initializes the general parameters of the class.
      * @param nThreads number of threads used in the problem.
      */
-    @SuppressWarnings("unchecked")
     private void initialize(int nThreads){
         this.nThreads = nThreads;
         this.gesThreads = new GESThread[this.nThreads];

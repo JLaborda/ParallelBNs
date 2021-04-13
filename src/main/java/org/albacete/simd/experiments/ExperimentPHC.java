@@ -12,8 +12,6 @@ import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class ExperimentPHC extends Experiment {
 

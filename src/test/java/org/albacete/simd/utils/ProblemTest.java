@@ -2,9 +2,6 @@ package org.albacete.simd.utils;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Node;
-import org.albacete.simd.utils.LocalScoreCacheConcurrent;
-import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
 import java.util.HashMap;

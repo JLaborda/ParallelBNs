@@ -164,7 +164,6 @@ public class ExperimentGES extends Experiment{
             csvWriter_global.close();
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

@@ -16,7 +16,7 @@ import java.util.*;
   GESThread is an abstract class that encapsulates the common attributes and methods of the threads executed in both the FES
   and BES stage. For future versions, there could be more types of threads other than {@link ThFES ThFES} and {@link ThBES ThBES}.
  */
-@SuppressWarnings({"DuplicatedCode", "unused"})
+//@SuppressWarnings({"DuplicatedCode", "unused"})
 public abstract class GESThread implements Runnable{
     /**
      * Tuple of Nodes that will be checked by this thread in the FES method

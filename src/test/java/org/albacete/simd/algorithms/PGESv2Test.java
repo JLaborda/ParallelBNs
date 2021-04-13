@@ -175,8 +175,7 @@ public class PGESv2Test
     @Test(expected = Exception.class)
     public void exceptionReadDataTest(){
         String path = "";
-        //noinspection unused
-        PGESv2 pGESv2 = new PGESv2(path, 1);
+        new PGESv2(path, 1);
         fail();
     }
 

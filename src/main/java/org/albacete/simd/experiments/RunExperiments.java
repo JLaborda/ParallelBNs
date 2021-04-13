@@ -1,12 +1,9 @@
 
 package org.albacete.simd.experiments;
 
-import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RunExperiments {
 

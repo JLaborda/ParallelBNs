@@ -163,7 +163,6 @@ public abstract class Experiment {
             // Saving paths
             //String path_iters = "experiments/" + this.net_name + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_" + this.fusion_consensus + "_iteratation_results.csv";
             String path_global;
-            String className = this.getClass().getSimpleName();
             if(seed == -1) {
                 path_global = "./experiments/" + this.net_name + "/" + this.algName + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_global_results.csv";
             }
@@ -206,8 +205,8 @@ public abstract class Experiment {
             csvWriter_global.close();
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            System.out.println("Error saving file");
         }
 
     }

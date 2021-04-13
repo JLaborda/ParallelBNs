@@ -122,12 +122,11 @@ public class PGESv2
      * Initializes the general parameters of the class.
      * @param nThreads number of threads used in the problem.
      */
-    @SuppressWarnings("unchecked")
     private void initialize(int nThreads){
         this.nThreads = nThreads;
         this.gesThreads = new GESThread[this.nThreads];
         this.threads = new Thread[this.nThreads];
-        this.subSets = new ArrayList(this.nThreads);
+        this.subSets = new ArrayList<List<Edge>>(this.nThreads);
 
         //The total number of arcs of a graph is n*(n-1), where n is the number of nodes in the graph.
         this.listOfArcs = new ArrayList<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1));

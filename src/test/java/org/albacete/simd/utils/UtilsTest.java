@@ -135,7 +135,6 @@ public class UtilsTest {
 
 
         // Acting: Getting MB for every node
-        Map<String,List<Node>> mbs = new HashMap<>();
         for (Node n: dag.getNodes() ) {
             List<Node> result = Utils.getMarkovBlanket(dag,n);
             List<Node> exp = expected.get(n);

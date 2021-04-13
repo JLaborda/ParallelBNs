@@ -26,7 +26,6 @@ public class Utils {
      * @param numSplits The number of splits to do in the listOfArcs.
      * @return The subsets of the listOfArcs in an ArrayList of TupleNode.
      */
-    @SuppressWarnings("unchecked")
     public static List<List<Edge>> split(List<Edge> listOfArcs, int numSplits){
 
 
@@ -71,7 +70,7 @@ public class Utils {
         List<Edge> listOfArcs = new ArrayList<>(data.getNumColumns() * (data.getNumColumns() -1));
         //1. Get edges (variables)
         List<Node> variables = data.getVariables();
-        int index = 0;
+        //int index = 0;
         //2. Iterate over variables and save pairs
         for(int i=0; i<data.getNumColumns()-1; i++){
             for(int j=i+1; j<data.getNumColumns(); j++){
@@ -82,7 +81,7 @@ public class Utils {
                 //3. Storing both pairs
                 listOfArcs.add(Edges.directedEdge(var_A,var_B));
                 listOfArcs.add(Edges.directedEdge(var_B,var_A));
-                index++;
+                //index++;
                 //this.listOfArcs[index] = new TupleNode(var_B,var_A);
                 //index++;
             }

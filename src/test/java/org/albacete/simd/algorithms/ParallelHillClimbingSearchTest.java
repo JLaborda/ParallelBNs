@@ -2,7 +2,6 @@ package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.algorithms.ParallelHillClimbingSearch;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -145,8 +144,7 @@ public class ParallelHillClimbingSearchTest {
     @Test(expected = Exception.class)
     public void exceptionReadDataTest(){
         String path = "";
-        //noinspection unused
-        ParallelHillClimbingSearch alg = new ParallelHillClimbingSearch(path, 1);
+        new ParallelHillClimbingSearch(path, 1);
         fail();
     }
 
