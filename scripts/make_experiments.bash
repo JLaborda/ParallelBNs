@@ -56,6 +56,14 @@ for((i=0;i<$len_nets;i++))
 do
     netPath=${networks[$i]};
     testPath=${tests[$i]};
+    net_name=${net_names[$i]}
+
+    # Defining Databases for current network
+    databases=()
+    for ending in ${endings[@]}; do
+        databases+=(${BBDD_FOLDER}${net_name}$ending)
+    done
+
     for dataPath in ${databases[@]};
     do
         for nthread in ${nThreads[@]};
