@@ -75,13 +75,14 @@ public class RunExperiments {
                 List<String> bbddPaths = createBBDDPaths(netName);
                 String testPath = createTestPath(netName);
                 for (String bbddPath : bbddPaths){
+                    // GES
+                    experiment = new ExperimentGES(netPath, bbddPath, testPath);
+                    experiment.runExperiment();
+                    experiment.printResults();
+                    csvWriter.append(experiment.getResults());
+                    csvWriter.flush();
                     for(Integer interleaving : interleavings){
-                        // GES
-                        experiment = new ExperimentGES(netPath, bbddPath, testPath, interleaving);
-                        experiment.runExperiment();
-                        experiment.printResults();
-                        csvWriter.append(experiment.getResults());
-                        csvWriter.flush();
+
                         //HC
                         experiment = new ExperimentHC(netPath, bbddPath, testPath, maxIterations, interleaving);
                         experiment.runExperiment();

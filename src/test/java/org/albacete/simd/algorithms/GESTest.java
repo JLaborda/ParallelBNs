@@ -5,7 +5,6 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
-import org.albacete.simd.algorithms.GES;
 import org.albacete.simd.utils.Problem;
 import org.junit.Test;
 
@@ -44,7 +43,7 @@ public class GESTest {
 
         // Creating GES with the first constructor
         DataSet dataSet = reader.parseTabular(new File("res/networks/BBDD/cancer.xbif_.csv"));
-        GES ges1 = new GES(dataSet,100);
+        GES ges1 = new GES(dataSet);
 
         ges1.search();
         Graph g = ges1.getCurrentGraph();

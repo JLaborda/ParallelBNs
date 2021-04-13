@@ -52,7 +52,7 @@ public class MainExperiment{
         Experiment experiment = null;
         switch (algorithmName) {
             case "ges":
-                experiment = new ExperimentGES(netPath, bbddPath, testPath, nInterleaving);
+                experiment = new ExperimentGES(netPath, bbddPath, testPath);
                 break;
             case "pges":
                 experiment = new ExperimentPGES(netPath, bbddPath, testPath, nThreads, maxIterations, nInterleaving, seed);

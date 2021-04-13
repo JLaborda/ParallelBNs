@@ -49,7 +49,7 @@ seeds=(2 3 5 7 11 13 17 19 23 29)
 
 declare -a nThreads=(2 4 6 8)
 declare -a nItInterleavings=(5 10 15)
-maxIterations=25
+maxIterations=1000
 
 len_nets=${#networks[@]};
 for((i=0;i<$len_nets;i++))

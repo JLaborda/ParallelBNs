@@ -24,12 +24,8 @@ public class FESThread extends GESThread{
      * @param maxIt maximum number of iterations allowed in the fes stage
      */
     public FESThread(Problem problem, Graph initialDag, List<Edge> subset, int maxIt) {
-        this.problem = problem;
-        setInitialGraph(initialDag);
-        setSubSetSearch(subset);
-        setMaxIt(maxIt);
-        this.id = threadCounter;
-        threadCounter++;
+        this(problem,subset, maxIt);
+        this.initialDag = initialDag;
     }
 
     /**

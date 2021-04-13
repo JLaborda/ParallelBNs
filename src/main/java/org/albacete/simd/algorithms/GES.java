@@ -18,8 +18,7 @@ public class GES{
     private Graph initialDag;
     private long elapsedTime;
     private double modelBDeu;
-    private int interleaving = Integer.MAX_VALUE;
-    private int maxIt = 15;
+    //private int interleaving = Integer.MAX_VALUE;
     private List<Edge> combinations;
     private Graph graph;
     private Problem problem;
@@ -35,7 +34,7 @@ public class GES{
         this(dataSet);
         this.initialDag = initialDag;
     }
-
+/*
     public GES(DataSet dataSet, int interleaving){
         this(dataSet);
         this.interleaving = interleaving;
@@ -45,6 +44,7 @@ public class GES{
         this(dataSet, initialDag);
         this.interleaving = interleaving;
     }
+*/
 
 /*
     */
@@ -108,9 +108,9 @@ public class GES{
         // Method 1-- original.
         double score = 0;
 
-        // Doing forward search
+        // Doing forward search without interleaving
         System.out.println("FES stage: ");
-        fes = new FESThread(problem, combinations, interleaving);
+        fes = new FESThread(problem, initialDag, combinations, Integer.MAX_VALUE);
         fes.run();
         graph = fes.getCurrentGraph();
 
@@ -127,10 +127,8 @@ public class GES{
 
         // Measuring stats
         long endTime = System.currentTimeMillis();
-        this.elapsedTime = endTime - startTime;
+        this.elapsedTime =  endTime - startTime;
         this.modelBDeu = score;
-
-
         return graph;
     }
 
@@ -145,5 +143,13 @@ public class GES{
 
     public Problem getProblem() {
         return problem;
+    }
+
+    public double getModelBDeu(){
+        return modelBDeu;
+    }
+
+    public long getElapsedTime() {
+        return elapsedTime;
     }
 }

@@ -12,25 +12,21 @@ import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class ExperimentGES extends Experiment{
 
 
     private GES algorithm;
-
+/*
     public ExperimentGES(String net_path, String bbdd_path, String test_path, int nItInterleaving){
         super(net_path, bbdd_path, test_path, 0, 0,nItInterleaving);
         algName = "ges";
     }
-
+*/
     public ExperimentGES(String net_path, String bbdd_path, String test_path) {
-        this(net_path, bbdd_path, test_path, Integer.MAX_VALUE);
+        super(net_path, bbdd_path, test_path, 0, 0, Integer.MAX_VALUE);
+        algName = "ges";
     }
-
-
-
 
 
     @Override
@@ -58,7 +54,7 @@ public class ExperimentGES extends Experiment{
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.algorithm = new GES(dataSet, this.nItInterleaving);
+            this.algorithm = new GES(dataSet);
 
             // Search is executed
             //alg.search();
