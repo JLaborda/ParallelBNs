@@ -3,6 +3,8 @@ package org.albacete.simd.experiments;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 
@@ -111,20 +113,35 @@ public class ExperimentsTest {
 
     @Test
     public void saveExperimentTest(){
-        //Arrange: Creating Experiment
-        Experiment experiment = new ExperimentPGES(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving, seed);
-        experiment.runExperiment();
-
-        //Act: Saving Experiment
-        experiment.saveExperiment();
+        String savePath = "/home/jdls/developer/projects/ParallelBNs/results/test.txt";
+        File file = new File(savePath);
+        try {
+            //Arrange: Creating Experiment and deleting previous file
+            Files.deleteIfExists(file.toPath());
+            Experiment experiment = new ExperimentPGES(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving, seed);
+            experiment.runExperiment();
+            String results = experiment.getResults();
+            
+            //Act: Saving Experiment
+            Experiment.saveExperiment(savePath, results);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         //Assert: Checking if the file has been saved
-        String path = "./experiments/res/networks/alarm/pges/alarm.xbif50001_T2_I5_global_results.csv";
-
-        File temp = new File(path);
-
+        File temp = new File(savePath);
         assertTrue(temp.exists());
 
+        // Deleting again
+        try {
+            Files.deleteIfExists(temp.toPath());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+            
+        
     }
 
 

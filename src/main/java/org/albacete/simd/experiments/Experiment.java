@@ -3,6 +3,7 @@ package org.albacete.simd.experiments;
 import edu.cmu.tetrad.data.DataSet;
 import org.albacete.simd.utils.Utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -156,59 +157,20 @@ public abstract class Experiment {
 
 
     public abstract void printResults();
-
-    public void saveExperiment()
-    {
-        try {
-            // Saving paths
-            //String path_iters = "experiments/" + this.net_name + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_" + this.fusion_consensus + "_iteratation_results.csv";
-            String path_global;
-            if(seed == -1) {
-                path_global = "./experiments/" + this.net_name + "/" + this.algName + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_global_results.csv";
+    
+    public static void saveExperiment(String savePath, String results) throws IOException{
+        File file = new File(savePath);
+            BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
+            //FileWriter csvWriter = new FileWriter(savePath, true);
+            if(file.length() == 0) {
+                String header = "algorithm, network, bbdd, threads, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, dfMM minus, Total iterations, Total time(s)\n";
+                csvWriter.append(header);
             }
-            else{
-                path_global = "./experiments/" + this.net_name + "/" + this.algName + "/" + this.bbdd_name + "T" + this.nThreads + "_I" + this.nItInterleaving + "_S" + this.seed+ "_global_results.csv";
-            }
-            // Files
-            //File file_iters = new File(path_iters);
-            //file_iters.getParentFile().mkdirs();
-            File file_global = new File(path_global);
-            file_global.getParentFile().mkdirs();
+            csvWriter.append(results);
 
-            // File Writers
-            //FileWriter csvWriter_iters = new FileWriter(file_iters);
-            FileWriter csvWriter_global = new FileWriter(file_global);
-
-
-            // Saving global results
-            csvWriter_global.append("SHD");
-            csvWriter_global.append(",");
-            csvWriter_global.append("LL Score");
-            csvWriter_global.append(",");
-            csvWriter_global.append("BDeu Score");
-            csvWriter_global.append(",");
-            csvWriter_global.append("dfMM");
-            csvWriter_global.append(",");
-            csvWriter_global.append("dfMM plus");
-            csvWriter_global.append(",");
-            csvWriter_global.append("dfMM minus");
-            csvWriter_global.append(",");
-            csvWriter_global.append("Total iterations");
-            csvWriter_global.append(",");
-            csvWriter_global.append("Total time(s)");
-            csvWriter_global.append("\n");
-
-            String row = this.shd + "," + this.LLscore + "," + this.score + "," + this.dfmm[0] + "," + this.dfmm[1] + "," + this.dfmm[2] + "," + this.nIterations + ","  + elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
-            csvWriter_global.append(row);
-
-            csvWriter_global.flush();
-            csvWriter_global.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Error saving file");
-        }
-
+            csvWriter.flush();
+            csvWriter.close();
+            System.out.println("Results saved at: " + savePath);
     }
 
     public static ArrayList<String> getNetworkPaths(String netFolder){

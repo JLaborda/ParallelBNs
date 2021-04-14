@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 
+
 public class MainExperiment{
 
     public static final String EXPERIMENTS_FOLDER = "/parallelbns/results/cluster/";//"/home/jorlabs/projects/ParallelBNs-git/ParallelBNs/experiments/galgo/";
@@ -21,17 +22,17 @@ public class MainExperiment{
         String bbddPath = args[3];
         String testPath = args[4];
         int nThreads = 0;
-        int nInterleaving = Integer.parseInt(args[5]);
+        int nInterleaving = 0;
         int maxIterations = 0;
         int seed = 0;
         // HC
-        if (args.length == 7){
+        if (args.length >= 7){
+            nInterleaving = Integer.parseInt(args[5]);
             maxIterations = Integer.parseInt(args[6]);
         }
         // Rest of experiments
         if(args.length == 9){
-            nThreads = Integer.parseInt(args[6]);
-            maxIterations = Integer.parseInt(args[7]);
+            nThreads = Integer.parseInt(args[7]);
             seed = Integer.parseInt(args[8]);
         }
 
@@ -75,24 +76,15 @@ public class MainExperiment{
         // Running experiment
         experiment.runExperiment();
         //experiment.saveExperiment();
-        try{
-            String results = experiment.getResults();
-            String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + ".csv";
-            File file = new File(savePath);
-            BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
-            //FileWriter csvWriter = new FileWriter(savePath, true);
-            if(file.length() == 0) {
-                String header = "algorithm, network, bbdd, thread, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, Total iterations, Total time(s)\n";
-                csvWriter.append(header);
-            }
-            csvWriter.append(results);
-
-            csvWriter.flush();
-            csvWriter.close();
-            System.out.println("Results saved at: " + savePath);
-        }catch (IOException e) {
+        String results = experiment.getResults();
+        String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + ".csv";
+        try {
+            Experiment.saveExperiment(savePath, results);
+        } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Error saving results at: " + savePath);
         }
-
     }
+
+
 }
