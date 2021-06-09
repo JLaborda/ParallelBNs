@@ -1,4 +1,4 @@
-algorithm, network, bbdd, threads, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, dfMM minus, Total iterations, Total time(s)
+algorithm,network,bbdd,threads,interleaving,seed,SHD,LL Score,BDeu Score,dfMM,dfMM plus,dfMM minus,Total iterations,Total time(s)
 ges,parallelbns/res/networks/andes,andes.xbif_,0,2147483647,-1,173,-0.4181927461851755,-475749.2570055629,1.7130044843049328,40.0,342.0,0,713
 pges,parallelbns/res/networks/andes,andes.xbif_,1,5,29,163,-0.5419522018543106,-475353.78039629594,1.5874439461883407,16.0,338.0,61,779
 pges,parallelbns/res/networks/andes,andes.xbif_,1,5,17,163,-0.5459810102714379,-475359.3985655222,1.5874439461883407,16.0,338.0,62,794
