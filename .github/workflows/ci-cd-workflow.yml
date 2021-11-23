@@ -21,18 +21,9 @@ jobs:
           distribution: 'adopt'
           cache: maven
 
-      # Caching repositories
-#      - name: Caching repository
-#        uses: actions/cache@v1
-#        with:
-#          path: ~/.m2/repository
-#          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-#          restore-keys: |
-#            ${{ runner.os }}-maven-
-
       # Building code
       - name: Build with Maven
-      - run: mvn --batch-mode --update-snapshots verify
+        run: mvn --batch-mode --update-snapshots verify
         #|
          # mvn -B package --file $GITHUB_WORKSPACE/pom.xml
          # mvn cobertura:cobertura
@@ -49,3 +40,12 @@ jobs:
           file: ./target/site/cobertura/coverage.xml #optional
           yml: ./codecov.yml #optional
           fail_ci_if_error: false #optional (default = false)
+
+      # Caching repositories
+#      - name: Caching repository
+#        uses: actions/cache@v1
+#        with:
+#          path: ~/.m2/repository
+#          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: |
+#            ${{ runner.os }}-maven-
