@@ -1,6 +1,7 @@
 package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.graph.Dag;
+import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.utils.Problem;
 import org.junit.Test;
 
@@ -17,8 +18,8 @@ public class HillClimbingSearchTest {
 
         assertNotNull(hc1);
         assertNotNull(hc2);
-        assertEquals(1, hc1.getnThreads());
-        assertEquals(1, hc2.getnThreads());
+        assertEquals(0, hc1.getnThreads());
+        assertEquals(0, hc2.getnThreads());
         assertEquals(15, hc1.getMaxIterations());
         assertEquals(15, hc2.getMaxIterations());
         assertEquals(5, hc1.getItInterleaving());

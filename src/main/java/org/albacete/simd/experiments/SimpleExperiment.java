@@ -5,19 +5,19 @@ import java.io.IOException;
 public class SimpleExperiment {
 
     public static void main(String[] args) throws IOException {
-        String networkFolder = "/home/jdls/developer/projects/ParallelBNs/res/networks/";
-        Experiment experiment = new ExperimentPGES( networkFolder + "andes.xbif",
-                networkFolder + "BBDD/andes.xbif50001_.csv",
-                networkFolder + "BBDD/tests/andes_test.csv",
-                8,
+        String networkFolder = "res/networks/";
+        Experiment experiment = new ExperimentPGES( networkFolder + "alarm.xbif",
+                networkFolder + "BBDD/alarm.xbif50001_.csv",
+                networkFolder + "BBDD/tests/alarm_test.csv",
+                2,
                 1000,
                 15,
-                30
+                42
                 );
         experiment.runExperiment();
         experiment.printResults();
         String results = experiment.getResults();
-        String savePath = "/home/jdls/developer/projects/ParallelBNs/results/prueba.txt";
-        Experiment.saveExperiment(savePath, results);
+        //String savePath = "/home/jdls/developer/projects/ParallelBNs/results/prueba.txt";
+        //Experiment.saveExperiment(savePath, results);
     }
 }

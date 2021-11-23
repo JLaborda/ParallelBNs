@@ -1,17 +1,17 @@
 #!/bin/bash
-HOME_FOLDER="/parallelbns/"
+HOME_FOLDER="/Users/jdls/developer/projects/ParallelBNs/"
 NETWORKS_FOLDER=${HOME_FOLDER}"res/networks/";
 BBDD_FOLDER=${NETWORKS_FOLDER}"BBDD/";
 TEST_FOLDER=${NETWORKS_FOLDER}"BBDD/tests/";
 ENDING_NETWORKS=".xbif";
 ENDING_BBDD10K="10k.csv";
 ENDING_BBDD50K="50k.csv";
-PARAMS_FOLDER="/home/jdls/developer/projects/ParallelBNs/res/params/";
+PARAMS_FOLDER="/Users/jdls/developer/projects/ParallelBNs/res/params/";
 
 declare -a algorithms=("ges" "pges" "hc" "phc" "pfhcbes")
 
-#declare -a net_names=("alarm" "andes" "barley" "cancer" "child" "earthquake" "hailfinder" "hepar2" "insurance" "link" "mildew" "munin" "pigs" "water" "win95pts")
-declare -a net_names=("andes" "link" "mildew" "munin" "pigs" "water" "win95pts")
+declare -a net_names=("alarm" "andes" "barley" "cancer" "child" "earthquake" "hailfinder" "hepar2" "insurance" "link" "mildew" "munin" "pigs" "water" "win95pts")
+#declare -a net_names=("andes" "link" "mildew" "munin" "pigs" "water" "win95pts")
 
 declare networks=()
 for net in ${net_names[@]}; do
@@ -66,10 +66,16 @@ do
 
     # Deleting files of previous params
     FILE=${PARAMS_FOLDER}experiments_${net_name}.txt
-    if test -f "$FILE"; then
-        rm $FILE
-    fi
+    #if test -f "$FILE"; then
+    #    rm $FILE
+    #fi
 
+    # Creating new File
+    >${FILE}
+    echo "Creating experiments for: ${net_name} at: ${FILE}"
+    #if test -f "$FILE"; then
+    #    echo "File Created: $FILE"
+    #fi
     # Defining Databases for current network
     databases=()
     for ending in ${endings[@]}; do
@@ -85,7 +91,7 @@ do
                 for alg in ${algorithms[@]};
                 do
                     if [ $alg == "ges" ]
-                    then    
+                    then
                         echo ${net_names[$i]} $alg $netPath $dataPath $testPath >> $FILE
                     elif [ $alg == "hc" ]
                         then
@@ -93,7 +99,7 @@ do
                     else
                         for seed in ${seeds[@]};
                         do
-                            echo ${net_names[$i]} $alg $netPath $dataPath $testPath $nItInterleaving $maxIterations $nthread  $seed >> $FILE
+                            echo ${net_names[$i]} $alg $netPath $dataPath $testPath $nItInterleaving $maxIterations $nthread $seed >> $FILE
                         done
                     fi
                 done

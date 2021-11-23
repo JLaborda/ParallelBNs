@@ -69,6 +69,11 @@ public abstract class BNBuilder {
     protected Graph currentGraph = null;
 
     /**
+     * Score of the currentGraph
+     */
+    protected double score = 0;
+
+    /**
      * Iteration counter. It stores the current iteration of the algorithm.
      */
     protected int it = 1;

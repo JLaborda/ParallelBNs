@@ -113,7 +113,7 @@ public class ExperimentsTest {
 
     @Test
     public void saveExperimentTest(){
-        String savePath = "/home/jdls/developer/projects/ParallelBNs/results/test.txt";
+        String savePath = "./results/test.txt";
         File file = new File(savePath);
         try {
             //Arrange: Creating Experiment and deleting previous file

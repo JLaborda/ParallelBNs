@@ -1,7 +1,7 @@
 package org.albacete.simd.framework;
 
 import edu.cmu.tetrad.graph.Edge;
-import org.albacete.simd.algorithms.HillClimbingSearch;
+import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class BNBuilderTest {
         assertNull(algorithm.getCurrentGraph());
         assertEquals(1, algorithm.getIterations());
         assertEquals(problem, algorithm.getProblem());
-        assertEquals(1, algorithm.getnThreads());
+        assertEquals(0, algorithm.getnThreads());
 
 
     }
