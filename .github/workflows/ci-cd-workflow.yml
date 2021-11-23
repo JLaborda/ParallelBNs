@@ -1,4 +1,4 @@
-name: Continuos Integration
+name: Continuos Integration and Continuous Delivery
 
 on: [push, pull_request]
 
