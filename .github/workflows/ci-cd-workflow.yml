@@ -33,16 +33,15 @@ jobs:
          name: Package
          path: staging
      # CodeCov
-
       - name: Running Codecov
         uses: codecov/codecov-action@v2
-          with:
-            token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-            files: ./codecov.yml # optional
-            #flags: unittests # optional
-            name: codecov-umbrella # optional
-            fail_ci_if_error: false # optional (default = false)
-            verbose: true # optional (default = false)
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: ./codecov.yml # optional
+          #flags: unittests # optional
+          name: codecov-umbrella # optional
+          fail_ci_if_error: false # optional (default = false)
+          verbose: true # optional (default = false)
 
   push_to_registries:
     name: Push Docker image to multiple registries
