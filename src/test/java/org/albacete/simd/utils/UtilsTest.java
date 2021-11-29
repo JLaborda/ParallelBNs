@@ -3,6 +3,7 @@ package org.albacete.simd.utils;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
+import org.albacete.simd.Resources;
 import org.junit.Test;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
@@ -17,13 +18,13 @@ import java.util.*;
 public class UtilsTest {
 
 
-    final String path1 = "src/test/resources/repeatedNames.csv";
-    final String path2 = "src/test/resources/cancer.xbif_.csv";
+    //final String path1 = "src/test/resources/repeatedNames.csv";
+    final String path = Resources.CANCER_BBDD_PATH;
     /**
      * Dataset created from the data file1
      */
     //final DataSet datasetRepeated = Utils.readData(path1);
-    final DataSet dataset = Utils.readData(path2);
+    final DataSet dataset = Utils.readData(path);
 
 
 
@@ -74,8 +75,6 @@ public class UtilsTest {
      */
     @Test
     public void readDataTest(){
-        // Arrange
-        String path = "src/test/resources/cancer.xbif_.csv";
 
         //Act
         DataSet result = Utils.readData(path);
@@ -92,7 +91,7 @@ public class UtilsTest {
 
         /*TEST: Comparing the same bn should return 0*/
         // Arrange
-        String net_path = "./res/networks/cancer.xbif";
+        String net_path = Resources.CANCER_NET_PATH;
         BIFReader bf = new BIFReader();
         bf.processFile(net_path);
         BayesNet bn = (BayesNet) bf;
@@ -118,7 +117,7 @@ public class UtilsTest {
     @Test
     public void markovBlanquetTest() throws Exception {
         // Arranging: Loading the cancer network
-        String net_path1 = "./res/networks/cancer.xbif";
+        String net_path1 = Resources.CANCER_NET_PATH;
         BIFReader bf = new BIFReader();
         bf.processFile(net_path1);
         MlBayesIm bn1 = new MlBayesIm((BayesNet) bf);
@@ -130,8 +129,8 @@ public class UtilsTest {
         expected.put(dag.getNode("Smoker"), Arrays.asList(dag.getNode("Cancer"), dag.getNode("Pollution")));
         expected.put(dag.getNode("Cancer"), Arrays.asList(dag.getNode("Pollution"), dag.getNode("Smoker"),
                 dag.getNode("Xray"), dag.getNode("Dyspnoea")));
-        expected.put(dag.getNode("Xray"), Arrays.asList(dag.getNode("Cancer")));
-        expected.put(dag.getNode("Dyspnoea"), Arrays.asList(dag.getNode("Cancer")));
+        expected.put(dag.getNode("Xray"), Collections.singletonList(dag.getNode("Cancer")));
+        expected.put(dag.getNode("Dyspnoea"), Collections.singletonList(dag.getNode("Cancer")));
 
 
         // Acting: Getting MB for every node
@@ -157,8 +156,8 @@ public class UtilsTest {
     @Test
     public void avgMarkovBlanquetDifTest() throws Exception {
         /*TEST: Different Dags should return null*/
-        String net_path1 = "./res/networks/cancer.xbif";
-        String net_path2 = "./res/networks/alarm.xbif";
+        String net_path1 = Resources.CANCER_NET_PATH;
+        String net_path2 = Resources.ALARM_NET_PATH;
         BIFReader bf = new BIFReader();
 
         // Arranging dags of alarm and cancer
@@ -181,6 +180,7 @@ public class UtilsTest {
         // Acting: Getting the avgMarkovBlanquetDif:
         result = Utils.avgMarkovBlanquetdif(bn1.getDag(), bn2.getDag());
         // Asserting
+        assertNotNull(result);
         for(double r: result){
             assertEquals(0,r,0.000001);
         }
@@ -204,7 +204,7 @@ public class UtilsTest {
         double expected_mbavg = 4.0/5.0;
         double expected_mbplus = 2;
         double expected_mbminus = 2;
-
+        assertNotNull(result);
         assertEquals(expected_mbavg, result[0], 0.000001);
         assertEquals(expected_mbplus, result[1], 0.000001);
         assertEquals(expected_mbminus, result[2 ], 0.000001);
@@ -213,7 +213,7 @@ public class UtilsTest {
     @Test
     public void getNodeByNameTest() throws Exception {
         BIFReader bf = new BIFReader();
-        bf.processFile("res/networks/cancer.xbif");
+        bf.processFile(Resources.CANCER_NET_PATH);
         BayesNet bn = (BayesNet) bf;
         System.out.println("Numero de variables: "+bn.getNrOfNodes());
         MlBayesIm bn2 = new MlBayesIm(bn);
@@ -230,7 +230,7 @@ public class UtilsTest {
     @Test
     public void getIndexOfNodesByNameTest() throws Exception {
         BIFReader bf = new BIFReader();
-        bf.processFile("res/networks/cancer.xbif");
+        bf.processFile(Resources.CANCER_NET_PATH);
         BayesNet bn = (BayesNet) bf;
         System.out.println("Numero de variables: "+bn.getNrOfNodes());
         MlBayesIm bn2 = new MlBayesIm(bn);

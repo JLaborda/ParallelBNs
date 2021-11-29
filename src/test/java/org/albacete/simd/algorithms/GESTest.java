@@ -6,6 +6,7 @@ import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.utils.Problem;
+import org.albacete.simd.Resources;
 import org.junit.Test;
 
 import java.io.File;
@@ -24,7 +25,7 @@ public class GESTest {
         reader.setMaxIntegralDiscrete(100);
 
         // Creating GES with the first constructor
-        DataSet dataSet = reader.parseTabular(new File("res/networks/BBDD/alarm.xbif_.csv"));
+        DataSet dataSet = reader.parseTabular(new File(Resources.ALARM_BBDD_PATH));
         GES ges1 = new GES(dataSet);
 
         // Creating GES with the second constructor
@@ -42,7 +43,7 @@ public class GESTest {
         reader.setMaxIntegralDiscrete(100);
 
         // Creating GES with the first constructor
-        DataSet dataSet = reader.parseTabular(new File("res/networks/BBDD/cancer.xbif_.csv"));
+        DataSet dataSet = reader.parseTabular(new File(Resources.CANCER_BBDD_PATH));
         GES ges1 = new GES(dataSet);
 
         ges1.search();
@@ -59,7 +60,7 @@ public class GESTest {
         reader.setMaxIntegralDiscrete(100);
 
         // Creating GES with the first constructor
-        DataSet dataSet = reader.parseTabular(new File("res/networks/BBDD/cancer.xbif_.csv"));
+        DataSet dataSet = reader.parseTabular(new File(Resources.CANCER_BBDD_PATH));
         Problem expected = new Problem(dataSet);
 
         GES ges1 = new GES(dataSet);

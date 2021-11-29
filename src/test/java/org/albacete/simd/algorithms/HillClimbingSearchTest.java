@@ -3,15 +3,16 @@ package org.albacete.simd.algorithms;
 import edu.cmu.tetrad.graph.Dag;
 import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.utils.Problem;
+import org.albacete.simd.Resources;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class HillClimbingSearchTest {
 
+    String path = Resources.ALARM_BBDD_PATH;
     @Test
     public void constructorTest(){
-        String path = "src/test/resources/alarm.xbif_.csv";
         Problem problem = new Problem(path);
         HillClimbingSearch hc1 = new HillClimbingSearch(path,15,5);
         HillClimbingSearch hc2 = new HillClimbingSearch(problem.getData(), 15, 5);
@@ -29,7 +30,6 @@ public class HillClimbingSearchTest {
 
     @Test
     public void searchTest(){
-        String path = "src/test/resources/alarm.xbif_.csv";
         HillClimbingSearch hc1 = new HillClimbingSearch(path,15,5);
 
         hc1.search();
@@ -40,7 +40,6 @@ public class HillClimbingSearchTest {
 
     @Test
     public void convergenceTest(){
-        String path = "src/test/resources/alarm.xbif_.csv";
         HillClimbingSearch hc1 = new HillClimbingSearch(path,1,5);
 
         hc1.search();

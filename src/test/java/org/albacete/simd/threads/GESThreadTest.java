@@ -2,6 +2,7 @@ package org.albacete.simd.threads;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
+import org.albacete.simd.Resources;
 import org.albacete.simd.utils.LocalScoreCacheConcurrent;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
@@ -25,7 +26,7 @@ public class GESThreadTest {
      * cancer Bayesian Network @see
      * <a href="https://www.bnlearn.com/bnrepository/discrete-small.html">https://www.bnlearn.com/bnrepository/discrete-small.html</a>
      */
-    final String path = "src/test/resources/cancer.xbif_.csv";
+    final String path = Resources.CANCER_BBDD_PATH;
     /**
      * Dataset created from the data file
      */
@@ -460,11 +461,10 @@ public class GESThreadTest {
     }
 
 
-    /**
+
+    /*
      * Testing that a buildingIndexing is built when asked to.
      * @result Test should be true
-     */
-    /*
     @Test
     public void buildIndexingNotBuiltTest(){
         // Arrange

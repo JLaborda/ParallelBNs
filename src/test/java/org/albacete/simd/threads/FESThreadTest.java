@@ -4,6 +4,7 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.utils.Problem;
+import org.albacete.simd.Resources;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -19,7 +20,7 @@ public class FESThreadTest {
      * cancer Bayesian Network @see
      * <a href="https://www.bnlearn.com/bnrepository/discrete-small.html">https://www.bnlearn.com/bnrepository/discrete-small.html</a>
      */
-    final String path = "src/test/resources/cancer.xbif_.csv";
+    final String path = Resources.CANCER_BBDD_PATH;
     /**
      * Dataset created from the data file
      */
@@ -228,7 +229,7 @@ public class FESThreadTest {
     @Test
     public void alarmExecutionTest() throws InterruptedException {
         // ThFES objects
-        String alarmPath = "src/test/resources/alarm.xbif_.csv";
+        String alarmPath = Resources.ALARM_BBDD_PATH;
         DataSet alarmDataset = Utils.readData(alarmPath);
         List<Edge> listOfArcs = Utils.calculateArcs(alarmDataset);
         Utils.setSeed(42);

@@ -2,6 +2,7 @@ package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
+import org.albacete.simd.Resources;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ public class ParallelHillClimbingSearchTest {
      * cancer Bayesian Network @see
      * <a href="https://www.bnlearn.com/bnrepository/discrete-small.html">https://www.bnlearn.com/bnrepository/discrete-small.html</a>
      */
-    final String path = "src/test/resources/cancer.xbif_.csv";
+    final String path = Resources.CANCER_BBDD_PATH;
     /**
      * Dataset created from the data file
      */
@@ -52,11 +53,6 @@ public class ParallelHillClimbingSearchTest {
      * Subset2 of pairs of nodes or variables.
      */
     final List<Edge> subset2 = new ArrayList<>();
-
-
-    /**
-     * This method initializes the subsets, splitting the nodes in what is expected to happen when the seed is 42
-     */
 
 
     /**
@@ -212,7 +208,7 @@ public class ParallelHillClimbingSearchTest {
     @Test
     public void searchAlarmTest(){
         //Arrange
-        String alarmPath = "src/test/resources/alarm.xbif_.csv";
+        String alarmPath = Resources.ALARM_BBDD_PATH;
         ParallelHillClimbingSearch pGESv2 = new ParallelHillClimbingSearch(alarmPath, 2);
 
         // Act
@@ -239,7 +235,7 @@ public class ParallelHillClimbingSearchTest {
     @Test
     public void convergenceTest(){
         //Arrange
-        DataSet datasetAlarm = Utils.readData("src/test/resources/alarm.xbif_.csv");
+        DataSet datasetAlarm = Utils.readData(Resources.ALARM_BBDD_PATH);
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
         phc1.setMaxIterations(2);
         //Act
@@ -251,7 +247,7 @@ public class ParallelHillClimbingSearchTest {
 
     @Test
     public void interruptedExceptionTest(){
-        DataSet datasetAlarm = Utils.readData("src/test/resources/alarm.xbif_.csv");
+        DataSet datasetAlarm = Utils.readData(Resources.ALARM_BBDD_PATH);
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
         phc1.setMaxIterations(30);
         phc1.search();

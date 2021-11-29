@@ -43,7 +43,7 @@ public class ExperimentBNBuilder {
 
     protected int nThreads;
     protected int nItInterleaving;
-    protected int maxIterations = 15;
+    protected int maxIterations;
     //protected static HashMap<String, HashMap<String,String>> map;
 
     protected int shd = Integer.MAX_VALUE;
@@ -55,7 +55,7 @@ public class ExperimentBNBuilder {
 
 
     protected String log = "";
-    protected String algName = "";
+    protected String algName;
     protected long seed = -1;
 
     public ExperimentBNBuilder(BNBuilder algorithm, String net_path, String bbdd_path, String test_path) {
@@ -290,7 +290,7 @@ public class ExperimentBNBuilder {
                 ", " + nInterleaving + ", " +  maxIterations + ", " + seed);
         System.out.println();
 
-        ExperimentBNBuilder experiment = null;
+        ExperimentBNBuilder experiment;
         BNBuilder algorithm = null;
         switch (algorithmName) {
             case "ges":
@@ -322,7 +322,7 @@ public class ExperimentBNBuilder {
         experiment.runExperiment();
         //experiment.saveExperiment();
         String results = experiment.getResults();
-        String EXPERIMENTS_FOLDER = "results/";
+        String EXPERIMENTS_FOLDER = "./results/"; // BOOKMARK: EL ERROR ESTÁ AQUÍ!
         String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + ".csv";
         try {
             Experiment.saveExperiment(savePath, results);

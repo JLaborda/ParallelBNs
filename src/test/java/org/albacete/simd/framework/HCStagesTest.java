@@ -5,6 +5,7 @@ import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
+import org.albacete.simd.Resources;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ public class HCStagesTest {
     public void runTest() throws InterruptedException{
 
         //Arrange
-        String path = "src/test/resources/alarm.xbif_.csv";
+        String path = Resources.ALARM_BBDD_PATH;
         Problem problem = new Problem(path);
         int nThreads = 2;
         int itInterleaving = 5;

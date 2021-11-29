@@ -1,15 +1,18 @@
 package org.albacete.simd.algorithms;
 
 import org.albacete.simd.utils.Problem;
+import org.albacete.simd.Resources;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class ParallelFHCBESTest {
 
+    String path = Resources.ALARM_BBDD_PATH;
+
     @Test
     public void constructorTest(){
-        String path = "src/test/resources/alarm.xbif_.csv";
+
         Problem problem = new Problem(path);
 
         ParallelFHCBES alg1 = new ParallelFHCBES(problem.getData(),
@@ -39,7 +42,6 @@ public class ParallelFHCBESTest {
 
     @Test
     public void runTest(){
-        String path = "src/test/resources/alarm.xbif_.csv";
         ParallelFHCBES alg = new ParallelFHCBES(path,
                 2,
                 15,
@@ -53,7 +55,6 @@ public class ParallelFHCBESTest {
 
     @Test
     public void convergenceTest(){
-        String path = "src/test/resources/alarm.xbif_.csv";
         ParallelFHCBES alg = new ParallelFHCBES(path,
                 2,
                 1,

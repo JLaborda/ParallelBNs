@@ -1,5 +1,6 @@
 package org.albacete.simd.experiments;
 
+import org.albacete.simd.Resources;
 import org.junit.Test;
 
 import java.io.File;
@@ -11,9 +12,9 @@ import java.util.ArrayList;
 import static org.junit.Assert.*;
 
 public class ExperimentsTest {
-    String net_path = "./res/networks/alarm.xbif";
-    String bbdd_path = "./res/networks/BBDD/alarm.xbif50001_.csv";
-    String test_path = "./res/networks/BBDD/tests/alarm_test.csv";
+    String net_path = Resources.ALARM_NET_PATH;
+    String bbdd_path = Resources.ALARM_BBDD_PATH;
+    String test_path = Resources.ALARM_TEST_PATH;
     int nThreads = 2;
     int nItInterleaving = 5;
     int seed = 42;
@@ -44,7 +45,7 @@ public class ExperimentsTest {
         assertNotEquals(Integer.MAX_VALUE,exp.getShd());
     }
 
-
+/*
     @Test
     public void getNetworkPathsTest(){
         // Arrange
@@ -55,6 +56,7 @@ public class ExperimentsTest {
         assertTrue(net_paths.contains(netFolder + "munin.xbif"));
         assertFalse(net_paths.contains(netFolder + "munin1.net"));
     }
+ */
 
     /*
     @Test
@@ -113,7 +115,7 @@ public class ExperimentsTest {
 
     @Test
     public void saveExperimentTest(){
-        String savePath = "./results/test.txt";
+        String savePath = "./test.txt";
         File file = new File(savePath);
         try {
             //Arrange: Creating Experiment and deleting previous file

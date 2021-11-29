@@ -3,6 +3,7 @@ package org.albacete.simd.framework;
 import edu.cmu.tetrad.graph.Edge;
 import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.utils.Problem;
+import org.albacete.simd.Resources;
 import org.albacete.simd.utils.Utils;
 import org.junit.Test;
 
@@ -14,7 +15,7 @@ public class BNBuilderTest {
 
     @Test
     public void settersAndGettersTest(){
-        String path = "src/test/resources/alarm.xbif_.csv";
+        String path = Resources.ALARM_BBDD_PATH;
         BNBuilder algorithm = new HillClimbingSearch(path, 15, 5);
         Problem problem = new Problem(path);
         List<Edge> arcs = Utils.calculateArcs(problem.getData());

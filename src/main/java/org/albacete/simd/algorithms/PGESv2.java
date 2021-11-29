@@ -126,7 +126,7 @@ public class PGESv2
         this.nThreads = nThreads;
         this.gesThreads = new GESThread[this.nThreads];
         this.threads = new Thread[this.nThreads];
-        this.subSets = new ArrayList<List<Edge>>(this.nThreads);
+        this.subSets = new ArrayList<>(this.nThreads);
 
         //The total number of arcs of a graph is n*(n-1), where n is the number of nodes in the graph.
         this.listOfArcs = new ArrayList<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1));
@@ -369,7 +369,7 @@ public class PGESv2
      */
 
     public Dag fusionIntersection(){
-        ArrayList<Node> order = new ArrayList<Node>(this.currentGraph.getTierOrdering());
+        ArrayList<Node> order = new ArrayList<>(this.currentGraph.getTierOrdering());
         for(Dag g: this.graphs) {
             for(Edge e:g.getEdges()) {
                 if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW)) continue;
@@ -674,7 +674,7 @@ public class PGESv2
      */
     public static void main(String[] args){
         // 1. Read Data
-        String path = "src/test/resources/alarm.xbif_.csv";
+        String path = "./src/test/res/BBDD/alarm.xbif_.csv";
         DataSet ds = Utils.readData(path);
  
         // 2. Configuring algorithm
