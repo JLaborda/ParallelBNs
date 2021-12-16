@@ -24,6 +24,8 @@ public class ExperimentPGES2 extends Experiment {
         this.algName="pges";
     }
 
+    private BayesNet bn;
+    private MlBayesIm bn2;
 
     @Override
     public void runExperiment(){
@@ -42,9 +44,9 @@ public class ExperimentPGES2 extends Experiment {
             long startTime = System.currentTimeMillis();
             BIFReader bf = new BIFReader();
             bf.processFile(this.net_path);
-            BayesNet bn = (BayesNet) bf;
+            bn = (BayesNet) bf;
             System.out.println("Numero de variables: "+bn.getNrOfNodes());
-            MlBayesIm bn2 = new MlBayesIm(bn);
+            bn2 = new MlBayesIm(bn);
             DataReader reader = new DataReader();
             reader.setDelimiter(DelimiterType.COMMA);
             reader.setMaxIntegralDiscrete(100);
@@ -96,6 +98,34 @@ public class ExperimentPGES2 extends Experiment {
 
     }
 
+            @Override
+    public int getNnodes() {
+        return bn2.getDag().getNumNodes();
+    }
+    
+    @Override
+    public int getNarcs() {
+        return bn2.getDag().getNumEdges();
+    }
+    
+    @Override
+    public int getNewNnodes(){
+        return algorithm.getCurrentGraph().getNumNodes();
+    }
+    
+    @Override
+    public int getNewNarcs(){
+        return algorithm.getCurrentGraph().getNumEdges();
+    }
+    
+    @Override
+    public int getNparams() {
+        int temp = 0;
+        for (int i = 0; i < bn.getNrOfNodes(); i++) {
+            temp += bn.getCardinality(i);
+        }
+        return temp;
+    }
 
     @Override
     public void printResults(){

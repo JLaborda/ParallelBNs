@@ -13,9 +13,56 @@ import org.albacete.simd.utils.Problem;
 @SuppressWarnings("DuplicatedCode")
 public class FESThread extends GESThread{
 
-
+    private static long[] timeList;
+    
+    private int iThread;
+    
+    private long startTime;
+    
+    private double ratio;
+    
     private static int threadCounter = 1;
 
+    /**
+     * Constructor of FESThread with an initial DAG and a thread list
+     * @param problem object containing all the information of the problem
+     * @param initialDag initial DAG with which the FES stage starts with, if it's null, use the other constructor
+     * @param subset subset of edges the fes stage will try to add to the resulting graph
+     * @param maxIt maximum number of iterations allowed in the fes stage
+     * @param timeList list of the time of the other threads
+     * @param ratio
+     * @param i 
+     */
+    public FESThread(Problem problem, Graph initialDag, List<Edge> subset, int maxIt, long[] timeList, double ratio, int i) {
+        this(problem,subset, maxIt);
+        this.initialDag = initialDag;
+        FESThread.timeList = timeList;
+        this.ratio = ratio;
+        this.iThread = i;
+    }
+
+    /**
+     * Constructor of FESThread with an initial DataSet and a thread list
+     * @param problem object containing information of the problem such as data or variables.
+     * @param subset subset of edges the fes stage will try to add to the resulting graph
+     * @param maxIt maximum number of iterations allowed in the fes stage
+     * @param timeList list of the time of the other threads
+     * @param ratio
+     * @param i
+     */
+    public FESThread(Problem problem, List<Edge> subset, int maxIt, long[] timeList, double ratio, int i) {
+        this.problem = problem;
+        this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
+        setSubSetSearch(subset);
+        setMaxIt(maxIt);
+        this.id = threadCounter;
+        threadCounter++;
+        FESThread.timeList = timeList;
+        this.ratio = ratio;
+        this.iThread = i;
+    }
+    
+    
     /**
      * Constructor of FESThread with an initial DAG
      * @param problem object containing all the information of the problem
@@ -69,7 +116,7 @@ public class FESThread extends GESThread{
      * @return the resulting Pattern.
      */
     private Graph search() {
-        long startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         numTotalCalls=0;
         numNonCachedCalls=0;
         //localScoreCache.clear();
@@ -86,6 +133,10 @@ public class FESThread extends GESThread{
         long endTime = System.currentTimeMillis();
         this.elapsedTime = endTime - startTime;
         this.modelBDeu = score;
+        
+        // Save the time elapsed
+        timeList[iThread] = elapsedTime;
+        System.out.println("\n  FES HILO " + iThread + ": " + elapsedTime + "\n");        
         return graph;
 
     }
@@ -116,7 +167,7 @@ public class FESThread extends GESThread{
         // Calling fs to calculate best edge to add.
         bestInsert = fs(graph,bestScore);
 
-        while((x_i != null) && (iterations < this.maxIt)){
+        while((x_i != null) && (iterations < this.maxIt) && !finishThread()){
             // Changing best score because x_i, and therefore, y_i is not null
             bestScore = bestInsert;
 
@@ -294,6 +345,27 @@ public class FESThread extends GESThread{
 
     }
 
+    /**
+     * If a thread has not yet finished having been executed for 
+     * ratio*(fastest thread time), it cancels its execution.
+     * @param ratio The ratio
+     * @return If thread must be finished or not
+     */
+    public boolean finishThread(){
+        long smallerTime = Long.MAX_VALUE;
+        for (int i = 0; i < timeList.length; i++) {
+            System.out.println(timeList[i]);
+            if ((timeList[i] != 0) && (timeList[i] < smallerTime)){
+                smallerTime = timeList[i];
+            }
+        }
+        if ((smallerTime != Long.MAX_VALUE) && (System.currentTimeMillis() - startTime) > (ratio*smallerTime)) {
+            System.out.println("\n\n" + (System.currentTimeMillis() - startTime) + " vs " + (ratio*smallerTime) + ", FINALIZANDO HILO\n\n");
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-
+    
 }

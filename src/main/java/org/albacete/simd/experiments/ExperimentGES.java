@@ -27,7 +27,9 @@ public class ExperimentGES extends Experiment{
         super(net_path, bbdd_path, test_path, 0, 0, Integer.MAX_VALUE);
         algName = "ges";
     }
-
+    
+    private BayesNet bn;
+    private MlBayesIm bn2;
 
     @Override
     public void runExperiment() {
@@ -45,9 +47,9 @@ public class ExperimentGES extends Experiment{
             long startTime = System.currentTimeMillis();
             BIFReader bf = new BIFReader();
             bf.processFile(this.net_path);
-            BayesNet bn = (BayesNet) bf;
+            bn = (BayesNet) bf;
             System.out.println("Numero de variables: "+bn.getNrOfNodes());
-            MlBayesIm bn2 = new MlBayesIm(bn);
+            bn2 = new MlBayesIm(bn);
             DataReader reader = new DataReader();
             reader.setDelimiter(DelimiterType.COMMA);
             reader.setMaxIntegralDiscrete(100);
@@ -169,6 +171,43 @@ public class ExperimentGES extends Experiment{
 
     }
 */
+    
+    @Override
+    public int getNnodes() {
+        return bn2.getDag().getNumNodes();
+    }
+    
+    @Override
+    public int getNarcs() {
+        return bn2.getDag().getNumEdges();
+    }
+    
+    @Override
+    public int getNewNnodes(){
+        try {
+            return algorithm.getCurrentGraph().getNumNodes();
+        } catch(InterruptedException e){
+            return -1;
+        }
+    }
+    
+    @Override
+    public int getNewNarcs(){
+        try { 
+            return algorithm.getCurrentGraph().getNumEdges();
+        } catch(InterruptedException e){
+            return -1;
+        }
+    }
+    
+    @Override
+    public int getNparams() {
+        int temp = 0;
+        for (int i = 0; i < bn.getNrOfNodes(); i++) {
+            temp += bn.getCardinality(i);
+        }
+        return temp;
+    }
 
     @Override
     public String toString() {

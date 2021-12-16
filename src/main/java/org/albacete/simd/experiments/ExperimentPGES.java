@@ -20,14 +20,25 @@ public class ExperimentPGES extends Experiment{
 
 
     private PGESv2 algorithm;
+    
+    private double ratio = Double.MAX_VALUE;
 
+    public ExperimentPGES(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving, long partition_seed, double ratio) {
+        super(net_path,bbdd_path, test_path, nThreads,maxIterations,nItInterleaving, partition_seed);
+        this.algName = "pges";
+        this.ratio = ratio;
+    }
+    
     public ExperimentPGES(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving, long partition_seed) {
         super(net_path,bbdd_path, test_path, nThreads,maxIterations,nItInterleaving, partition_seed);
         this.algName = "pges";
-
     }
+    
+    private BayesNet bn;
+    private MlBayesIm bn2;
 
 
+    @Override
     public void runExperiment() {
         try {
             System.out.println("Starting Experiment:");
@@ -45,9 +56,9 @@ public class ExperimentPGES extends Experiment{
             long startTime = System.currentTimeMillis();
             BIFReader bf = new BIFReader();
             bf.processFile(this.net_path);
-            BayesNet bn = (BayesNet) bf;
+            bn = (BayesNet) bf;
             System.out.println("Numero de variables: "+bn.getNrOfNodes());
-            MlBayesIm bn2 = new MlBayesIm(bn);
+            bn2 = new MlBayesIm(bn);
             DataReader reader = new DataReader();
             reader.setDelimiter(DelimiterType.COMMA);
             reader.setMaxIntegralDiscrete(100);
@@ -57,6 +68,7 @@ public class ExperimentPGES extends Experiment{
             this.algorithm = new PGESv2(dataSet,this.nThreads);
             this.algorithm.setMaxIterations(this.maxIterations);
             this.algorithm.setNFESItInterleaving(this.nItInterleaving);
+            this.algorithm.setRatio(this.ratio);
 
             // Search is executed
             algorithm.search();
@@ -99,7 +111,37 @@ public class ExperimentPGES extends Experiment{
         }
 
     }
+    
+    @Override
+    public int getNnodes() {
+        return bn2.getDag().getNumNodes();
+    }
+    
+    @Override
+    public int getNarcs() {
+        return bn2.getDag().getNumEdges();
+    }
+    
+    @Override
+    public int getNewNnodes(){
+        return algorithm.getCurrentGraph().getNumNodes();
+    }
+    
+    @Override
+    public int getNewNarcs(){
+        return algorithm.getCurrentGraph().getNumEdges();
+    }
+    
+    @Override
+    public int getNparams() {
+        int temp = 0;
+        for (int i = 0; i < bn.getNrOfNodes(); i++) {
+            temp += bn.getCardinality(i);
+        }
+        return temp;
+    }
 
+    @Override
     public void printResults() {
         // Report
         System.out.println(this);
