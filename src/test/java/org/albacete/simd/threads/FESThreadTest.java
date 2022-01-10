@@ -3,9 +3,12 @@ package org.albacete.simd.threads;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.Resources;
 import org.albacete.simd.utils.Utils;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -64,6 +67,12 @@ public class FESThreadTest {
     public FESThreadTest(){
         problem = new Problem(dataset);
         initializeSubsets();
+    }
+
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
     }
 
     /**
@@ -150,7 +159,8 @@ public class FESThreadTest {
      */
     @Test
     public void searchTwoThreadsTest() throws InterruptedException {
-
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
         // ThFES objects
         FESThread thread1 = new FESThread(problem, subset1, 15);
         FESThread thread2 = new FESThread(problem, subset2, 15);

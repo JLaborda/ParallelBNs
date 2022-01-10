@@ -5,6 +5,7 @@ import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.Resources;
 import org.albacete.simd.utils.Utils;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -12,6 +13,12 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class BNBuilderTest {
+
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
 
     @Test
     public void settersAndGettersTest(){

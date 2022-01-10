@@ -3,7 +3,10 @@ package org.albacete.simd.algorithms;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.Resources;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Utils;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -57,6 +60,13 @@ public class PGESv2Test
      * Subset2 of pairs of nodes or variables.
      */
     final ArrayList<Edge> subset2 = new ArrayList<>();
+
+
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
 
 
     /**
