@@ -1,12 +1,22 @@
 package org.albacete.simd.algorithms;
 
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.Resources;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class ParallelFHCBESTest {
+
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
+
 
     String path = Resources.ALARM_BBDD_PATH;
 

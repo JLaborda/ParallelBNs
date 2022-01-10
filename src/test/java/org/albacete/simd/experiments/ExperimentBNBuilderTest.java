@@ -3,6 +3,9 @@ package org.albacete.simd.experiments;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.Resources;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -23,6 +26,13 @@ public class ExperimentBNBuilderTest {
 
     BNBuilder algorithm = new PGESwithStages(Resources.ALARM_BBDD_PATH, nThreads, maxIterations, nItInterleaving);
     ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, Resources.ALARM_TEST_PATH, seed);
+
+
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
 
 
     @Test

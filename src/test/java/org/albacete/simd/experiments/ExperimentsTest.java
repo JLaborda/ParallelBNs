@@ -1,6 +1,9 @@
 package org.albacete.simd.experiments;
 
 import org.albacete.simd.Resources;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -19,6 +22,13 @@ public class ExperimentsTest {
     int nItInterleaving = 5;
     int seed = 42;
     int maxIterations = 15;
+
+
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
 
 
     @Test

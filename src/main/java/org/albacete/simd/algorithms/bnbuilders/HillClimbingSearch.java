@@ -22,11 +22,11 @@ public class HillClimbingSearch extends BNBuilder {
     }
 
     public HillClimbingSearch(DataSet data) {
-        super(data, -1, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        super(data, 1, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     public HillClimbingSearch(String path) {
-        super(path, -1, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        super(path, 1, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
 

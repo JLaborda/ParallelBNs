@@ -260,10 +260,6 @@ public abstract class Experiment {
     public int getShd() {
         return shd;
     }
-    
-    public double getLLScore() {
-        return LLscore;
-    }
 
     public long getElapsedTimeMiliseconds() {
         return elapsedTime;
@@ -297,16 +293,6 @@ public abstract class Experiment {
                 + this.nIterations + ","
                 + elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
     }
-    
-    public abstract int getNnodes();
-    
-    public abstract int getNarcs();
-    
-    public abstract int getNparams();
-    
-    public abstract int getNewNnodes();
-    
-    public abstract int getNewNarcs();
 
     @Override
     public String toString() {

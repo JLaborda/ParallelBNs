@@ -39,6 +39,7 @@ public class BackwardsHillClimbingThread extends GESThread {
         setMaxIt(maxIt);
         this.id = threadCounter;
         threadCounter++;
+        this.isForwards=false;
     }
 
 
@@ -60,7 +61,7 @@ public class BackwardsHillClimbingThread extends GESThread {
     }
 
     private Graph search() {
-        long startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         numTotalCalls = 0;
         numNonCachedCalls = 0;
 
@@ -103,7 +104,9 @@ public class BackwardsHillClimbingThread extends GESThread {
             Edge bestEdge = null;
             SubSet bestSubSet = null;
             for (Edge edge : edges) {
-
+                //Checking Time
+                if(isTimeout())
+                    break;
                 if (!graph.containsEdge(edge))
                     continue;
 

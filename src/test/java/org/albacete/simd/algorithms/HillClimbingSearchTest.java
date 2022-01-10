@@ -2,13 +2,23 @@ package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.graph.Dag;
 import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.Resources;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class HillClimbingSearchTest {
+
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
+
 
     String path = Resources.ALARM_BBDD_PATH;
     @Test

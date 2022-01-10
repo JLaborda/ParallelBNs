@@ -8,7 +8,7 @@ import org.albacete.simd.utils.Problem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FESStage extends ThreadStage{
+public class FESStage extends ForwardStage{
 
     public FESStage(Problem problem, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
         super(problem, nThreads, itInterleaving, subsets);
