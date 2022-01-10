@@ -22,12 +22,16 @@ jobs:
           cache: maven
 
       # Building code
+            #|
+          # mvn -B package --file $GITHUB_WORKSPACE/pom.xml
+          # mvn cobertura:cobertura
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots verify
-        #|
-         # mvn -B package --file $GITHUB_WORKSPACE/pom.xml
-         # mvn cobertura:cobertura
-      - run: mkdir staging && cp target/*.jar staging
+            |
+      - name: Coverage Report
+        run: mvn test
+      - name: Staging Phase
+        run: mkdir staging && cp target/*.jar staging
       - uses: actions/upload-artifact@v2
         with:
          name: Package
@@ -37,7 +41,8 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          #file: ./coverage.xml # optional
+          directory: ./target/site/jacoco/
+          #files: ./coverage.xml # optional
           #flags: unittests # optional
           #name: codecov-umbrella # optional
           #fail_ci_if_error: false # optional (default = false)
