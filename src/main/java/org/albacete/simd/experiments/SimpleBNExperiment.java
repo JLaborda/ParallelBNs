@@ -2,6 +2,7 @@ package org.albacete.simd.experiments;
 
 import edu.cmu.tetrad.data.DataSet;
 import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
+import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.utils.Utils;
 
@@ -13,13 +14,13 @@ public class SimpleBNExperiment {
     public static void main(String[] args){
         // 1. Configuration
         String networkFolder = "res/networks/";
-        String net_path = networkFolder + "alarm.xbif";
-        String bbdd_path = networkFolder + "BBDD/alarm.xbif50001_.csv";
+        String net_path = networkFolder + "munin.xbif";
+        String bbdd_path = networkFolder + "BBDD/munin.xbif50001_.csv";
         DataSet ds = Utils.readData(bbdd_path);
-        String test_path = networkFolder + "BBDD/tests/alarm_test.csv";
+        String test_path = networkFolder + "BBDD/tests/munin_test.csv";
 
         // 2. Algorithm
-        BNBuilder algorithm = new HillClimbingSearch(ds);
+        BNBuilder algorithm = new PGESwithStages(ds, 8, 30, 5);
 
         // Experiment
         ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, net_path, bbdd_path, test_path, 42);

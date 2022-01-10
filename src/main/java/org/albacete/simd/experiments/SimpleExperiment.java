@@ -9,11 +9,10 @@ public class SimpleExperiment {
         Experiment experiment = new ExperimentPGES( networkFolder + "alarm.xbif",
                 networkFolder + "BBDD/alarm.xbif50001_.csv",
                 networkFolder + "BBDD/tests/alarm_test.csv",
-                4,
+                2,
                 1000,
-                5,
-                42,
-                4
+                15,
+                42
                 );
         experiment.runExperiment();
         experiment.printResults();

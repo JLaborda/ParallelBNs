@@ -6,6 +6,8 @@ import edu.cmu.tetrad.search.MeekRules;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.NumberFormatUtil;
 import edu.cmu.tetrad.util.ProbUtils;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.LocalScoreCacheConcurrent;
 import org.albacete.simd.utils.Problem;
 
@@ -62,6 +64,11 @@ public abstract class GESThread implements Runnable{
      * Elapsed time of the most recent search.
      */
     protected long elapsedTime;
+
+    /**
+     * Start time of the search
+     */
+    protected long startTime;
 
     /**
      * True if cycles are to be aggressively prevented. May be expensive
@@ -124,6 +131,22 @@ public abstract class GESThread implements Runnable{
     protected int id = -1;
 
     private String log = "";
+
+    /**
+     * Boolean value that says if the thread is from a forward stage (true) or from a backwards stage (false)
+     */
+    protected boolean isForwards;
+
+    /**
+     * Timeout provided by the time it takes the first thread of the stage to finish
+     */
+    //public static long forwardTimeout = -1;
+
+    /**
+     * Timeout provided by the time it takes the first thread of the stage to finish
+     */
+    //public static long backwardTimeout = -1;
+
 
 
 
@@ -611,13 +634,6 @@ public abstract class GESThread implements Runnable{
         return elapsedTime;
     }
 
-    /**
-     * Sets the elapsed time
-     * @param elapsedTime the elapsed time the thread has spent running.
-     */
-    public void setElapsedTime(long elapsedTime) {
-        this.elapsedTime = elapsedTime;
-    }
 
     /**
      * Gets the maximum number of edges allowed
@@ -758,4 +774,24 @@ public abstract class GESThread implements Runnable{
     public LocalScoreCacheConcurrent getLocalScoreCache() {
         return problem.getLocalScoreCache();
     }
+
+    protected boolean isTimeout(){
+        //return ((timeout != -1) &&
+        //        ((System.currentTimeMillis() - startTime) > timeout));
+        long time = (System.currentTimeMillis() - startTime);
+        double zScore = 0;
+        if(isForwards) {
+            if (ForwardStage.meanTimeTotal != 0)
+                 zScore = (time - ForwardStage.meanTimeTotal) / Math.sqrt(ForwardStage.varianceTimeTotal);
+        }
+        else{
+            if (BackwardStage.meanTimeTotal != 0)
+                zScore = (time - BackwardStage.meanTimeTotal) / Math.sqrt(BackwardStage.varianceTimeTotal);
+        }
+        if(zScore > 3)
+            System.out.println("Timeout! Finishing Thread");
+        return zScore > 3;
+
+    }
+
 }

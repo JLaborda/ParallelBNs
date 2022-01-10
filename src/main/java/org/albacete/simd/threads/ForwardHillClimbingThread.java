@@ -26,6 +26,7 @@ public class ForwardHillClimbingThread extends GESThread {
         this.maxIt = maxIt;
         this.id = threadCounter;
         threadCounter++;
+        this.isForwards = true;
     }
 
     /**
@@ -51,7 +52,7 @@ public class ForwardHillClimbingThread extends GESThread {
     }
 
     private Graph search() {
-        long startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         numTotalCalls=0;
         numNonCachedCalls=0;
 
@@ -92,6 +93,11 @@ public class ForwardHillClimbingThread extends GESThread {
             Edge bestEdge = null;
             SubSet bestSubSet = null;
             for(Edge edge : edges) {
+
+                //Checking Time
+                if(isTimeout())
+                    break;
+
                 //System.out.println("[FHC " + getId() + "]" + "Checking edge: " + edge);
 
                 if (graph.containsEdge(edge)) {

@@ -81,6 +81,8 @@ public abstract class ThreadStage extends Stage{
 
         }
 
+        // Calculating Timeout Stats
+        calculateStatsTimeTotal();
     }
 
     protected abstract void config();
@@ -94,6 +96,8 @@ public abstract class ThreadStage extends Stage{
         }
         return false;
     }
+
+    protected abstract void calculateStatsTimeTotal();
 
 
 

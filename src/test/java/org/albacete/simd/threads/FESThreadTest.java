@@ -432,8 +432,7 @@ public class FESThreadTest {
         // Arrange
         FESThread thfes = new FESThread(problem, subset1, 15);
         // Act
-        long expected = 23;
-        thfes.setElapsedTime(expected);
+        long expected = -1;
         long actual = thfes.getElapsedTime();
         // Assert
         assertEquals(expected, actual, 0);
