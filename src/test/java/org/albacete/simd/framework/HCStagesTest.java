@@ -23,6 +23,7 @@ public class HCStagesTest {
         Problem problem = new Problem(path);
         int nThreads = 2;
         int itInterleaving = 5;
+        Utils.setSeed(42);
         List<List<Edge>> subsets = Utils.split(Utils.calculateArcs(problem.getData()), nThreads);
         boolean flag;
 

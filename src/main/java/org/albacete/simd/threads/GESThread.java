@@ -780,13 +780,17 @@ public abstract class GESThread implements Runnable{
         //        ((System.currentTimeMillis() - startTime) > timeout));
         long time = (System.currentTimeMillis() - startTime);
         double zScore = 0;
+        //System.out.println("Forward Meantime: " + ForwardStage.meanTimeTotal);
+        //System.out.println("Backward Meantime: " + BackwardStage.meanTimeTotal);
+
         if(isForwards) {
             if (ForwardStage.meanTimeTotal != 0)
-                 zScore = (time - ForwardStage.meanTimeTotal) / Math.sqrt(ForwardStage.varianceTimeTotal);
+                zScore = (time - ForwardStage.meanTimeTotal) / Math.sqrt(ForwardStage.varianceTimeTotal);
         }
         else{
             if (BackwardStage.meanTimeTotal != 0)
                 zScore = (time - BackwardStage.meanTimeTotal) / Math.sqrt(BackwardStage.varianceTimeTotal);
+
         }
         if(zScore > 3)
             System.out.println("Timeout! Finishing Thread");
