@@ -25,6 +25,6 @@ script:
   - mvn -q clean install
   # Codecov support
   - mvn -q cobertura:cobertura
-after_success:
+#after_success:
   # Codecov support
-- bash <(curl -s https://codecov.io/bash) -t 6a58788b-64ad-4226-8e3d-e362b53d27fa
+#  - bash <(curl -s https://codecov.io/bash) -t 6a58788b-64ad-4226-8e3d-e362b53d27fa
