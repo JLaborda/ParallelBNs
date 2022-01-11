@@ -1,4 +1,4 @@
-package org.albacete.simd.algorithms;
+package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.graph.Dag;
 import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
@@ -26,15 +26,23 @@ public class HillClimbingSearchTest {
         Problem problem = new Problem(path);
         HillClimbingSearch hc1 = new HillClimbingSearch(path,15,5);
         HillClimbingSearch hc2 = new HillClimbingSearch(problem.getData(), 15, 5);
+        HillClimbingSearch hc3 = new HillClimbingSearch(path);
+        HillClimbingSearch hc4 = new HillClimbingSearch(problem.getData());
 
         assertNotNull(hc1);
         assertNotNull(hc2);
         assertEquals(0, hc1.getnThreads());
         assertEquals(0, hc2.getnThreads());
+        assertEquals(0, hc3.getnThreads());
+        assertEquals(0, hc4.getnThreads());
         assertEquals(15, hc1.getMaxIterations());
         assertEquals(15, hc2.getMaxIterations());
+        assertEquals(Integer.MAX_VALUE, hc3.getMaxIterations());
+        assertEquals(Integer.MAX_VALUE, hc4.getMaxIterations());
         assertEquals(5, hc1.getItInterleaving());
         assertEquals(5, hc2.getItInterleaving());
+        assertEquals(Integer.MAX_VALUE, hc3.getItInterleaving());
+        assertEquals(Integer.MAX_VALUE, hc4.getItInterleaving());
 
     }
 
@@ -48,13 +56,14 @@ public class HillClimbingSearchTest {
         assertTrue(hc1.getCurrentGraph() instanceof Dag);
     }
 
-    @Test
-    public void convergenceTest(){
-        HillClimbingSearch hc1 = new HillClimbingSearch(path,1,5);
-
+    public void searchTestWithInitialGraph(){
+        HillClimbingSearch hc1 = new HillClimbingSearch(path,15,5);
         hc1.search();
 
         assertNotNull(hc1.getCurrentGraph());
         assertTrue(hc1.getCurrentGraph() instanceof Dag);
+
     }
+
+
 }

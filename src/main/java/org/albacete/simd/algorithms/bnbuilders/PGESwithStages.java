@@ -69,7 +69,7 @@ public class PGESwithStages extends BNBuilder {
         besFusion.run();
         currentGraph = besFusion.getCurrentGraph();
     }
-
+/*
     public static void main(String[] args){
         // 1. Read Data
         String path = "src/test/resources/alarm.xbif_.csv";
@@ -87,4 +87,5 @@ public class PGESwithStages extends BNBuilder {
 
 
     }
+ */
 }

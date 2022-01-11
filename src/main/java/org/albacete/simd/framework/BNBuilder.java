@@ -96,8 +96,18 @@ public abstract class BNBuilder {
         this(Utils.readData(path), nThreads, maxIterations, nItInterleaving);
     }
 
+    public BNBuilder(Graph initialGraph, String path, int nThreads, int maxIterations, int nItInterleaving) {
+        this(path, nThreads, maxIterations, nItInterleaving);
+        this.currentGraph = initialGraph;
+    }
 
-    private void initialize(int nThreads){
+    public BNBuilder(Graph initialGraph, DataSet data, int nThreads, int maxIterations, int nItInterleaving){
+        this(data, nThreads, maxIterations, nItInterleaving);
+        this.currentGraph = initialGraph;
+    }
+
+
+        private void initialize(int nThreads){
         this.nThreads = nThreads;
         this.gesThreads = new FESThread[this.nThreads];
         this.threads = new Thread[this.nThreads];

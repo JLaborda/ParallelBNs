@@ -1,5 +1,7 @@
-package org.albacete.simd.algorithms;
+package org.albacete.simd.algorithms.bnbuilders;
 
+import edu.cmu.tetrad.graph.Dag;
+import org.albacete.simd.algorithms.ParallelFHCBES;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Problem;
@@ -51,7 +53,7 @@ public class ParallelFHCBESTest {
     }
 
     @Test
-    public void runTest(){
+    public void searchTest(){
         ParallelFHCBES alg = new ParallelFHCBES(path,
                 2,
                 15,
@@ -60,6 +62,7 @@ public class ParallelFHCBESTest {
         alg.search();
 
         assertNotNull(alg.getCurrentGraph());
+        assertTrue(alg.getCurrentGraph() instanceof Dag);
 
     }
 
@@ -73,6 +76,8 @@ public class ParallelFHCBESTest {
         alg.search();
 
         assertNotNull(alg.getCurrentGraph());
+        assertTrue(alg.getCurrentGraph() instanceof Dag);
+        assertEquals(1,alg.getIterations());
 
     }
 
