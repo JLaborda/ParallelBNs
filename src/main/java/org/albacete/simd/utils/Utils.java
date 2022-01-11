@@ -248,6 +248,14 @@ public class Utils {
         return mb;
     }
 
+    /**
+     * Gives back the percentages of markov's blanquet difference with the original bayesian network. It gives back the
+     * percentage of difference with the blanquet of the original bayesian network, the percentage of extra nodes added
+     * to the blanquet and the percentage of missing nodes in the blanquet compared with the original.
+     * @param original
+     * @param created
+     * @return
+     */
     public static double [] avgMarkovBlanquetdif(Dag original, Dag created) {
 
         if (original.getNodes().size() != created.getNodes().size())
@@ -255,9 +263,9 @@ public class Utils {
 
         // First number is the average dfMB, the second one is the amount of more variables in each MB, the last number is the the amount of missing variables in each MB
         double [] result = new double[3];
-        double res1 = 0;
-        double res2 = 0;
-        double res3 = 0;
+        double differenceNodes = 0;
+        double plusNodes = 0;
+        double minusNodes = 0;
 
 
         for( Node e1 : original.getNodes()) {
@@ -283,25 +291,24 @@ public class Utils {
             //Variables de más
             for(String s2: names2) {
                 if(!names1.contains(s2)) {
-                    res1++;
-                    res2++;
+                    differenceNodes++;
+                    plusNodes++;
                 }
             }
             // Variables de menos
             for(String s1: names1) {
                 if(!names2.contains(s1)) {
-                    res1++;
-                    res3++;
+                    differenceNodes++;
+                    minusNodes++;
                 }
             }
         }
 
         // Avg difference
-        res1 = res1 / original.getNodes().size();
 
-        result[0] = res1;
-        result[1] = res2;
-        result[2] = res3;
+        result[0] = differenceNodes / original.getNodes().size();
+        result[1] = plusNodes / original.getNodes().size();
+        result[2] = minusNodes / original.getNodes().size();
 
         return result;
 
