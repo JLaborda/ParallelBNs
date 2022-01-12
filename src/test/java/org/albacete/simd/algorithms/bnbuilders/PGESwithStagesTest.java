@@ -36,15 +36,36 @@ public class PGESwithStagesTest {
         PGESwithStages alg1 = new PGESwithStages(dataSet, 2, 100, 5);
         PGESwithStages alg2 = new PGESwithStages(path, 2, 100, 5);
 
+        List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
+        Dag initialGraph = new Dag(nodes);
+        initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
+        initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
+
+        PGESwithStages alg3 = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, 2, 100, 5);
+        PGESwithStages alg4 = new PGESwithStages(initialGraph, Resources.CANCER_DATASET, 2, 100, 5);
+
+
         assertNotNull(alg1);
         assertNotNull(alg2);
+        assertNotNull(alg3);
+        assertNotNull(alg4);
 
         assertEquals(2, alg1.getnThreads());
         assertEquals(2, alg2.getnThreads());
+        assertEquals(2, alg3.getnThreads());
+        assertEquals(2, alg4.getnThreads());
         assertEquals(100, alg1.getMaxIterations());
         assertEquals(100, alg2.getMaxIterations());
+        assertEquals(100, alg3.getMaxIterations());
+        assertEquals(100, alg4.getMaxIterations());
         assertEquals(5, alg1.getItInterleaving());
         assertEquals(5, alg2.getItInterleaving());
+        assertEquals(5, alg3.getItInterleaving());
+        assertEquals(5, alg4.getItInterleaving());
+        assertNull(alg1.getCurrentGraph());
+        assertNull(alg2.getCurrentGraph());
+        assertNotNull(alg3);
+        assertNotNull(alg4);
 
     }
 
@@ -93,6 +114,24 @@ public class PGESwithStagesTest {
 
     }
 
+    /* PROBLEMS HERE WITH INITIAL GRAPH
+    @Test
+    public void testSearchWithInitalGraph(){
+        List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
+        Dag initialGraph = new Dag(nodes);
+        initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
+        initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
+
+        PGESwithStages alg = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, 2, 100, 5);
+
+        assertEquals(initialGraph, alg.getCurrentGraph());
+        alg.search();
+        assertNotNull(alg.getCurrentGraph());
+        assertNotEquals(initialGraph, alg.getCurrentGraph());
+        assertTrue(alg.getCurrentGraph() instanceof Dag);
+
+    }
+*/
 
 
 

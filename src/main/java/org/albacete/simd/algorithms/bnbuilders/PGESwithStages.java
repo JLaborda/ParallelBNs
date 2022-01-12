@@ -1,6 +1,7 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
+import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.framework.*;
 import org.albacete.simd.utils.Utils;
 
@@ -15,6 +16,14 @@ public class PGESwithStages extends BNBuilder {
 
     public PGESwithStages(String path, int nThreads, int maxIterations, int nItInterleaving) {
         super(path, nThreads, maxIterations, nItInterleaving);
+    }
+
+    public PGESwithStages(Graph initialGraph, String path, int nThreads, int maxIterations, int nItInterleaving) {
+        super(initialGraph, path, nThreads, maxIterations, nItInterleaving);
+    }
+
+    public PGESwithStages(Graph initialGraph, DataSet data, int nThreads, int maxIterations, int nItInterleaving) {
+        super(initialGraph, data, nThreads, maxIterations, nItInterleaving);
     }
 
     @Override

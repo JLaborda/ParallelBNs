@@ -29,6 +29,15 @@ public class HillClimbingSearch extends BNBuilder {
         super(path, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
+    public HillClimbingSearch(Graph initialGraph, String path) {
+        super(initialGraph, path, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+    public HillClimbingSearch(Graph initialGraph, DataSet data){
+        super(initialGraph, data, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+
 
     @Override
     protected boolean convergence() {
