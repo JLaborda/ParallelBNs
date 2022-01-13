@@ -202,8 +202,8 @@ public class UtilsTest {
 
         // Asserting
         double expected_mbavg = 4.0/5.0;
-        double expected_mbplus = 2;
-        double expected_mbminus = 2;
+        double expected_mbplus = 2/5.0;
+        double expected_mbminus = 2/5.0;
         assertNotNull(result);
         assertEquals(expected_mbavg, result[0], 0.000001);
         assertEquals(expected_mbplus, result[1], 0.000001);

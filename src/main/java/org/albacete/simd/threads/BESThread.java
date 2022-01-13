@@ -12,13 +12,6 @@ import java.util.List;
 @SuppressWarnings("DuplicatedCode")
 public class BESThread extends GESThread {
 
-    private static long[] timeList;
-    
-    private int iThread;
-    
-    private long startTime;
-    
-    private double ratio;
 
     private static int threadCounter = 1;
 
@@ -39,22 +32,7 @@ public class BESThread extends GESThread {
         setSamplePrior(10.0);
         this.id = threadCounter;
         threadCounter++;
-    }
-    
-    /**
-     * Constructor of ThFES with an initial DAG and a ratio
-     * @param problem object containing information of the problem such as data or variables.
-     * @param initialDag initial DAG with which the FES stage starts with.
-     * @param subset subset of edges the fes stage will try to add to the resulting graph
-     * @param timeList
-     * @param ratio If a thread has not yet finished having been executed for ratio*(fastest thread time), it cancels its execution.
-     * @param i
-     */
-    public BESThread(Problem problem, Graph initialDag, List<Edge> subset, long[] timeList, double ratio, int i){
-        this(problem, initialDag, subset);
-        BESThread.timeList = timeList;
-        this.ratio = ratio;
-        this.iThread = i;
+        this.isForwards = false;
     }
 
     /**
@@ -88,12 +66,9 @@ public class BESThread extends GESThread {
         long endTime = System.currentTimeMillis();
         this.elapsedTime = endTime - startTime;
         this.modelBDeu = score;
-        
-        // Save the time elapsed
-        timeList[iThread] = elapsedTime;
-        System.out.println("\n  BES HILO " + iThread + ": " + elapsedTime + "\n");        
         return graph;
     }
+
 
     /**
      * Backward equivalence search.
@@ -119,7 +94,14 @@ public class BESThread extends GESThread {
         // Calling fs to calculate best edge to add.
         bestDelete = bs(graph,bestScore);
 
-        while((x_d != null) && !finishThread()){
+        while(x_d != null){
+
+            //Checking time
+            if(isTimeout()) {
+                System.out.println("Timeout in BESTHREAD id: " + getId());
+                break;
+            }
+
             // Changing best score because x_d, and y_d are not null
             bestScore = bestDelete;
 
@@ -189,6 +171,12 @@ public class BESThread extends GESThread {
 */
         for (Edge edge : edges) {
 
+            //Checking time
+            if(isTimeout()) {
+                System.out.println("Timeout in BESTHREAD id: " + getId());
+                break;
+            }
+
             // Checking if the edge is actually inside the graph
             if(!graph.containsEdge(edge))
                 continue;
@@ -231,26 +219,6 @@ public class BESThread extends GESThread {
         return bestScore;
     }
 
-    /**
-     * If a thread has not yet finished having been executed for 
-     * ratio*(fastest thread time), it cancels its execution.
-     * @return If thread must be finished or not
-     */
-    public boolean finishThread(){
-        long smallerTime = Long.MAX_VALUE;
-        for (int i = 0; i < timeList.length; i++) {
-            System.out.println(timeList[i]);
-            if ((timeList[i] != 0) && (timeList[i] < smallerTime)){
-                smallerTime = timeList[i];
-            }
-        }
-        if ((smallerTime != Long.MAX_VALUE) && (System.currentTimeMillis() - startTime) > (ratio*smallerTime)) {
-            System.out.println("\n\n" + (System.currentTimeMillis() - startTime) + " vs " + (ratio*smallerTime) + ", FINALIZANDO HILO\n\n");
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    
+
+
 }

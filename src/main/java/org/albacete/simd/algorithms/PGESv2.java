@@ -84,10 +84,6 @@ public class PGESv2
     private boolean fesFlag = false;
 
     private boolean besFlag = false;
-    
-    private double ratio = Double.MAX_VALUE;
-    
-    private long[] timeList;
 
 
     /**
@@ -119,33 +115,8 @@ public class PGESv2
     public PGESv2(String path, int nThreads, int maxIterations, int nFESItInterleaving){
         this(Utils.readData(path),nThreads, maxIterations, nFESItInterleaving);
     }
-    
-    /**
-     * Constructor of Main that uses a DataSet containing the data and a ratio.
-     * @param data Dataset containing the data of the problem.
-     * @param nThreads Number of threads used in the problem.
-     * @param maxIterations
-     * @param nFESItInterleaving
-     * @param ratio Ratio for continue the execution of FES stages
-     */
-    public PGESv2(DataSet data, int nThreads, int maxIterations, int nFESItInterleaving, double ratio){
-        this(data, nThreads);
-        this.ratio = ratio;
-        this.maxIterations = maxIterations;
-        this.nFESItInterleaving = nFESItInterleaving;
-    }
 
-    /**
-     * Constructor of Main that uses the path to the csv file and a ratio.
-     * @param path path to the csv file
-     * @param nThreads number of threads of the problem
-     * @param maxIterations
-     * @param nFESItInterleaving
-     * @param ratio Ratio for continue the execution of FES stages
-     */
-    public PGESv2(String path, int nThreads, int maxIterations, int nFESItInterleaving, double ratio){
-        this(Utils.readData(path),nThreads, maxIterations, nFESItInterleaving, ratio);
-    }
+
 
     /**
      * Initializes the general parameters of the class.
@@ -185,18 +156,16 @@ public class PGESv2
 
         // Rebuilding hashIndex
         //problem.buildIndexing(currentGraph);
-        
-        timeList = new long[nThreads];
 
         // Creating each ThFES runnable
         if (this.currentGraph == null) {
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new FESThread(this.problem, this.subSets.get(i), this.nFESItInterleaving, this.timeList, this.ratio, i);
+                this.gesThreads[i] = new FESThread(this.problem, this.subSets.get(i), this.nFESItInterleaving);
             }
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new FESThread(this.problem, this.currentGraph, this.subSets.get(i), this.nFESItInterleaving, this.timeList, this.ratio, i);
+                this.gesThreads[i] = new FESThread(this.problem, this.currentGraph, this.subSets.get(i), this.nFESItInterleaving);
             }
         }
 
@@ -238,8 +207,8 @@ public class PGESv2
             //System.out.println("Graph of Thread " + (i +1) + ": \n" + gdag);
 
         }
-        
-        
+
+
     }
 
     public boolean checkWorkingStatus() throws InterruptedException {
@@ -292,13 +261,11 @@ public class PGESv2
 
         // Rebuilding hashIndex
         //problem.buildIndexing(currentGraph);
-        
-        timeList = new long[nThreads];
 
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
         List<List<Edge>> subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads);
         for (int i = 0; i < this.nThreads; i++) {
-            this.gesThreads[i] = new BESThread(this.problem, this.currentGraph, subsets_BES.get(i), this.timeList, this.ratio, i);
+            this.gesThreads[i] = new BESThread(this.problem, this.currentGraph, subsets_BES.get(i));
         }
 
         // Initializing thread config
@@ -662,14 +629,6 @@ public class PGESv2
      */
     public void setNFESItInterleaving(int nFESItInterleaving) {
         this.nFESItInterleaving = nFESItInterleaving;
-    }
-    
-    /**
-     * Sets the ratio of the FES stage.
-     * @param ratio the ratio to set
-     */
-    public void setRatio(double ratio) {
-        this.ratio = ratio;
     }
 
     /**

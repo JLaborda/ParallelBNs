@@ -22,29 +22,25 @@ public class HillClimbingSearch extends BNBuilder {
     }
 
     public HillClimbingSearch(DataSet data) {
-        super(data, -1, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        super(data, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     public HillClimbingSearch(String path) {
-        super(path, -1, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        super(path, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
+
+    public HillClimbingSearch(Graph initialGraph, String path) {
+        super(initialGraph, path, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+    public HillClimbingSearch(Graph initialGraph, DataSet data){
+        super(initialGraph, data, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
 
 
     @Override
     protected boolean convergence() {
-        // Checking Iterations
-        if (it >= this.maxIterations)
-            return true;
-
-        //System.out.println("FHCFlag: " + fhcFlag);
-        //System.out.println("BHCFlag: " + bhcFlag);
-
-        // Checking working status
-        if(!fhcFlag && !bhcFlag){
-            return true;
-        }
-
-        it++;
         return false;
     }
 

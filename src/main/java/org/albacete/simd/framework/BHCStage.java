@@ -10,7 +10,7 @@ import org.albacete.simd.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BHCStage extends ThreadStage {
+public class BHCStage extends BackwardStage {
 
 
     public BHCStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
