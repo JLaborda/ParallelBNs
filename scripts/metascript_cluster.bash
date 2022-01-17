@@ -2,8 +2,8 @@
 
 #declare -a net_names=("andes" "barley" "cancer" "child" "earthquake" "hailfinder" "hepar2" "insurance" "link" "mildew" "munin" "pigs" "water" "win95pts")
 #declare -a net_names=("alarm" "andes" "barley" "cancer" "child" "earthquake" "hailfinder" "hepar2" "insurance" "link" "mildew" "munin" "pigs" "water" "win95pts")
-declare -a net_names=("andes" "link" "mildew" "munin" "pigs" "water" "win95pts")
-
+#declare -a net_names=("andes" "link" "mildew" "munin" "pigs" "water" "win95pts")
+declare -a net_names=("alarm", "barley", "child", "insurance", "hailfinder", "hepar2") # Redes pequeñas
 
 # declare -a suffixes=("01" "02" "03" "04" "05" "06")
 #PARAMS_FOLDER="res/params/"

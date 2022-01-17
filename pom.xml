@@ -211,7 +211,8 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>org.albacete.simd.experiments.ExperimentBNBuilder</mainClass>
+                <!--<mainClass>org.albacete.simd.experiments.ExperimentBNBuilder</mainClass>-->
+                <mainClass>org.albacete.simd.experiments.ExperimentBNLauncher</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>
