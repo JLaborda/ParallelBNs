@@ -279,7 +279,6 @@ public class Utils {
             double differenceNodesAux = 0;
             double plusNodesAux = 0;
             double minusNodesAux = 0;
-    
 
             ArrayList<String> names1 = new ArrayList<String>();
             ArrayList<String> names2 = new ArrayList<String>();
@@ -311,7 +310,7 @@ public class Utils {
             //Dividing by the total amount of variables in the original mb all the auxiliar variables
             differenceNodesAux = differenceNodesAux / mb1.size();
             plusNodesAux = plusNodesAux / mb1.size();
-            minusNodesAux = minusNodes / mb1.size();
+            minusNodesAux = minusNodesAux / mb1.size();
 
             // Adding results to total results
             differenceNodes += differenceNodesAux;
