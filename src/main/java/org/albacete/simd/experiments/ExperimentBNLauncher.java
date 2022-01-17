@@ -1,5 +1,12 @@
 package org.albacete.simd.experiments;
 
+import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
+import org.albacete.simd.framework.BNBuilder;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,8 +14,9 @@ import java.util.Map;
 
 public class ExperimentBNLauncher {
 
+    /*
     public static final String[] algorithmNames = {"ges", "pges", "hc", "phc", "pfhcbes"};
-    public static final String[] netNames = {"alarm"}//, "andes", "barley", "cancer", "child", "earthquake", "hailfinder",
+    public static final String[] netNames = {"alarm"};//, "andes", "barley", "cancer", "child", "earthquake", "hailfinder",
             //"hepar2", "insurance", "link", "mildew", "munin", "pigs", "water", "win95pts"};
     public static final String[] bbddEndings = {".xbif_.csv", ".xbif50001_.csv", ".xbif50002_.csv", ".xbif50003_.csv",
             ".xbif50004_.csv", ".xbif50005_.csv", ".xbif50006_.csv", ".xbif50007_.csv", ".xbif50008_.csv",
@@ -19,9 +27,9 @@ public class ExperimentBNLauncher {
     //public static Map<String, List<String>> bbddPaths = new HashMap<>();
     public static Map<String, String> testPaths = new HashMap<>();
     public static Map<Integer, List<Object>> parameters = new HashMap<>();
-
-    public static final MAXITERATIONS = 250;
-    public static final PARAMS_FILE = "./res/params/hyperparams.txt";
+    */
+    public static final int MAXITERATIONS = 250;
+    public static final String PARAMS_FILE = "./res/params/hyperparams.txt";
 
     public static void main(String[] args) {
         int index = Integer.parseInt(args[0]);
@@ -29,14 +37,14 @@ public class ExperimentBNLauncher {
         
         List<Object> parameters = readParameters(netName, index);
 
-        runExperiment(parameters);
+        runExperiment(parameters, netName);
 
     }
 
-    public static List<Objects> readParameters(String netName, index){
-        String netPath = "./res/networks/" + netName + ".xbif";
+    public static List<Object> readParameters(String netName, int index){
         String params [];
-        try (BufferedReader br = new BufferedReader(new FileReader("file.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(PARAMS_FILE))) {
+            String line;
             for (int i = 0; i < index; i++)
                 br.readLine();
             line = br.readLine();
@@ -44,8 +52,8 @@ public class ExperimentBNLauncher {
             params = line.split(" ");
             String ending = params[0];
             String netPath = "./res/networks/" + netName + ".xbif";
-            String bbddPath = "./res/networks/BBDD/" + name + ending;
-            String testPath = "./res/networks/BBDD/tests/" + name + "_test.csv";
+            String bbddPath = "./res/networks/BBDD/" + netName + ending;
+            String testPath = "./res/networks/BBDD/tests/" + netName + "_test.csv";
             int interleaving = Integer.parseInt(params[1]);
             int seed = Integer.parseInt(params[2]);
             List<Object> parameters = new ArrayList<>();
@@ -56,8 +64,10 @@ public class ExperimentBNLauncher {
             parameters.add(seed);
             return parameters;
         }
-        catch(IOException e){
+        catch(FileNotFoundException e){
           System.out.println(e);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         /*
@@ -78,12 +88,12 @@ public class ExperimentBNLauncher {
 
         }
         */
-
+        return null;
     }
 
-    public static void runExperiment(List<Object> parameters){
+    public static void runExperiment(List<Object> parameters, String netName){
         String netPath = (String) parameters.get(0);
-        String bbddPath = (String) parameters[.get(1);
+        String bbddPath = (String) parameters.get(1);
         String testPath = (String) parameters.get(2);
         int nThreads = Runtime.getRuntime().availableProcessors();
         int nInterleaving = (Integer) parameters.get(3);
@@ -97,7 +107,7 @@ public class ExperimentBNLauncher {
         
         // Running experiment
         //experimentGES.runExperiment();
-        experimentPGES.runExperiment
+        experimentPGES.runExperiment();
         //experiment.saveExperiment();
         //String resultsGES = experimentGES.getResults();
         String resultsPGES = experimentPGES.getResults();
