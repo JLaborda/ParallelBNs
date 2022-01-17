@@ -275,6 +275,11 @@ public class Utils {
             List<Node> mb1 = getMarkovBlanket(original, e1);
             List<Node> mb2 = getMarkovBlanket(created, e2);
 
+            // Auxiliar variables
+            double differenceNodesAux = 0;
+            double plusNodesAux = 0;
+            double minusNodesAux = 0;
+    
 
             ArrayList<String> names1 = new ArrayList<String>();
             ArrayList<String> names2 = new ArrayList<String>();
@@ -291,24 +296,34 @@ public class Utils {
             //Variables de más
             for(String s2: names2) {
                 if(!names1.contains(s2)) {
-                    differenceNodes++;
-                    plusNodes++;
+                    differenceNodesAux++;
+                    plusNodesAux++;
                 }
             }
             // Variables de menos
             for(String s1: names1) {
                 if(!names2.contains(s1)) {
-                    differenceNodes++;
-                    minusNodes++;
+                    differenceNodesAux++;
+                    minusNodesAux++;
                 }
             }
+
+            //Dividing by the total amount of variables in the original mb all the auxiliar variables
+            differenceNodesAux = differenceNodesAux / mb1.size();
+            plusNodesAux = plusNodesAux / mb1.size();
+            minusNodesAux = minusNodes / mb1.size();
+
+            // Adding results to total results
+            differenceNodes += differenceNodesAux;
+            plusNodes += plusNodesAux;
+            minusNodes += minusNodesAux;
         }
 
-        // Avg difference
+        // Avg difference percentages
 
-        result[0] = differenceNodes / original.getNodes().size();
-        result[1] = plusNodes / original.getNodes().size();
-        result[2] = minusNodes / original.getNodes().size();
+        result[0] = differenceNodes / original.getNodes().size() * 100;
+        result[1] = plusNodes / original.getNodes().size() * 100;
+        result[2] = minusNodes / original.getNodes().size() * 100;
 
         return result;
 
