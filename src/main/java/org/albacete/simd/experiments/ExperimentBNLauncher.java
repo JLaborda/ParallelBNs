@@ -29,7 +29,7 @@ public class ExperimentBNLauncher {
     public static Map<Integer, List<Object>> parameters = new HashMap<>();
     */
     public static final int MAXITERATIONS = 250;
-    public static final String PARAMS_FILE = "./res/params/hyperparams.txt";
+    public static final String PARAMS_FILE = "/res/params/hyperparams.txt";
 
     public static void main(String[] args) {
         int index = Integer.parseInt(args[0]);
@@ -51,9 +51,9 @@ public class ExperimentBNLauncher {
             System.out.println(line);
             params = line.split(" ");
             String ending = params[0];
-            String netPath = "./res/networks/" + netName + ".xbif";
-            String bbddPath = "./res/networks/BBDD/" + netName + ending;
-            String testPath = "./res/networks/BBDD/tests/" + netName + "_test.csv";
+            String netPath = "/res/networks/" + netName + ".xbif";
+            String bbddPath = "/res/networks/BBDD/" + netName + ending;
+            String testPath = "/res/networks/BBDD/tests/" + netName + "_test.csv";
             int interleaving = Integer.parseInt(params[1]);
             int seed = Integer.parseInt(params[2]);
             List<Object> parameters = new ArrayList<>();
@@ -112,7 +112,7 @@ public class ExperimentBNLauncher {
         //String resultsGES = experimentGES.getResults();
         String resultsPGES = experimentPGES.getResults();
         
-        String EXPERIMENTS_FOLDER = "./results/"; // BOOKMARK: EL ERROR ESTÁ AQUÍ!
+        String EXPERIMENTS_FOLDER = "/results/"; // BOOKMARK: EL ERROR ESTÁ AQUÍ!
         String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + ".csv";
         try {
             //Experiment.saveExperiment(savePath, resultsGES);
