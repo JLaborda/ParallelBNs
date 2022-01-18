@@ -1,2 +1,2 @@
 #!/bin/bash
-singularity pull --docker-login docker://jorlabs/parallelbns:feature-experiments 
+singularity pull --docker-login -F docker://jorlabs/parallelbns:feature-experiments 
