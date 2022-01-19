@@ -17,12 +17,12 @@ public class GES_BNBuilder extends BNBuilder {
     private Graph initialDag;
 
     public GES_BNBuilder(DataSet data) {
-        super(data, -1, -1, -1);
+        super(data, 1, -1, -1);
         initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
     }
 
     public GES_BNBuilder(String path) {
-        super(path, -1, -1, -1);
+        super(path, 1, -1, -1);
         initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
     }
 
@@ -65,7 +65,7 @@ public class GES_BNBuilder extends BNBuilder {
 
     @Override
     protected void backwardStage() throws InterruptedException {
-        BESThread bes = new BESThread(problem, initialDag, listOfArcs);
+        BESThread bes = new BESThread(problem, currentGraph, listOfArcs);
         bes.run();
         currentGraph = bes.getCurrentGraph();
         score = bes.getScoreBDeu();
@@ -80,7 +80,11 @@ public class GES_BNBuilder extends BNBuilder {
     public Graph search(){
         try {
             forwardStage();
+            System.out.println("Forwards Graph");
+            System.out.println(currentGraph);
             backwardStage();
+            System.out.println("Backwards Graph");
+            System.out.println(currentGraph);
         }catch(InterruptedException e){
             System.err.println("Interrupted Exception");
             e.printStackTrace();

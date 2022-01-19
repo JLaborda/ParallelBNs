@@ -1,5 +1,6 @@
 package org.albacete.simd.experiments;
 
+import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.framework.BNBuilder;
 
@@ -28,16 +29,47 @@ public class ExperimentBNLauncher {
     public static Map<String, String> testPaths = new HashMap<>();
     public static Map<Integer, List<Object>> parameters = new HashMap<>();
     */
+
+    public static final String[] bbddEndings = {".xbif_.csv", ".xbif50001_.csv", ".xbif50002_.csv", ".xbif50003_.csv",
+            ".xbif50004_.csv", ".xbif50005_.csv", ".xbif50006_.csv", ".xbif50007_.csv", ".xbif50008_.csv",
+            ".xbif50009_.csv", ".xbif50001246_.csv"};
+
     public static final int MAXITERATIONS = 250;
     public static final String PARAMS_FILE = "/res/params/hyperparams.txt";
 
     public static void main(String[] args) {
         int index = Integer.parseInt(args[0]);
         String netName = args[1];
-        
-        List<Object> parameters = readParameters(netName, index);
 
-        runExperiment(parameters, netName);
+        runControlExperiment(netName, index);
+
+        //List<Object> parameters = readParameters(netName, index);
+
+        //runExperiment(parameters, netName);
+
+
+
+    }
+
+    public static void runControlExperiment(String netName, int index){
+        String ending = bbddEndings[index];
+        String netPath = "/res/networks/" + netName + ".xbif";
+        String bbddPath = "/res/networks/BBDD/" + netName + ending;
+        String testPath = "/res/networks/BBDD/tests/" + netName + "_test.csv";
+
+        BNBuilder alg = new GES_BNBuilder(bbddPath);
+        ExperimentBNBuilder experiment = new ExperimentBNBuilder(alg, netPath, bbddPath, testPath);
+
+        experiment.runExperiment();
+        String results = experiment.getResults();
+
+        String EXPERIMENTS_FOLDER = "/results/"; // BOOKMARK: EL ERROR ESTÁ AQUÍ!
+        String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + ".csv";
+        try {
+            Experiment.saveExperiment(savePath, results);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
