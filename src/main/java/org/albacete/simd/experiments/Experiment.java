@@ -291,7 +291,7 @@ public abstract class Experiment {
                 + this.dfmm[1] + ","
                 + this.dfmm[2] + ","
                 + this.nIterations + ","
-                + elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
+                + (double) elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
     }
 
     @Override
