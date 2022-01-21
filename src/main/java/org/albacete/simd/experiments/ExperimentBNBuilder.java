@@ -180,7 +180,7 @@ public class ExperimentBNBuilder {
         System.out.println("SHD: "+shd);
         System.out.println("LLScore: " + this.LLscore);
         System.out.println("Final BDeu: " +this.score);
-        System.out.println("Total execution time (s): " + elapsedTime/1000);
+        System.out.println("Total execution time (s): " + (double) elapsedTime/1000);
         System.out.println("Total number of Iterations: " + this.nIterations);
         System.out.println("dfMM: "+ dfmm[0]);
         System.out.println("dfMM plus: "+ dfmm[1]);

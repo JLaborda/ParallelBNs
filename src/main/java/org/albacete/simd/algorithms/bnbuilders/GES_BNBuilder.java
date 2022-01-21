@@ -4,6 +4,8 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.framework.BNBuilder;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.threads.GESThread;
@@ -52,6 +54,7 @@ public class GES_BNBuilder extends BNBuilder {
 
     @Override
     protected void forwardStage() throws InterruptedException {
+        ForwardStage.meanTimeTotal = 0;
         FESThread fes = new FESThread(problem, initialDag, listOfArcs, Integer.MAX_VALUE);
         fes.run();
         currentGraph = fes.getCurrentGraph();
@@ -65,6 +68,7 @@ public class GES_BNBuilder extends BNBuilder {
 
     @Override
     protected void backwardStage() throws InterruptedException {
+        BackwardStage.meanTimeTotal = 0;
         BESThread bes = new BESThread(problem, currentGraph, listOfArcs);
         bes.run();
         currentGraph = bes.getCurrentGraph();
