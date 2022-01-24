@@ -37,15 +37,24 @@ public class ExperimentBNLauncher {
     public static final int MAXITERATIONS = 250;
     public static final String PARAMS_FILE = "/res/params/hyperparams.txt";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         int index = Integer.parseInt(args[0]);
         String netName = args[1];
+        String alg = args[2];
 
-        runControlExperiment(netName, index);
+        switch (alg){
+            case "ges":
+                runControlExperiment(netName, index);
+                break;
+            case "pges":
+                List<Object> parameters = readParameters(netName, index);
+                assert parameters != null;
+                runExperiment(parameters, netName);
+                break;
+        }
 
-        //List<Object> parameters = readParameters(netName, index);
+        //runControlExperiment(netName, index);
 
-        //runExperiment(parameters, netName);
 
 
 
@@ -63,8 +72,9 @@ public class ExperimentBNLauncher {
         experiment.runExperiment();
         String results = experiment.getResults();
 
-        String EXPERIMENTS_FOLDER = "/results/"; // BOOKMARK: EL ERROR ESTÁ AQUÍ!
-        String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + ".csv";
+        String EXPERIMENTS_FOLDER = "/results/";
+        String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + "_" + experiment.bbdd_name + "_t" + experiment.nThreads +
+                "_i" + experiment.nItInterleaving + "_s" + experiment.seed + ".csv";
         try {
             Experiment.saveExperiment(savePath, results);
         } catch (IOException e) {
@@ -73,8 +83,9 @@ public class ExperimentBNLauncher {
 
     }
 
-    public static List<Object> readParameters(String netName, int index){
+    public static List<Object> readParameters(String netName, int index) throws Exception {
         String params [];
+        List<Object> parameters = null;
         try (BufferedReader br = new BufferedReader(new FileReader(PARAMS_FILE))) {
             String line;
             for (int i = 0; i < index; i++)
@@ -88,7 +99,7 @@ public class ExperimentBNLauncher {
             String testPath = "/res/networks/BBDD/tests/" + netName + "_test.csv";
             int interleaving = Integer.parseInt(params[1]);
             int seed = Integer.parseInt(params[2]);
-            List<Object> parameters = new ArrayList<>();
+            parameters = new ArrayList<>();
             parameters.add(netPath);
             parameters.add(bbddPath);
             parameters.add(testPath);
@@ -120,6 +131,9 @@ public class ExperimentBNLauncher {
 
         }
         */
+        if(parameters == null)
+            throw new Exception("Parameters not read! Index: "  + index + "\t Net: " + netName);
+
         return null;
     }
 
@@ -135,17 +149,18 @@ public class ExperimentBNLauncher {
         BNBuilder pgesAlg = new PGESwithStages(bbddPath, nThreads, MAXITERATIONS, nInterleaving);
 
         //ExperimentBNBuilder experimentGES = new ExperimentBNBuilder(gesAlg, netPath, bbddPath, testPath, seed);    
-        ExperimentBNBuilder experimentPGES = new ExperimentBNBuilder(pgesAlg, netPath, bbddPath, testPath, seed);  
+        ExperimentBNBuilder experiment = new ExperimentBNBuilder(pgesAlg, netPath, bbddPath, testPath, seed);
         
         // Running experiment
         //experimentGES.runExperiment();
-        experimentPGES.runExperiment();
+        experiment.runExperiment();
         //experiment.saveExperiment();
         //String resultsGES = experimentGES.getResults();
-        String resultsPGES = experimentPGES.getResults();
-        
-        String EXPERIMENTS_FOLDER = "/results/"; // BOOKMARK: EL ERROR ESTÁ AQUÍ!
-        String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + ".csv";
+        String resultsPGES = experiment.getResults();
+
+        String EXPERIMENTS_FOLDER = "/results/";
+        String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + "_" + experiment.bbdd_name + "_t" + experiment.nThreads +
+                "_i" + experiment.nItInterleaving + "_s" + experiment.seed + ".csv";
         try {
             //Experiment.saveExperiment(savePath, resultsGES);
             Experiment.saveExperiment(savePath, resultsPGES);
