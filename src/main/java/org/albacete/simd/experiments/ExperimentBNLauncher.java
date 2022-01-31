@@ -48,7 +48,7 @@ public class ExperimentBNLauncher {
                 break;
             case "pges":
                 List<Object> parameters = readParameters(netName, index);
-                assert parameters != null;
+                 assert parameters != null;
                 runExperiment(parameters, netName);
                 break;
         }
