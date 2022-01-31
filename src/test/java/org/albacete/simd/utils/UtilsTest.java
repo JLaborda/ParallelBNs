@@ -201,11 +201,12 @@ public class UtilsTest {
         result = Utils.avgMarkovBlanquetdif(dag1, dag2);
 
         // Asserting
-        double expected_mbavg = (0 + 0 +(double)1/4 + 1 + 2)/5.0 *100;
-        double expected_mbplus = (0+0+0+1+1)/5.0 * 100;
-        double expected_mbminus = (0+0+(double)1/4+0+1)/5.0 * 100;
+
+        double expected_mbdiff = 0 + 0 + 1 + 1 + 2;//(0 + 0 +(double)1/4 + 1 + 2)/5.0 *100;
+        double expected_mbplus = 0 + 0 + 0 + 1 + 1;//(0+0+0+1+1)/5.0 * 100;
+        double expected_mbminus = 0 + 0 + 1 + 0 + 1;//(0+0+(double)1/4+0+1)/5.0 * 100;
         assertNotNull(result);
-        assertEquals(expected_mbavg, result[0], 0.000001);
+        assertEquals(expected_mbdiff, result[0], 0.000001);
         assertEquals(expected_mbplus, result[1], 0.000001);
         assertEquals(expected_mbminus, result[2], 0.000001);
     }
