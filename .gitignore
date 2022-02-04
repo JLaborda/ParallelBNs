@@ -45,3 +45,6 @@ target/
 # Large Datasets
 *10k.csv
 *50k.csv
+
+# Individual results
+experiment_results*
