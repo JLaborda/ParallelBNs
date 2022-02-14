@@ -1,0 +1,1047 @@
+Params are: 
+1
+Zero arg is: 
+/parallelbns/scripts/experiments_Pablo.bash
+First arg is: 
+37
+Second arg is: 
+1
+Numero de hilos: 8
+Ejecutamos PGES, seed = 7
+Match!
+res/networks/andes
+Starting Experiment:
+-----------------------------------------
+	Net Name: res/networks/andes
+	BBDD Name: andes.xbif50004_
+	nThreads: 8
+	nItInterleaving: 5
+-----------------------------------------
+Net_path: ./res/networks/andes.xbif
+BBDD_path: ./res/networks/BBDD/andes.xbif50004_.csv
+Numero de variables: 223
+INITIALIZE: 0.001
+
+Iteration: 1
+    fes search: 4.088
+    fes search: 4.166
+    fes search: 4.2
+    fes search: 4.217
+    fes search: 4.27
+    fes search: 4.313
+    fes search: 4.309
+    fes search: 4.411
+  FES STAGE: 4.455
+        ALPHA ORDER: 0.015
+        COMPUTE ALPHA H2: 0.985
+        TRANSFORM DAGS: 0.01
+        TRANSFORM(): 0.758
+      CONSENSUS UNION: 1.77
+      FUSION.UNION(): 0.011
+      SCORE FUSION: 0.023
+      SCORE CURRENT: 0.0
+        Fusion Score: -579498.376008498
+        Current Score: -Infinity
+  FUSION FES STAGE: 1.804
+    -bes search: 0.025
+    -bes search: 0.044
+    -bes search: 0.055
+    -bes search: 0.056
+    -bes search: 0.04
+    -bes search: 0.042
+    -bes search: 0.036
+    -bes search: 0.039
+  -BES STAGE: 0.143
+    -bes search: 0.017
+  -FUSION BES STAGE: 0.063
+
+Iteration: 2
+    fes search: 1.61
+    fes search: 1.617
+    fes search: 1.688
+    fes search: 1.709
+    fes search: 1.76
+    fes search: 1.79
+    fes search: 1.93
+    fes search: 2.139
+  FES STAGE: 2.205
+        ALPHA ORDER: 0.024
+        COMPUTE ALPHA H2: 1.651
+        TRANSFORM DAGS: 0.012
+        TRANSFORM(): 0.484
+      CONSENSUS UNION: 2.172
+      FUSION.UNION(): 0.01
+      SCORE FUSION: 0.01
+      SCORE CURRENT: 0.005
+        Fusion Score: -559424.1745761227
+        Current Score: -579460.3769755951
+  FUSION FES STAGE: 2.198
+    -bes search: 0.01
+    -bes search: 0.014
+    -bes search: 0.015
+    -bes search: 0.015
+    -bes search: 0.017
+    -bes search: 0.017
+    -bes search: 0.01
+    -bes search: 0.012
+  -BES STAGE: 0.066
+    -bes search: 0.01
+  -FUSION BES STAGE: 0.039
+
+Iteration: 3
+    fes search: 1.371
+    fes search: 1.405
+    fes search: 1.402
+    fes search: 1.43
+    fes search: 1.44
+    fes search: 1.485
+    fes search: 1.656
+    fes search: 1.661
+  FES STAGE: 1.708
+        ALPHA ORDER: 0.019
+        COMPUTE ALPHA H2: 1.328
+        TRANSFORM DAGS: 0.013
+        TRANSFORM(): 0.547
+      CONSENSUS UNION: 1.907
+      FUSION.UNION(): 0.011
+      SCORE FUSION: 0.013
+      SCORE CURRENT: 0.005
+        Fusion Score: -542123.4400047822
+        Current Score: -559359.3812825718
+  FUSION FES STAGE: 1.936
+    -bes search: 0.016
+    -bes search: 0.018
+    -bes search: 0.019
+    -bes search: 0.02
+    -bes search: 0.021
+    -bes search: 0.022
+    -bes search: 0.022
+    -bes search: 0.029
+  -BES STAGE: 0.111
+  -FUSION BES STAGE: 0.029
+
+Iteration: 4
+    fes search: 1.396
+    fes search: 1.46
+    fes search: 1.498
+    fes search: 1.508
+    fes search: 1.542
+    fes search: 1.574
+    fes search: 1.673
+    fes search: 1.975
+  FES STAGE: 2.036
+        ALPHA ORDER: 0.024
+        COMPUTE ALPHA H2: 2.446
+        TRANSFORM DAGS: 0.016
+        TRANSFORM(): 0.919
+      CONSENSUS UNION: 3.405
+      FUSION.UNION(): 0.015
+      SCORE FUSION: 0.027
+      SCORE CURRENT: 0.015
+        Fusion Score: -524444.7570872803
+        Current Score: -541996.4283039784
+  FUSION FES STAGE: 3.462
+    -bes search: 0.025
+    -bes search: 0.029
+    -bes search: 0.029
+    -bes search: 0.03
+    -bes search: 0.044
+    -bes search: 0.043
+    -bes search: 0.047
+    -bes search: 0.044
+  -BES STAGE: 0.27
+  -FUSION BES STAGE: 0.056
+
+Iteration: 5
+    fes search: 1.799
+    fes search: 1.845
+    fes search: 1.856
+    fes search: 1.87
+    fes search: 1.9
+    fes search: 1.906
+    fes search: 1.998
+    fes search: 2.142
+  FES STAGE: 2.294
+        ALPHA ORDER: 0.03
+        COMPUTE ALPHA H2: 2.072
+        TRANSFORM DAGS: 0.018
+        TRANSFORM(): 0.609
+      CONSENSUS UNION: 2.73
+      FUSION.UNION(): 0.013
+      SCORE FUSION: 0.021
+      SCORE CURRENT: 0.014
+        Fusion Score: -510755.73464345984
+        Current Score: -524388.7739211391
+  FUSION FES STAGE: 2.779
+    -bes search: 0.037
+    -bes search: 0.042
+    -bes search: 0.042
+    -bes search: 0.042
+    -bes search: 0.041
+    -bes search: 0.042
+    -bes search: 0.046
+    -bes search: 0.043
+  -BES STAGE: 0.271
+  -FUSION BES STAGE: 0.049
+
+Iteration: 6
+    fes search: 1.863
+    fes search: 1.899
+    fes search: 1.907
+    fes search: 2.059
+    fes search: 2.075
+    fes search: 2.134
+    fes search: 2.217
+    fes search: 2.252
+  FES STAGE: 2.4
+        ALPHA ORDER: 0.031
+        COMPUTE ALPHA H2: 2.351
+        TRANSFORM DAGS: 0.024
+        TRANSFORM(): 0.634
+      CONSENSUS UNION: 3.04
+      FUSION.UNION(): 0.015
+      SCORE FUSION: 0.028
+      SCORE CURRENT: 0.017
+        Fusion Score: -498415.2275940591
+        Current Score: -510598.9651551987
+  FUSION FES STAGE: 3.1
+    -bes search: 0.031
+    -bes search: 0.052
+    -bes search: 0.065
+    -bes search: 0.067
+    -bes search: 0.066
+    -bes search: 0.072
+    -bes search: 0.08
+    -bes search: 0.113
+  -BES STAGE: 0.427
+  -FUSION BES STAGE: 0.08
+
+Iteration: 7
+    fes search: 2.371
+    fes search: 2.52
+    fes search: 2.538
+    fes search: 2.656
+    fes search: 2.695
+    fes search: 2.722
+    fes search: 2.848
+    fes search: 2.826
+  FES STAGE: 3.028
+        ALPHA ORDER: 0.037
+        COMPUTE ALPHA H2: 3.191
+        TRANSFORM DAGS: 0.033
+        TRANSFORM(): 0.688
+      CONSENSUS UNION: 3.949
+      FUSION.UNION(): 0.017
+      SCORE FUSION: 0.026
+      SCORE CURRENT: 0.019
+        Fusion Score: -489523.7223059709
+        Current Score: -498179.8773179142
+  FUSION FES STAGE: 4.011
+    -bes search: 0.03
+    -bes search: 0.047
+    -bes search: 0.075
+    -bes search: 0.076
+    -bes search: 0.067
+    -bes search: 0.126
+    -bes search: 0.126
+    -bes search: 0.138
+  -BES STAGE: 0.376
+  -FUSION BES STAGE: 0.067
+
+Iteration: 8
+    fes search: 2.946
+    fes search: 3.031
+    fes search: 3.061
+    fes search: 3.1
+    fes search: 3.168
+    fes search: 3.209
+    fes search: 3.304
+    fes search: 3.497
+  FES STAGE: 3.719
+        ALPHA ORDER: 0.044
+        COMPUTE ALPHA H2: 4.263
+        TRANSFORM DAGS: 0.034
+        TRANSFORM(): 0.756
+      CONSENSUS UNION: 5.098
+      FUSION.UNION(): 0.019
+      SCORE FUSION: 0.036
+      SCORE CURRENT: 0.021
+        Fusion Score: -484906.0019455754
+        Current Score: -489341.9463385727
+  FUSION FES STAGE: 5.174
+    -bes search: 0.416
+    -bes search: 0.447
+    -bes search: 0.758
+    -bes search: 0.954
+    -bes search: 1.065
+    -bes search: 1.096
+    -bes search: 1.18
+    -bes search: 1.182
+  -BES STAGE: 1.757
+  -FUSION BES STAGE: 0.09
+
+Iteration: 9
+    fes search: 3.165
+    fes search: 3.186
+    fes search: 3.272
+    fes search: 3.232
+    fes search: 3.382
+    fes search: 3.438
+    fes search: 3.521
+    fes search: 4.018
+  FES STAGE: 4.226
+        ALPHA ORDER: 0.094
+        COMPUTE ALPHA H2: 5.895
+        TRANSFORM DAGS: 0.082
+        TRANSFORM(): 7.623
+      CONSENSUS UNION: 13.694
+      FUSION.UNION(): 0.02
+      SCORE FUSION: 0.047
+      SCORE CURRENT: 0.027
+        Fusion Score: -485049.41454553674
+        Current Score: -484107.79771364277
+      for ADD DIRECTED EDGE: 0.003
+    fes search: 5.027
+      FUSE.RUN: 5.028
+      REMOVE INCONSISTENCIES: 0.197
+  FUSION FES STAGE: 19.073
+    -bes search: 0.166
+    -bes search: 0.192
+    -bes search: 0.209
+    -bes search: 0.267
+    -bes search: 0.306
+    -bes search: 0.335
+    -bes search: 0.427
+    -bes search: 0.536
+  -BES STAGE: 1.638
+  -FUSION BES STAGE: 0.096
+
+Iteration: 10
+    fes search: 3.492
+    fes search: 3.504
+    fes search: 3.553
+    fes search: 3.68
+    fes search: 4.118
+    fes search: 4.237
+    fes search: 4.369
+    fes search: 4.371
+  FES STAGE: 4.845
+        ALPHA ORDER: 0.181
+        COMPUTE ALPHA H2: 5.973
+        TRANSFORM DAGS: 0.17
+        TRANSFORM(): 0.859
+      CONSENSUS UNION: 7.183
+      FUSION.UNION(): 0.025
+      SCORE FUSION: 0.031
+      SCORE CURRENT: 0.025
+        Fusion Score: -479659.72421952704
+        Current Score: -479925.247883805
+  FUSION FES STAGE: 7.264
+    -bes search: 0.264
+    -bes search: 0.325
+    -bes search: 0.585
+    -bes search: 0.672
+    -bes search: 0.722
+    -bes search: 0.834
+    -bes search: 0.95
+    -bes search: 2.384
+  -BES STAGE: 3.518
+  -FUSION BES STAGE: 0.101
+
+Iteration: 11
+    fes search: 3.566
+    fes search: 3.667
+    fes search: 3.686
+    fes search: 3.674
+    fes search: 3.697
+    fes search: 4.015
+    fes search: 4.081
+    fes search: 4.246
+  FES STAGE: 4.862
+        ALPHA ORDER: 0.271
+        COMPUTE ALPHA H2: 7.134
+        TRANSFORM DAGS: 0.257
+        TRANSFORM(): 2.977
+      CONSENSUS UNION: 10.639
+      FUSION.UNION(): 0.021
+      SCORE FUSION: 0.043
+      SCORE CURRENT: 0.027
+        Fusion Score: -480934.8175880898
+        Current Score: -479394.3754130914
+      for ADD DIRECTED EDGE: 0.004
+    fes search: 5.723
+      FUSE.RUN: 5.724
+      REMOVE INCONSISTENCIES: 0.318
+  FUSION FES STAGE: 16.902
+    -bes search: 0.2
+    -bes search: 0.204
+    -bes search: 0.207
+    -bes search: 0.21
+    -bes search: 0.226
+    -bes search: 0.403
+    -bes search: 0.528
+    -bes search: 0.983
+  -BES STAGE: 2.597
+    -bes search: 1.065
+  -FUSION BES STAGE: 1.508
+
+Iteration: 12
+    fes search: 2.875
+    fes search: 3.138
+    fes search: 3.174
+    fes search: 3.674
+    fes search: 3.678
+    fes search: 3.816
+    fes search: 4.508
+    fes search: 4.653
+  FES STAGE: 5.861
+        ALPHA ORDER: 0.593
+        COMPUTE ALPHA H2: 7.342
+        TRANSFORM DAGS: 0.567
+        TRANSFORM(): 1.789
+      CONSENSUS UNION: 10.291
+      FUSION.UNION(): 0.021
+      SCORE FUSION: 0.034
+      SCORE CURRENT: 0.025
+        Fusion Score: -478200.9867462219
+        Current Score: -477545.07808418374
+      for ADD DIRECTED EDGE: 0.003
+    fes search: 7.393
+      FUSE.RUN: 7.394
+      REMOVE INCONSISTENCIES: 0.369
+  FUSION FES STAGE: 18.159
+    -bes search: 0.038
+    -bes search: 0.04
+    -bes search: 0.728
+    -bes search: 0.729
+    -bes search: 0.727
+    -bes search: 0.745
+    -bes search: 0.94
+    -bes search: 1.592
+  -BES STAGE: 3.279
+    -bes search: 3.975
+  -FUSION BES STAGE: 4.319
+
+Iteration: 13
+    fes search: 1.433
+    fes search: 1.455
+    fes search: 1.779
+    fes search: 2.158
+    fes search: 2.164
+    fes search: 2.961
+    fes search: 3.713
+    fes search: 3.891
+  FES STAGE: 5.668
+        ALPHA ORDER: 0.214
+        COMPUTE ALPHA H2: 7.078
+        TRANSFORM DAGS: 0.178
+        TRANSFORM(): 207122.714
+      CONSENSUS UNION: 207130.184
+      FUSION.UNION(): 0.029
+      SCORE FUSION: 0.071
+      SCORE CURRENT: 0.037
+        Fusion Score: -485896.2905528659
+        Current Score: -476415.00397127675
+      for ADD DIRECTED EDGE: 0.007
+    fes search: 5.328
+      FUSE.RUN: 5.33
+      REMOVE INCONSISTENCIES: 1.143
+  FUSION FES STAGE: 207136.867
+    -bes search: 0.04
+    -bes search: 0.405
+    -bes search: 0.418
+    -bes search: 0.55
+    -bes search: 0.613
+    -bes search: 0.722
+    -bes search: 1.121
+    -bes search: 1.218
+  -BES STAGE: 9.578
+  -FUSION BES STAGE: 0.115
+
+Iteration: 14
+    fes search: 0.61
+    fes search: 1.367
+    fes search: 1.393
+    fes search: 1.439
+    fes search: 1.457
+    fes search: 1.487
+    fes search: 1.56
+    fes search: 2.209
+  FES STAGE: 4.398
+        ALPHA ORDER: 0.202
+        COMPUTE ALPHA H2: 7.377
+        TRANSFORM DAGS: 0.137
+        TRANSFORM(): 0.755
+      CONSENSUS UNION: 8.471
+      FUSION.UNION(): 0.025
+      SCORE FUSION: 0.045
+      SCORE CURRENT: 0.027
+        Fusion Score: -475844.434030551
+        Current Score: -475805.7595452772
+      for ADD DIRECTED EDGE: 0.002
+    fes search: 0.842
+      FUSE.RUN: 0.843
+      REMOVE INCONSISTENCIES: 0.315
+  FUSION FES STAGE: 9.745
+    -bes search: 0.036
+    -bes search: 0.054
+    -bes search: 0.407
+    -bes search: 0.396
+    -bes search: 0.421
+    -bes search: 0.404
+    -bes search: 0.67
+    -bes search: 0.692
+  -BES STAGE: 2.757
+  -FUSION BES STAGE: 0.107
+
+Iteration: 15
+    fes search: 0.582
+    fes search: 0.653
+    fes search: 1.343
+    fes search: 1.332
+    fes search: 1.369
+    fes search: 1.413
+    fes search: 1.568
+    fes search: 2.354
+  FES STAGE: 3.764
+        ALPHA ORDER: 0.126
+        COMPUTE ALPHA H2: 6.779
+        TRANSFORM DAGS: 0.107
+        TRANSFORM(): 0.723
+      CONSENSUS UNION: 7.735
+      FUSION.UNION(): 0.024
+      SCORE FUSION: 0.032
+      SCORE CURRENT: 0.026
+        Fusion Score: -475730.65943076444
+        Current Score: -475665.3336638609
+      for ADD DIRECTED EDGE: 0.003
+    fes search: 0.714
+      FUSE.RUN: 0.715
+      REMOVE INCONSISTENCIES: 0.254
+  FUSION FES STAGE: 8.803
+    -bes search: 0.041
+    -bes search: 0.041
+    -bes search: 0.036
+    -bes search: 0.039
+    -bes search: 0.266
+    -bes search: 0.269
+    -bes search: 0.282
+    -bes search: 0.504
+  -BES STAGE: 2.015
+    -bes search: 0.468
+  -FUSION BES STAGE: 0.922
+
+Iteration: 16
+    fes search: 0.521
+    fes search: 0.523
+    fes search: 0.541
+    fes search: 0.604
+    fes search: 1.192
+    fes search: 1.273
+    fes search: 1.26
+    fes search: 1.376
+  FES STAGE: 4.022
+        ALPHA ORDER: 0.173
+        COMPUTE ALPHA H2: 6.816
+        TRANSFORM DAGS: 0.155
+        TRANSFORM(): 0.697
+      CONSENSUS UNION: 7.841
+      FUSION.UNION(): 0.024
+      SCORE FUSION: 0.029
+      SCORE CURRENT: 0.026
+        Fusion Score: -475673.5470594988
+        Current Score: -475532.34441113117
+      for ADD DIRECTED EDGE: 0.003
+    fes search: 0.483
+      FUSE.RUN: 0.484
+      REMOVE INCONSISTENCIES: 0.33
+  FUSION FES STAGE: 8.757
+    -bes search: 0.034
+    -bes search: 0.035
+    -bes search: 0.037
+    -bes search: 0.034
+    -bes search: 0.038
+    -bes search: 0.247
+    -bes search: 0.288
+    -bes search: 0.272
+  -BES STAGE: 2.609
+  -FUSION BES STAGE: 0.107
+
+Iteration: 17
+    fes search: 0.528
+    fes search: 0.534
+    fes search: 0.534
+    fes search: 1.205
+    fes search: 1.207
+    fes search: 1.261
+    fes search: 1.367
+    fes search: 1.379
+  FES STAGE: 2.88
+        ALPHA ORDER: 0.18
+        COMPUTE ALPHA H2: 6.951
+        TRANSFORM DAGS: 0.16
+        TRANSFORM(): 0.714
+      CONSENSUS UNION: 8.005
+      FUSION.UNION(): 0.02
+      SCORE FUSION: 0.034
+      SCORE CURRENT: 0.026
+        Fusion Score: -475315.5378669947
+        Current Score: -475464.137624528
+  FUSION FES STAGE: 8.085
+    -bes search: 0.045
+    -bes search: 0.04
+    -bes search: 0.041
+    -bes search: 0.042
+    -bes search: 0.042
+    -bes search: 0.301
+    -bes search: 0.29
+    -bes search: 0.299
+  -BES STAGE: 18.902
+  -FUSION BES STAGE: 0.104
+
+Iteration: 18
+    fes search: 0.537
+    fes search: 0.541
+    fes search: 0.548
+    fes search: 0.58
+    fes search: 0.6
+    fes search: 0.821
+    fes search: 0.836
+    fes search: 1.258
+  FES STAGE: 16.972
+        ALPHA ORDER: 0.277
+        COMPUTE ALPHA H2: 7.123
+        TRANSFORM DAGS: 0.196
+        TRANSFORM(): 0.842
+      CONSENSUS UNION: 8.439
+      FUSION.UNION(): 0.02
+      SCORE FUSION: 0.036
+      SCORE CURRENT: 0.031
+        Fusion Score: -475230.2073142972
+        Current Score: -475262.9584540646
+  FUSION FES STAGE: 8.526
+    -bes search: 0.041
+    -bes search: 0.042
+    -bes search: 0.043
+    -bes search: 0.043
+    -bes search: 0.043
+    -bes search: 0.045
+    -bes search: 0.047
+    -bes search: 0.049
+  -BES STAGE: 15.418
+    -bes search: 0.032
+  -FUSION BES STAGE: 2.069
+
+Iteration: 19
+    fes search: 0.529
+    fes search: 0.534
+    fes search: 0.547
+    fes search: 0.556
+    fes search: 0.518
+    fes search: 0.565
+    fes search: 0.571
+    fes search: 0.627
+  FES STAGE: 16.218
+        ALPHA ORDER: 0.055
+        COMPUTE ALPHA H2: 7.216
+        TRANSFORM DAGS: 0.032
+        TRANSFORM(): 0.553
+      CONSENSUS UNION: 7.856
+      FUSION.UNION(): 0.022
+      SCORE FUSION: 0.032
+      SCORE CURRENT: 0.031
+        Fusion Score: -475230.20731429727
+        Current Score: -475230.2073142972
+      for ADD DIRECTED EDGE: 0.002
+    fes search: 0.036
+      FUSE.RUN: 0.037
+      REMOVE INCONSISTENCIES: 1.905
+  FUSION FES STAGE: 9.889
+    -bes search: 0.042
+    -bes search: 0.042
+    -bes search: 0.04
+    -bes search: 0.04
+    -bes search: 0.04
+    -bes search: 0.04
+    -bes search: 0.041
+    -bes search: 0.041
+  -BES STAGE: 15.534
+    -bes search: 0.033
+  -FUSION BES STAGE: 2.107
+-----------------------
+Experiment pges
+-----------------------
+Net Name: res/networks/andes	Database: andes.xbif50004_	Threads: 8	Interleaving: 5	Max. Iterations: 250
+Resulting DAG:
+
+Graph Nodes:
+INCLINE51 NORMAL52 HORIZ53 NEED36 VECTOR44 SNode_68 GOAL_66 GOAL_62 WRITE30 GOAL_61 NEED67 SNode_25 NORMAL50 FIND49 TRY24 GOAL_48 COMPO16 EQUATION28 SNode_47 SNode_3 RApp1 SNode_8 SNode_5 TRY11 GOAL_49 GOAL_56 APPLY32 GOAL_50 SNode_51 SNode_52 
+RESOLVE38 SNode_43 GOAL_53 SNode_42 KNOWN6 SNode_41 CONSTANT5 SNode_55 GOAL_72 SNode_73 SNode_75 GOAL_80 RApp6 VECTOR27 GOAL_79 RApp5 GOAL_81 GOAL_83 GOAL_84 SYSTEM46 SNode_86 NEWTONS45 SNode_156 GOAL_87 SNode_88 WEIGHT56 SNode_10 GIVEN21 SNode_33 SNode_16 
+SNode_94 FORCE60 SNode_102 APPLY61 GOAL_103 GOAL_108 RApp9 GOAL66 GOAL_127 RApp10 SNode_128 SUM75 SNode_137 IDENTIFY55 SNode_97 SNode_132 GOAL_146 RApp13 GOAL_143 RApp12 GOAL_142 RApp11 GOAL_147 GOAL_149 TRY76 GOAL_126 GOAL65 SLIDING4 SNode_15 SNode_54 
+GOAL_69 RESOLVE40 VELOCITY7 GOAL_109 GOAL_107 GOAL_104 MAXIMIZE34 SNode_106 SNode_152 AXIS33 SNode_7 CHOOSE35 GOAL_57 SNode_59 SNode_60 WRITE31 TRY12 TRY15 WRITE64 SNode_70 SNode_71 IDENTIFY41 WRITE63 CHOOSE62 KINEMATI17 IDENTIFY39 SNode_37 VAR20 SNode_38 VALUE3 
+SNode_40 GOAL_110 GOAL68 GOAL_114 SNode_115 TRY25 TRY26 CHOOSE47 WEIGHT57 SNode_95 SNode_18 IDENTIFY59 GOAL_99 GOAL_98 SNode_100 GOAL72 GOAL_121 SNode_154 GOAL_153 SNode_155 IDENTIFY22 BUGGY54 SNode_12 STRAT_90 SNode_92 SNode_6 SNode_134 SNode_4 SNode_14 SNode_122 
+VECTOR73 SNode_123 GOAL_113 SNode_117 SNode_91 VECTOR70 SNode_118 EQUAL71 SNode_93 SNode_119 SNode_135 SNode_26 SNode_11 RApp4 KNOWN8 GOAL_129 SNode_133 KINE29 SNode_13 IDENTIFY10 NEWTONS74 SNode_124 SNode_34 IDENTIFY43 VECTOR69 SNode_74 DISPLACEM0 APPLY77 NEED1 SNode_20 
+GOAL_150 GRAV78 SNode_151 GOAL_2 DEFINE23 FIND58 RESOLVE42 GOAL_130 SNode_131 SNode_116 GOAL_111 RApp8 RApp7 SNode_112 SNode_125 SNode_120 SNode_19 SNode_136 RApp3 SNode_27 SNode_28 GOAL_63 RESOLVE37 RApp2 GIVEN_1 SNode_44 SNode_46 SNode_29 SNode_31 GRAV2 
+SNode_21 SNode_24 TRY14 NULL48 SNode_64 SNode_65 SNode_9 IDENTIFY9 SNode_17 SYSTEM18 CHOOSE19 SNode_67 TRY13 
+
+Graph Edges: 
+1. APPLY32 --> SNode_52
+2. APPLY61 --> GOAL_103
+3. APPLY77 --> GOAL_150
+4. AXIS33 --> SNode_60
+5. BUGGY54 --> SNode_92
+6. CHOOSE35 --> GOAL_57
+7. COMPO16 --> GOAL_2
+8. COMPO16 --> RApp12
+9. COMPO16 --> RApp6
+10. CONSTANT5 --> SNode_11
+11. CONSTANT5 --> SNode_26
+12. CONSTANT5 --> SNode_34
+13. CONSTANT5 --> SNode_55
+14. CONSTANT5 --> SNode_9
+15. EQUAL71 --> SNode_119
+16. EQUATION28 --> GOAL_146
+17. EQUATION28 --> GOAL_80
+18. FIND49 --> GOAL_87
+19. FORCE60 --> SNode_102
+20. GIVEN21 --> SNode_33
+21. GOAL65 --> GOAL_110
+22. GOAL66 --> GOAL_111
+23. GOAL66 --> GOAL_127
+24. GOAL68 --> GOAL_113
+25. GOAL68 --> GOAL_114
+26. GOAL68 --> GOAL_129
+27. GOAL68 --> GOAL_130
+28. GOAL72 --> GOAL_121
+29. GOAL72 --> GOAL_153
+30. GOAL_103 --> CHOOSE62
+31. GOAL_103 --> GOAL_104
+32. GOAL_103 --> GOAL_107
+33. GOAL_103 --> GOAL_108
+34. GOAL_103 --> WRITE63
+35. GOAL_104 --> CHOOSE62
+36. GOAL_104 --> SNode_106
+37. GOAL_107 --> SNode_152
+38. GOAL_107 --> WRITE63
+39. GOAL_107 --> WRITE64
+40. GOAL_108 --> GOAL65
+41. GOAL_108 --> GOAL_107
+42. GOAL_108 --> GOAL_109
+43. GOAL_108 --> GOAL_126
+44. GOAL_108 --> GOAL_127
+45. GOAL_108 --> GOAL_153
+46. GOAL_108 --> RApp9
+47. GOAL_108 --> SNode_136
+48. GOAL_108 --> SNode_137
+49. GOAL_108 --> WRITE64
+50. GOAL_109 --> GOAL_107
+51. GOAL_109 --> GOAL_110
+52. GOAL_109 --> GOAL_111
+53. GOAL_109 --> GOAL_121
+54. GOAL_109 --> RApp7
+55. GOAL_109 --> SNode_124
+56. GOAL_109 --> SNode_125
+57. GOAL_109 --> WRITE64
+58. GOAL_110 --> GOAL_113
+59. GOAL_110 --> GOAL_114
+60. GOAL_111 --> RApp8
+61. GOAL_113 --> SNode_117
+62. GOAL_113 --> SNode_118
+63. GOAL_114 --> SNode_115
+64. GOAL_121 --> SNode_122
+65. GOAL_121 --> SNode_123
+66. GOAL_121 --> SNode_154
+67. GOAL_126 --> GOAL65
+68. GOAL_126 --> GOAL_129
+69. GOAL_126 --> GOAL_130
+70. GOAL_127 --> RApp10
+71. GOAL_129 --> SNode_133
+72. GOAL_130 --> SNode_131
+73. GOAL_142 --> RApp11
+74. GOAL_143 --> RApp12
+75. GOAL_146 --> RApp13
+76. GOAL_147 --> GOAL_149
+77. GOAL_147 --> TRY76
+78. GOAL_149 --> GOAL_150
+79. GOAL_149 --> TRY76
+80. GOAL_150 --> SNode_151
+81. GOAL_153 --> SNode_155
+82. GOAL_48 --> COMPO16
+83. GOAL_48 --> GOAL_2
+84. GOAL_48 --> GOAL_49
+85. GOAL_49 --> APPLY32
+86. GOAL_49 --> CHOOSE19
+87. GOAL_49 --> GOAL_50
+88. GOAL_49 --> GOAL_53
+89. GOAL_49 --> GOAL_56
+90. GOAL_49 --> IDENTIFY10
+91. GOAL_49 --> SNode_52
+92. GOAL_49 --> SNode_6
+93. GOAL_50 --> CHOOSE19
+94. GOAL_50 --> SNode_51
+95. GOAL_50 --> SYSTEM18
+96. GOAL_53 --> IDENTIFY10
+97. GOAL_53 --> IDENTIFY39
+98. GOAL_53 --> IDENTIFY41
+99. GOAL_53 --> IDENTIFY43
+100. GOAL_53 --> IDENTIFY9
+101. GOAL_53 --> SNode_28
+102. GOAL_53 --> SNode_42
+103. GOAL_53 --> SNode_54
+104. GOAL_53 --> SNode_55
+105. GOAL_56 --> APPLY32
+106. GOAL_56 --> GOAL_57
+107. GOAL_56 --> SNode_52
+108. GOAL_56 --> WRITE31
+109. GOAL_57 --> SNode_59
+110. GOAL_61 --> GOAL_56
+111. GOAL_61 --> WRITE31
+112. GOAL_62 --> GOAL_61
+113. GOAL_62 --> GOAL_63
+114. GOAL_62 --> GOAL_69
+115. GOAL_62 --> GOAL_72
+116. GOAL_62 --> RESOLVE37
+117. GOAL_62 --> RESOLVE40
+118. GOAL_62 --> RESOLVE42
+119. GOAL_62 --> SNode_43
+120. GOAL_62 --> WRITE30
+121. GOAL_63 --> RESOLVE37
+122. GOAL_63 --> SNode_64
+123. GOAL_63 --> SNode_65
+124. GOAL_66 --> GOAL_62
+125. GOAL_66 --> SNode_43
+126. GOAL_66 --> SNode_67
+127. GOAL_69 --> RESOLVE40
+128. GOAL_69 --> SNode_70
+129. GOAL_69 --> SNode_71
+130. GOAL_72 --> RESOLVE42
+131. GOAL_72 --> SNode_73
+132. GOAL_72 --> SNode_75
+133. GOAL_79 --> RApp5
+134. GOAL_79 --> SNode_74
+135. GOAL_80 --> RApp6
+136. GOAL_81 --> GOAL_83
+137. GOAL_83 --> CHOOSE47
+138. GOAL_83 --> DEFINE23
+139. GOAL_83 --> GOAL_103
+140. GOAL_83 --> GOAL_84
+141. GOAL_83 --> GOAL_87
+142. GOAL_83 --> GOAL_98
+143. GOAL_83 --> SNode_37
+144. GOAL_84 --> CHOOSE47
+145. GOAL_84 --> SNode_86
+146. GOAL_87 --> SNode_102
+147. GOAL_87 --> SNode_88
+148. GOAL_87 --> SNode_93
+149. GOAL_87 --> SNode_94
+150. GOAL_87 --> SNode_97
+151. GOAL_98 --> DEFINE23
+152. GOAL_98 --> FIND58
+153. GOAL_98 --> IDENTIFY22
+154. GOAL_98 --> SNode_100
+155. GOAL_99 --> FIND58
+156. GOAL_99 --> GOAL_98
+157. GRAV2 --> SNode_21
+158. GRAV78 --> SNode_151
+159. IDENTIFY55 --> SNode_93
+160. IDENTIFY55 --> SNode_97
+161. IDENTIFY59 --> SNode_100
+162. INCLINE51 --> BUGGY54
+163. INCLINE51 --> NORMAL52
+164. INCLINE51 --> SNode_91
+165. KNOWN6 --> RApp3
+166. KNOWN6 --> SNode_41
+167. MAXIMIZE34 --> SNode_106
+168. MAXIMIZE34 --> SNode_59
+169. NEED1 --> SNode_20
+170. NEED36 --> GOAL_66
+171. NEED36 --> RApp10
+172. NEED36 --> RApp8
+173. NEED36 --> SNode_115
+174. NEED36 --> SNode_117
+175. NEED36 --> SNode_122
+176. NEED36 --> SNode_131
+177. NEED36 --> SNode_133
+178. NEED36 --> SNode_154
+179. NEED36 --> SNode_64
+180. NEED36 --> SNode_67
+181. NEED36 --> SNode_68
+182. NEED36 --> SNode_70
+183. NEED36 --> SNode_73
+184. NEED67 --> RApp7
+185. NEED67 --> RApp9
+186. NEWTONS45 --> SNode_156
+187. NEWTONS74 --> SNode_124
+188. NORMAL50 --> SNode_88
+189. NORMAL52 --> HORIZ53
+190. NULL48 --> SNode_65
+191. RApp1 --> DISPLACEM0
+192. RApp1 --> RApp2
+193. RApp1 --> SNode_8
+194. RApp10 --> SNode_128
+195. RApp11 --> GOAL_147
+196. RApp12 --> GOAL_147
+197. RApp13 --> GOAL_147
+198. RApp2 --> GIVEN_1
+199. RApp3 --> SNode_27
+200. RApp4 --> KNOWN8
+201. RApp4 --> SNode_27
+202. RApp5 --> GOAL_81
+203. RApp6 --> GOAL_81
+204. RApp7 --> SNode_112
+205. RApp8 --> SNode_112
+206. RApp9 --> SNode_128
+207. RESOLVE38 --> SNode_43
+208. SLIDING4 --> SNode_15
+209. SNode_10 --> SNode_33
+210. SNode_10 --> SNode_34
+211. SNode_100 --> SNode_123
+212. SNode_100 --> SNode_155
+213. SNode_102 --> GOAL_103
+214. SNode_106 --> AXIS33
+215. SNode_106 --> SNode_152
+216. SNode_11 --> KNOWN8
+217. SNode_11 --> RApp4
+218. SNode_112 --> SNode_125
+219. SNode_117 --> SNode_119
+220. SNode_118 --> SNode_119
+221. SNode_12 --> SNode_92
+222. SNode_122 --> SNode_123
+223. SNode_128 --> SNode_137
+224. SNode_132 --> GOAL_146
+225. SNode_137 --> GOAL_146
+226. SNode_152 --> AXIS33
+227. SNode_152 --> WRITE63
+228. SNode_154 --> SNode_155
+229. SNode_156 --> DEFINE23
+230. SNode_156 --> GOAL_87
+231. SNode_156 --> GOAL_98
+232. SNode_156 --> SNode_37
+233. SNode_16 --> SNode_20
+234. SNode_16 --> SNode_94
+235. SNode_17 --> SYSTEM18
+236. SNode_20 --> GOAL_150
+237. SNode_20 --> SNode_21
+238. SNode_21 --> SNode_24
+239. SNode_25 --> SLIDING4
+240. SNode_25 --> SNode_15
+241. SNode_25 --> SNode_88
+242. SNode_26 --> RApp3
+243. SNode_26 --> SNode_11
+244. SNode_27 --> IDENTIFY9
+245. SNode_27 --> SNode_28
+246. SNode_28 --> GOAL_63
+247. SNode_28 --> IDENTIFY9
+248. SNode_28 --> RESOLVE37
+249. SNode_28 --> SNode_29
+250. SNode_29 --> SNode_31
+251. SNode_29 --> SNode_65
+252. SNode_3 --> DISPLACEM0
+253. SNode_3 --> RApp1
+254. SNode_3 --> VELOCITY7
+255. SNode_33 --> SNode_94
+256. SNode_34 --> IDENTIFY43
+257. SNode_37 --> GOAL_150
+258. SNode_37 --> GOAL_98
+259. SNode_37 --> GOAL_99
+260. SNode_37 --> IDENTIFY22
+261. SNode_37 --> SNode_124
+262. SNode_37 --> SNode_136
+263. SNode_37 --> SNode_38
+264. SNode_38 --> SNode_40
+265. SNode_41 --> CONSTANT5
+266. SNode_41 --> SNode_9
+267. SNode_42 --> IDENTIFY39
+268. SNode_42 --> KNOWN6
+269. SNode_42 --> SNode_41
+270. SNode_43 --> GOAL_53
+271. SNode_43 --> IDENTIFY39
+272. SNode_43 --> SNode_42
+273. SNode_43 --> SNode_44
+274. SNode_44 --> SNode_46
+275. SNode_47 --> RApp3
+276. SNode_47 --> SNode_3
+277. SNode_47 --> VELOCITY7
+278. SNode_5 --> GOAL_49
+279. SNode_51 --> KINEMATI17
+280. SNode_51 --> SNode_17
+281. SNode_51 --> SNode_52
+282. SNode_51 --> SYSTEM18
+283. SNode_52 --> GOAL_53
+284. SNode_52 --> IDENTIFY10
+285. SNode_52 --> KINEMATI17
+286. SNode_54 --> GOAL_69
+287. SNode_54 --> IDENTIFY41
+288. SNode_54 --> RESOLVE40
+289. SNode_55 --> GOAL_72
+290. SNode_55 --> IDENTIFY43
+291. SNode_55 --> RESOLVE42
+292. SNode_59 --> SNode_60
+293. SNode_60 --> WRITE31
+294. SNode_64 --> SNode_65
+295. SNode_68 --> GOAL_66
+296. SNode_68 --> SNode_67
+297. SNode_7 --> SNode_59
+298. SNode_70 --> SNode_71
+299. SNode_73 --> SNode_75
+300. SNode_75 --> GOAL_80
+301. SNode_75 --> SNode_74
+302. SNode_8 --> RApp2
+303. SNode_8 --> SNode_41
+304. SNode_86 --> SNode_156
+305. SNode_88 --> SNode_102
+306. SNode_88 --> SNode_91
+307. SNode_88 --> SNode_93
+308. SNode_91 --> SNode_118
+309. SNode_93 --> SNode_119
+310. SNode_94 --> SNode_102
+311. SNode_94 --> SNode_95
+312. SNode_94 --> SNode_97
+313. SNode_97 --> SNode_132
+314. STRAT_90 --> SNode_91
+315. STRAT_90 --> SNode_92
+316. SUM75 --> SNode_125
+317. SUM75 --> SNode_137
+318. SYSTEM46 --> SNode_86
+319. TRY11 --> GOAL_49
+320. TRY11 --> TRY12
+321. TRY12 --> TRY13
+322. TRY12 --> TRY14
+323. TRY12 --> TRY15
+324. TRY24 --> GOAL_83
+325. TRY24 --> TRY25
+326. TRY25 --> TRY26
+327. VALUE3 --> SNode_24
+328. VALUE3 --> SNode_31
+329. VALUE3 --> SNode_40
+330. VALUE3 --> SNode_46
+331. VAR20 --> SNode_29
+332. VAR20 --> SNode_38
+333. VAR20 --> SNode_44
+334. VECTOR27 --> RApp11
+335. VECTOR27 --> RApp13
+336. VECTOR27 --> RApp5
+337. VECTOR44 --> GOAL_66
+338. VECTOR44 --> SNode_155
+339. VECTOR44 --> SNode_68
+340. VECTOR44 --> SNode_71
+341. VECTOR44 --> SNode_75
+342. VECTOR70 --> SNode_118
+343. VECTOR73 --> SNode_123
+344. WEIGHT56 --> SNode_94
+345. WEIGHT57 --> SNode_95
+346. WRITE30 --> GOAL_61
+
+
+Total Nodes of Resulting DAG
+223
+-------------------------
+Metrics: 
+SHD: 156
+LLScore: -0.5438468814389728
+Final BDeu: -475230.2073142972
+Total execution time (s): 207467.73
+Total number of Iterations: 19
+dfMM: 1.5784753363228698
+dfMM plus: 58.0
+dfMM minus: 294.0
