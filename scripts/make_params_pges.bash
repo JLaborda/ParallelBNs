@@ -86,16 +86,16 @@ do
     do
       # Defining database of the network
       database=${BBDD_FOLDER}$net$ending
-      for threads in ${nThreads[@]};
+      #for threads in ${nThreads[@]};
+      #do
+      for nItInterleaving in ${nItInterleavings[@]}
       do
-        for nItInterleaving in ${nItInterleavings[@]}
+        for seed in ${seeds[@]}
         do
-          for seed in ${seeds[@]}
-          do
-            echo $alg $network $database $test $threads $nItInterleaving $seed >> $SAVE_FILE
-          done
+          echo $alg $net $network $database $test $threads $nItInterleaving $seed >> $SAVE_FILE
         done
       done
+      #done
     done
   done
 done

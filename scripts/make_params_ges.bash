@@ -45,7 +45,7 @@ do
       database=${BBDD_FOLDER}$net$ending
 
       # Saving hyperparams
-      echo $alg $network $database $test >> $SAVE_FILE
+      echo $alg $net $network $database $test >> $SAVE_FILE
 
     done
   done
