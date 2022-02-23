@@ -1,5 +1,8 @@
 #!/bin/bash
-HOME_FOLDER="/home/jdls/developer/projects/ParallelBNs/" #/Users/jdls/developer/projects/ParallelBNs/"
+# FOLDERS AND SAVE FILE
+ HOME_FOLDER="/home/jdls/developer/projects/ParallelBNs/"
+# HOME_FOLDER="/Users/jdls/developer/projects/ParallelBNs/"
+# HOME_FOLDER="~/developer/projects/ParallelBNs/"
 NETWORKS_FOLDER=${HOME_FOLDER}"res/networks/";
 BBDD_FOLDER=${NETWORKS_FOLDER}"BBDD/";
 TEST_FOLDER=${NETWORKS_FOLDER}"BBDD/tests/";
@@ -7,12 +10,15 @@ ENDING_NETWORKS=".xbif";
 #ENDING_BBDD10K="10k.csv";
 #ENDING_BBDD50K="50k.csv";
 PARAMS_FOLDER=${HOME_FOLDER}"res/params/";
-SAVE_FILE=${PARAMS_FOLDER}"hyperparams.txt"
-#declare -a algorithms=("ges" "pges" "hc" "phc" "pfhcbes")
-
-#declare -a net_names=("alarm" "andes" "barley" "cancer" "child" "earthquake" "hailfinder" "hepar2" "insurance" "link" "mildew" "munin" "pigs" "water" "win95pts")
-#declare -a net_names=("andes" "link" "mildew" "munin" "pigs" "water" "win95pts")
-
+#SAVE_FILE=${PARAMS_FOLDER}"hyperparams.txt"
+SAVE_FILE="/Users/jdls/developer/projects/ParallelBNs/res/params/hyperparams.txt"
+###################
+# HYPERPARAMETERS #
+###################
+# ALGORITHMS
+declare -a algorithms=("ges" "pges") #"hc" "phc" "pfhcbes")
+#NETWORKS PATHS
+declare -a net_names=("alarm" "andes" "barley" "child" "earthquake" "hailfinder" "hepar2" "insurance" "link" "mildew" "munin" "pigs" "water" "win95pts")
 declare networks=()
 for net in ${net_names[@]}; do
     networks+=(${NETWORKS_FOLDER}$net${ENDING_NETWORKS} )
@@ -29,43 +35,55 @@ done
 #    ${BBDD_FOLDER}"mildew"${ENDING_BBDD10K} ${BBDD_FOLDER}"mildew"${ENDING_BBDD50K}
 #    ${BBDD_FOLDER}"water"${ENDING_BBDD10K} ${BBDD_FOLDER}"water"${ENDING_BBDD50K}
 #)
+# DATABASES PATHS
 endings=(".xbif_.csv" ".xbif50001_.csv" ".xbif50002_.csv" ".xbif50003_.csv"
 ".xbif50004_.csv" ".xbif50005_.csv" ".xbif50006_.csv" ".xbif50007_.csv" ".xbif50008_.csv"
 ".xbif50009_.csv" ".xbif50001246_.csv")
+declare databases=()
+for net in ${net_names[@]}; do
+  for ending in ${endings[@]}; do
+    databases+=(${BBDD_FOLDER}$net$ending)
+  done
+done
 
-#databases=()
-#for net in ${net_names[@]}; do
-#    for ending in ${endings[@]}; do
-#        databases+=(${BBDD_FOLDER}$net$ending)
-#    done
-#done
+#TESTS PATHS
+tests=()
+for net in ${net_names[@]}; do
+    tests+=(${TEST_FOLDER}$net"_test.csv")
+done
 
-#tests=()
-#for net in ${net_names[@]}; do
-#    tests+=(${TEST_FOLDER}$net"_test.csv")
-#done
+#SEEDS
 seeds=(2 3 5 7 11 13 17 19 23 29)
 
 
-#echo "${tests[@]}"
-
-#declare -a nThreads=(1 2 4 8)
+# INTERLEAVING AND THREADS
+declare -a nThreads=(1 2 4 6 8)
 declare -a nItInterleavings=(5 10 15)
 #maxIterations=250
 
+echo "Saving data into ${SAVE_FILE}"
 
-# Saving params
-for ending in ${endings[@]};
+# SAVING HYPERPARAMETERS
+for alg in ${algorithms[@]};
 do
-    for nItInterleaving in ${nItInterleavings[@]}
+  echo "Hellooooo"
+  for database in ${databses[@]};
+  do
+    for test in ${tests[@]};
     do
-        for seed in ${seeds[@]}
+      for threads in ${nThreads[@]};
+      do
+        for nItInterleaving in ${nItInterleavings[@]}
         do
-            echo $ending $nthread $nItInterleaving $seed >> $SAVE_FILE
+            for seed in ${seeds[@]}
+            do
+              echo $alg $database $test $threads $nItInterleaving $seed >> $SAVE_FILE
+            done
         done
+      done
     done
+  done
 done
-
 
 
 
