@@ -25,7 +25,7 @@ public class ExperimentBNBuilderTest {
     int maxIterations = 15;
 
     BNBuilder algorithm = new PGESwithStages(Resources.ALARM_BBDD_PATH, nThreads, maxIterations, nItInterleaving);
-    ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, Resources.ALARM_TEST_PATH, seed);
+    ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, Resources.ALARM_TEST_PATH, seed);
 
 
     @Before

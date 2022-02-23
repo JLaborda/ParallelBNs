@@ -30,82 +30,53 @@ public class ExperimentBNLauncher {
     public static Map<Integer, List<Object>> parameters = new HashMap<>();
     */
 
+    /*
     public static final String[] bbddEndings = {".xbif_.csv", ".xbif50001_.csv", ".xbif50002_.csv", ".xbif50003_.csv",
             ".xbif50004_.csv", ".xbif50005_.csv", ".xbif50006_.csv", ".xbif50007_.csv", ".xbif50008_.csv",
             ".xbif50009_.csv", ".xbif50001246_.csv"};
-
+    */
     public static final int MAXITERATIONS = 250;
-    public static final String PARAMS_FILE = "/res/params/hyperparams.txt";
+    //public static final String PARAMS_FILE = "/res/params/hyperparams.txt";
 
     public static void main(String[] args) throws Exception {
+        // Reading arguments
         int index = Integer.parseInt(args[0]);
-        String netName = args[1];
-        String alg = args[2];
+        String paramsFile = args[1];
 
-        switch (alg){
-            case "ges":
-                runControlExperiment(netName, index);
-                break;
-            case "pges":
-                List<Object> parameters = readParameters(netName, index);
-                 assert parameters != null;
-                runExperiment(parameters, netName);
-                break;
-        }
+        // Reading parameters
+        List<Object> parameters = readParameters(paramsFile, index);
 
-        //runControlExperiment(netName, index);
-
-
-
-
+        // Running Experiment
+        runExperiment(parameters);
     }
 
-    public static void runControlExperiment(String netName, int index){
-        String ending = bbddEndings[index];
-        String netPath = "/res/networks/" + netName + ".xbif";
-        String bbddPath = "/res/networks/BBDD/" + netName + ending;
-        String testPath = "/res/networks/BBDD/tests/" + netName + "_test.csv";
 
-        BNBuilder alg = new GES_BNBuilder(bbddPath);
-        ExperimentBNBuilder experiment = new ExperimentBNBuilder(alg, netPath, bbddPath, testPath);
-
-        experiment.runExperiment();
-        String results = experiment.getResults();
-
-        String EXPERIMENTS_FOLDER = "/results/";
-        String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + "_" + experiment.bbdd_name + "_t" + experiment.nThreads +
-                "_i" + experiment.nItInterleaving + "_s" + experiment.seed + ".csv";
-        try {
-            Experiment.saveExperiment(savePath, results);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static List<Object> readParameters(String netName, int index) throws Exception {
+    public static List<Object> readParameters(String paramsFile, int index) throws Exception {
         String params [];
         List<Object> parameters = null;
-        try (BufferedReader br = new BufferedReader(new FileReader(PARAMS_FILE))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(paramsFile))) {
+            //Reading index line
             String line;
             for (int i = 0; i < index; i++)
                 br.readLine();
             line = br.readLine();
+
+            // Printing params
             System.out.println(line);
+
+            //Splitting params
             params = line.split(" ");
-            String ending = params[0];
-            String netPath = "/res/networks/" + netName + ".xbif";
-            String bbddPath = "/res/networks/BBDD/" + netName + ending;
-            String testPath = "/res/networks/BBDD/tests/" + netName + "_test.csv";
-            int interleaving = Integer.parseInt(params[1]);
-            int seed = Integer.parseInt(params[2]);
-            parameters = new ArrayList<>();
-            parameters.add(netPath);
-            parameters.add(bbddPath);
-            parameters.add(testPath);
-            parameters.add(interleaving);
-            parameters.add(seed);
-            return parameters;
+
+            //Getting params from line
+            String alg = params[0];
+            switch(alg) {
+                case "ges":
+                    return readParametersControl(params);
+                case "pges":
+                    return readParametersPGES(params);
+                default:
+                    throw new Exception("Algorithm not PGES or GES...\n value of alg: " + alg);
+            }
         }
         catch(FileNotFoundException e){
           System.out.println(e);
@@ -113,57 +84,99 @@ public class ExperimentBNLauncher {
             e.printStackTrace();
         }
 
-        /*
-        for(String name: netNames) {
-            // Setting networkPaths
-            networkPaths.put(name, "./res/networks/" + name + ".xbif");
-
-            // Setting BBDDPaths
-            List<String> paths = new ArrayList<>();
-            for(String ending: bbddEndings){
-                paths.add("./res/networks/BBDD/" + name + ending);
-            }
-            bbddPaths.put(name, paths);
-
-            // Setting test paths
-            testPaths.put(name, "./res/networks/BBDD/tests/" + name + "_test.csv");
-
-
-        }
-        */
         if(parameters == null)
-            throw new Exception("Parameters not read! Index: "  + index + "\t Net: " + netName);
+            throw new Exception("Parameters not read! Index: "  + index + "ParamsFile: " + paramsFile);
 
-        return null;
+        return parameters;
     }
 
-    public static void runExperiment(List<Object> parameters, String netName){
-        String netPath = (String) parameters.get(0);
-        String bbddPath = (String) parameters.get(1);
-        String testPath = (String) parameters.get(2);
-        int nThreads = Runtime.getRuntime().availableProcessors();
-        int nInterleaving = (Integer) parameters.get(3);
-        int seed = (Integer) parameters.get(4);
+    public static List<Object> readParametersControl(String [] params){
+        String alg = params[0];
+        String netName = params[1];
+        String netPath = params[2];
+        String bbddPath = params[3];
+        String testPath = params[4];
 
-        //BNBuilder gesAlg = new GES_BNBuilder(bbddPath);
-        BNBuilder pgesAlg = new PGESwithStages(bbddPath, nThreads, MAXITERATIONS, nInterleaving);
+        List<Object> parameters = new ArrayList<>();
+        parameters.add(alg);
+        parameters.add(netName);
+        parameters.add(netPath);
+        parameters.add(bbddPath);
+        parameters.add(testPath);
 
-        //ExperimentBNBuilder experimentGES = new ExperimentBNBuilder(gesAlg, netPath, bbddPath, testPath, seed);    
-        ExperimentBNBuilder experiment = new ExperimentBNBuilder(pgesAlg, netPath, bbddPath, testPath, seed);
-        
+        return parameters;
+
+    }
+
+    public static List<Object> readParametersPGES(String [] params){
+        String alg = params[0];
+        String netName = params[1];
+        String netPath = params[2];
+        String bbddPath = params[3];
+        String testPath = params[4];
+        //int threads = Integer.parseInt(params[5]);
+        int interleaving = Integer.parseInt(params[5]);
+        int seed = Integer.parseInt(params[6]);
+
+        //Adding params into an ArrayList
+        List<Object> parameters = new ArrayList<>();
+        parameters.add(alg);
+        parameters.add(netName);
+        parameters.add(netPath);
+        parameters.add(bbddPath);
+        parameters.add(testPath);
+        //parameters.add(threads);
+        parameters.add(interleaving);
+        parameters.add(seed);
+
+        return parameters;
+
+    }
+
+    public static void runExperiment(List<Object> parameters) throws Exception {
+        BNBuilder experimentAlgorithm;
+        String alg = (String) parameters.get(0);
+        String netName;
+        String netPath;
+        String bbddPath;
+        String testPath;
+        ExperimentBNBuilder experiment;
+        switch (alg){
+            case "pges":
+                netName = (String) parameters.get(1);
+                netPath = (String) parameters.get(2);
+                bbddPath = (String) parameters.get(3);
+                testPath = (String) parameters.get(4);
+                int nThreads = Runtime.getRuntime().availableProcessors();
+                int nInterleaving = (Integer) parameters.get(5);
+                int seed = (Integer) parameters.get(6);
+                experimentAlgorithm = new PGESwithStages(bbddPath, nThreads, MAXITERATIONS, nInterleaving);
+                experiment = new ExperimentBNBuilder(experimentAlgorithm, netName, netPath, bbddPath, testPath, seed);
+                break;
+            case "ges":
+                netName = (String) parameters.get(1);
+                netPath = (String) parameters.get(2);
+                bbddPath = (String) parameters.get(3);
+                testPath = (String) parameters.get(4);
+                experimentAlgorithm = new GES_BNBuilder(bbddPath);
+                experiment = new ExperimentBNBuilder(experimentAlgorithm, netName, netPath, bbddPath, testPath);
+                break;
+            default:
+                throw new Exception("Error... Algoritmo incorrecto: " + alg);
+        }
+
+
         // Running experiment
-        //experimentGES.runExperiment();
         experiment.runExperiment();
-        //experiment.saveExperiment();
-        //String resultsGES = experimentGES.getResults();
-        String resultsPGES = experiment.getResults();
+
+        String results = experiment.getResults();
 
         String EXPERIMENTS_FOLDER = "/results/";
         String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + "_" + experiment.bbdd_name + "_t" + experiment.nThreads +
                 "_i" + experiment.nItInterleaving + "_s" + experiment.seed + ".csv";
         try {
             //Experiment.saveExperiment(savePath, resultsGES);
-            Experiment.saveExperiment(savePath, resultsPGES);
+            Experiment.saveExperiment(savePath, results);
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error saving results at: " + savePath);

@@ -58,23 +58,17 @@ public class ExperimentBNBuilder {
     protected String algName;
     protected long seed = -1;
 
-    public ExperimentBNBuilder(BNBuilder algorithm, String net_path, String bbdd_path, String test_path) {
+    public ExperimentBNBuilder(BNBuilder algorithm, String net_name, String net_path, String bbdd_path, String test_path) {
         this.algorithm = algorithm;
+        this.net_name = net_name;
         this.net_path = net_path;
         this.bbdd_path = bbdd_path;
         this.test_path = test_path;
         this.test_dataset = Utils.readData(test_path);
         this.algName = algorithm.getClass().getSimpleName();
-        Pattern pattern = Pattern.compile("/(.*)\\.");
-        Matcher matcher = pattern.matcher(this.net_path);
-        if (matcher.find()) {
-            System.out.println("Match!");
-            System.out.println(matcher.group(1));
-            net_name = matcher.group(1).replaceAll("networks/", "");
-        }
 
-        pattern = Pattern.compile(".*/(.*).csv");
-        matcher = pattern.matcher(this.bbdd_path);
+        Pattern pattern = Pattern.compile(".*/(.*).csv");
+        Matcher matcher = pattern.matcher(this.bbdd_path);
         if (matcher.find()) {
             //System.out.println("Match!");
             //System.out.println(matcher.group(1));
@@ -87,8 +81,8 @@ public class ExperimentBNBuilder {
         this.nItInterleaving = algorithm.getItInterleaving();
     }
 
-    public ExperimentBNBuilder(BNBuilder algorithm, String net_path, String bbdd_path, String test_path, long partition_seed) {
-        this(algorithm, net_path, bbdd_path, test_path);
+    public ExperimentBNBuilder(BNBuilder algorithm, String net_name, String net_path, String bbdd_path, String test_path, long partition_seed) {
+        this(algorithm, net_name, net_path, bbdd_path, test_path);
         this.seed = partition_seed;
         Utils.setSeed(partition_seed);
     }
@@ -315,9 +309,9 @@ public class ExperimentBNBuilder {
                 break;
         }
         if(seed == -1)
-            experiment = new ExperimentBNBuilder(algorithm, netPath, bbddPath, testPath);
+            experiment = new ExperimentBNBuilder(algorithm, netName, netPath, bbddPath, testPath);
         else
-            experiment = new ExperimentBNBuilder(algorithm, netPath, bbddPath, testPath, seed);
+            experiment = new ExperimentBNBuilder(algorithm, netName, netPath, bbddPath, testPath, seed);
         // Running experiment
         experiment.runExperiment();
         //experiment.saveExperiment();
