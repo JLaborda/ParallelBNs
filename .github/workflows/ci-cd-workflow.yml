@@ -29,12 +29,13 @@ jobs:
         run: mvn --batch-mode --update-snapshots verify
       - name: Coverage Report
         run: mvn test
-      - name: Staging Phase
-        run: mkdir staging && cp target/*.jar staging
-      - uses: actions/upload-artifact@v2
-        with:
-         name: Package
-         path: staging
+      # REMOVING PACKAGE UPLOAD TO GITHUB
+      #- name: Staging Phase
+      #  run: mkdir staging && cp target/*.jar staging
+      #- uses: actions/upload-artifact@v2
+      #  with:
+      #   name: Package
+      #   path: staging
      # CodeCov
       - name: Running Codecov
         uses: codecov/codecov-action@v2
