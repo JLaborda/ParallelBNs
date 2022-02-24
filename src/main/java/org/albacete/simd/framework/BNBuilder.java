@@ -34,13 +34,13 @@ public abstract class BNBuilder {
     /**
      * Number of iterations allowed inside the FES stage. This is a hyperparameter used in experimentation.
      */
-    protected int nItInterleaving = 5;
+    protected int nItInterleaving;
 
 
     /**
      * The maximum number of iterations allowed for the algorithm.
      */
-    protected int maxIterations = 15;
+    protected int maxIterations;
 
     /**
      * The {@link GESThread GESThread} array that will be executed in each stage.
@@ -99,12 +99,12 @@ public abstract class BNBuilder {
 
     public BNBuilder(Graph initialGraph, String path, int nThreads, int maxIterations, int nItInterleaving) {
         this(path, nThreads, maxIterations, nItInterleaving);
-        this.currentGraph = new EdgeListGraph(initialGraph);;
+        this.currentGraph = new EdgeListGraph(initialGraph);
     }
 
     public BNBuilder(Graph initialGraph, DataSet data, int nThreads, int maxIterations, int nItInterleaving){
         this(data, nThreads, maxIterations, nItInterleaving);
-        this.currentGraph = new EdgeListGraph(initialGraph);;
+        this.currentGraph = new EdgeListGraph(initialGraph);
     }
 
 
@@ -136,10 +136,9 @@ public abstract class BNBuilder {
 
     public Graph search(){
         initialConfig();
-
+        repartition();
         do{
             try{
-                repartition();
                 forwardStage();
                 forwardFusion();
                 backwardStage();
