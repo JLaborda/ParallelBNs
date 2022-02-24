@@ -48,3 +48,6 @@ target/
 
 # Individual results
 experiment_results*
+
+# Outputs and errors
+run_experiments_cluster*

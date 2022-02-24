@@ -25,7 +25,7 @@ public class SimpleBNExperiment {
         BNBuilder algorithm = new GES_BNBuilder(bbdd_path);//new PGESwithStages(ds, 8, 30, 5);
 
         // Experiment
-        ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, net_path, bbdd_path, test_path);//new ExperimentBNBuilder(algorithm, net_path, bbdd_path, test_path, 42);
+        ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, net_name, net_path, bbdd_path, test_path);//new ExperimentBNBuilder(algorithm, net_path, bbdd_path, test_path, 42);
 
         System.out.println("Alg Name: " + experiment.getAlgName());
         experiment.runExperiment();
