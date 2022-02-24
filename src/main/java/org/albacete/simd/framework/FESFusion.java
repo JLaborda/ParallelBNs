@@ -35,10 +35,10 @@ public class FESFusion extends FusionStage{
 
 
         // Checking if the score has improved
-        if (fusionScore > currentScore) {
+        /*if (fusionScore > currentScore) {
             this.currentGraph = fusionGraph;
             return (Dag) this.currentGraph;
-        }
+        }*/
 
         System.out.println("FES to obtain the fusion: ");
 

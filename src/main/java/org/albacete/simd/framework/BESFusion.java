@@ -1,6 +1,9 @@
 package org.albacete.simd.framework;
 
-import edu.cmu.tetrad.graph.*;
+import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Edge;
+import edu.cmu.tetrad.graph.Edges;
+import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
@@ -27,11 +30,12 @@ public class BESFusion extends FusionStage{
 
 
         // Checking if the score has improved
+        /*
         if (fusionScore > currentScore) {
             this.currentGraph = fusionGraph;
             return (Dag) this.currentGraph;
         }
-
+        */
         System.out.println("BES to obtain the fusion: ");
 
         List<Edge> candidates = new ArrayList<>();
