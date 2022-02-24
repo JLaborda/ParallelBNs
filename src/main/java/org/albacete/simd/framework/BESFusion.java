@@ -5,7 +5,6 @@ import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Edges;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.threads.BESThread;
-import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 
@@ -22,6 +21,7 @@ public class BESFusion extends FusionStage{
         Dag fusionGraph = this.fusionIntersection();
 
         // Getting Scores
+        /*
         double fusionScore = GESThread.scoreGraph(fusionGraph, problem);
         double currentScore = GESThread.scoreGraph(this.currentGraph, problem);
 
@@ -30,7 +30,7 @@ public class BESFusion extends FusionStage{
 
 
         // Checking if the score has improved
-        /*
+
         if (fusionScore > currentScore) {
             this.currentGraph = fusionGraph;
             return (Dag) this.currentGraph;
