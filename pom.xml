@@ -69,8 +69,13 @@
       <version>1.0</version>
     </dependency>
 
-    <!--librería de Tetrad manipulado por José Miguel Puerta-->
-
+    <!-- Librería de Tetrad -->
+    <dependency>
+      <groupId>edu.cmu</groupId>
+      <artifactId>tetrad</artifactId>
+      <version>6.9.0</version>
+    </dependency>
+    <!--librería de Fusión y Tetrad manipulado por José Miguel Puerta-->
     <dependency>
       <groupId>fusion</groupId>
       <artifactId>fusion</artifactId>
@@ -97,15 +102,16 @@
       <version>1.0</version>
     </dependency>
 
-<!--
-    <dependency>
-      <groupId>weka</groupId>
-      <artifactId>weka</artifactId>
-      <scope>system</scope>
-      <version>1.0</version>
-      <systemPath>${basedir}/src/lib/weka.jar</systemPath>
-    </dependency>
--->
+
+    <!--
+        <dependency>
+          <groupId>weka</groupId>
+          <artifactId>weka</artifactId>
+          <scope>system</scope>
+          <version>1.0</version>
+          <systemPath>${basedir}/src/lib/weka.jar</systemPath>
+        </dependency>
+    -->
     <!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-stable -->
 
     <dependency>
@@ -295,6 +301,10 @@
     <repository>
       <id>local-repo-f2jutil</id>
       <url>file://${project.basedir}/repos/f2jutil</url>
+    </repository>
+    <repository>
+      <id>local-repo-tetrad</id>
+      <url>file://${project.basedir}/repos/tetrad</url>
     </repository>
     <repository>
       <id>local-repo-fusion</id>
