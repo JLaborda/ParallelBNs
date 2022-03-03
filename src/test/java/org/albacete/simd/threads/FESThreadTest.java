@@ -3,16 +3,18 @@ package org.albacete.simd.threads;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
+import org.albacete.simd.Resources;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.Resources;
 import org.albacete.simd.utils.Utils;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -52,11 +54,11 @@ public class FESThreadTest {
     /**
      * Subset1 of pairs of nodes or variables.
      */
-    final List<Edge> subset1 = new ArrayList<>();
+    final Set<Edge> subset1 = new HashSet<>();
     /**
      * Subset2 of pairs of nodes or variables.
      */
-    final List<Edge> subset2 = new ArrayList<>();
+    final Set<Edge> subset2 = new HashSet<>();
 
     private Problem problem;
 
@@ -241,11 +243,11 @@ public class FESThreadTest {
         // ThFES objects
         String alarmPath = Resources.ALARM_BBDD_PATH;
         DataSet alarmDataset = Utils.readData(alarmPath);
-        List<Edge> listOfArcs = Utils.calculateArcs(alarmDataset);
+        Set<Edge> setOfArcs = Utils.calculateArcs(alarmDataset);
         Utils.setSeed(42);
-        List<List<Edge>> subsets = Utils.split(listOfArcs,2);
-        List<Edge> subset1 = subsets.get(0);
-        List<Edge> subset2 = subsets.get(1);
+        List<Set<Edge>> subsets = Utils.split(setOfArcs, 2);
+        Set<Edge> subset1 = subsets.get(0);
+        Set<Edge> subset2 = subsets.get(1);
 
         Problem pAlarm = new Problem(alarmDataset);
         FESThread thread1 = new FESThread(pAlarm, subset1, 100);
@@ -273,7 +275,7 @@ public class FESThreadTest {
         Edge edge1 = Edges.directedEdge(this.cancer,this.cancer);
         Edge edge2 = Edges.directedEdge(this.cancer, this.smoker);
 
-        List<Edge> S = new ArrayList<>();
+        Set<Edge> S = new HashSet<>();
         S.add(edge1);
         S.add(edge2);
 

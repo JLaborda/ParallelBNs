@@ -1,21 +1,22 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
-import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.*;
+import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Edge;
+import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.Resources;
-import org.albacete.simd.algorithms.ParallelFHCBES;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Utils;
 import org.junit.Before;
 import org.junit.Test;
-import weka.classifiers.bayes.BayesNet;
-import weka.classifiers.bayes.net.BIFReader;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
-
-import java.util.*;
 
 public class PGESwithStagesTest {
 
@@ -92,7 +93,7 @@ public class PGESwithStagesTest {
         assertNotNull(alg1.getCurrentGraph());
         assertTrue(alg1.getCurrentGraph() instanceof Dag);
 
-        List<Edge> resultingEdges = alg1.getCurrentGraph().getEdges();
+        Set<Edge> resultingEdges = alg1.getCurrentGraph().getEdges();
         for(Edge edge: resultingEdges){
             assertTrue(expected.containsEdge(edge));
         }

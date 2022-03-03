@@ -9,7 +9,8 @@ import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Set;
 
 public class GES{
 
@@ -19,7 +20,7 @@ public class GES{
     private long elapsedTime;
     private double modelBDeu;
     //private int interleaving = Integer.MAX_VALUE;
-    private List<Edge> combinations;
+    private Set<Edge> combinations;
     private Graph graph;
     private Problem problem;
 

@@ -1,14 +1,11 @@
 package org.albacete.simd.threads;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-
-import edu.cmu.tetrad.graph.*;
-import consensusBN.SubSet;
 import consensusBN.PowerSetFabric;
+import consensusBN.SubSet;
+import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.utils.Problem;
+
+import java.util.*;
 
 @SuppressWarnings("DuplicatedCode")
 public class FESThread extends GESThread{
@@ -18,23 +15,25 @@ public class FESThread extends GESThread{
 
     /**
      * Constructor of FESThread with an initial DAG
-     * @param problem object containing all the information of the problem
+     *
+     * @param problem    object containing all the information of the problem
      * @param initialDag initial DAG with which the FES stage starts with, if it's null, use the other constructor
-     * @param subset subset of edges the fes stage will try to add to the resulting graph
-     * @param maxIt maximum number of iterations allowed in the fes stage
+     * @param subset     subset of edges the fes stage will try to add to the resulting graph
+     * @param maxIt      maximum number of iterations allowed in the fes stage
      */
-    public FESThread(Problem problem, Graph initialDag, List<Edge> subset, int maxIt) {
-        this(problem,subset, maxIt);
+    public FESThread(Problem problem, Graph initialDag, Set<Edge> subset, int maxIt) {
+        this(problem, subset, maxIt);
         this.initialDag = initialDag;
     }
 
     /**
      * Constructor of FESThread with an initial DataSet
+     *
      * @param problem object containing information of the problem such as data or variables.
-     * @param subset subset of edges the fes stage will try to add to the resulting graph
-     * @param maxIt maximum number of iterations allowed in the fes stage
+     * @param subset  subset of edges the fes stage will try to add to the resulting graph
+     * @param maxIt   maximum number of iterations allowed in the fes stage
      */
-    public FESThread(Problem problem, List<Edge> subset, int maxIt) {
+    public FESThread(Problem problem, Set<Edge> subset, int maxIt) {
         this.problem = problem;
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);

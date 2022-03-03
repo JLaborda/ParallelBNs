@@ -10,7 +10,8 @@ import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FESFusion extends FusionStage{
 
@@ -47,7 +48,7 @@ public class FESFusion extends FusionStage{
         System.out.println("FES to obtain the fusion: ");
 
 
-        List<Edge> candidates = new ArrayList<>();
+        Set<Edge> candidates = new HashSet<>();
 
 
         for (Edge e : fusionGraph.getEdges()) {

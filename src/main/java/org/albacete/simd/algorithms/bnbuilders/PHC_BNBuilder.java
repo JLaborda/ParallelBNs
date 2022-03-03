@@ -48,7 +48,7 @@ public class PHC_BNBuilder extends BNBuilder{
 
     @Override
     protected void repartition() {
-        this.subSets = Utils.split(listOfArcs, nThreads);
+        this.subSets = Utils.split(setOfArcs, nThreads);
     }
 
     @Override

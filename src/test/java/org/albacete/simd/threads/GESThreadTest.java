@@ -11,12 +11,12 @@ import org.albacete.simd.utils.Utils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for the GESThread class
@@ -58,11 +58,11 @@ public class GESThreadTest {
     /**
      * Subset1 of pairs of nodes or variables.
      */
-    final List<Edge> subset1 = new ArrayList<>();
+    final Set<Edge> subset1 = new HashSet<>();
     /**
      * Subset2 of pairs of nodes or variables.
      */
-    final List<Edge> subset2 = new ArrayList<>();
+    final Set<Edge> subset2 = new HashSet<>();
 
     @Before
     public void restartMeans(){

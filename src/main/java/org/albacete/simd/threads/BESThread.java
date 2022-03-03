@@ -8,6 +8,7 @@ import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("DuplicatedCode")
 public class BESThread extends GESThread {
@@ -17,11 +18,12 @@ public class BESThread extends GESThread {
 
     /**
      * Constructor of ThFES with an initial DAG
-     * @param problem object containing information of the problem such as data or variables.
+     *
+     * @param problem    object containing information of the problem such as data or variables.
      * @param initialDag initial DAG with which the FES stage starts with.
-     * @param subset subset of edges the fes stage will try to add to the resulting graph
+     * @param subset     subset of edges the fes stage will try to add to the resulting graph
      */
-    public BESThread(Problem problem, Graph initialDag, List<Edge> subset) {
+    public BESThread(Problem problem, Graph initialDag, Set<Edge> subset) {
 
         this.problem = problem;
         setInitialGraph(initialDag);

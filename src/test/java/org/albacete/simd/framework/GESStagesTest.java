@@ -3,17 +3,17 @@ package org.albacete.simd.framework;
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
+import org.albacete.simd.Resources;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.Resources;
 import org.albacete.simd.utils.Utils;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 
 public class GESStagesTest {
 
@@ -30,7 +30,7 @@ public class GESStagesTest {
         Problem problem = new Problem(path);
         int nThreads = 2;
         int itInterleaving = 5;
-        List<List<Edge>> subsets = Utils.split(Utils.calculateArcs(problem.getData()), nThreads);
+        List<Set<Edge>> subsets = Utils.split(Utils.calculateArcs(problem.getData()), nThreads);
         Stage fesStage = new FESStage(problem, nThreads, itInterleaving, subsets);
 
         // TESTING FESStage

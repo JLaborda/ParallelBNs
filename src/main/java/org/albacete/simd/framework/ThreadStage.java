@@ -10,6 +10,7 @@ import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 
 import java.util.List;
+import java.util.Set;
 
 public abstract class ThreadStage extends Stage{
     /**
@@ -29,9 +30,9 @@ public abstract class ThreadStage extends Stage{
 
     protected int nThreads;
 
-    protected List<List<Edge>> subsets;
+    protected List<Set<Edge>> subsets;
 
-    public ThreadStage(Problem problem, int nThreads, int itInterleaving, List<List<Edge>> subsets){
+    public ThreadStage(Problem problem, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
         super(problem);
         this.nThreads = nThreads;
         this.threads = new Thread[nThreads];
@@ -40,7 +41,7 @@ public abstract class ThreadStage extends Stage{
         this.subsets = subsets;
     }
 
-    public ThreadStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
+    public ThreadStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
         super(problem, currentGraph);
         this.currentGraph = currentGraph;
         this.nThreads = nThreads;

@@ -21,9 +21,9 @@ import java.util.*;
 //@SuppressWarnings({"DuplicatedCode", "unused"})
 public abstract class GESThread implements Runnable{
     /**
-     * Tuple of Nodes that will be checked by this thread in the FES method
+     * Set of edges that will be checked over the GESThread
      */
-    protected List<Edge> S;
+    protected Set<Edge> S;
 
     /**
      * Problem the thread is solving
@@ -666,10 +666,11 @@ public abstract class GESThread implements Runnable{
 
     /**
      * Sets the subset that is searched by the thread.
+     *
      * @param subset Subset of {@link Edge Edges}.
      */
-    public void setSubSetSearch(List<Edge> subset) {
-        this.S=subset;
+    public void setSubSetSearch(Set<Edge> subset) {
+        this.S = subset;
 
     }
 

@@ -1,14 +1,14 @@
 package org.albacete.simd.framework;
 
 import edu.cmu.tetrad.graph.Edge;
+import org.albacete.simd.Resources;
 import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.Resources;
 import org.albacete.simd.utils.Utils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -25,7 +25,7 @@ public class BNBuilderTest {
         String path = Resources.ALARM_BBDD_PATH;
         BNBuilder algorithm = new HillClimbingSearch(path, 15, 5);
         Problem problem = new Problem(path);
-        List<Edge> arcs = Utils.calculateArcs(problem.getData());
+        Set<Edge> arcs = Utils.calculateArcs(problem.getData());
 
         algorithm.setSeed(30);
         algorithm.setMaxIterations(30);
@@ -33,7 +33,7 @@ public class BNBuilderTest {
 
 
         assertEquals(30, algorithm.getSeed());
-        assertEquals(arcs, algorithm.getListOfArcs());
+        assertEquals(arcs, algorithm.getSetOfArcs());
         assertTrue(algorithm.getSubSets().isEmpty());
         assertEquals(problem.getData(), algorithm.getData());
         assertEquals(30, algorithm.getMaxIterations());

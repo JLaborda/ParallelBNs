@@ -9,11 +9,7 @@ import org.albacete.simd.utils.Utils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.image.RescaleOp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -183,7 +179,7 @@ public class PGESv2Test
         );
         // Act
         pGESv2.calculateArcs();
-        List<Edge> result =  pGESv2.getListOfArcs();
+        Set<Edge> result = pGESv2.getSetOfArcs();
 
         // Assert
         // Asserting size
@@ -205,21 +201,21 @@ public class PGESv2Test
      * @result Each arc is only once in a subset.
      */
     @Test
-    public void splitArcsTest(){
+    public void splitArcsTest() {
         // Arrange
         PGESv2 pGESv2 = new PGESv2(Resources.CANCER_BBDD_PATH, 2);
 
         // Act
         pGESv2.calculateArcs();
         pGESv2.splitArcs();
-        List<Edge> arcs = pGESv2.getListOfArcs();
-        List<List<Edge>> subsets = pGESv2.getSubSets();
+        Set<Edge> arcs = pGESv2.getSetOfArcs();
+        List<Set<Edge>> subsets = pGESv2.getSubSets();
 
         // Assert
         // Checking that each arc is in fact in a subset, and that it is only once in it.
         for (Edge edge : arcs) {
             int counter = 0;
-            for (List<Edge> subset : subsets){
+            for (Set<Edge> subset : subsets) {
                 counter += Collections.frequency(subset, edge);
             }
             // Double pairs
@@ -339,7 +335,7 @@ public class PGESv2Test
         }
 
         // Assert Edges
-        List<Edge> resultingEdges = result.getEdges();
+        Set<Edge> resultingEdges = result.getEdges();
         for(Edge resEdge : resultingEdges){
             /*Node node1 = resEdge.getNode1();
             Node node2 = resEdge.getNode2();

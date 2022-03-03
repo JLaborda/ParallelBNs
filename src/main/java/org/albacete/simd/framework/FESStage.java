@@ -7,14 +7,15 @@ import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class FESStage extends ForwardStage{
 
-    public FESStage(Problem problem, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
+    public FESStage(Problem problem, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
         super(problem, nThreads, itInterleaving, subsets);
     }
 
-    public FESStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
+    public FESStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
         super(problem, currentGraph, nThreads, itInterleaving, subsets);
     }
 

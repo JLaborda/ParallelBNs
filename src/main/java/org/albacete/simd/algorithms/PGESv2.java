@@ -1,15 +1,18 @@
 package org.albacete.simd.algorithms;
 
+import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import consensusBN.ConsensusUnion;
-import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
+import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -58,7 +61,7 @@ public class PGESv2
     /**
      * Subset of {@link Edge Edges}. Each subset will be assigned to {@link GESThread GESThread}
      */
-    private List<List<Edge>> subSets = null;
+    private List<Set<Edge>> subSets = null;
 
     /**
      * {@link ArrayList ArrayList} of graphs. This contains the list of {@link Graph graphs} created for each stage,
@@ -79,7 +82,7 @@ public class PGESv2
     /**
      * {@link Edge Edge} array containing the possible list of edges of the resulting bayesian network.
      */
-    private List<Edge> listOfArcs;
+    private Set<Edge> setOfArcs;
 
     private boolean fesFlag = false;
 
@@ -129,20 +132,20 @@ public class PGESv2
         this.subSets = new ArrayList<>(this.nThreads);
 
         //The total number of arcs of a graph is n*(n-1), where n is the number of nodes in the graph.
-        this.listOfArcs = new ArrayList<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1));
+        this.setOfArcs = new HashSet<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() - 1));
     }
 
     /**
      * Calculates the amount of possible arcs between the variables of the dataset and stores it.
      */
     public void calculateArcs(){
-        this.listOfArcs = Utils.calculateArcs(this.problem.getData());
+        this.setOfArcs = Utils.calculateArcs(this.problem.getData());
     }
     /**
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem
      */
     public void splitArcs(){
-        this.subSets = Utils.split(listOfArcs, nThreads);
+        this.subSets = Utils.split(setOfArcs, nThreads);
     }
 
 
@@ -263,7 +266,7 @@ public class PGESv2
         //problem.buildIndexing(currentGraph);
 
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
-        List<List<Edge>> subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads);
+        List<Set<Edge>> subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads);
         for (int i = 0; i < this.nThreads; i++) {
             this.gesThreads[i] = new BESThread(this.problem, this.currentGraph, subsets_BES.get(i));
         }
@@ -331,9 +334,9 @@ public class PGESv2
         }
 
         System.out.println("FES to obtain the fusion: ");
- 
 
-        List<Edge> candidates = new ArrayList<>();
+
+        Set<Edge> candidates = new HashSet<>();
         
         
         for (Edge e: fusionGraph.getEdges()){
@@ -369,7 +372,7 @@ public class PGESv2
      */
 
     public Dag fusionIntersection(){
-        ArrayList<Node> order = new ArrayList<>(this.currentGraph.getTierOrdering());
+        ArrayList<Node> order = new ArrayList<>(this.currentGraph.getCausalOrdering());
         for(Dag g: this.graphs) {
             for(Edge e:g.getEdges()) {
                 if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW)) continue;
@@ -437,7 +440,7 @@ public class PGESv2
         //GESThread.setProblem(this.data);
 
         // 1. Calculating Edges
-        this.listOfArcs = Utils.calculateArcs(this.problem.getData());
+        this.setOfArcs = Utils.calculateArcs(this.problem.getData());
 
         do {
             System.out.println("============================");
@@ -445,7 +448,7 @@ public class PGESv2
             System.out.println("============================");
 
             // 2 Random Repartitioning
-            this.subSets = Utils.split(listOfArcs, nThreads);
+            this.subSets = Utils.split(setOfArcs, nThreads);
 
             //System.out.println("----------------------------");
             //System.out.println("Splits: ");
@@ -534,12 +537,12 @@ public class PGESv2
         // Checking if the score has improved
         if (fusionScore > currentScore) {
             this.currentGraph = fusionGraph;
-            return (Dag) this.currentGraph;
+            return this.currentGraph;
         }
 
         System.out.println("BES to obtain the fusion: ");
 
-        List<Edge> candidates = new ArrayList<>();
+        Set<Edge> candidates = new HashSet<>();
         
         for (Edge e: this.currentGraph.getEdges()){
             if(fusionGraph.getEdge(e.getNode1(), e.getNode2())==null && fusionGraph.getEdge(e.getNode2(),e.getNode1())==null ) {
@@ -585,17 +588,19 @@ public class PGESv2
 
     /**
      * Gets the list of possible edges of the problem
+     *
      * @return List of {@link Edge Edges} representing all the possible edges of the problem.
      */
-    public List<Edge> getListOfArcs() {
-        return listOfArcs;
+    public Set<Edge> getSetOfArcs() {
+        return setOfArcs;
     }
 
     /**
      * Gets the current subsets of edges.
+     *
      * @return List of Lists of {@link Edge Edges} containing the edges of each subset.
      */
-    public List<List<Edge>> getSubSets() {
+    public List<Set<Edge>> getSubSets() {
         return subSets;
     }
 

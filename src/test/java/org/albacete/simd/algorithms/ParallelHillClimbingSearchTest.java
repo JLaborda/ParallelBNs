@@ -1,7 +1,9 @@
 package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.*;
+import edu.cmu.tetrad.graph.Edge;
+import edu.cmu.tetrad.graph.EdgeListGraph;
+import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.Resources;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
@@ -236,7 +238,7 @@ public class ParallelHillClimbingSearchTest {
         BackwardStage.meanTimeTotal=0;
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(cancerDataset, 1);
         phc1.search();
-        assertEquals(5*4, phc1.getListOfArcs().size());
+        assertEquals(5 * 4, phc1.getSetOfArcs().size());
         assertEquals(1, phc1.getSubSets().size());
         assertEquals(1,phc1.getGraphs().size());
         assertNotEquals(1, phc1.getIterations());

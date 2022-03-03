@@ -9,11 +9,12 @@ import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class BHCStage extends BackwardStage {
 
 
-    public BHCStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
+    public BHCStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
         super(problem, currentGraph, nThreads, itInterleaving, subsets);
     }
 
@@ -27,7 +28,7 @@ public class BHCStage extends BackwardStage {
         //problem.buildIndexing(currentGraph);
 
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
-        List<List<Edge>> subsets_BHC = Utils.split(this.currentGraph.getEdges(), this.nThreads);
+        List<Set<Edge>> subsets_BHC = Utils.split(this.currentGraph.getEdges(), this.nThreads);
         for (int i = 0; i < this.nThreads; i++) {
             this.gesThreads[i] = new BackwardsHillClimbingThread(this.problem, this.currentGraph, subsets_BHC.get(i));
         }

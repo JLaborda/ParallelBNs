@@ -8,7 +8,6 @@ import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
-import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
 
 import java.util.LinkedList;
@@ -55,7 +54,7 @@ public class GES_BNBuilder extends BNBuilder {
     @Override
     protected void forwardStage() throws InterruptedException {
         ForwardStage.meanTimeTotal = 0;
-        FESThread fes = new FESThread(problem, initialDag, listOfArcs, Integer.MAX_VALUE);
+        FESThread fes = new FESThread(problem, initialDag, setOfArcs, Integer.MAX_VALUE);
         fes.run();
         currentGraph = fes.getCurrentGraph();
         score = fes.getScoreBDeu();
@@ -69,7 +68,7 @@ public class GES_BNBuilder extends BNBuilder {
     @Override
     protected void backwardStage() throws InterruptedException {
         BackwardStage.meanTimeTotal = 0;
-        BESThread bes = new BESThread(problem, currentGraph, listOfArcs);
+        BESThread bes = new BESThread(problem, currentGraph, setOfArcs);
         bes.run();
         currentGraph = bes.getCurrentGraph();
         score = bes.getScoreBDeu();

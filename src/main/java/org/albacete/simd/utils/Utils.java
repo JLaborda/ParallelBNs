@@ -10,6 +10,7 @@ import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
+import weka.classifiers.bayes.BayesNet;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,14 +23,15 @@ public class Utils {
 
     /**
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem.
+     *
      * @param listOfArcs List of {@link Edge Edges} containing all the possible edges for the actual problem.
-     * @param numSplits The number of splits to do in the listOfArcs.
+     * @param numSplits  The number of splits to do in the listOfArcs.
      * @return The subsets of the listOfArcs in an ArrayList of TupleNode.
      */
-    public static List<List<Edge>> split(List<Edge> listOfArcs, int numSplits){
+    public static List<Set<Edge>> split(Set<Edge> listOfArcs, int numSplits) {
 
 
-        List<List<Edge>> subSets = new ArrayList<>(numSplits);
+        List<Set<Edge>> subSets = new ArrayList<>(numSplits);
 
         // Shuffling arcs
         List<Edge> shuffledArcs = new ArrayList<>(listOfArcs);
@@ -38,7 +40,7 @@ public class Utils {
         // Splitting Arcs into subsets
         int n = 0;
         for(int s = 0; s< numSplits-1; s++){
-            List<Edge> sub = new ArrayList<>();
+            Set<Edge> sub = new HashSet<>();
             for(int i = 0; i < Math.floorDiv(shuffledArcs.size(),numSplits) ; i++){
                 sub.add(shuffledArcs.get(n));
                 n++;
@@ -47,7 +49,7 @@ public class Utils {
         }
 
         // Adding leftovers
-        ArrayList<Edge> sub = new ArrayList<>();
+        Set<Edge> sub = new HashSet<>();
         for(int i = n; i < shuffledArcs.size(); i++ ){
             sub.add(shuffledArcs.get(i));
         }
@@ -63,30 +65,31 @@ public class Utils {
 
     /**
      * Calculates the amount of possible arcs between the variables of the dataset and stores it.
+     *
      * @param data DataSet used to calculate the arcs between its columns (nodes).
      */
-    public static List<Edge> calculateArcs(DataSet data){
+    public static Set<Edge> calculateArcs(DataSet data) {
         //0. Accumulator
-        List<Edge> listOfArcs = new ArrayList<>(data.getNumColumns() * (data.getNumColumns() -1));
+        Set<Edge> setOfArcs = new HashSet<>(data.getNumColumns() * (data.getNumColumns() - 1));
         //1. Get edges (variables)
         List<Node> variables = data.getVariables();
         //int index = 0;
         //2. Iterate over variables and save pairs
-        for(int i=0; i<data.getNumColumns()-1; i++){
-            for(int j=i+1; j<data.getNumColumns(); j++){
+        for (int i = 0; i < data.getNumColumns() - 1; i++) {
+            for (int j = i + 1; j < data.getNumColumns(); j++) {
                 // Getting pair of variables (Each variable is different)
                 Node var_A = variables.get(i);
                 Node var_B = variables.get(j);
 
                 //3. Storing both pairs
-                listOfArcs.add(Edges.directedEdge(var_A,var_B));
-                listOfArcs.add(Edges.directedEdge(var_B,var_A));
+                setOfArcs.add(Edges.directedEdge(var_A, var_B));
+                setOfArcs.add(Edges.directedEdge(var_B, var_A));
                 //index++;
-                //this.listOfArcs[index] = new TupleNode(var_B,var_A);
+                //this.setOfArcs[index] = new TupleNode(var_B,var_A);
                 //index++;
             }
         }
-        return listOfArcs;
+        return setOfArcs;
     }
 
 
@@ -136,9 +139,9 @@ public class Utils {
 
         List<Node> nodes = setofbns.get(0).getNodes();
         //System.out.println("Nodes: " + nodes);
-        for(int i = 1 ; i< setofbns.size(); i++){
+        for(int i = 1 ; i< setofbns.size(); i++) {
             Dag oldDag = setofbns.get(i);
-            List<Edge> oldEdges = oldDag.getEdges();
+            Set<Edge> oldEdges = oldDag.getEdges();
             Dag newdag = new Dag(nodes);
             for(Edge e: oldEdges){
                 /*
@@ -590,13 +593,41 @@ public class Utils {
 
         }
 
-        return sum/data.getNumRows()/data.getNumColumns();
+        return sum / data.getNumRows() / data.getNumColumns();
     }
 
-    public static double LL(Dag g, DataSet data){
+    public static double LL(Dag g, DataSet data) {
         BayesPm bnaux = new BayesPm(g);
         MlBayesIm bnOut = new MlBayesIm(bnaux, MlBayesIm.MANUAL);
         return LL(bnOut, data);
+    }
+
+    /**
+     * Transforms a BayesNet read from a xbif file into a BayesPm object for tetrad
+     *
+     * @param wekabn BayesNet read from an xbif file
+     * @return The BayesPm of the BayesNet
+     */
+    public static BayesPm transformBayesNetToBayesPm(BayesNet wekabn) {
+        Dag graph = new Dag();
+
+        // Getting nodes from weka network and adding them to a GraphNode
+        for (int indexNode = 0; indexNode < wekabn.getNrOfNodes(); indexNode++) {
+            GraphNode node = new GraphNode(wekabn.getNodeName(indexNode));
+            graph.addNode(node);
+        }
+        // Adding all of the edges from the wekabn into the new Graph
+        for (int indexNode = 0; indexNode < wekabn.getNrOfNodes(); indexNode++) {
+            int nParent = wekabn.getNrOfParents(indexNode);
+            for (int np = 0; np < nParent; np++) {
+                int indexp = wekabn.getParent(indexNode, np);
+                Edge ed = new Edge(graph.getNode(wekabn.getNodeName(indexp)), graph.getNode(wekabn.getNodeName(indexNode)), Endpoint.TAIL, Endpoint.ARROW);
+                graph.addEdge(ed);
+            }
+        }
+        //System.out.println(graph);
+        return new BayesPm(graph);
+
     }
 
 }
