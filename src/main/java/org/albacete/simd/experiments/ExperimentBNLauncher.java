@@ -35,7 +35,7 @@ public class ExperimentBNLauncher {
             ".xbif50004_.csv", ".xbif50005_.csv", ".xbif50006_.csv", ".xbif50007_.csv", ".xbif50008_.csv",
             ".xbif50009_.csv", ".xbif50001246_.csv"};
     */
-    public static final int MAXITERATIONS = 250;
+    public static final int MAXITERATIONS = 100;
     //public static final String PARAMS_FILE = "/res/params/hyperparams.txt";
 
     public static void main(String[] args) throws Exception {

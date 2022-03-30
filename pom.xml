@@ -91,13 +91,6 @@
           <version>6.9.0</version>
       </dependency>
       <!--librería de Fusión y Tetrad manipulado por José Miguel Puerta-->
-      <dependency>
-      <groupId>fusion</groupId>
-      <artifactId>fusion</artifactId>
-      <!--<scope>system</scope>-->
-      <version>1.0</version>
-      <!--<systemPath>${basedir}/lib/fusion.jar</systemPath>-->
-    </dependency>
 
     <dependency>
       <groupId>opt</groupId>

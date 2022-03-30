@@ -3,6 +3,7 @@ package org.albacete.simd.framework;
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.threads.GESThread;
@@ -72,7 +73,9 @@ public abstract class ThreadStage extends Stage{
             score_threads = score_threads + gesThreads[i].getScoreBDeu();
 
             // Removing Inconsistencies and transforming it to a DAG
-            Dag gdag = Utils.removeInconsistencies(g);
+            SearchGraphUtils.pdagToDag(g);
+            Dag gdag = new Dag(g);
+            //Dag gdag = Utils.removeInconsistencies(g);
 
             // Adding the new dag to the graph list
             this.graphs.add(gdag);
@@ -96,6 +99,19 @@ public abstract class ThreadStage extends Stage{
             }
         }
         return false;
+    }
+    
+    public GESThread getMaxBDeuThread() {
+        GESThread best = gesThreads[0];
+        double bdeu = gesThreads[0].getScoreBDeu();
+        
+        for (int i = 1; i > gesThreads.length; i++) {
+            if (gesThreads[i].getScoreBDeu() > bdeu) {
+                bdeu = gesThreads[i].getScoreBDeu();
+                best = gesThreads[i];
+            }
+        }
+        return best;
     }
 
     protected abstract void calculateStatsTimeTotal();

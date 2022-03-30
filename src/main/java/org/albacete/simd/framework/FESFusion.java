@@ -5,6 +5,7 @@ import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Edges;
 import edu.cmu.tetrad.graph.Graph;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
@@ -12,12 +13,18 @@ import org.albacete.simd.utils.Utils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import org.albacete.simd.threads.GESThread;
 
 public class FESFusion extends FusionStage{
+    
+    ThreadStage fesStage;
 
-    public FESFusion(Problem problem, Graph currentGraph, ArrayList<Dag> graphs) {
+    public FESFusion(Problem problem, Graph currentGraph, ArrayList<Dag> graphs, FESStage fesStage) {
         super(problem, currentGraph, graphs);
+        this.fesStage = fesStage;
     }
+    
+    public boolean flag = false;
 
     @Override
     protected Dag fusion() {
@@ -28,10 +35,10 @@ public class FESFusion extends FusionStage{
         // Getting Scores
         /*
         double fusionScore = GESThread.scoreGraph(fusionGraph, problem);
-        /double currentScore = GESThread.scoreGraph(this.currentGraph, problem);
+        double currentScore = GESThread.scoreGraph(this.currentGraph, problem);
 
-        System.out.println("Fusion Score: " + fusionScore);
-        System.out.println("Current Score: " + currentScore);
+        System.out.println("Fusion Score FES: " + fusionScore);
+        System.out.println("Current Score FES: " + currentScore + "\n");
 
 
 
@@ -42,6 +49,7 @@ public class FESFusion extends FusionStage{
         }
         */
         if (currentGraph == null) {
+            flag = true;
             this.currentGraph = fusionGraph;
             return (Dag) this.currentGraph;
         }
@@ -62,16 +70,47 @@ public class FESFusion extends FusionStage{
         FESThread fuse = new FESThread(this.problem,this.currentGraph,candidates,candidates.size());
 
         fuse.run();
-
+        
+        // We obtain the flag of the FES. If true, FESThread has improve the result.
+        try {
+            flag = fuse.getFlag();
+        } catch (InterruptedException ex) {}
+        
+        // If the FESThread has not improved the previous result, we check if the fusion improves it.
+        if (!flag) {
+            double fusionScore = GESThread.scoreGraph(fusionGraph, problem);
+            double currentScore = GESThread.scoreGraph(this.currentGraph, problem);
+            
+            if (fusionScore > currentScore) {
+                flag = true;
+                this.currentGraph = fusionGraph;
+                return (Dag) this.currentGraph;
+            } 
+            
+            // If the fusion doesn´t improves the result, we check if any previous FESThread has improved the results.
+            else {
+                GESThread thread = fesStage.getMaxBDeuThread();
+                if (thread.getScoreBDeu() > currentScore) {
+                    try {
+                        this.currentGraph = thread.getCurrentGraph();
+                        flag = true;
+                    } catch (InterruptedException ex) {}
+                    return (Dag) this.currentGraph;
+                }
+            }
+        }
+        
         try {
             this.currentGraph = fuse.getCurrentGraph();
-            System.out.println("Score Fusion: "+ FESThread.scoreGraph(this.currentGraph, problem));
-            this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-            System.out.println("Score Fusion sin inconsistencias: "+ FESThread.scoreGraph(this.currentGraph, problem));
+            //System.out.println("Score Fusion: "+ FESThread.scoreGraph(this.currentGraph, problem));
+            //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
+            //System.out.println("Score Fusion sin inconsistencias: "+ FESThread.scoreGraph(this.currentGraph, problem));
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }
 
+        SearchGraphUtils.pdagToDag(this.currentGraph);
         return new Dag(this.currentGraph);
+        //return Utils.removeInconsistencies(this.currentGraph);
     }
 }

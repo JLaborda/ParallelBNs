@@ -77,16 +77,28 @@ public class FESThread extends GESThread{
         Graph graph = new EdgeListGraph(this.initialDag);
         //buildIndexing(graph);
 
-        // Method 1-- original.
-        double score = scoreGraph(graph, problem);
+         // Method 1-- original.
+        double scoreInitial = scoreGraph(graph, problem);
 
-        // Do forward search.
-        score = fes(graph, score);
+        // Do backward search.
+        double score = fes(graph, scoreInitial);
 
         long endTime = System.currentTimeMillis();
         this.elapsedTime = endTime - startTime;
-        this.modelBDeu = score;
-        return graph;
+        
+        double newScore = scoreGraph(graph, problem);
+        System.out.println(" ["+getId()+"] FES New Score: " + newScore + ", Initial Score: " + scoreInitial);
+        // If we improve the score, return the new graph
+        if (newScore > scoreInitial+0.1) {
+            this.modelBDeu = score;
+            this.flag = true;
+            return graph;
+        } else {
+            System.out.println("   ["+getId()+"] ELSE");
+            this.modelBDeu = scoreInitial;
+            this.flag = false;
+            return this.initialDag;
+        }
     }
 
     /**
@@ -118,10 +130,10 @@ public class FESThread extends GESThread{
         while((x_i != null) && (iterations < this.maxIt)){
 
             // Checking Time
-            if(isTimeout()) {
+            /*if(isTimeout()) {
                 System.out.println("Timeout in FESTHREAD id: " + getId());
                 break;
-            }
+            }*/
 
             // Changing best score because x_i, and therefore, y_i is not null
             bestScore = bestInsert;
@@ -190,10 +202,10 @@ public class FESThread extends GESThread{
         for(Edge edge : edges){
 
             //Checking time
-            if(isTimeout()) {
+            /*if(isTimeout()) {
                 System.out.println("Timeout in FESTHREAD id: " + getId());
                 break;
-            }
+            }*/
 
             Node _x = Edges.getDirectedEdgeTail(edge);
             Node _y = Edges.getDirectedEdgeHead(edge);
