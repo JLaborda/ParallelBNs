@@ -9,6 +9,7 @@ import org.albacete.simd.utils.Utils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class HierarchicalClustering {
 
@@ -18,6 +19,7 @@ public class HierarchicalClustering {
     private double[][] simMatrix;
     private boolean isParallel = false;
     private Map<Edge, Double> edgeScores = new ConcurrentHashMap<>();
+    private List<Set<Node>> clusters;
 
     public HierarchicalClustering(Problem problem) {
         this.problem = problem;
@@ -33,7 +35,7 @@ public class HierarchicalClustering {
     //Prueba
     public static void main(String[] args) {
         String networkFolder = "./res/networks/";
-        String net_name = "andes";
+        String net_name = "alarm";
         String net_path = networkFolder + net_name + ".xbif";
         String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif50001_.csv";
         Problem p = new Problem(Utils.readData(bbdd_path));
@@ -44,7 +46,12 @@ public class HierarchicalClustering {
         System.out.println("Mapa: " + map);
 
         System.out.println("Probando clusterizing");
-        clustering.clusterize(2);
+        List<Set<Node>> clusters = clustering.clusterize(10);
+
+
+        for (int i = 0; i < clusters.size(); i++) {
+            System.out.println("Cluster " + i + ": " + clusters.get(i));
+        }
 
     }
 
@@ -68,7 +75,7 @@ public class HierarchicalClustering {
         return edgeScores;
     }
 
-    private void getSimMatrixSequential() {
+    private void initializeSimMatrixSequential() {
         List<Node> nodes = problem.getVariables();
         int numNodes = problem.getVariables().size();
         for (int i = 0; i < numNodes; i++) {
@@ -84,7 +91,7 @@ public class HierarchicalClustering {
         }
     }
 
-    private void getSimMatrixParallel() {
+    private void initializeSimMatrixParallel() {
         // Similarity matrix
         // Getting hashmap of indexes
         Map<Node, Integer> index = problem.getHashIndices();
@@ -99,11 +106,11 @@ public class HierarchicalClustering {
 
     }
 
-    private void calculateSimMatrix() {
+    private void initializeSimMatrix() {
         if (isParallel)
-            getSimMatrixParallel();
+            initializeSimMatrixParallel();
         else
-            getSimMatrixSequential();
+            initializeSimMatrixSequential();
 
     }
 
@@ -113,7 +120,7 @@ public class HierarchicalClustering {
         }
     }
 
-    private double getScoreClusrters(Set<Node> cluster1, Set<Node> cluster2) {
+    private double getScoreClusters(Set<Node> cluster1, Set<Node> cluster2) {
         // Nodes of the problem
         List<Node> nodes = problem.getVariables();
         // Indexes of the nodes
@@ -125,18 +132,60 @@ public class HierarchicalClustering {
         // initializing score
         double score = 0.0;
 
-/* BOOKMARK!
-        for (int i = 0; i < mergeCluster.size(); i++) {
-            for (int j = i; j < mergeCluster.size() ; j++) {
-                Node nodeI = mergeClusterArray.
-                score+=
+        List<Node> mergeClusterList = new ArrayList<>(mergeCluster);
+
+        for (int i = 0; i < mergeClusterList.size(); i++) {
+            for (int j = i+1; j < mergeClusterList.size() ; j++) {
+                Node nodeI = mergeClusterList.get(i);
+                Node nodeJ = mergeClusterList.get(j);
+                Edge edge = new Edge(nodeI, nodeJ, Endpoint.TAIL, Endpoint.ARROW);
+                System.out.println(edge);
+                score+=edgeScores.get(edge);
             }
         }
 
- */
+        //In parallel
+        // Maybe it won't work because of the mergeCluster not being concurrent.
+        /*
+        score = edgeScores.entrySet().parallelStream().filter(edgeDoubleEntry -> {
+            Node node1 = edgeDoubleEntry.getKey().getNode1();
+            Node node2 = edgeDoubleEntry.getKey().getNode2();
+            return mergeCluster.contains(node1) && mergeCluster.contains(node2);
+        })
+                .map(
+                edgeDoubleEntry -> edgeDoubleEntry.getValue()
+                )
+                .reduce( 0.0, (value1, value2) -> value1 + value2);
+        */
 
-
+        score /= ((double) mergeCluster.size() * (mergeCluster.size() - 1) / 2);
         return score;
+    }
+
+    private void deleteClusterInSimMatrix(int posJ){
+        // Deleting cluster in position posJ
+        clusters.remove(posJ);
+        // Making copy
+        double[][]auxMatrix = Arrays.stream(simMatrix)
+                .map(double[]::clone)
+                .toArray(double[][]::new);
+        // Reducing by one the size of the simMatrix since the size of the clusters is one less
+        simMatrix = new double[clusters.size()][clusters.size()];
+
+        // Row posJ and column posJ will be deleted
+        int p = 0;
+        for (int i = 0; i < auxMatrix.length; i++) {
+            if(i == posJ)
+                continue;
+            int q = 0;
+            for (int j = 0; j < auxMatrix.length; j++) {
+                if(j == posJ)
+                    continue;
+                simMatrix[p][q] = auxMatrix[i][j];
+                q++;
+            }
+            p++;
+        }
     }
 
     public List<Set<Node>> clusterize(int numClusters) {
@@ -145,7 +194,7 @@ public class HierarchicalClustering {
         List<Node> nodes = problem.getVariables();
         int numNodes = nodes.size();
         //Initializing clusters
-        List<Set<Node>> clusters = new ArrayList<>(nodes.size());
+        clusters = new ArrayList<>(nodes.size());
         for (Node n : nodes) {
             Set<Node> s = new HashSet<Node>();
             s.add(n);
@@ -156,7 +205,7 @@ public class HierarchicalClustering {
         int maxVarsClusters = Math.floorDiv(nodes.size(), numClusters) + 2;
 
         // Initializing Simmilarity Matrix
-        calculateSimMatrix();
+        initializeSimMatrix();
 
         // Calculating clusters
 
@@ -177,7 +226,7 @@ public class HierarchicalClustering {
                     }
                 }
             }
-            // Merging the chosen clusters
+            // Merging the chosen clusters into posI of the clusters list.
             Set<Node> mergeCluster = new HashSet<>();
             mergeCluster.addAll(clusters.get(posI));
             mergeCluster.addAll(clusters.get(posJ));
@@ -186,16 +235,72 @@ public class HierarchicalClustering {
             //Recalculating simMatrix (Parallel?)
             for (int j = posI + 1; j < numClusters; j++) {
                 if (j != posJ) {
-                    // BOOKMARK!
-                    //simMatrix[posI][j] = getScoreClusrters()
+                    simMatrix[posI][j] = getScoreClusters(clusters.get(posI), clusters.get(j));
+                }
+            }
+            for (int i = 0; i < posI; i++) {
+                simMatrix[i][posI] = getScoreClusters(clusters.get(i), clusters.get(posI));
+            }
+
+            // Deleting cluster and the information of posJ in simMatrix
+            deleteClusterInSimMatrix(posJ);
+
+        }
+        return clusters;
+    }
+
+
+    public List<Set<Edge>> generateEdgeDistribution(List<Set<Node>> clusters, boolean duplicate){
+        List<Node> nodes = problem.getVariables();
+        List<Set<Edge>> edgeDistribution = new ArrayList<>(clusters.size());
+        int [] numEdgesInCluster = new int[clusters.size()];
+
+        //Inner edges
+        for (int c = 0; c < clusters.size(); c++) {
+            Set<Node> cluster = clusters.get(c);
+            // Filtering only the edges where the nodes are contained inside the corresponding cluster
+            Set<Edge> innerEdges = allEdges.stream().filter(edge -> {
+                Node n1 = edge.getNode1();
+                Node n2 = edge.getNode2();
+                return cluster.contains(n1) && cluster.contains(n2);
+            }).collect(Collectors.toSet());
+            // Adding innerEdges
+            edgeDistribution.add(innerEdges);
+            // Updating number of edges inside this edgeDistribution cluster
+            numEdgesInCluster[c] = innerEdges.size();
+        }
+
+        //Outer edges
+        for (int c1 = 0; c1 < clusters.size()-1; c1++) {
+            List<Node> cluster1 = new ArrayList<>(clusters.get(c1));
+            Set<Edge> edgesCluster1 = edgeDistribution.get(c1);
+            for (int c2 = c1+1; c2 < clusters.size(); c2++) {
+                List<Node> cluster2 = new ArrayList<>(clusters.get(c2));
+                Set<Edge> edgesCluster2 = edgeDistribution.get(c2);
+                // ESTO ES MUY INEFICIENTE... QUIZÁS SE PUEDA HACER EN PARALELO...
+                for (Node node1: cluster1) {
+                    for (Node node2: cluster2) {
+                        Edge candidateEdge = new Edge(node1, node2, Endpoint.TAIL, Endpoint.ARROW);
+                        double value = edgeScores.get(candidateEdge);
+                        if(duplicate && value > 0){
+                            edgesCluster1.add(candidateEdge);
+                            edgesCluster2.add(candidateEdge);
+                            edgeDistribution.set(c1, edgesCluster1);
+                            edgeDistribution.set(c2, edgesCluster2);
+                            numEdgesInCluster[c1]+=1;
+                            numEdgesInCluster[c2]+=1;
+                        }
+                        //BOOKMARK!
+                        else{
+
+                        }
+                    }
                 }
             }
 
-
         }
 
-
-        return clusters;
+        return edgeDistribution;
     }
 
 
