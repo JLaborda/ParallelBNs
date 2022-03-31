@@ -1,0 +1,11 @@
+Pseudocódigo del clustering
+
+get_edges_scores(datos):
+    nodes = nodos de los datos;
+    bdeu = BDeuScore function
+
+    all_edges = new ArrayList
+    all_edges_scores = new HashMap
+
+    for i in range
+

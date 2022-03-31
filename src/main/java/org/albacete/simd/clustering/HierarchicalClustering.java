@@ -9,7 +9,6 @@ import org.albacete.simd.utils.Utils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class HierarchicalClustering {
 
@@ -20,6 +19,7 @@ public class HierarchicalClustering {
     private boolean isParallel = false;
     private Map<Edge, Double> edgeScores = new ConcurrentHashMap<>();
     private List<Set<Node>> clusters;
+    private Map<Node, Integer> nodeClusterMap = new HashMap<>();
 
     public HierarchicalClustering(Problem problem) {
         this.problem = problem;
@@ -35,7 +35,7 @@ public class HierarchicalClustering {
     //Prueba
     public static void main(String[] args) {
         String networkFolder = "./res/networks/";
-        String net_name = "alarm";
+        String net_name = "win95pts";
         String net_path = networkFolder + net_name + ".xbif";
         String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif50001_.csv";
         Problem p = new Problem(Utils.readData(bbdd_path));
@@ -46,12 +46,21 @@ public class HierarchicalClustering {
         System.out.println("Mapa: " + map);
 
         System.out.println("Probando clusterizing");
-        List<Set<Node>> clusters = clustering.clusterize(10);
+        List<Set<Node>> clusters = clustering.clusterize(4);
 
 
         for (int i = 0; i < clusters.size(); i++) {
             System.out.println("Cluster " + i + ": " + clusters.get(i));
+            System.out.println("Number of nodes: " + clusters.get(i).size());
         }
+
+        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(clusters, false);
+
+        for (int i = 0; i < edgeDistribution.size(); i++) {
+            System.out.println("EdgeDistibution " + i + ": " + edgeDistribution.get(i));
+            System.out.println("Number of edges: " + edgeDistribution.get(i).size());
+        }
+
 
     }
 
@@ -139,7 +148,7 @@ public class HierarchicalClustering {
                 Node nodeI = mergeClusterList.get(i);
                 Node nodeJ = mergeClusterList.get(j);
                 Edge edge = new Edge(nodeI, nodeJ, Endpoint.TAIL, Endpoint.ARROW);
-                System.out.println(edge);
+                //System.out.println(edge);
                 score+=edgeScores.get(edge);
             }
         }
@@ -192,7 +201,6 @@ public class HierarchicalClustering {
         //Initial setup
         Map<Edge, Double> scores = getEdgesScore();
         List<Node> nodes = problem.getVariables();
-        int numNodes = nodes.size();
         //Initializing clusters
         clusters = new ArrayList<>(nodes.size());
         for (Node n : nodes) {
@@ -217,7 +225,7 @@ public class HierarchicalClustering {
             int posJ = -1;
 
             //Checking which two clusters are better to merge together
-            for (int i = 0; i < numClusters; i++) {
+            for (int i = 0; i < (numClusters - 1); i++) {
                 for (int j = i + 1; j < numClusters; j++) {
                     if (simMatrix[i][j] > maxValue) {
                         maxValue = simMatrix[i][j];
@@ -246,60 +254,54 @@ public class HierarchicalClustering {
             deleteClusterInSimMatrix(posJ);
 
         }
+
+        //Indexing the cluster nodes
+        for (int i = 0; i < clusters.size(); i++) {
+            Set<Node> nodesCluster = clusters.get(i);
+            for (Node node : nodesCluster) {
+                nodeClusterMap.put(node, i);
+            }
+        }
+
         return clusters;
     }
 
 
-    public List<Set<Edge>> generateEdgeDistribution(List<Set<Node>> clusters, boolean duplicate){
+    public List<Set<Edge>> generateEdgeDistribution(List<Set<Node>> clusters, boolean duplicate) {
         List<Node> nodes = problem.getVariables();
         List<Set<Edge>> edgeDistribution = new ArrayList<>(clusters.size());
-        int [] numEdgesInCluster = new int[clusters.size()];
-
-        //Inner edges
-        for (int c = 0; c < clusters.size(); c++) {
-            Set<Node> cluster = clusters.get(c);
-            // Filtering only the edges where the nodes are contained inside the corresponding cluster
-            Set<Edge> innerEdges = allEdges.stream().filter(edge -> {
-                Node n1 = edge.getNode1();
-                Node n2 = edge.getNode2();
-                return cluster.contains(n1) && cluster.contains(n2);
-            }).collect(Collectors.toSet());
-            // Adding innerEdges
-            edgeDistribution.add(innerEdges);
-            // Updating number of edges inside this edgeDistribution cluster
-            numEdgesInCluster[c] = innerEdges.size();
+        for (int i = 0; i < clusters.size(); i++) {
+            edgeDistribution.add(new HashSet<>());
         }
-
-        //Outer edges
-        for (int c1 = 0; c1 < clusters.size()-1; c1++) {
-            List<Node> cluster1 = new ArrayList<>(clusters.get(c1));
-            Set<Edge> edgesCluster1 = edgeDistribution.get(c1);
-            for (int c2 = c1+1; c2 < clusters.size(); c2++) {
-                List<Node> cluster2 = new ArrayList<>(clusters.get(c2));
-                Set<Edge> edgesCluster2 = edgeDistribution.get(c2);
-                // ESTO ES MUY INEFICIENTE... QUIZÁS SE PUEDA HACER EN PARALELO...
-                for (Node node1: cluster1) {
-                    for (Node node2: cluster2) {
-                        Edge candidateEdge = new Edge(node1, node2, Endpoint.TAIL, Endpoint.ARROW);
-                        double value = edgeScores.get(candidateEdge);
-                        if(duplicate && value > 0){
-                            edgesCluster1.add(candidateEdge);
-                            edgesCluster2.add(candidateEdge);
-                            edgeDistribution.set(c1, edgesCluster1);
-                            edgeDistribution.set(c2, edgesCluster2);
-                            numEdgesInCluster[c1]+=1;
-                            numEdgesInCluster[c2]+=1;
-                        }
-                        //BOOKMARK!
-                        else{
-
-                        }
+        for (Edge edge : allEdges) {
+            Node n1 = edge.getNode1();
+            Node n2 = edge.getNode2();
+            int clusterID1 = nodeClusterMap.get(n1);
+            int clusterID2 = nodeClusterMap.get(n2);
+            if (clusterID1 == clusterID2) {
+                //Inner edge
+                Set<Edge> edgeCluster = edgeDistribution.get(clusterID1);
+                edgeCluster.add(edge);
+                //edgeDistribution.set(clusterID1, edgeCluster);
+            } else {
+                //Outer edge
+                //¿Siempre añadimos el enlace aunque sea malo?
+                if (duplicate && edgeScores.get(edge) > 0) {
+                    Set<Edge> edgeCluster1 = edgeDistribution.get(clusterID1);
+                    edgeCluster1.add(edge);
+                    Set<Edge> edgeCluster2 = edgeDistribution.get(clusterID2);
+                    edgeCluster2.add(edge);
+                } else {
+                    if (edgeDistribution.get(clusterID1).size() <= edgeDistribution.get(clusterID2).size()) {
+                        Set<Edge> edgeCluster1 = edgeDistribution.get(clusterID1);
+                        edgeCluster1.add(edge);
+                    } else {
+                        Set<Edge> edgeCluster2 = edgeDistribution.get(clusterID2);
+                        edgeCluster2.add(edge);
                     }
                 }
             }
-
         }
-
         return edgeDistribution;
     }
 
