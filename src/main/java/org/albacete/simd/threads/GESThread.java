@@ -492,17 +492,18 @@ public abstract class GESThread implements Runnable{
 
     /**
      * Bdeu Score function for a {@link Node node} and a set of parent nodes.
-     * @param nNode index of the child node
+     *
+     * @param nNode    index of the child node
      * @param nParents index of the parents of the node being considered as child.
      * @return The Bdeu score of the combination.
      */
 
-    protected static double localBdeuScore(int nNode, int[] nParents, Problem problem) {
+    public static double localBdeuScore(int nNode, int[] nParents, Problem problem) {
         numTotalCalls++;
 
         LocalScoreCacheConcurrent localScoreCache = problem.getLocalScoreCache();
 
-        double oldScore =localScoreCache.get(nNode, nParents);
+        double oldScore = localScoreCache.get(nNode, nParents);
         if (!Double.isNaN(oldScore)) {
             return oldScore;
         }
