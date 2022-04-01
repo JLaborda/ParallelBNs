@@ -51,7 +51,6 @@ public class FESFusion extends FusionStage{
         if (currentGraph == null) {
             flag = true;
             this.currentGraph = fusionGraph;
-            return (Dag) this.currentGraph;
         }
         System.out.println("FES to obtain the fusion: ");
 
@@ -84,6 +83,7 @@ public class FESFusion extends FusionStage{
             if (fusionScore > currentScore) {
                 flag = true;
                 this.currentGraph = fusionGraph;
+                System.out.println("  FESFusion -> FUSION, " + fusionScore);
                 return (Dag) this.currentGraph;
             } 
             
@@ -95,6 +95,8 @@ public class FESFusion extends FusionStage{
                         this.currentGraph = thread.getCurrentGraph();
                         flag = true;
                     } catch (InterruptedException ex) {}
+                    System.out.println("  FESFusion -> THREAD, " + thread.getScoreBDeu());
+                    this.currentGraph = new Dag(this.currentGraph);
                     return (Dag) this.currentGraph;
                 }
             }
