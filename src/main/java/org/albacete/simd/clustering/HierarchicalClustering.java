@@ -32,38 +32,6 @@ public class HierarchicalClustering {
         this.isParallel = isParallel;
     }
 
-    //Prueba
-    public static void main(String[] args) {
-        String networkFolder = "./res/networks/";
-        String net_name = "win95pts";
-        String net_path = networkFolder + net_name + ".xbif";
-        String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif50001_.csv";
-        Problem p = new Problem(Utils.readData(bbdd_path));
-
-        HierarchicalClustering clustering = new HierarchicalClustering(p, false);
-        Map<Edge, Double> map = clustering.getEdgesScore();
-
-        System.out.println("Mapa: " + map);
-
-        System.out.println("Probando clusterizing");
-        List<Set<Node>> clusters = clustering.clusterize(4);
-
-
-        for (int i = 0; i < clusters.size(); i++) {
-            System.out.println("Cluster " + i + ": " + clusters.get(i));
-            System.out.println("Number of nodes: " + clusters.get(i).size());
-        }
-
-        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(clusters, false);
-
-        for (int i = 0; i < edgeDistribution.size(); i++) {
-            System.out.println("EdgeDistibution " + i + ": " + edgeDistribution.get(i));
-            System.out.println("Number of edges: " + edgeDistribution.get(i).size());
-        }
-
-
-    }
-
     public Map<Edge, Double> getEdgesScore() {
         // Calculating all the edges
         allEdges = Utils.calculateArcs(problem.getData()); //IDEA: ¿Calcularlo directamente en problem?
@@ -87,7 +55,7 @@ public class HierarchicalClustering {
     private void initializeSimMatrixSequential() {
         List<Node> nodes = problem.getVariables();
         int numNodes = problem.getVariables().size();
-        for (int i = 0; i < numNodes; i++) {
+        for (int i = 0; i < (numNodes - 1); i++) {
             for (int j = i + 1; j < numNodes; j++) {
                 // Getting Nodes
                 Node x = nodes.get(i);
@@ -130,10 +98,6 @@ public class HierarchicalClustering {
     }
 
     private double getScoreClusters(Set<Node> cluster1, Set<Node> cluster2) {
-        // Nodes of the problem
-        List<Node> nodes = problem.getVariables();
-        // Indexes of the nodes
-        Map<Node, Integer> index = problem.getHashIndices();
         // Merged cluster
         Set<Node> mergeCluster = new HashSet<>();
         mergeCluster.addAll(cluster1);
@@ -143,13 +107,13 @@ public class HierarchicalClustering {
 
         List<Node> mergeClusterList = new ArrayList<>(mergeCluster);
 
-        for (int i = 0; i < mergeClusterList.size(); i++) {
-            for (int j = i+1; j < mergeClusterList.size() ; j++) {
+        for (int i = 0; i < (mergeClusterList.size() - 1); i++) {
+            for (int j = i + 1; j < mergeClusterList.size(); j++) {
                 Node nodeI = mergeClusterList.get(i);
                 Node nodeJ = mergeClusterList.get(j);
                 Edge edge = new Edge(nodeI, nodeJ, Endpoint.TAIL, Endpoint.ARROW);
                 //System.out.println(edge);
-                score+=edgeScores.get(edge);
+                score += edgeScores.get(edge);
             }
         }
 
@@ -225,8 +189,8 @@ public class HierarchicalClustering {
             int posJ = -1;
 
             //Checking which two clusters are better to merge together
-            for (int i = 0; i < (numClusters - 1); i++) {
-                for (int j = i + 1; j < numClusters; j++) {
+            for (int i = 0; i < (clusters.size() - 1); i++) {
+                for (int j = i + 1; j < clusters.size(); j++) {
                     if (simMatrix[i][j] > maxValue) {
                         maxValue = simMatrix[i][j];
                         posI = i;
@@ -241,7 +205,7 @@ public class HierarchicalClustering {
             clusters.set(posI, mergeCluster);
 
             //Recalculating simMatrix (Parallel?)
-            for (int j = posI + 1; j < numClusters; j++) {
+            for (int j = posI + 1; j < clusters.size(); j++) {
                 if (j != posJ) {
                     simMatrix[posI][j] = getScoreClusters(clusters.get(posI), clusters.get(j));
                 }
@@ -304,6 +268,38 @@ public class HierarchicalClustering {
         }
         return edgeDistribution;
     }
+
+    //Prueba
+    /*
+    public static void main(String[] args) {
+        String networkFolder = "./res/networks/";
+        String net_name = "alarm";
+        String net_path = networkFolder + net_name + ".xbif";
+        String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif50001_.csv";
+        Problem p = new Problem(Utils.readData(bbdd_path));
+        System.out.println("Number of nodes: " + p.getVariables().size());
+
+        HierarchicalClustering clustering = new HierarchicalClustering(p, false);
+        Map<Edge, Double> map = clustering.getEdgesScore();
+
+        System.out.println("Mapa: " + map);
+
+        System.out.println("Probando clusterizing");
+        List<Set<Node>> clusters = clustering.clusterize(2);
+
+        for (int i = 0; i < clusters.size(); i++) {
+            System.out.println("Cluster " + i + ": " + clusters.get(i));
+            System.out.println("Number of nodes: " + clusters.get(i).size());
+        }
+
+        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(clusters, true);
+
+        for (int i = 0; i < edgeDistribution.size(); i++) {
+            System.out.println("EdgeDistibution " + i + ": " + edgeDistribution.get(i));
+            System.out.println("Number of edges: " + edgeDistribution.get(i).size());
+        }
+    }
+     */
 
 
 }
