@@ -2,6 +2,7 @@ package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
+import org.albacete.simd.clustering.Clustering;
 import org.albacete.simd.framework.*;
 import org.albacete.simd.utils.Utils;
 
@@ -13,20 +14,30 @@ public class PGESwithStages extends BNBuilder {
     private FESStage fesStage;
     private BESStage besStage;
 
-    public PGESwithStages(DataSet data, int nThreads, int maxIterations, int nItInterleaving) {
+    private Clustering clustering;
+
+    public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(data, nThreads, maxIterations, nItInterleaving);
+        this.clustering = clustering;
+        this.clustering.setProblem(super.getProblem());
     }
 
-    public PGESwithStages(String path, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(path, nThreads, maxIterations, nItInterleaving);
+        this.clustering = clustering;
+        this.clustering.setProblem(super.getProblem());
     }
 
-    public PGESwithStages(Graph initialGraph, String path, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(Graph initialGraph, String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(initialGraph, path, nThreads, maxIterations, nItInterleaving);
+        this.clustering = clustering;
+        this.clustering.setProblem(super.getProblem());
     }
 
-    public PGESwithStages(Graph initialGraph, DataSet data, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(Graph initialGraph, DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(initialGraph, data, nThreads, maxIterations, nItInterleaving);
+        this.clustering = clustering;
+        this.clustering.setProblem(super.getProblem());
     }
 
     @Override
@@ -52,7 +63,7 @@ public class PGESwithStages extends BNBuilder {
 
     @Override
     protected void repartition() {
-        this.subSets = Utils.split(setOfArcs, nThreads);
+        this.subSets = clustering.generateEdgeDistribution(nThreads, false);
     }
 
     @Override

@@ -10,10 +10,9 @@ import org.albacete.simd.utils.Utils;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class HierarchicalClustering {
+public class HierarchicalClustering extends Clustering{
 
     private final Object lock = new Object();
-    private Problem problem;
     private Set<Edge> allEdges;
     private double[][] simMatrix;
     private boolean isParallel = false;
@@ -21,9 +20,12 @@ public class HierarchicalClustering {
     private List<Set<Node>> clusters;
     private Map<Node, Integer> nodeClusterMap = new HashMap<>();
 
+    public HierarchicalClustering(){
+
+    }
+
     public HierarchicalClustering(Problem problem) {
-        this.problem = problem;
-        this.simMatrix = new double[problem.getVariables().size()][problem.getVariables().size()];
+        super(problem);
     }
 
 
@@ -84,6 +86,7 @@ public class HierarchicalClustering {
     }
 
     private void initializeSimMatrix() {
+        this.simMatrix = new double[problem.getVariables().size()][problem.getVariables().size()];
         if (isParallel)
             initializeSimMatrixParallel();
         else
@@ -231,8 +234,10 @@ public class HierarchicalClustering {
     }
 
 
-    public List<Set<Edge>> generateEdgeDistribution(List<Set<Node>> clusters, boolean duplicate) {
-        List<Node> nodes = problem.getVariables();
+    public List<Set<Edge>> generateEdgeDistribution(int numClusters, boolean duplicate) {
+        // Generating node clusters
+        clusters = this.clusterize(numClusters);
+
         List<Set<Edge>> edgeDistribution = new ArrayList<>(clusters.size());
         for (int i = 0; i < clusters.size(); i++) {
             edgeDistribution.add(new HashSet<>());

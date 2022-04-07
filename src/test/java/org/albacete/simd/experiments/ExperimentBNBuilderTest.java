@@ -1,6 +1,8 @@
 package org.albacete.simd.experiments;
 
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
+import org.albacete.simd.clustering.Clustering;
+import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.Resources;
 import org.albacete.simd.framework.BackwardStage;
@@ -23,8 +25,8 @@ public class ExperimentBNBuilderTest {
     int nItInterleaving = 5;
     int seed = 42;
     int maxIterations = 15;
-
-    BNBuilder algorithm = new PGESwithStages(Resources.ALARM_BBDD_PATH, nThreads, maxIterations, nItInterleaving);
+    Clustering clustering = new RandomClustering();
+    BNBuilder algorithm = new PGESwithStages(Resources.ALARM_BBDD_PATH, clustering, nThreads, maxIterations, nItInterleaving);
     ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, Resources.ALARM_TEST_PATH, seed);
 
 

@@ -7,6 +7,8 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
+import org.albacete.simd.clustering.Clustering;
+import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
@@ -54,7 +56,8 @@ public class ExperimentPGES2 extends Experiment {
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.algorithm = new PGESwithStages(dataSet, nThreads, maxIterations, nItInterleaving);
+            Clustering clustering = new RandomClustering(42);
+            this.algorithm = new PGESwithStages(dataSet, clustering, nThreads, maxIterations, nItInterleaving);
 
             // Search is executed
             algorithm.search();

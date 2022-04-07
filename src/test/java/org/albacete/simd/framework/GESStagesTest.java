@@ -45,7 +45,7 @@ public class GESStagesTest {
         assertNotNull(fesStage.getGraphs().get(1));
 
         //TESTING FESFusion
-        Stage fesFusion = new FESFusion(problem, fesStage.getCurrentGraph(), fesStage.getGraphs());
+        Stage fesFusion = new FESFusion(problem, fesStage.getCurrentGraph(), fesStage.getGraphs(),  (FESStage)fesStage);
         flag = fesFusion.run();
         Graph g = fesFusion.getCurrentGraph();
         double fesFusionScore = GESThread.scoreGraph(g, problem);
@@ -74,7 +74,7 @@ public class GESStagesTest {
         assertTrue(besStageScore >= fesFusionScore);
 
         //TESTING BESFusion
-        Stage besFusion = new BESFusion(problem, besStage.getCurrentGraph(), besStage.getGraphs());
+        Stage besFusion = new BESFusion(problem, besStage.getCurrentGraph(), besStage.getGraphs(), (BESStage) besStage);
         flag = besFusion.run();
         Graph g2 = besFusion.getCurrentGraph();
         double besFusionScore = GESThread.scoreGraph(g2, problem);

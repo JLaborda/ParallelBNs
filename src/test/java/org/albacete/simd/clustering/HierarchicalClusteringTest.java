@@ -71,8 +71,8 @@ public class HierarchicalClusteringTest {
     public void edgeDistributionTest() {
         HierarchicalClustering clustering = new HierarchicalClustering(p);
 
-        List<Set<Node>> clusters = clustering.clusterize(2);
-        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(clusters, false);
+        //List<Set<Node>> clusters = clustering.clusterize(2);
+        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(2, false);
 
         assertEquals(2, edgeDistribution.size());
         assertTrue(edgeDistribution.get(0).size() == 666 || edgeDistribution.get(0).size() == 667 || edgeDistribution.get(0).size() == 665);
@@ -84,8 +84,8 @@ public class HierarchicalClusteringTest {
     public void edgeDistributionDuplicateTest() {
         HierarchicalClustering clustering = new HierarchicalClustering(p);
 
-        List<Set<Node>> clusters = clustering.clusterize(2);
-        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(clusters, true);
+        //List<Set<Node>> clusters = clustering.clusterize(2);
+        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(2, true);
 
         assertEquals(2, edgeDistribution.size());
 

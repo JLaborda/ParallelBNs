@@ -2,6 +2,9 @@ package org.albacete.simd.experiments;
 
 import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
+import org.albacete.simd.clustering.Clustering;
+import org.albacete.simd.clustering.HierarchicalClustering;
+import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
 
 import java.io.BufferedReader;
@@ -136,22 +139,34 @@ public class ExperimentBNLauncher {
     public static void runExperiment(List<Object> parameters) throws Exception {
         BNBuilder experimentAlgorithm;
         String alg = (String) parameters.get(0);
-        String netName;
-        String netPath;
-        String bbddPath;
-        String testPath;
+        String netName, netPath, bbddPath, testPath;
+        int nThreads, nInterleaving, seed;
         ExperimentBNBuilder experiment;
+        Clustering clustering;
         switch (alg){
             case "pges":
                 netName = (String) parameters.get(1);
                 netPath = (String) parameters.get(2);
                 bbddPath = (String) parameters.get(3);
                 testPath = (String) parameters.get(4);
-                int nThreads = Runtime.getRuntime().availableProcessors();
-                int nInterleaving = (Integer) parameters.get(5);
-                int seed = (Integer) parameters.get(6);
-                experimentAlgorithm = new PGESwithStages(bbddPath, nThreads, MAXITERATIONS, nInterleaving);
+                nThreads = Runtime.getRuntime().availableProcessors();
+                nInterleaving = (Integer) parameters.get(5);
+                seed = (Integer) parameters.get(6);
+                clustering = new RandomClustering(seed);
+                experimentAlgorithm = new PGESwithStages(bbddPath, clustering, nThreads, MAXITERATIONS, nInterleaving);
                 experiment = new ExperimentBNBuilder(experimentAlgorithm, netName, netPath, bbddPath, testPath, seed);
+                break;
+            case "hpges":
+                netName = (String) parameters.get(1);
+                netPath = (String) parameters.get(2);
+                bbddPath = (String) parameters.get(3);
+                testPath = (String) parameters.get(4);
+                nThreads = Runtime.getRuntime().availableProcessors();
+                nInterleaving = (Integer) parameters.get(5);
+                //int seed = (Integer) parameters.get(6);
+                clustering = new HierarchicalClustering();
+                experimentAlgorithm = new PGESwithStages(bbddPath, clustering, nThreads, MAXITERATIONS, nInterleaving);
+                experiment = new ExperimentBNBuilder(experimentAlgorithm, netName, netPath, bbddPath, testPath);
                 break;
             case "ges":
                 netName = (String) parameters.get(1);

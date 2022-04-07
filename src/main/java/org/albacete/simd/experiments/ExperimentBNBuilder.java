@@ -11,6 +11,8 @@ import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.algorithms.bnbuilders.PHC_BNBuilder;
+import org.albacete.simd.clustering.Clustering;
+import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
@@ -297,7 +299,8 @@ public class ExperimentBNBuilder {
                 algorithm = new GES_BNBuilder(bbddPath);
                 break;
             case "pges":
-                algorithm = new PGESwithStages(bbddPath, nThreads, maxIterations, nInterleaving);
+                Clustering clustering = new RandomClustering();
+                algorithm = new PGESwithStages(bbddPath, clustering, nThreads, maxIterations, nInterleaving);
                 break;
             case "hc":
                 algorithm = new HillClimbingSearch(bbddPath);

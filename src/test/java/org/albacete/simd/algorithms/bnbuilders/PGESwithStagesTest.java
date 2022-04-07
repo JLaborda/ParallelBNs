@@ -5,6 +5,8 @@ import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.Resources;
+import org.albacete.simd.clustering.Clustering;
+import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Utils;
@@ -22,7 +24,7 @@ public class PGESwithStagesTest {
 
     String path = Resources.CANCER_BBDD_PATH;
     DataSet dataSet = Utils.readData(path);
-
+    Clustering clustering = new RandomClustering();
 
     @Before
     public void restartMeans(){
@@ -33,17 +35,16 @@ public class PGESwithStagesTest {
 
     @Test
     public void testConstructor(){
-
-        PGESwithStages alg1 = new PGESwithStages(dataSet, 2, 100, 5);
-        PGESwithStages alg2 = new PGESwithStages(path, 2, 100, 5);
+        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5);
+        PGESwithStages alg2 = new PGESwithStages(path,clustering, 2, 100, 5);
 
         List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
         Dag initialGraph = new Dag(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
-        PGESwithStages alg3 = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, 2, 100, 5);
-        PGESwithStages alg4 = new PGESwithStages(initialGraph, Resources.CANCER_DATASET, 2, 100, 5);
+        PGESwithStages alg3 = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5);
+        PGESwithStages alg4 = new PGESwithStages(initialGraph, Resources.CANCER_DATASET, clustering, 2, 100, 5);
 
 
         assertNotNull(alg1);
@@ -72,7 +73,7 @@ public class PGESwithStagesTest {
 
     @Test
     public void searchTest(){
-        PGESwithStages alg1 = new PGESwithStages(dataSet, 2, 100, 5);
+        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5);
         Utils.setSeed(42);
         List<Node> nodes = new ArrayList<>();
         nodes.add(Resources.CANCER);
@@ -103,6 +104,7 @@ public class PGESwithStagesTest {
     @Test
     public void convergenceTest(){
         PGESwithStages alg = new PGESwithStages(Utils.readData(Resources.ALARM_BBDD_PATH),
+                clustering,
                 2,
                 1,
                 5
