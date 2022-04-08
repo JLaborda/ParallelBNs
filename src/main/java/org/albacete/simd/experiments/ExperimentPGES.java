@@ -90,11 +90,13 @@ public class ExperimentPGES extends Experiment{
 
 
             //Metrics
-            this.shd = Utils.SHD((Dag) bn2.getDag(), (Dag) algorithm.getCurrentGraph());
-            this.dfmm = Utils.avgMarkovBlanquetdif((Dag) bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            Dag original = new Dag(bn2.getDag());
+            Dag result = new Dag(algorithm.getCurrentGraph());
+            this.shd = Utils.SHD(original, result);
+            this.dfmm = Utils.avgMarkovBlanquetdif(original, result);
             this.nIterations = algorithm.getIterations();
             this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
-            this.LLscore = Utils.LL((Dag) algorithm.getCurrentGraph(), test_dataset);
+            this.LLscore = Utils.LL(result, test_dataset);
 
 
         } catch (Exception e) {

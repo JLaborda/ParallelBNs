@@ -24,7 +24,7 @@ public class BNBuilderTest {
     public void settersAndGettersTest(){
         String path = Resources.ALARM_BBDD_PATH;
         BNBuilder algorithm = new HillClimbingSearch(path, 15, 5);
-        Problem problem = new Problem(path);
+        Problem problem = algorithm.getProblem();
         Set<Edge> arcs = Utils.calculateArcs(problem.getData());
 
         algorithm.setSeed(30);

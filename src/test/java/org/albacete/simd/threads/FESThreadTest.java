@@ -271,6 +271,7 @@ public class FESThreadTest {
      */
     @Test
     public void xAndYAreEqualShouldContinueTest() throws InterruptedException {
+        //BOOKMARK!
         // Arrange
         Edge edge1 = Edges.directedEdge(this.cancer,this.cancer);
         Edge edge2 = Edges.directedEdge(this.cancer, this.smoker);
@@ -286,7 +287,7 @@ public class FESThreadTest {
         tFES.start();
         tFES.join();
         Graph result = fes.getCurrentGraph();
-
+        Set<Edge> edgesResult = result.getEdges();
         // Assert
         Edge badEdge1 = Edges.undirectedEdge(this.cancer, this.cancer);
         Edge badEdge2 = Edges.directedEdge(this.cancer, this.cancer);

@@ -252,10 +252,11 @@ public abstract class GESThread implements Runnable{
      * @return List of nodes that are connected to Y and adjacent to X.
      */
     protected static List<Node> findNaYX(Node x, Node y, Graph graph) {
-        List<Node> naYX = new LinkedList<>(graph.getAdjacentNodes(y));
+        List<Node> adjY = graph.getAdjacentNodes(y);
+        List<Node> naYX = new LinkedList<>(adjY);
         naYX.retainAll(graph.getAdjacentNodes(x));
 
-        for (int i = naYX.size()-1; i >= 0; i--) {
+        for (int i = naYX.size() - 1; i >= 0; i--) {
             Node z = naYX.get(i);
             Edge edge = graph.getEdge(y, z);
 

@@ -117,25 +117,28 @@ public class PGESwithStagesTest {
 
     }
 
-    /* PROBLEMS HERE WITH INITIAL GRAPH
+    //PROBLEMS HERE WITH INITIAL GRAPH
     @Test
-    public void testSearchWithInitalGraph(){
-        List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
+    public void testSearchWithInitalGraph() {
+        List<Node> nodes = Arrays.asList(Resources.XRAY, Resources.DYSPNOEA, Resources.CANCER, Resources.POLLUTION, Resources.SMOKER);
         Dag initialGraph = new Dag(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
-        PGESwithStages alg = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, 2, 100, 5);
+        Clustering clustering = new RandomClustering(42);
+        PGESwithStages alg = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5);
 
-        assertEquals(initialGraph, alg.getCurrentGraph());
+        Dag result = alg.getCurrentDag();
+        // Equals is never gonna work. Because tetrad doesn't have a proper equals
+        assertEquals(initialGraph.getNodes(), result.getNodes());
+        assertEquals(initialGraph.getEdges(), result.getEdges());
+        //&assertEquals(initialGraph, result);
         alg.search();
         assertNotNull(alg.getCurrentGraph());
-        assertNotEquals(initialGraph, alg.getCurrentGraph());
-        assertTrue(alg.getCurrentGraph() instanceof Dag);
+        assertNotNull(alg.getCurrentDag());
+        assertNotEquals(initialGraph, alg.getCurrentDag());
 
     }
-*/
-
 
 
 }
