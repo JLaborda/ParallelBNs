@@ -291,11 +291,11 @@ public class FESThreadTest {
         // Assert
         Edge badEdge1 = Edges.undirectedEdge(this.cancer, this.cancer);
         Edge badEdge2 = Edges.directedEdge(this.cancer, this.cancer);
-        Edge goodEdge1 = Edges.undirectedEdge(this.smoker, this.cancer);
+        Edge goodEdge1 = Edges.undirectedEdge(this.cancer, this.smoker);
 
-        assertFalse(result.getEdges().contains(badEdge1));
-        assertFalse(result.getEdges().contains(badEdge2));
-        assertTrue(result.getEdges().contains(goodEdge1));
+        assertFalse(edgesResult.contains(badEdge1));
+        assertFalse(edgesResult.contains(badEdge2));
+        assertTrue(edgesResult.contains(goodEdge1));
     }
 
 

@@ -74,9 +74,10 @@ public class HierarchicalClusteringTest {
         //List<Set<Node>> clusters = clustering.clusterize(2);
         List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(2, false);
 
+        // Checking that there is the same distribution in both clusters
         assertEquals(2, edgeDistribution.size());
-        assertTrue(edgeDistribution.get(0).size() == 666 || edgeDistribution.get(0).size() == 667 || edgeDistribution.get(0).size() == 665);
-        assertTrue(edgeDistribution.get(1).size() == 666 || edgeDistribution.get(1).size() == 667 || edgeDistribution.get(0).size() == 665);
+        assertTrue(edgeDistribution.get(0).size() >= 650 && edgeDistribution.get(0).size() <= 675);
+        assertTrue(edgeDistribution.get(1).size() >= 650 && edgeDistribution.get(1).size() <= 675);
 
     }
 
