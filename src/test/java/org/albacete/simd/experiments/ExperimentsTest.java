@@ -9,15 +9,13 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-
 
 import static org.junit.Assert.*;
 
 public class ExperimentsTest {
-    String net_path = Resources.ALARM_NET_PATH;
-    String bbdd_path = Resources.ALARM_BBDD_PATH;
-    String test_path = Resources.ALARM_TEST_PATH;
+    String net_path = Resources.CANCER_NET_PATH;
+    String bbdd_path = Resources.CANCER_BBDD_PATH;
+    String test_path = Resources.CANCER_TEST_PATH;
     int nThreads = 2;
     int nItInterleaving = 5;
     int seed = 42;
@@ -25,7 +23,7 @@ public class ExperimentsTest {
 
 
     @Before
-    public void restartMeans(){
+    public void restartMeans() {
         BackwardStage.meanTimeTotal = 0;
         ForwardStage.meanTimeTotal = 0;
     }

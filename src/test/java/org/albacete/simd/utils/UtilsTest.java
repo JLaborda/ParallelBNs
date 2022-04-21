@@ -166,7 +166,7 @@ public class UtilsTest {
     public void avgMarkovBlanquetDifTest() throws Exception {
         /*TEST: Different Dags should return null*/
         String net_path1 = Resources.CANCER_NET_PATH;
-        String net_path2 = Resources.ALARM_NET_PATH;
+        String net_path2 = Resources.EARTHQUAKE_NET_PATH;
         BIFReader bf = new BIFReader();
 
         // Arranging dags of alarm and cancer

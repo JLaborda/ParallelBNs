@@ -219,7 +219,7 @@ public class ParallelHillClimbingSearchTest {
         Utils.setSeed(42);
         ForwardStage.meanTimeTotal=0;
         BackwardStage.meanTimeTotal=0;
-        String alarmPath = Resources.ALARM_BBDD_PATH;
+        String alarmPath = Resources.CANCER_BBDD_PATH;
         ParallelHillClimbingSearch pGESv2 = new ParallelHillClimbingSearch(alarmPath, 2);
 
         // Act
@@ -252,7 +252,7 @@ public class ParallelHillClimbingSearchTest {
         Utils.setSeed(42);
         ForwardStage.meanTimeTotal=0;
         BackwardStage.meanTimeTotal=0;
-        DataSet datasetAlarm = Utils.readData(Resources.ALARM_BBDD_PATH);
+        DataSet datasetAlarm = Utils.readData(Resources.CANCER_BBDD_PATH);
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
         phc1.setMaxIterations(2);
         //Act
@@ -264,7 +264,7 @@ public class ParallelHillClimbingSearchTest {
 
     @Test
     public void interruptedExceptionTest(){
-        DataSet datasetAlarm = Utils.readData(Resources.ALARM_BBDD_PATH);
+        DataSet datasetAlarm = Utils.readData(Resources.CANCER_BBDD_PATH);
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
         phc1.setMaxIterations(30);
         phc1.search();

@@ -22,7 +22,7 @@ public class BNBuilderTest {
 
     @Test
     public void settersAndGettersTest(){
-        String path = Resources.ALARM_BBDD_PATH;
+        String path = Resources.CANCER_BBDD_PATH;
         BNBuilder algorithm = new HillClimbingSearch(path, 15, 5);
         Problem problem = algorithm.getProblem();
         Set<Edge> arcs = Utils.calculateArcs(problem.getData());

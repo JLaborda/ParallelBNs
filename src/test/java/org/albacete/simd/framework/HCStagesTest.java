@@ -29,7 +29,7 @@ public class HCStagesTest {
     public void runTest() throws InterruptedException{
 
         //Arrange
-        String path = Resources.ALARM_BBDD_PATH;
+        String path = Resources.CANCER_BBDD_PATH;
         Problem problem = new Problem(path);
         int nThreads = 2;
         int itInterleaving = 5;
@@ -91,7 +91,7 @@ public class HCStagesTest {
         double fhcStageScore2 = (GESThread.scoreGraph(graphs.get(0), problem) + GESThread.scoreGraph(graphs.get(1), problem)) / 2;
 
         // No new Edges added
-        assertTrue(flag);
+        assertFalse(flag);
         assertEquals(nThreads, fhcStage2.getGraphs().size());
         assertNotNull(fhcStage2.getGraphs().get(0));
         assertNotNull(fhcStage2.getGraphs().get(1));

@@ -109,7 +109,7 @@ public class ProblemTest {
     @Test
     public void equalsTest(){
         String path1 = Resources.CANCER_BBDD_PATH;
-        String path2 = Resources.ALARM_BBDD_PATH;
+        String path2 = Resources.EARTHQUAKE_BBDD_PATH;
         Problem p = new Problem(path1);
         Problem p2 = new Problem(path2);
         Problem p3 = p;

@@ -264,14 +264,19 @@ public class Utils {
         if (original.getNodes().size() != created.getNodes().size())
             return null;
 
+        for (String originalNodeName : original.getNodeNames()) {
+            if (!created.getNodeNames().contains(originalNodeName))
+                return null;
+        }
+
         // First number is the average dfMB, the second one is the amount of more variables in each MB, the last number is the the amount of missing variables in each MB
-        double [] result = new double[3];
+        double[] result = new double[3];
         double differenceNodes = 0;
         double plusNodes = 0;
         double minusNodes = 0;
 
 
-        for( Node e1 : original.getNodes()) {
+        for (Node e1 : original.getNodes()) {
             Node e2 = created.getNode(e1.getName());
 
             // Creating Markov's Blanket

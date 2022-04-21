@@ -230,13 +230,14 @@ public class ForwardHillClimbingThreadTest {
 
     /**
      * Tests that the algorithm works correct with the Alarm network.
-     * @result The resulting graph has the same number of edges as the set maximum number of edges.
+     *
      * @throws InterruptedException Caused by an external interruption.
+     * @result The resulting graph has the same number of edges as the set maximum number of edges.
      */
     @Test
-    public void alarmExecutionTest() throws InterruptedException {
+    public void cancerExecutionTest() throws InterruptedException {
         // ThFES objects
-        String alarmPath = Resources.ALARM_BBDD_PATH;
+        String alarmPath = Resources.CANCER_BBDD_PATH;
         DataSet alarmDataset = Utils.readData(alarmPath);
         Set<Edge> setOfArcs = Utils.calculateArcs(alarmDataset);
         Utils.setSeed(42);

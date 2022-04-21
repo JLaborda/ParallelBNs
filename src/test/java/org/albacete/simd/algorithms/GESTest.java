@@ -5,10 +5,10 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
+import org.albacete.simd.Resources;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.Resources;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,7 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class GESTest {
@@ -35,7 +36,7 @@ public class GESTest {
         reader.setMaxIntegralDiscrete(100);
 
         // Creating GES with the first constructor
-        DataSet dataSet = reader.parseTabular(new File(Resources.ALARM_BBDD_PATH));
+        DataSet dataSet = reader.parseTabular(new File(Resources.CANCER_BBDD_PATH));
         GES ges1 = new GES(dataSet);
 
         // Creating GES with the second constructor

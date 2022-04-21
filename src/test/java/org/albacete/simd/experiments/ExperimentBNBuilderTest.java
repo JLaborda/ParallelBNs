@@ -1,10 +1,10 @@
 package org.albacete.simd.experiments;
 
+import org.albacete.simd.Resources;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.clustering.Clustering;
 import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
-import org.albacete.simd.Resources;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.junit.Before;
@@ -14,10 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class ExperimentBNBuilderTest {
@@ -26,12 +23,12 @@ public class ExperimentBNBuilderTest {
     int seed = 42;
     int maxIterations = 15;
     Clustering clustering = new RandomClustering();
-    BNBuilder algorithm = new PGESwithStages(Resources.ALARM_BBDD_PATH, clustering, nThreads, maxIterations, nItInterleaving);
-    ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, Resources.ALARM_TEST_PATH, seed);
+    BNBuilder algorithm = new PGESwithStages(Resources.CANCER_BBDD_PATH, clustering, nThreads, maxIterations, nItInterleaving);
+    ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "cancer", Resources.CANCER_NET_PATH, Resources.CANCER_BBDD_PATH, Resources.CANCER_TEST_PATH, seed);
 
 
     @Before
-    public void restartMeans(){
+    public void restartMeans() {
         BackwardStage.meanTimeTotal = 0;
         ForwardStage.meanTimeTotal = 0;
     }

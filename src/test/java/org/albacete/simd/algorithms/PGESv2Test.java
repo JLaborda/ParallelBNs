@@ -369,6 +369,7 @@ public class PGESv2Test
     public void besStageTest() throws InterruptedException {
         // Arrange
         initializeSubsets();
+        Utils.setSeed(42);
         // Expectation
         List<Edge> expected = new ArrayList<>();
         expected.add(new Edge(Resources.CANCER, Resources.DYSPNOEA, Endpoint.TAIL, Endpoint.ARROW));
@@ -390,11 +391,15 @@ public class PGESv2Test
         pGESv2.besStage();
         ArrayList<Dag> results = pGESv2.getGraphs();
 
-        // Assert
-        for(Dag graph : results){
-            for(Edge edge : expected) {
+        // Assert;
+        System.out.println();
+        int i = 0;
+        for (Dag graph : results) {
+            System.out.println("Graph [" + i + "]: \n" + graph);
+            for (Edge edge : expected) {
                 assertTrue(graph.getEdges().contains(edge));
             }
+            i++;
         }
     }
 

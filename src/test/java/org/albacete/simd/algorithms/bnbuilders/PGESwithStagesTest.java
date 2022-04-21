@@ -73,7 +73,8 @@ public class PGESwithStagesTest {
 
     @Test
     public void searchTest(){
-        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5);
+        System.out.println("PGESwithStagesTest: searchTest");
+        PGESwithStages alg1 = new PGESwithStages(Resources.CANCER_DATASET, clustering, 2, 100, 5);
         Utils.setSeed(42);
         List<Node> nodes = new ArrayList<>();
         nodes.add(Resources.CANCER);
@@ -103,7 +104,7 @@ public class PGESwithStagesTest {
 
     @Test
     public void convergenceTest(){
-        PGESwithStages alg = new PGESwithStages(Utils.readData(Resources.ALARM_BBDD_PATH),
+        PGESwithStages alg = new PGESwithStages(Utils.readData(Resources.CANCER_BBDD_PATH),
                 clustering,
                 2,
                 1,

@@ -26,10 +26,10 @@ public class HillClimbingSearchTest {
 
     @Test
     public void constructorTest(){
-        Problem problem = new Problem(Resources.ALARM_BBDD_PATH);
-        HillClimbingSearch hc1 = new HillClimbingSearch(Resources.ALARM_BBDD_PATH,15,5);
+        Problem problem = new Problem(Resources.CANCER_BBDD_PATH);
+        HillClimbingSearch hc1 = new HillClimbingSearch(Resources.CANCER_BBDD_PATH, 15, 5);
         HillClimbingSearch hc2 = new HillClimbingSearch(problem.getData(), 15, 5);
-        HillClimbingSearch hc3 = new HillClimbingSearch(Resources.ALARM_BBDD_PATH);
+        HillClimbingSearch hc3 = new HillClimbingSearch(Resources.CANCER_BBDD_PATH);
         HillClimbingSearch hc4 = new HillClimbingSearch(problem.getData());
 
         List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
@@ -37,7 +37,7 @@ public class HillClimbingSearchTest {
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
-        HillClimbingSearch hc5 = new HillClimbingSearch(initialGraph,Resources.CANCER_BBDD_PATH);
+        HillClimbingSearch hc5 = new HillClimbingSearch(initialGraph, Resources.CANCER_BBDD_PATH);
         HillClimbingSearch hc6 = new HillClimbingSearch(initialGraph,Resources.CANCER_DATASET);
 
 
@@ -79,7 +79,7 @@ public class HillClimbingSearchTest {
 
     @Test
     public void searchTest(){
-        HillClimbingSearch hc1 = new HillClimbingSearch(Resources.ALARM_BBDD_PATH,15,5);
+        HillClimbingSearch hc1 = new HillClimbingSearch(Resources.CANCER_BBDD_PATH, 15, 5);
 
         hc1.search();
 
