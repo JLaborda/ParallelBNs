@@ -29,6 +29,7 @@ public class HCStagesTest {
     public void runTest() throws InterruptedException{
 
         //Arrange
+        Utils.setSeed(42);
         String path = Resources.CANCER_BBDD_PATH;
         Problem problem = new Problem(path);
         int nThreads = 2;

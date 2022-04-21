@@ -93,7 +93,7 @@ public class HierarchicalClusteringTest {
         System.out.println("edgeDistribution0: " + edgeDistribution.get(0).size());
         System.out.println("edgeDistribution1: " + edgeDistribution.get(1).size());
 
-        assertTrue(edgeDistribution.get(0).size() == 736 || edgeDistribution.get(0).size() == 737 || edgeDistribution.get(0).size() == 735);
-        assertTrue(edgeDistribution.get(1).size() == 736 || edgeDistribution.get(1).size() == 737 || edgeDistribution.get(0).size() == 735);
+        assertTrue(edgeDistribution.get(0).size() >= 725 && edgeDistribution.get(0).size() <= 745);
+        assertTrue(edgeDistribution.get(1).size() >= 725 && edgeDistribution.get(1).size() <= 745);
     }
 }

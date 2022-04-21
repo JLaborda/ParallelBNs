@@ -73,8 +73,8 @@ public class PHC_BNBuilderTest {
 
     @Test
     public void searchTest() {
-        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5);
         Utils.setSeed(42);
+        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5);
         List<Node> nodes = new ArrayList<>();
         nodes.add(Resources.CANCER);
         nodes.add(Resources.DYSPNOEA);
