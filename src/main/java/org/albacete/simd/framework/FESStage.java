@@ -32,8 +32,7 @@ public class FESStage extends ForwardStage{
         }
     }
 
-    @Override
-    protected void config() {
+    private void config() {
         // Initializing Graphs structure
         this.graphs = new ArrayList<>();
 

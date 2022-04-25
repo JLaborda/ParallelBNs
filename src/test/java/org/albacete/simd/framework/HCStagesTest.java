@@ -27,7 +27,7 @@ public class HCStagesTest {
 
     @Test
     public void runTest() throws InterruptedException{
-
+        // THIS IS NOT AN OK TEST!
         //Arrange
         Utils.setSeed(42);
         String path = Resources.CANCER_BBDD_PATH;

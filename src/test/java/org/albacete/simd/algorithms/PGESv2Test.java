@@ -319,45 +319,16 @@ public class PGESv2Test
         System.out.println(result);
 
         // Assert Nodes
-        List<Node> resultingNodes = result.getNodes();
-        List<Node> expectedNodes = expected.getNodes();
-        for(Node expNode : expectedNodes){
+        List<String> resultingNodes = result.getNodeNames();
+        List<String> expectedNodes = expected.getNodeNames();
+        for (String expNode : expectedNodes) {
             // System.out.println("Expected Node: " + expNode.getName());
-            boolean assertion = false;
-            for(Node resNode: resultingNodes){
-                // System.out.println("Resulting Node: " + resNode.getName());
-                if(expNode.getName().equals(resNode.getName())){
-                    assertion = true;
-                    break;
-                }
-            }
-            assertTrue(assertion);
+            assertTrue(resultingNodes.contains(expNode));
         }
 
         // Assert Edges
         Set<Edge> resultingEdges = result.getEdges();
-        for(Edge resEdge : resultingEdges){
-            /*Node node1 = resEdge.getNode1();
-            Node node2 = resEdge.getNode2();
-
-            // System.out.println("Node1: " + node1.getName());
-            // System.out.println("Node2: " + node2.getName());
-
-            if(node1.getName().equals("Cancer")){
-                String node2Name = node2.getName();
-                assertTrue(((node2Name.equals("Dyspnoea")) || (node2Name.equals("Xray")) || (node2Name.equals("Pollution")) ));
-                continue;
-            }
-            if(node1.getName().equals("Smoker")){
-                assertEquals("Cancer", node2.getName());
-                continue;
-            }
-            // If node1 i not any of these nodes, then assert error
-            fail("Node1 is not in the expected range.");
-            */
-            assertTrue(expected.containsEdge(resEdge));
-        }
-
+        assertTrue(Resources.equalsEdges(expected.getEdges(), result.getEdges()));
     }
 
     /**
@@ -403,34 +374,6 @@ public class PGESv2Test
         }
     }
 
-
-    /**
-     * Tests the search method of the Main class.
-     * @result The resulting graph is equal to the expected graph for the cancer dataset.
-     */
-    /*
-    @Test
-    public void searchCancerTest(){
-        //Arrange
-        Utils.setSeed(42);
-        PGESv2 pGESv2 = new PGESv2(Resources.CANCER_BBDD_PATH, 2);
-
-        //Expectation
-        List<Node> nodes = Arrays.asList(Resources.SMOKER, Resources.CANCER, Resources.POLLUTION, Resources.DYSPNOEA, Resources.XRAY);
-        Dag expectation = new Dag(nodes);
-        expectation.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
-        expectation.addDirectedEdge(Resources.CANCER, Resources.POLLUTION);
-        expectation.addDirectedEdge(Resources.CANCER, Resources.XRAY);
-        expectation.addDirectedEdge(Resources.SMOKER, Resources.CANCER);
-
-        // Act
-        pGESv2.search();
-
-        //Assert
-        assertEquals(expectation, pGESv2.getCurrentGraph());
-
-    }
-*/
     /**
      * Executes the main function in order to see that everything is working, and that no exceptions are being thrown.
      * @result No exception is thrown.

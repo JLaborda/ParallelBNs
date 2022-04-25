@@ -8,7 +8,6 @@ import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.Utils;
 
 import java.util.List;
 import java.util.Set;
@@ -18,12 +17,12 @@ public abstract class ThreadStage extends Stage{
      * The {@link GESThread GESThread} array that will be executed in each stage.
      * They can either be {@link FESThread ThFES} or {@link BESThread ThBES} threads.
      */
-    protected GESThread[] gesThreads = null;
+    protected GESThread[] gesThreads;
 
     /**
      * The {@link Thread Thread} array that encapsulate the {@link GESThread GESThread} for each stage.
      */
-    protected Thread[] threads = null;
+    protected Thread[] threads;
 
     protected boolean flag = false;
 
@@ -89,7 +88,6 @@ public abstract class ThreadStage extends Stage{
         calculateStatsTimeTotal();
     }
 
-    protected abstract void config();
 
 
     public boolean checkWorkingStatus() throws InterruptedException {
@@ -100,11 +98,11 @@ public abstract class ThreadStage extends Stage{
         }
         return false;
     }
-    
-    public GESThread getMaxBDeuThread() {
+
+    protected GESThread getMaxBDeuThread() {
         GESThread best = gesThreads[0];
         double bdeu = gesThreads[0].getScoreBDeu();
-        
+
         for (int i = 1; i > gesThreads.length; i++) {
             if (gesThreads[i].getScoreBDeu() > bdeu) {
                 bdeu = gesThreads[i].getScoreBDeu();

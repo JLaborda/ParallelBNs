@@ -1,8 +1,12 @@
 package org.albacete.simd;
 
 import edu.cmu.tetrad.data.DataSet;
+import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Node;
+import edu.cmu.tetrad.graph.NodeEqualityMode;
 import org.albacete.simd.utils.Utils;
+
+import java.util.Set;
 
 public class Resources {
     // EARTHQUAKE
@@ -30,5 +34,21 @@ public class Resources {
     public static final Node CANCER = CANCER_DATASET.getVariable("Cancer");
     public static final Node POLLUTION = CANCER_DATASET.getVariable("Pollution");
     public static final Node SMOKER = CANCER_DATASET.getVariable("Smoker");
+
+    public static boolean equalsEdges(Set<Edge> expected, Set<Edge> result) {
+        boolean assertion = false;
+        NodeEqualityMode.setEqualityMode(NodeEqualityMode.Type.NAME);
+        for (Edge resEdge : result) {
+            for (Edge expEdge : expected) {
+                if (expEdge.equals(resEdge)) {
+                    assertion = true;
+                    break;
+                }
+            }
+            if (!assertion)
+                return false;
+        }
+        return assertion;
+    }
 
 }

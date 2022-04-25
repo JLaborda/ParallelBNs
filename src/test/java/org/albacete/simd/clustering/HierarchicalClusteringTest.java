@@ -3,6 +3,7 @@ package org.albacete.simd.clustering;
 
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Node;
+import org.albacete.simd.Resources;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 import org.junit.Before;
@@ -18,11 +19,7 @@ import static org.junit.Assert.*;
 
 public class HierarchicalClusteringTest {
 
-    String networkFolder = "./res/networks/";
-    String net_name = "alarm";
-    String net_path = networkFolder + net_name + ".xbif";
-    String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif50001_.csv";
-    Problem p = new Problem(Utils.readData(bbdd_path));
+    Problem p = new Problem(Resources.CANCER_BBDD_PATH);
 
 
     @Before
@@ -74,10 +71,13 @@ public class HierarchicalClusteringTest {
         //List<Set<Node>> clusters = clustering.clusterize(2);
         List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(2, false);
 
+        System.out.println("edgeDistribution0: " + edgeDistribution.get(0).size());
+        System.out.println("edgeDistribution1: " + edgeDistribution.get(1).size());
+
         // Checking that there is the same distribution in both clusters
         assertEquals(2, edgeDistribution.size());
-        assertTrue(edgeDistribution.get(0).size() >= 650 && edgeDistribution.get(0).size() <= 675);
-        assertTrue(edgeDistribution.get(1).size() >= 650 && edgeDistribution.get(1).size() <= 675);
+        assertTrue(edgeDistribution.get(0).size() >= 3 && edgeDistribution.get(0).size() <= 20);
+        assertTrue(edgeDistribution.get(1).size() >= 3 && edgeDistribution.get(1).size() <= 20);
 
     }
 
@@ -93,7 +93,7 @@ public class HierarchicalClusteringTest {
         System.out.println("edgeDistribution0: " + edgeDistribution.get(0).size());
         System.out.println("edgeDistribution1: " + edgeDistribution.get(1).size());
 
-        assertTrue(edgeDistribution.get(0).size() >= 725 && edgeDistribution.get(0).size() <= 745);
-        assertTrue(edgeDistribution.get(1).size() >= 725 && edgeDistribution.get(1).size() <= 745);
+        assertTrue(edgeDistribution.get(0).size() >= 3 && edgeDistribution.get(0).size() <= 20);
+        assertTrue(edgeDistribution.get(1).size() >= 3 && edgeDistribution.get(1).size() <= 20);
     }
 }

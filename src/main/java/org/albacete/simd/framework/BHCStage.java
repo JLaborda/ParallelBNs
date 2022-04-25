@@ -18,8 +18,7 @@ public class BHCStage extends BackwardStage {
         super(problem, currentGraph, nThreads, itInterleaving, subsets);
     }
 
-    @Override
-    protected void config() {
+    private void config() {
         // Initializing Graphs structure
         this.graphs = new ArrayList<>();
         this.gesThreads = new GESThread[this.nThreads];

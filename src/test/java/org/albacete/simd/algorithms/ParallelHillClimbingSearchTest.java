@@ -58,7 +58,6 @@ public class ParallelHillClimbingSearchTest {
         ForwardStage.meanTimeTotal = 0;
     }
 
-
     /**
      * Testing both possible constructors of the Main class
      * @result Both objects should have the same dataset stored in it.
@@ -148,10 +147,6 @@ public class ParallelHillClimbingSearchTest {
         fail();
     }
 
-    
-
-
-   
     /**
      * Testing the setter and getter of MaxIterations
      * @result MaxIterations is changed to 21 and obtained as such.
@@ -184,35 +179,6 @@ public class ParallelHillClimbingSearchTest {
     }
 
 
-    /**
-     * Tests the search method of the Main class.
-     * @result The resulting graph is equal to the expected graph for the cancer dataset.
-     */
-    /*
-    @Test
-    public void searchCancerTest(){
-        //Arrange
-        Utils.setSeed(42);
-        ForwardStage.meanTimeTotal=0;
-        BackwardStage.meanTimeTotal=0;
-        ParallelHillClimbingSearch alg = new ParallelHillClimbingSearch(Resources.CANCER_BBDD_PATH, 2);
-
-        //Expectation
-        List<Node> nodes = Arrays.asList(cancer, dyspnoea, pollution, xray, smoker);
-        EdgeListGraph expectation = new EdgeListGraph(nodes);
-        expectation.addDirectedEdge(cancer, dyspnoea);
-        expectation.addDirectedEdge(cancer, xray);
-        expectation.addDirectedEdge(pollution, cancer);
-        expectation.addDirectedEdge(smoker, cancer);
-
-        // Act
-        alg.search();
-
-        //Assert
-        assertEquals(expectation, alg.getCurrentGraph());
-
-    }
-*/
     @Test
     public void searchAlarmTest(){
         //Arrange

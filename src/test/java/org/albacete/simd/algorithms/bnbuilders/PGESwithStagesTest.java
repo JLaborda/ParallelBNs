@@ -96,9 +96,8 @@ public class PGESwithStagesTest {
         assertTrue(alg1.getCurrentGraph() instanceof Dag);
 
         Set<Edge> resultingEdges = alg1.getCurrentGraph().getEdges();
-        for(Edge edge: resultingEdges){
-            assertTrue(expected.containsEdge(edge));
-        }
+        // Asserting
+        assertTrue(Resources.equalsEdges(expected.getEdges(), resultingEdges));
     }
 
 
