@@ -51,3 +51,10 @@ experiment_results*
 
 # Outputs and errors
 run_experiments_cluster*
+*.bash.[eo]*
+
+# Singularity Image
+*.sif
+
+#Hyperparams
+hyperparams_*
