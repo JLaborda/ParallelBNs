@@ -58,3 +58,6 @@ run_experiments_cluster*
 
 #Hyperparams
 hyperparams_*
+
+#Github keys script
+scripts/git-keys-update.bash
