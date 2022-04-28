@@ -6,7 +6,8 @@ BBDD_FOLDER=${NETWORKS_FOLDER}"BBDD/";
 TEST_FOLDER=${NETWORKS_FOLDER}"BBDD/tests/";
 ENDING_NETWORKS=".xbif";
 PARAMS_FOLDER=${HOME_FOLDER}"res/params/";
-SAVE_FOLDER="/Users/jdls/developer/projects/ParallelBNs/res/params/"; # Mac save_folder
+# SAVE_FOLDER="/Users/jdls/developer/projects/ParallelBNs/res/params/"; # Mac save_folder
+SAVE_FOLDER="/home/jdls/developer/projects/ParallelBNs/res/params/"; # Cluster save_folder
 
 ###################
 # HYPERPARAMETERS #

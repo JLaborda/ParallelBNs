@@ -13,7 +13,8 @@ ENDING_NETWORKS=".xbif";
 #ENDING_BBDD50K="50k.csv";
 PARAMS_FOLDER=${HOME_FOLDER}"res/params/";
 #SAVE_FILE="${PARAMS_FOLDER}hyperparams.txt";
-SAVE_FOLDER="/Users/jdls/developer/projects/ParallelBNs/res/params/"
+# SAVE_FOLDER="/Users/jdls/developer/projects/ParallelBNs/res/params/" # Mac Save Folder
+SAVE_FOLDER="/home/jdls/developer/projects/ParallelBNs/res/params/"    # Cluster Save Folder
 ###################
 # HYPERPARAMETERS #
 ###################
