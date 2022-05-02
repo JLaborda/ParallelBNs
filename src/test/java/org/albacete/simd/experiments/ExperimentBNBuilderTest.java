@@ -45,11 +45,11 @@ public class ExperimentBNBuilderTest {
     public void runExperimentTest(){
         exp.runExperiment();
 
-        assertNotEquals(0.0, exp.getScore(), 0.000001);
-        assertNotNull(exp.getDfmm());
+        assertNotEquals(0.0, exp.getBdeuScore(), 0.000001);
+        assertNotNull(exp.getDifferencesOfMalkovsBlanket());
         assertNotEquals(0L,exp.getElapsedTimeMiliseconds());
-        assertNotEquals(0,exp.getnIterations());
-        assertNotEquals(Integer.MAX_VALUE,exp.getShd());
+        assertNotEquals(0,exp.getNumberOfIterations());
+        assertNotEquals(Integer.MAX_VALUE,exp.getStructuralHamiltonDistanceValue());
         assertEquals("PGESwithStages", exp.getAlgName());
         //String results = "PGESwithStages,res/alarm,alarm.xbif50001_,2,5,42,18,-0.47065998245296453,-56422.320053854455,1.1891891891891893,8.0,36.0,10,3\n";
         //System.out.println(exp.getResults());

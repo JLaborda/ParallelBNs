@@ -12,6 +12,7 @@ import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.algorithms.bnbuilders.PHC_BNBuilder;
 import org.albacete.simd.clustering.Clustering;
+import org.albacete.simd.clustering.HierarchicalClustering;
 import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.threads.GESThread;
@@ -36,55 +37,92 @@ import java.util.regex.Pattern;
 public class ExperimentBNBuilder {
 
     protected BNBuilder algorithm;
-    protected String net_path;
-    protected String bbdd_path;
-    protected String net_name;
-    protected String bbdd_name;
-    protected String test_path;
-    protected DataSet test_dataset;
+    protected String netPath;
+    protected String databasePath;
+    protected String netName;
+    protected String databaseName;
+    protected String testDatabasePath;
+    protected DataSet testDataset;
 
-    protected int nThreads;
-    protected int nItInterleaving;
+    protected int numberOfThreads;
+    protected int interleaving;
     protected int maxIterations;
     //protected static HashMap<String, HashMap<String,String>> map;
 
-    protected int shd = Integer.MAX_VALUE;
-    protected double score;
-    protected double [] dfmm;
+    protected int structuralHamiltonDistanceValue = Integer.MAX_VALUE;
+    protected double bdeuScore;
+    protected double [] differencesOfMalkovsBlanket;
+    private long startTime;
+    private long endTime;
     protected long elapsedTime;
-    protected int nIterations;
-    protected double LLscore;
+    protected int numberOfIterations;
+    protected double LogLikelihoodScore;
 
 
     protected String log = "";
     protected String algName;
     protected long seed = -1;
+    private MlBayesIm controlBayesianNetwork;
+    private Dag resultingBayesianNetwork;
 
-    public ExperimentBNBuilder(BNBuilder algorithm, String net_name, String net_path, String bbdd_path, String test_path) {
+
+    public ExperimentBNBuilder(String[] parameters) throws Exception {
+        extractParametersForClusterExperiment(parameters);
+        createBNBuilder();
+    }
+
+    private void extractParametersForClusterExperiment(String[] parameters){
+        algName = parameters[0];
+        netName = parameters[1];
+        netPath = parameters[2];
+        databasePath = parameters[3];
+        testDatabasePath = parameters[4];
+        if(!algName.equals("ges")) {
+            numberOfThreads = Runtime.getRuntime().availableProcessors();
+            interleaving = Integer.parseInt(parameters[5]);
+            seed = Integer.parseInt(parameters[6]);
+        }
+    }
+
+    private void createBNBuilder() throws Exception {
+        switch(algName) {
+            case "pges":
+                Clustering randomClustering = new RandomClustering(seed);
+                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                break;
+            case "pges_clustering":
+                Clustering hierarchicalClustering = new HierarchicalClustering();
+                algorithm = new PGESwithStages(databasePath, hierarchicalClustering, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                break;
+            case "ges":
+                algorithm = new GES_BNBuilder(databasePath);
+                break;
+            default:
+                throw new Exception("Error... Algoritmo incorrecto: " + algName);
+        }
+    }
+
+    public ExperimentBNBuilder(BNBuilder algorithm, String netName, String netPath, String bbddPath, String testDatabasePath) {
         this.algorithm = algorithm;
-        this.net_name = net_name;
-        this.net_path = net_path;
-        this.bbdd_path = bbdd_path;
-        this.test_path = test_path;
-        this.test_dataset = Utils.readData(test_path);
+        this.netName = netName;
+        this.netPath = netPath;
+        this.databasePath = bbddPath;
+        this.testDatabasePath = testDatabasePath;
+        this.testDataset = Utils.readData(testDatabasePath);
         this.algName = algorithm.getClass().getSimpleName();
 
         Pattern pattern = Pattern.compile(".*/(.*).csv");
-        Matcher matcher = pattern.matcher(this.bbdd_path);
+        Matcher matcher = pattern.matcher(this.databasePath);
         if (matcher.find()) {
-            //System.out.println("Match!");
-            //System.out.println(matcher.group(1));
-            bbdd_name = matcher.group(1);
+            databaseName = matcher.group(1);
         }
-
-
-        this.nThreads = algorithm.getnThreads();
+        this.numberOfThreads = algorithm.getnThreads();
         this.maxIterations = algorithm.getMaxIterations();
-        this.nItInterleaving = algorithm.getItInterleaving();
+        this.interleaving = algorithm.getItInterleaving();
     }
 
-    public ExperimentBNBuilder(BNBuilder algorithm, String net_name, String net_path, String bbdd_path, String test_path, long partition_seed) {
-        this(algorithm, net_name, net_path, bbdd_path, test_path);
+    public ExperimentBNBuilder(BNBuilder algorithm, String netName, String netPath, String bbddPath, String testDatabasePath, long partition_seed) {
+        this(algorithm, netName, netPath, bbddPath, testDatabasePath);
         this.seed = partition_seed;
         Utils.setSeed(partition_seed);
     }
@@ -93,74 +131,16 @@ public class ExperimentBNBuilder {
     public void runExperiment()
     {
         try {
-            System.out.println("Starting Experiment:");
-            System.out.println("-----------------------------------------");
-            System.out.println("\tNet Name: " + net_name);
-            System.out.println("\tBBDD Name: " + bbdd_name);
-            //System.out.println("\tFusion Consensus: " + fusion_consensus);
-            System.out.println("\tnThreads: " + nThreads);
-            System.out.println("\tnItInterleaving: " + nItInterleaving);
-            System.out.println("-----------------------------------------");
+            printExperimentInformation();
 
-            System.out.println("Net_path: " + net_path);
-            System.out.println("BBDD_path: " + bbdd_path);
-
-            long startTime = System.currentTimeMillis();
-            BIFReader bf = new BIFReader();
-            bf.processFile(this.net_path);
-            BayesNet bn = bf;
-            System.out.println("Numero de variables: " + bn.getNrOfNodes());
-
-            //Transforming the BayesNet into a BayesPm
-            BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bn);
-            MlBayesIm bn2 = new MlBayesIm(bayesPm);
-
-            DataReader reader = new DataReader();
-            reader.setDelimiter(DelimiterType.COMMA);
-            reader.setMaxIntegralDiscrete(100);
-
-            // Running Experiment
-            //DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            //this.algorithm = new PGESv2(dataSet,this.nThreads);
-            //this.algorithm.setMaxIterations(this.maxIterations);
-            //this.algorithm.setNFESItInterleaving(this.nItInterleaving);
+            controlBayesianNetwork = readOriginalBayesianNetwork();
 
             // Search is executed
             this.algorithm.search();
-
-            // Measuring time
-            long endTime = System.currentTimeMillis();
+            resultingBayesianNetwork =  this.algorithm.getCurrentDag();
 
             // Metrics
-            this.elapsedTime = endTime - startTime;
-            //System.out.println("Original DAG:");
-            //System.out.println(bn2.getDag());
-            //System.out.println("Total Nodes Original DAG:");
-            //System.out.println(bn2.getDag().getNodes().size());
-
-            /*
-            List<Node> nodes_original = bn2.getDag().getNodes();
-            List<Node> nodes_created = alg.getCurrentGraph().getNodes();
-
-            boolean cond = true;
-            for(Node node_original : nodes_original){
-                if (!nodes_created.contains(node_original)){
-                    cond = false;
-                }
-            }
-            */
-
-            // System.out.println(cond);
-
-
-            Dag prueba = algorithm.getCurrentDag();
-            //Metrics
-            this.shd = Utils.SHD(Utils.removeInconsistencies(bn2.getDag()), algorithm.getCurrentDag());
-            this.dfmm = Utils.avgMarkovBlanquetdif(Utils.removeInconsistencies(bn2.getDag()), algorithm.getCurrentDag());
-            this.nIterations = algorithm.getIterations();
-            this.score = GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem());
-            this.LLscore = Utils.LL(algorithm.getCurrentDag(), test_dataset);
-
+            calcuateMeasurements(controlBayesianNetwork);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -168,25 +148,65 @@ public class ExperimentBNBuilder {
 
     }
 
+    private void printExperimentInformation() {
+        System.out.println("Starting Experiment:");
+        System.out.println("-----------------------------------------");
+        System.out.println("\tNet Name: " + netName);
+        System.out.println("\tBBDD Name: " + databaseName);
+        //System.out.println("\tFusion Consensus: " + fusion_consensus);
+        System.out.println("\tnThreads: " + numberOfThreads);
+        System.out.println("\tnItInterleaving: " + interleaving);
+        System.out.println("-----------------------------------------");
+
+        System.out.println("Net_path: " + netPath);
+        System.out.println("BBDD_path: " + databasePath);
+    }
+
+    private MlBayesIm readOriginalBayesianNetwork() throws Exception {
+        // Starting timer
+        startTime = System.currentTimeMillis();
+
+        BIFReader bayesianReader = new BIFReader();
+        bayesianReader.processFile(this.netPath);
+        BayesNet bayesianNet = bayesianReader;
+        System.out.println("Numero de variables: " + bayesianNet.getNrOfNodes());
+
+        //Transforming the BayesNet into a BayesPm
+        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bayesianNet);
+        MlBayesIm bn2 = new MlBayesIm(bayesPm);
+
+        DataReader reader = new DataReader();
+        reader.setDelimiter(DelimiterType.COMMA);
+        reader.setMaxIntegralDiscrete(100);
+        return bn2;
+    }
+
+    private void calcuateMeasurements(MlBayesIm controlBayesianNetwork) {
+        // Ending timer
+        endTime = System.currentTimeMillis();
+        this.elapsedTime = endTime - startTime;
+        this.structuralHamiltonDistanceValue = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
+        this.differencesOfMalkovsBlanket = Utils.avgMarkovBlanquetdif(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
+        this.numberOfIterations = algorithm.getIterations();
+        this.bdeuScore = GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem());
+        this.LogLikelihoodScore = Utils.LL(algorithm.getCurrentDag(), testDataset);
+    }
 
     public void printResults() {
-        // Report
         System.out.println(this);
         System.out.println("Resulting DAG:");
         System.out.println(algorithm.getCurrentGraph());
         System.out.println("Total Nodes of Resulting DAG");
         System.out.println(algorithm.getCurrentGraph().getNodes().size());
         System.out.println("-------------------------\nMetrics: ");
-
-        System.out.println("SHD: "+shd);
-        System.out.println("LLScore: " + this.LLscore);
-        System.out.println("Final BDeu: " +this.score);
+        System.out.println("SHD: "+ structuralHamiltonDistanceValue);
+        System.out.println("LLScore: " + this.LogLikelihoodScore);
+        System.out.println("Final BDeu: " +this.bdeuScore);
         System.out.println("Total execution time (s): " + (double) elapsedTime/1000);
-        System.out.println("Total number of Iterations: " + this.nIterations);
-        System.out.println("dfMM: "+ dfmm[0]);
-        System.out.println("dfMM plus: "+ dfmm[1]);
-        System.out.println("dfMM minus: "+ dfmm[2]);
-
+        System.out.println("Total number of Iterations: " + this.numberOfIterations);
+        System.out.println("differencesOfMalkovsBlanket avg: "+ differencesOfMalkovsBlanket[0]);
+        System.out.println("differencesOfMalkovsBlanket plus: "+ differencesOfMalkovsBlanket[1]);
+        System.out.println("differencesOfMalkovsBlanket minus: "+ differencesOfMalkovsBlanket[2]);
     }
 
     public void saveExperiment(String savePath) throws IOException{
@@ -204,28 +224,28 @@ public class ExperimentBNBuilder {
         System.out.println("Results saved at: " + savePath);
     }
 
-    public double[] getDfmm() {
-        return dfmm;
+    public double[] getDifferencesOfMalkovsBlanket() {
+        return differencesOfMalkovsBlanket;
     }
 
-    public double getScore() {
-        return score;
+    public double getBdeuScore() {
+        return bdeuScore;
     }
 
-    public int getShd() {
-        return shd;
+    public int getStructuralHamiltonDistanceValue() {
+        return structuralHamiltonDistanceValue;
     }
 
     public long getElapsedTimeMiliseconds() {
         return elapsedTime;
     }
 
-    public int getnIterations() {
-        return nIterations;
+    public int getNumberOfIterations() {
+        return numberOfIterations;
     }
 
-    public int getnItInterleaving() {
-        return nItInterleaving;
+    public int getInterleaving() {
+        return interleaving;
     }
 
     public String getAlgName() {
@@ -234,104 +254,24 @@ public class ExperimentBNBuilder {
 
     public String getResults(){
         return  this.algName + ","
-                + this.net_name + ","
-                + this.bbdd_name + ","
-                + this.nThreads + ","
-                + this.nItInterleaving + ","
+                + this.netName + ","
+                + this.databaseName + ","
+                + this.numberOfThreads + ","
+                + this.interleaving + ","
                 + this.seed + ","
-                + this.shd + ","
-                + this.LLscore + ","
-                + this.score + ","
-                + this.dfmm[0] + ","
-                + this.dfmm[1] + ","
-                + this.dfmm[2] + ","
-                + this.nIterations + ","
+                + this.structuralHamiltonDistanceValue + ","
+                + this.LogLikelihoodScore + ","
+                + this.bdeuScore + ","
+                + this.differencesOfMalkovsBlanket[0] + ","
+                + this.differencesOfMalkovsBlanket[1] + ","
+                + this.differencesOfMalkovsBlanket[2] + ","
+                + this.numberOfIterations + ","
                 + (double) elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
     }
 
     @Override
     public String toString() {
-        return "-----------------------\nExperiment " + algName + "\n-----------------------\nNet Name: " + net_name + "\tDatabase: " + bbdd_name + "\tThreads: " + nThreads + "\tInterleaving: " + nItInterleaving + "\tMax. Iterations: " + maxIterations;
-    }
-
-    public static void main(String[] args) {
-        //System.out.println("Numero de hilos: " + Thread.getAllStackTraces().keySet().size());
-        // Reading arguments
-        String netName = args[0].toLowerCase();
-        String algorithmName = args[1].toLowerCase();
-        String netPath = args[2];
-        String bbddPath = args[3];
-        String testPath = args[4];
-        int nThreads = 0;
-        int nInterleaving = 0;
-        int maxIterations = 0;
-        int seed = -1;
-        // HC
-        if (args.length >= 7){
-            nInterleaving = Integer.parseInt(args[5]);
-            maxIterations = Integer.parseInt(args[6]);
-        }
-        // Rest of experiments
-        if(args.length == 9){
-            nThreads = Integer.parseInt(args[7]);
-            seed = Integer.parseInt(args[8]);
-        }
-
-
-        System.out.println("Len PARAMS: " + args.length);
-
-        System.out.print("PARAMS: " );
-        for(String arg: args){
-            System.out.print(arg + ", ");
-        }
-        System.out.println();
-        System.out.println("VARIABLES: ");
-        System.out.println(netName + ", " + algorithmName + ", " +
-                netPath + ", " + bbddPath + ", " + testPath + ", " + nThreads +
-                ", " + nInterleaving + ", " +  maxIterations + ", " + seed);
-        System.out.println();
-
-        ExperimentBNBuilder experiment;
-        BNBuilder algorithm = null;
-        switch (algorithmName) {
-            case "ges":
-                //experiment = new ExperimentGES(netPath, bbddPath, testPath);
-                algorithm = new GES_BNBuilder(bbddPath);
-                break;
-            case "pges":
-                Clustering clustering = new RandomClustering();
-                algorithm = new PGESwithStages(bbddPath, clustering, nThreads, maxIterations, nInterleaving);
-                break;
-            case "hc":
-                algorithm = new HillClimbingSearch(bbddPath);
-                break;
-            case "phc":
-                algorithm = new PHC_BNBuilder(bbddPath,  nThreads, maxIterations, nInterleaving);
-                break;
-            case "pfhcbes":
-                algorithm = new ParallelFHCBES(bbddPath, nThreads, maxIterations, nInterleaving);
-                break;
-            default:
-                System.out.println("Experiment is not registered... Exiting program");
-                System.exit(-1);
-                break;
-        }
-        if(seed == -1)
-            experiment = new ExperimentBNBuilder(algorithm, netName, netPath, bbddPath, testPath);
-        else
-            experiment = new ExperimentBNBuilder(algorithm, netName, netPath, bbddPath, testPath, seed);
-        // Running experiment
-        experiment.runExperiment();
-        //experiment.saveExperiment();
-        String results = experiment.getResults();
-        String EXPERIMENTS_FOLDER = "./results/"; // BOOKMARK: EL ERROR ESTÁ AQUÍ!
-        String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + netName + ".csv";
-        try {
-            Experiment.saveExperiment(savePath, results);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Error saving results at: " + savePath);
-        }
+        return "-----------------------\nExperiment " + algName + "\n-----------------------\nNet Name: " + netName + "\tDatabase: " + databaseName + "\tThreads: " + numberOfThreads + "\tInterleaving: " + interleaving + "\tMax. Iterations: " + maxIterations;
     }
 }
 

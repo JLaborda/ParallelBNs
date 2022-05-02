@@ -13,7 +13,7 @@ public class RandomClustering extends Clustering{
         this(42);
     }
 
-    public RandomClustering( int seed){
+    public RandomClustering( long seed){
         Utils.setSeed(seed);
     }
 
