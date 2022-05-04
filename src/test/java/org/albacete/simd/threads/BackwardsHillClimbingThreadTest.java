@@ -3,17 +3,15 @@ package org.albacete.simd.threads;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
-import org.albacete.simd.utils.Problem;
 import org.albacete.simd.Resources;
+import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
 
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class BackwardsHillClimbingThreadTest {
 
@@ -51,11 +49,11 @@ public class BackwardsHillClimbingThreadTest {
     /**
      * Subset1 of pairs of nodes or variables.
      */
-    final List<Edge> subset1 = new ArrayList<>();
+    final Set<Edge> subset1 = new HashSet<>();
     /**
      * Subset2 of pairs of nodes or variables.
      */
-    final List<Edge> subset2 = new ArrayList<>();
+    final Set<Edge> subset2 = new HashSet<>();
 
     private Problem problem;
 

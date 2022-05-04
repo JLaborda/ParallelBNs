@@ -57,10 +57,10 @@ public class HillClimbingSearch extends BNBuilder {
         Graph g = getCurrentGraph();
         ForwardHillClimbingThread fhc;
         if (g == null){
-            fhc = new ForwardHillClimbingThread(getProblem(),getListOfArcs(), getItInterleaving());
+            fhc = new ForwardHillClimbingThread(getProblem(), getSetOfArcs(), getItInterleaving());
         }
         else {
-            fhc = new ForwardHillClimbingThread(getProblem(), getCurrentGraph(), getListOfArcs(), getItInterleaving());
+            fhc = new ForwardHillClimbingThread(getProblem(), getCurrentGraph(), getSetOfArcs(), getItInterleaving());
         }
         fhc.run();
         fhcFlag = fhc.getFlag();
@@ -75,7 +75,7 @@ public class HillClimbingSearch extends BNBuilder {
 
     @Override
     protected void backwardStage() throws InterruptedException {
-        BackwardsHillClimbingThread bhc = new BackwardsHillClimbingThread(getProblem(),getCurrentGraph(),getListOfArcs());
+        BackwardsHillClimbingThread bhc = new BackwardsHillClimbingThread(getProblem(), getCurrentGraph(), getSetOfArcs());
         bhc.run();
         bhcFlag = bhc.getFlag();
         Graph g = bhc.getCurrentGraph();

@@ -21,103 +21,42 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
 
+    <!-- Apache Libraries-->
+      <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-math3</artifactId>
+          <version>3.6.1</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-collections4</artifactId>
+          <version>4.4</version>
+      </dependency>
 
-    <!--Tetrad Libraries-->
-    <dependency>
-      <groupId>colt</groupId>
-      <artifactId>colt</artifactId>
-      <version>1.2.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>3.2.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.blogspot.ostas</groupId>
-      <artifactId>Jama</artifactId>
-      <version>1.0.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>jdepend</groupId>
-      <artifactId>jdepend</artifactId>
-      <version>2.9.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.woodstock.dependlibs</groupId>
-      <artifactId>jh</artifactId>
-      <version>2.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.hynnet</groupId>
-      <artifactId>jxl</artifactId>
-      <version>2.6.12.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mrj</groupId>
-      <artifactId>MRJToolkitStubs</artifactId>
-      <version>1.0</version>
-    </dependency>
-
-    <!--librería de Tetrad manipulado por José Miguel Puerta-->
-
-    <dependency>
-      <groupId>fusion</groupId>
-      <artifactId>fusion</artifactId>
-      <!--<scope>system</scope>-->
-      <version>1.0</version>
-      <!--<systemPath>${basedir}/lib/fusion.jar</systemPath>-->
-    </dependency>
-
-    <dependency>
-      <groupId>opt</groupId>
-      <artifactId>opt</artifactId>
-      <version>7.7</version>
-    </dependency>
-
-    <dependency>
-      <groupId>pal</groupId>
-      <artifactId>pal</artifactId>
-      <version>1.4</version>
-    </dependency>
-
-    <dependency>
-      <groupId>f2jutil</groupId>
-      <artifactId>f2jutil</artifactId>
-      <version>1.0</version>
-    </dependency>
-
-<!--
-    <dependency>
-      <groupId>weka</groupId>
-      <artifactId>weka</artifactId>
-      <scope>system</scope>
-      <version>1.0</version>
-      <systemPath>${basedir}/src/lib/weka.jar</systemPath>
-    </dependency>
--->
-    <!-- https://mvnrepository.com/artifact/nz.ac.waikato.cms.weka/weka-stable -->
+      <!-- Librería de Tetrad -->
+      <dependency>
+          <groupId>edu.cmu</groupId>
+          <artifactId>tetrad</artifactId>
+          <version>6.9.0</version>
+      </dependency>
+      <!--librería de Fusión y Tetrad manipulado por José Miguel Puerta-->
 
     <dependency>
       <groupId>nz.ac.waikato.cms.weka</groupId>
       <artifactId>weka-stable</artifactId>
-      <version>3.8.0</version>
+      <version>3.8.6</version>
     </dependency>
 
     <dependency>
       <groupId>xom</groupId>
       <artifactId>xom</artifactId>
-      <version>1.1</version>
+      <version>1.3.7</version>
     </dependency>
 
 
@@ -131,17 +70,10 @@
           <version>3.1.0</version>
         </plugin>
         <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html #Plugin_bindings_for_jar_packaging -->
-        <!--
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.0.2</version>
-        </plugin>
-        -->
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.22.1</version>
         </plugin>
-
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
           <version>2.5.2</version>
@@ -159,45 +91,7 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
-
-      <!-- Copiar Dependencias. Esto funciona, pero creo que no es correcto porque no mete las
-      dependencias en el jar, sino que las copia y se las pasa después en el classpath. En docker, puede que no funcione.
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>copy-dependencies</id>
-              <phase>prepare-package</phase>
-              <goals>
-                <goal>copy-dependencies</goal>
-              </goals>
-              <configuration>
-                <outputDirectory>
-                  ${project.build.directory}/libs
-                </outputDirectory>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <configuration>
-            <archive>
-              <manifest>
-               <addClasspath>true</addClasspath>
-                <classpathPrefix>libs/</classpathPrefix>
-                <mainClass>
-                  org.albacete.simd.experiments.ExperimentBNBuilder
-                </mainClass>
-
-              </manifest>
-            </archive>
-          </configuration>
-        </plugin>
-        -->
+        <!--Plugin to package classes into jar package-->
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
           <executions>
@@ -211,7 +105,6 @@
           <configuration>
             <archive>
               <manifest>
-                <!--<mainClass>org.albacete.simd.experiments.ExperimentBNBuilder</mainClass>-->
                 <mainClass>org.albacete.simd.experiments.ExperimentBNLauncher</mainClass>
               </manifest>
             </archive>
@@ -220,7 +113,6 @@
             </descriptorRefs>
           </configuration>
         </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -229,22 +121,7 @@
           <target>8</target>
         </configuration>
       </plugin>
-      <!--Codecov-->
-        <!--
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
-        <configuration>
-          <formats>
-            <format>html</format>
-            <format>xml</format>
-          </formats>
-          <check />
-        </configuration>
-      </plugin>
-      -->
-
+        <!--Code Coverage plugin-->
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
@@ -253,6 +130,7 @@
             <excludes>
               <exclude>src/main/java/org/albacete/simd/simulacionRedes/**</exclude>
               <exclude>src/main/java/org/albacete/simd/experiments/**</exclude>
+              <exclude>src/main/java/consensusBN/**</exclude>
             </excludes>
           </configuration>
           <executions>
@@ -290,23 +168,10 @@
     </plugins>
   </build>
 
-
   <repositories>
     <repository>
-      <id>local-repo-f2jutil</id>
-      <url>file://${project.basedir}/repos/f2jutil</url>
-    </repository>
-    <repository>
-      <id>local-repo-fusion</id>
-      <url>file://${project.basedir}/repos/fusion</url>
-    </repository>
-    <repository>
-      <id>local-repo-opt</id>
-      <url>file://${project.basedir}/repos/opt</url>
-    </repository>
-    <repository>
-      <id>local-repo-pal</id>
-      <url>file://${project.basedir}/repos/pal</url>
+      <id>local-repo-tetrad</id>
+      <url>file://${project.basedir}/repos/tetrad</url>
     </repository>
   </repositories>
 

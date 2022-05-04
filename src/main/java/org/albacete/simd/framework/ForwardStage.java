@@ -6,6 +6,7 @@ import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
 
 import java.util.List;
+import java.util.Set;
 
 public abstract class ForwardStage extends ThreadStage{
 
@@ -17,11 +18,11 @@ public abstract class ForwardStage extends ThreadStage{
     public static double varianceTimeTotal =0;
 
 
-    public ForwardStage(Problem problem, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
+    public ForwardStage(Problem problem, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
         super(problem, nThreads, itInterleaving, subsets);
     }
 
-    public ForwardStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
+    public ForwardStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
         super(problem, currentGraph, nThreads, itInterleaving, subsets);
     }
 

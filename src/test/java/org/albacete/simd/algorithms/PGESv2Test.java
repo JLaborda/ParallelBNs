@@ -9,11 +9,7 @@ import org.albacete.simd.utils.Utils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.image.RescaleOp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -183,7 +179,7 @@ public class PGESv2Test
         );
         // Act
         pGESv2.calculateArcs();
-        List<Edge> result =  pGESv2.getListOfArcs();
+        Set<Edge> result = pGESv2.getSetOfArcs();
 
         // Assert
         // Asserting size
@@ -205,21 +201,21 @@ public class PGESv2Test
      * @result Each arc is only once in a subset.
      */
     @Test
-    public void splitArcsTest(){
+    public void splitArcsTest() {
         // Arrange
         PGESv2 pGESv2 = new PGESv2(Resources.CANCER_BBDD_PATH, 2);
 
         // Act
         pGESv2.calculateArcs();
         pGESv2.splitArcs();
-        List<Edge> arcs = pGESv2.getListOfArcs();
-        List<List<Edge>> subsets = pGESv2.getSubSets();
+        Set<Edge> arcs = pGESv2.getSetOfArcs();
+        List<Set<Edge>> subsets = pGESv2.getSubSets();
 
         // Assert
         // Checking that each arc is in fact in a subset, and that it is only once in it.
         for (Edge edge : arcs) {
             int counter = 0;
-            for (List<Edge> subset : subsets){
+            for (Set<Edge> subset : subsets) {
                 counter += Collections.frequency(subset, edge);
             }
             // Double pairs
@@ -323,45 +319,16 @@ public class PGESv2Test
         System.out.println(result);
 
         // Assert Nodes
-        List<Node> resultingNodes = result.getNodes();
-        List<Node> expectedNodes = expected.getNodes();
-        for(Node expNode : expectedNodes){
+        List<String> resultingNodes = result.getNodeNames();
+        List<String> expectedNodes = expected.getNodeNames();
+        for (String expNode : expectedNodes) {
             // System.out.println("Expected Node: " + expNode.getName());
-            boolean assertion = false;
-            for(Node resNode: resultingNodes){
-                // System.out.println("Resulting Node: " + resNode.getName());
-                if(expNode.getName().equals(resNode.getName())){
-                    assertion = true;
-                    break;
-                }
-            }
-            assertTrue(assertion);
+            assertTrue(resultingNodes.contains(expNode));
         }
 
         // Assert Edges
-        List<Edge> resultingEdges = result.getEdges();
-        for(Edge resEdge : resultingEdges){
-            /*Node node1 = resEdge.getNode1();
-            Node node2 = resEdge.getNode2();
-
-            // System.out.println("Node1: " + node1.getName());
-            // System.out.println("Node2: " + node2.getName());
-
-            if(node1.getName().equals("Cancer")){
-                String node2Name = node2.getName();
-                assertTrue(((node2Name.equals("Dyspnoea")) || (node2Name.equals("Xray")) || (node2Name.equals("Pollution")) ));
-                continue;
-            }
-            if(node1.getName().equals("Smoker")){
-                assertEquals("Cancer", node2.getName());
-                continue;
-            }
-            // If node1 i not any of these nodes, then assert error
-            fail("Node1 is not in the expected range.");
-            */
-            assertTrue(expected.containsEdge(resEdge));
-        }
-
+        Set<Edge> resultingEdges = result.getEdges();
+        assertTrue(Resources.equalsEdges(expected.getEdges(), result.getEdges()));
     }
 
     /**
@@ -373,6 +340,7 @@ public class PGESv2Test
     public void besStageTest() throws InterruptedException {
         // Arrange
         initializeSubsets();
+        Utils.setSeed(42);
         // Expectation
         List<Edge> expected = new ArrayList<>();
         expected.add(new Edge(Resources.CANCER, Resources.DYSPNOEA, Endpoint.TAIL, Endpoint.ARROW));
@@ -394,37 +362,16 @@ public class PGESv2Test
         pGESv2.besStage();
         ArrayList<Dag> results = pGESv2.getGraphs();
 
-        // Assert
-        for(Dag graph : results){
-            for(Edge edge : expected) {
+        // Assert;
+        System.out.println();
+        int i = 0;
+        for (Dag graph : results) {
+            System.out.println("Graph [" + i + "]: \n" + graph);
+            for (Edge edge : expected) {
                 assertTrue(graph.getEdges().contains(edge));
             }
+            i++;
         }
-    }
-
-    /**
-     * Tests the search method of the Main class.
-     * @result The resulting graph is equal to the expected graph for the cancer dataset.
-     */
-    @Test
-    public void searchCancerTest(){
-        //Arrange
-        PGESv2 pGESv2 = new PGESv2(Resources.CANCER_BBDD_PATH, 2);
-
-        //Expectation
-        List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
-        EdgeListGraph expectation = new EdgeListGraph(nodes);
-        expectation.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
-        expectation.addDirectedEdge(Resources.CANCER, Resources.XRAY);
-        expectation.addDirectedEdge(Resources.POLLUTION, Resources.CANCER);
-        expectation.addDirectedEdge(Resources.SMOKER, Resources.CANCER);
-
-        // Act
-        pGESv2.search();
-
-        //Assert
-        assertEquals(expectation, pGESv2.getCurrentGraph());
-
     }
 
     /**

@@ -1,7 +1,8 @@
 package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.*;
+import edu.cmu.tetrad.graph.Edge;
+import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.Resources;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
@@ -56,7 +57,6 @@ public class ParallelHillClimbingSearchTest {
         BackwardStage.meanTimeTotal = 0;
         ForwardStage.meanTimeTotal = 0;
     }
-
 
     /**
      * Testing both possible constructors of the Main class
@@ -147,10 +147,6 @@ public class ParallelHillClimbingSearchTest {
         fail();
     }
 
-    
-
-
-   
     /**
      * Testing the setter and getter of MaxIterations
      * @result MaxIterations is changed to 21 and obtained as such.
@@ -183,41 +179,13 @@ public class ParallelHillClimbingSearchTest {
     }
 
 
-    /**
-     * Tests the search method of the Main class.
-     * @result The resulting graph is equal to the expected graph for the cancer dataset.
-     */
-    @Test
-    public void searchCancerTest(){
-        //Arrange
-        Utils.setSeed(42);
-        ForwardStage.meanTimeTotal=0;
-        BackwardStage.meanTimeTotal=0;
-        ParallelHillClimbingSearch pGESv2 = new ParallelHillClimbingSearch(Resources.CANCER_BBDD_PATH, 2);
-
-        //Expectation
-        List<Node> nodes = Arrays.asList(cancer, dyspnoea, pollution, xray, smoker);
-        EdgeListGraph expectation = new EdgeListGraph(nodes);
-        expectation.addDirectedEdge(cancer, dyspnoea);
-        expectation.addDirectedEdge(cancer, pollution);
-        expectation.addDirectedEdge(cancer, smoker);
-        expectation.addDirectedEdge(cancer, xray);
-
-        // Act
-        pGESv2.search();
-
-        //Assert
-        assertEquals(expectation, pGESv2.getCurrentGraph());
-
-    }
-
     @Test
     public void searchAlarmTest(){
         //Arrange
         Utils.setSeed(42);
         ForwardStage.meanTimeTotal=0;
         BackwardStage.meanTimeTotal=0;
-        String alarmPath = Resources.ALARM_BBDD_PATH;
+        String alarmPath = Resources.CANCER_BBDD_PATH;
         ParallelHillClimbingSearch pGESv2 = new ParallelHillClimbingSearch(alarmPath, 2);
 
         // Act
@@ -236,7 +204,7 @@ public class ParallelHillClimbingSearchTest {
         BackwardStage.meanTimeTotal=0;
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(cancerDataset, 1);
         phc1.search();
-        assertEquals(5*4, phc1.getListOfArcs().size());
+        assertEquals(5 * 4, phc1.getSetOfArcs().size());
         assertEquals(1, phc1.getSubSets().size());
         assertEquals(1,phc1.getGraphs().size());
         assertNotEquals(1, phc1.getIterations());
@@ -250,7 +218,7 @@ public class ParallelHillClimbingSearchTest {
         Utils.setSeed(42);
         ForwardStage.meanTimeTotal=0;
         BackwardStage.meanTimeTotal=0;
-        DataSet datasetAlarm = Utils.readData(Resources.ALARM_BBDD_PATH);
+        DataSet datasetAlarm = Utils.readData(Resources.CANCER_BBDD_PATH);
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
         phc1.setMaxIterations(2);
         //Act
@@ -262,7 +230,7 @@ public class ParallelHillClimbingSearchTest {
 
     @Test
     public void interruptedExceptionTest(){
-        DataSet datasetAlarm = Utils.readData(Resources.ALARM_BBDD_PATH);
+        DataSet datasetAlarm = Utils.readData(Resources.CANCER_BBDD_PATH);
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
         phc1.setMaxIterations(30);
         phc1.search();

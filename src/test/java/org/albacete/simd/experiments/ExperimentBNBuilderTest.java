@@ -1,8 +1,10 @@
 package org.albacete.simd.experiments;
 
-import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
-import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.Resources;
+import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
+import org.albacete.simd.clustering.Clustering;
+import org.albacete.simd.clustering.RandomClustering;
+import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.junit.Before;
@@ -12,10 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class ExperimentBNBuilderTest {
@@ -23,13 +22,13 @@ public class ExperimentBNBuilderTest {
     int nItInterleaving = 5;
     int seed = 42;
     int maxIterations = 15;
-
-    BNBuilder algorithm = new PGESwithStages(Resources.ALARM_BBDD_PATH, nThreads, maxIterations, nItInterleaving);
-    ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, Resources.ALARM_TEST_PATH, seed);
+    Clustering clustering = new RandomClustering();
+    BNBuilder algorithm = new PGESwithStages(Resources.CANCER_BBDD_PATH, clustering, nThreads, maxIterations, nItInterleaving);
+    ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "cancer", Resources.CANCER_NET_PATH, Resources.CANCER_BBDD_PATH, Resources.CANCER_TEST_PATH, seed);
 
 
     @Before
-    public void restartMeans(){
+    public void restartMeans() {
         BackwardStage.meanTimeTotal = 0;
         ForwardStage.meanTimeTotal = 0;
     }
@@ -46,11 +45,11 @@ public class ExperimentBNBuilderTest {
     public void runExperimentTest(){
         exp.runExperiment();
 
-        assertNotEquals(0.0, exp.getScore(), 0.000001);
-        assertNotNull(exp.getDfmm());
+        assertNotEquals(0.0, exp.getBdeuScore(), 0.000001);
+        assertNotNull(exp.getDifferencesOfMalkovsBlanket());
         assertNotEquals(0L,exp.getElapsedTimeMiliseconds());
-        assertNotEquals(0,exp.getnIterations());
-        assertNotEquals(Integer.MAX_VALUE,exp.getShd());
+        assertNotEquals(0,exp.getNumberOfIterations());
+        assertNotEquals(Integer.MAX_VALUE,exp.getStructuralHamiltonDistanceValue());
         assertEquals("PGESwithStages", exp.getAlgName());
         //String results = "PGESwithStages,res/alarm,alarm.xbif50001_,2,5,42,18,-0.47065998245296453,-56422.320053854455,1.1891891891891893,8.0,36.0,10,3\n";
         //System.out.println(exp.getResults());

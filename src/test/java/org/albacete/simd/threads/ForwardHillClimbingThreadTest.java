@@ -8,14 +8,15 @@ import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
-
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.*;
 
 public class ForwardHillClimbingThreadTest {
 
@@ -53,11 +54,11 @@ public class ForwardHillClimbingThreadTest {
     /**
      * Subset1 of pairs of nodes or variables.
      */
-    final List<Edge> subset1 = new ArrayList<>();
+    final Set<Edge> subset1 = new HashSet<>();
     /**
      * Subset2 of pairs of nodes or variables.
      */
-    final List<Edge> subset2 = new ArrayList<>();
+    final Set<Edge> subset2 = new HashSet<>();
 
     private Problem problem;
 
@@ -229,19 +230,20 @@ public class ForwardHillClimbingThreadTest {
 
     /**
      * Tests that the algorithm works correct with the Alarm network.
-     * @result The resulting graph has the same number of edges as the set maximum number of edges.
+     *
      * @throws InterruptedException Caused by an external interruption.
+     * @result The resulting graph has the same number of edges as the set maximum number of edges.
      */
     @Test
-    public void alarmExecutionTest() throws InterruptedException {
+    public void cancerExecutionTest() throws InterruptedException {
         // ThFES objects
-        String alarmPath = Resources.ALARM_BBDD_PATH;
+        String alarmPath = Resources.CANCER_BBDD_PATH;
         DataSet alarmDataset = Utils.readData(alarmPath);
-        List<Edge> listOfArcs = Utils.calculateArcs(alarmDataset);
+        Set<Edge> setOfArcs = Utils.calculateArcs(alarmDataset);
         Utils.setSeed(42);
-        List<List<Edge>> subsets = Utils.split(listOfArcs,2);
-        List<Edge> subset1 = subsets.get(0);
-        List<Edge> subset2 = subsets.get(1);
+        List<Set<Edge>> subsets = Utils.split(setOfArcs, 2);
+        Set<Edge> subset1 = subsets.get(0);
+        Set<Edge> subset2 = subsets.get(1);
 
         Problem pAlarm = new Problem(alarmDataset);
         ForwardHillClimbingThread thread1 = new ForwardHillClimbingThread(pAlarm, subset1, 100);

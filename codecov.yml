@@ -1,2 +1,6 @@
 ignore:
-  - "src/main/java/org/albacete/simd/experiments" # ignore experiments folder
+  - "src/main/java/org/albacete/simd/experiments" # Ignore experiments folder
+  - "src/main/java/org/albacete/simd/simulacionesRedes" # Ignore network sampling folder
+  - "src/main/java/org/albacete/simd/consensusBN" # Ignore consensusBN code
+  - "src/main/java/org/albacete/simd/framework/FHC*" # Ignore FHC stage and fusion
+  - "src/main/java/org/albacete/simd/framework/BHC*" # Ignore BHC stage and fusion

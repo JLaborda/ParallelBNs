@@ -8,7 +8,6 @@ import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
-import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
 
 import java.util.LinkedList;
@@ -31,11 +30,13 @@ public class GES_BNBuilder extends BNBuilder {
     public GES_BNBuilder(Graph initialDag, DataSet data) {
         this(data);
         this.initialDag = new EdgeListGraph(initialDag);
+        this.currentGraph = new EdgeListGraph(initialDag);
     }
 
     public GES_BNBuilder(Graph initialDag, String path) {
         this(path);
         this.initialDag = new EdgeListGraph(initialDag);
+        this.currentGraph = new EdgeListGraph(initialDag);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class GES_BNBuilder extends BNBuilder {
     @Override
     protected void forwardStage() throws InterruptedException {
         ForwardStage.meanTimeTotal = 0;
-        FESThread fes = new FESThread(problem, initialDag, listOfArcs, Integer.MAX_VALUE);
+        FESThread fes = new FESThread(problem, initialDag, setOfArcs, Integer.MAX_VALUE);
         fes.run();
         currentGraph = fes.getCurrentGraph();
         score = fes.getScoreBDeu();
@@ -69,7 +70,7 @@ public class GES_BNBuilder extends BNBuilder {
     @Override
     protected void backwardStage() throws InterruptedException {
         BackwardStage.meanTimeTotal = 0;
-        BESThread bes = new BESThread(problem, currentGraph, listOfArcs);
+        BESThread bes = new BESThread(problem, currentGraph, setOfArcs);
         bes.run();
         currentGraph = bes.getCurrentGraph();
         score = bes.getScoreBDeu();
@@ -84,11 +85,7 @@ public class GES_BNBuilder extends BNBuilder {
     public Graph search(){
         try {
             forwardStage();
-            System.out.println("Forwards Graph");
-            System.out.println(currentGraph);
             backwardStage();
-            System.out.println("Backwards Graph");
-            System.out.println(currentGraph);
         }catch(InterruptedException e){
             System.err.println("Interrupted Exception");
             e.printStackTrace();

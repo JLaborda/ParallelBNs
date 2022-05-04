@@ -17,7 +17,7 @@ public class BackwardsHillClimbingThread extends GESThread {
      * @param initialDag initial DAG with which the FES stage starts with, if it's null, use the other constructor
      * @param subset     subset of edges the fes stage will try to add to the resulting graph
      */
-    public BackwardsHillClimbingThread(Problem problem, Graph initialDag, List<Edge> subset) {
+    public BackwardsHillClimbingThread(Problem problem, Graph initialDag, Set<Edge> subset) {
         this.problem = problem;
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
@@ -32,14 +32,14 @@ public class BackwardsHillClimbingThread extends GESThread {
      * @param problem object containing information of the problem such as data or variables.
      * @param subset  subset of edges the fes stage will try to add to the resulting graph
      */
-    public BackwardsHillClimbingThread(Problem problem, List<Edge> subset) {
+    public BackwardsHillClimbingThread(Problem problem, Set<Edge> subset) {
         this.problem = problem;
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
         setMaxIt(maxIt);
         this.id = threadCounter;
         threadCounter++;
-        this.isForwards=false;
+        this.isForwards = false;
     }
 
 

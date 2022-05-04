@@ -9,7 +9,8 @@ import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BHCFusion extends FusionStage{
 
@@ -38,7 +39,7 @@ public class BHCFusion extends FusionStage{
 
         System.out.println("BHC to obtain the fusion: ");
 
-        List<Edge> candidates = new ArrayList<>();
+        Set<Edge> candidates = new HashSet<>();
 
         for (Edge e: this.currentGraph.getEdges()){
             if(fusionGraph.getEdge(e.getNode1(), e.getNode2())==null && fusionGraph.getEdge(e.getNode2(),e.getNode1())==null ) {

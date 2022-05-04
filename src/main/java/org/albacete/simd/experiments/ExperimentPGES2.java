@@ -1,11 +1,14 @@
 package org.albacete.simd.experiments;
 
+import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
+import org.albacete.simd.clustering.Clustering;
+import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
@@ -42,16 +45,19 @@ public class ExperimentPGES2 extends Experiment {
             long startTime = System.currentTimeMillis();
             BIFReader bf = new BIFReader();
             bf.processFile(this.net_path);
-            BayesNet bn = (BayesNet) bf;
-            System.out.println("Numero de variables: "+bn.getNrOfNodes());
-            MlBayesIm bn2 = new MlBayesIm(bn);
+            BayesNet bn = bf;
+            System.out.println("Numero de variables: " + bn.getNrOfNodes());
+            //Transforming the BayesNet into a BayesPm
+            BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bn);
+            MlBayesIm bn2 = new MlBayesIm(bayesPm);
             DataReader reader = new DataReader();
             reader.setDelimiter(DelimiterType.COMMA);
             reader.setMaxIntegralDiscrete(100);
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.algorithm = new PGESwithStages(dataSet, nThreads, maxIterations, nItInterleaving);
+            Clustering clustering = new RandomClustering(42);
+            this.algorithm = new PGESwithStages(dataSet, clustering, nThreads, maxIterations, nItInterleaving);
 
             // Search is executed
             algorithm.search();
@@ -81,13 +87,12 @@ public class ExperimentPGES2 extends Experiment {
             // System.out.println(cond);
 
 
-
             //Metrics
-            this.shd = Utils.SHD(bn2.getDag(),(Dag) algorithm.getCurrentGraph());
-            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            this.shd = Utils.SHD((Dag) bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            this.dfmm = Utils.avgMarkovBlanquetdif((Dag) bn2.getDag(), (Dag) algorithm.getCurrentGraph());
             this.nIterations = algorithm.getIterations();
             this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
-            this.LLscore = Utils.LL((Dag)algorithm.getCurrentGraph(), test_dataset);
+            this.LLscore = Utils.LL((Dag) algorithm.getCurrentGraph(), test_dataset);
 
 
         } catch (Exception e) {

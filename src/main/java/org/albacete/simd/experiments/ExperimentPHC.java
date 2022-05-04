@@ -1,5 +1,6 @@
 package org.albacete.simd.experiments;
 
+import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
@@ -39,9 +40,11 @@ public class ExperimentPHC extends Experiment {
             long startTime = System.currentTimeMillis();
             BIFReader bf = new BIFReader();
             bf.processFile(this.net_path);
-            BayesNet bn = (BayesNet) bf;
-            System.out.println("Numero de variables: "+bn.getNrOfNodes());
-            MlBayesIm bn2 = new MlBayesIm(bn);
+            BayesNet bn = bf;
+            System.out.println("Numero de variables: " + bn.getNrOfNodes());
+            //Transforming the BayesNet into a BayesPm
+            BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bn);
+            MlBayesIm bn2 = new MlBayesIm(bayesPm);
             DataReader reader = new DataReader();
             reader.setDelimiter(DelimiterType.COMMA);
             reader.setMaxIntegralDiscrete(100);
@@ -78,13 +81,12 @@ public class ExperimentPHC extends Experiment {
             // System.out.println(cond);
 
 
-
             //Metrics
-            this.shd = Utils.SHD(bn2.getDag(),(Dag) algorithm.getCurrentGraph());
-            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            this.shd = Utils.SHD((Dag) bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            this.dfmm = Utils.avgMarkovBlanquetdif((Dag) bn2.getDag(), (Dag) algorithm.getCurrentGraph());
             this.nIterations = algorithm.getIterations();
             this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
-            this.LLscore = Utils.LL((Dag)algorithm.getCurrentGraph(), test_dataset);
+            this.LLscore = Utils.LL((Dag) algorithm.getCurrentGraph(), test_dataset);
 
 
         } catch (Exception e) {

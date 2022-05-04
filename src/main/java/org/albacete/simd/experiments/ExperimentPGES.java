@@ -1,5 +1,6 @@
 package org.albacete.simd.experiments;
 
+import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
@@ -45,16 +46,18 @@ public class ExperimentPGES extends Experiment{
             long startTime = System.currentTimeMillis();
             BIFReader bf = new BIFReader();
             bf.processFile(this.net_path);
-            BayesNet bn = (BayesNet) bf;
-            System.out.println("Numero de variables: "+bn.getNrOfNodes());
-            MlBayesIm bn2 = new MlBayesIm(bn);
+            BayesNet bn = bf;
+            System.out.println("Numero de variables: " + bn.getNrOfNodes());
+            //Transforming the BayesNet into a BayesPm
+            BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bn);
+            MlBayesIm bn2 = new MlBayesIm(bayesPm);
             DataReader reader = new DataReader();
             reader.setDelimiter(DelimiterType.COMMA);
             reader.setMaxIntegralDiscrete(100);
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.algorithm = new PGESv2(dataSet,this.nThreads);
+            this.algorithm = new PGESv2(dataSet, this.nThreads);
             this.algorithm.setMaxIterations(this.maxIterations);
             this.algorithm.setNFESItInterleaving(this.nItInterleaving);
 
@@ -87,11 +90,13 @@ public class ExperimentPGES extends Experiment{
 
 
             //Metrics
-            this.shd = Utils.SHD(bn2.getDag(),(Dag) algorithm.getCurrentGraph());
-            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            Dag original = new Dag(bn2.getDag());
+            Dag result = new Dag(algorithm.getCurrentGraph());
+            this.shd = Utils.SHD(original, result);
+            this.dfmm = Utils.avgMarkovBlanquetdif(original, result);
             this.nIterations = algorithm.getIterations();
             this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
-            this.LLscore = Utils.LL((Dag)algorithm.getCurrentGraph(), test_dataset);
+            this.LLscore = Utils.LL(result, test_dataset);
 
 
         } catch (Exception e) {

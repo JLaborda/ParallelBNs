@@ -21,9 +21,9 @@ import java.util.*;
 //@SuppressWarnings({"DuplicatedCode", "unused"})
 public abstract class GESThread implements Runnable{
     /**
-     * Tuple of Nodes that will be checked by this thread in the FES method
+     * Set of edges that will be checked over the GESThread
      */
-    protected List<Edge> S;
+    protected Set<Edge> S;
 
     /**
      * Problem the thread is solving
@@ -252,10 +252,11 @@ public abstract class GESThread implements Runnable{
      * @return List of nodes that are connected to Y and adjacent to X.
      */
     protected static List<Node> findNaYX(Node x, Node y, Graph graph) {
-        List<Node> naYX = new LinkedList<>(graph.getAdjacentNodes(y));
+        List<Node> adjY = graph.getAdjacentNodes(y);
+        List<Node> naYX = new LinkedList<>(adjY);
         naYX.retainAll(graph.getAdjacentNodes(x));
 
-        for (int i = naYX.size()-1; i >= 0; i--) {
+        for (int i = naYX.size() - 1; i >= 0; i--) {
             Node z = naYX.get(i);
             Edge edge = graph.getEdge(y, z);
 
@@ -492,17 +493,18 @@ public abstract class GESThread implements Runnable{
 
     /**
      * Bdeu Score function for a {@link Node node} and a set of parent nodes.
-     * @param nNode index of the child node
+     *
+     * @param nNode    index of the child node
      * @param nParents index of the parents of the node being considered as child.
      * @return The Bdeu score of the combination.
      */
 
-    protected static double localBdeuScore(int nNode, int[] nParents, Problem problem) {
+    public static double localBdeuScore(int nNode, int[] nParents, Problem problem) {
         numTotalCalls++;
 
         LocalScoreCacheConcurrent localScoreCache = problem.getLocalScoreCache();
 
-        double oldScore =localScoreCache.get(nNode, nParents);
+        double oldScore = localScoreCache.get(nNode, nParents);
         if (!Double.isNaN(oldScore)) {
             return oldScore;
         }
@@ -666,10 +668,11 @@ public abstract class GESThread implements Runnable{
 
     /**
      * Sets the subset that is searched by the thread.
+     *
      * @param subset Subset of {@link Edge Edges}.
      */
-    public void setSubSetSearch(List<Edge> subset) {
-        this.S=subset;
+    public void setSubSetSearch(Set<Edge> subset) {
+        this.S = subset;
 
     }
 

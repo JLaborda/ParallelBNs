@@ -2,6 +2,7 @@ package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
+import org.albacete.simd.clustering.Clustering;
 import org.albacete.simd.framework.*;
 import org.albacete.simd.utils.Utils;
 
@@ -9,21 +10,36 @@ public class PGESwithStages extends BNBuilder {
 
     private boolean fesFlag = false;
     private boolean besFlag = false;
+    
+    private FESStage fesStage;
+    private BESStage besStage;
 
-    public PGESwithStages(DataSet data, int nThreads, int maxIterations, int nItInterleaving) {
+    private Clustering clustering;
+
+
+
+    public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(data, nThreads, maxIterations, nItInterleaving);
+        this.clustering = clustering;
+        this.clustering.setProblem(super.getProblem());
     }
 
-    public PGESwithStages(String path, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(path, nThreads, maxIterations, nItInterleaving);
+        this.clustering = clustering;
+        this.clustering.setProblem(super.getProblem());
     }
 
-    public PGESwithStages(Graph initialGraph, String path, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(Graph initialGraph, String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(initialGraph, path, nThreads, maxIterations, nItInterleaving);
+        this.clustering = clustering;
+        this.clustering.setProblem(super.getProblem());
     }
 
-    public PGESwithStages(Graph initialGraph, DataSet data, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(Graph initialGraph, DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(initialGraph, data, nThreads, maxIterations, nItInterleaving);
+        this.clustering = clustering;
+        this.clustering.setProblem(super.getProblem());
     }
 
     @Override
@@ -32,12 +48,13 @@ public class PGESwithStages extends BNBuilder {
         if (it >= this.maxIterations)
             return true;
 
+        System.out.println("      Comprobando convergencia. FES: " + fesFlag + ", BES: " + besFlag);
         // Checking working status
         if(!fesFlag && !besFlag){
             return true;
         }
         it++;
-        System.out.println("Iterations: " + it);
+        System.out.println("\n\nIterations: " + it);
         return false;
     }
 
@@ -48,34 +65,36 @@ public class PGESwithStages extends BNBuilder {
 
     @Override
     protected void repartition() {
-        this.subSets = Utils.split(listOfArcs, nThreads);
+        this.subSets = clustering.generateEdgeDistribution(nThreads, false);
     }
 
     @Override
     protected void forwardStage() throws InterruptedException {
-        Stage fesStage = new FESStage(problem, currentGraph,nThreads,nItInterleaving, subSets);
+        fesStage = new FESStage(problem, currentGraph,nThreads,nItInterleaving, subSets);
         fesFlag = fesStage.run();
         graphs = fesStage.getGraphs();
     }
 
     @Override
     protected void forwardFusion() throws InterruptedException {
-        Stage fesFusion = new FESFusion(problem, currentGraph, graphs);
+        FESFusion fesFusion = new FESFusion(problem, currentGraph, graphs, fesStage);
         fesFusion.run();
+        fesFlag = fesFusion.flag;
         currentGraph = fesFusion.getCurrentGraph();
     }
 
     @Override
     protected void backwardStage() throws InterruptedException {
-        Stage besStage = new BESStage(problem, currentGraph, nThreads, nItInterleaving, subSets);
+        besStage = new BESStage(problem, currentGraph, nThreads, nItInterleaving, subSets);
         besFlag = besStage.run();
         graphs = besStage.getGraphs();
     }
 
     @Override
     protected void backwardFusion() throws InterruptedException {
-        Stage besFusion = new BESFusion(problem, currentGraph, graphs);
+        BESFusion besFusion = new BESFusion(problem, currentGraph, graphs, besStage);
         besFusion.run();
+        besFlag = besFusion.flag;
         currentGraph = besFusion.getCurrentGraph();
     }
 /*
