@@ -12,6 +12,7 @@ PARAMS_FOLDER=${HOME_FOLDER}"res/params/";
 #SAVE_FILE="${PARAMS_FOLDER}hyperparams.txt";
 # SAVE_FOLDER="/Users/jdls/developer/projects/ParallelBNs/res/params/" # Mac Save Folder
 SAVE_FOLDER="/home/jdls/developer/projects/ParallelBNs/res/params/"    # Cluster Save Folder
+# SAVE_FOLDER="./res/params/" # General Save Folder
 ###################
 # HYPERPARAMETERS #
 ###################

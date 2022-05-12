@@ -19,6 +19,7 @@ public class ExperimentBNLauncher {
     private static final String EXPERIMENTS_FOLDER = "/results/";
     private int index;
     private String paramsFileName;
+    private ExperimentBNBuilder experiment;
 
     public ExperimentBNLauncher(int index, String paramsFileName){
         this.index = index;
@@ -28,7 +29,10 @@ public class ExperimentBNLauncher {
     public static void main(String[] args) throws Exception {
         ExperimentBNLauncher experimentBNLauncher = getExperimentBNLauncherFromCommandLineArguments(args);
         String[] parameters = experimentBNLauncher.readParameters();
-        experimentBNLauncher.runExperiment(parameters);
+
+        experimentBNLauncher.createExperiment(parameters);
+        experimentBNLauncher.runExperiment();
+        experimentBNLauncher.saveExperiment();
     }
 
     private static ExperimentBNLauncher getExperimentBNLauncherFromCommandLineArguments(String[] args) {
@@ -54,13 +58,20 @@ public class ExperimentBNLauncher {
         return parameterStrings;
     }
 
-    public void runExperiment(String[] parameters) throws Exception {
-        ExperimentBNBuilder experiment = new ExperimentBNBuilder(parameters);
-        experiment.runExperiment();
-        saveExperiment(experiment);
+    private void createExperiment(String[] parameters){
+        try {
+            experiment = new ExperimentBNBuilder(parameters);
+        } catch (Exception e) {
+            System.out.println("Exception when creating the experiment");
+            e.printStackTrace();
+        }
     }
 
-    private void saveExperiment(ExperimentBNBuilder experiment) {
+    private void runExperiment(){
+        experiment.runExperiment();
+    }
+
+    private void saveExperiment() {
         String results = experiment.getResults();
 
         String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + experiment.netName + "_" + experiment.databaseName + "_t" + experiment.numberOfThreads +

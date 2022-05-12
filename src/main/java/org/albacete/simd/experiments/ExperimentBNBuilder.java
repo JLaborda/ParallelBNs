@@ -76,12 +76,24 @@ public class ExperimentBNBuilder {
         netName = parameters[1];
         netPath = parameters[2];
         databasePath = parameters[3];
+        databaseName = getDatabaseNameFromPattern();
         testDatabasePath = parameters[4];
+
         if(!algName.equals("ges")) {
             numberOfThreads = Runtime.getRuntime().availableProcessors();
             interleaving = Integer.parseInt(parameters[5]);
             seed = Integer.parseInt(parameters[6]);
         }
+    }
+
+    private String getDatabaseNameFromPattern(){
+        // Matching the end of the csv file to get the name of the database
+        Pattern pattern = Pattern.compile(".*/(.*).csv");
+        Matcher matcher = pattern.matcher(this.databasePath);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
     private void createBNBuilder() throws Exception {
