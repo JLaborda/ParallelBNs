@@ -3,6 +3,7 @@ package org.albacete.simd.framework;
 import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
+import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Edges;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.search.SearchGraphUtils;
@@ -12,6 +13,7 @@ import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import org.albacete.simd.threads.GESThread;
 
@@ -45,26 +47,27 @@ public class FESFusion extends FusionStage{
         // Checking if the score has improved
         if (fusionScore > currentScore) {
             this.currentGraph = fusionGraph;
+            System.out.println((Dag)fusionGraph);
             return (Dag) this.currentGraph;
         }
         */
         if (currentGraph == null) {
             flag = true;
-            this.currentGraph = fusionGraph;
+            this.currentGraph = new EdgeListGraph(new LinkedList<>(fusionGraph.getNodes()));
         }
         System.out.println("FES to obtain the fusion: ");
-
+        
 
         Set<Edge> candidates = new HashSet<>();
-
-
+        
+        
         for (Edge e : fusionGraph.getEdges()) {
             if (this.currentGraph.getEdge(e.getNode1(), e.getNode2()) != null || this.currentGraph.getEdge(e.getNode2(), e.getNode1()) != null)
                 continue;
             candidates.add(Edges.directedEdge(e.getNode1(), e.getNode2()));
             candidates.add(Edges.directedEdge(e.getNode2(), e.getNode1()));
         }
-
+        
 
         FESThread fuse = new FESThread(this.problem,this.currentGraph,candidates,candidates.size());
 
@@ -72,7 +75,7 @@ public class FESFusion extends FusionStage{
         
         // We obtain the flag of the FES. If true, FESThread has improve the result.
         try {
-            flag = fuse.getFlag();
+            flag = flag || fuse.getFlag();
         } catch (InterruptedException ex) {}
         
         // If the FESThread has not improved the previous result, we check if the fusion improves it.
@@ -104,9 +107,6 @@ public class FESFusion extends FusionStage{
         
         try {
             this.currentGraph = fuse.getCurrentGraph();
-            //System.out.println("Score Fusion: "+ FESThread.scoreGraph(this.currentGraph, problem));
-            //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-            //System.out.println("Score Fusion sin inconsistencias: "+ FESThread.scoreGraph(this.currentGraph, problem));
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }

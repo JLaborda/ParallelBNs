@@ -418,7 +418,9 @@ public class Utils {
                     int[] parValues = bayesIm.getParentValues(varIndex, row);
 
                     for (int col = 0; col < var.getNumCategories(); col++) {
-                        observedCounts[varIndex][row][col] = 0;
+                        try{
+                            observedCounts[varIndex][row][col] = 0;
+                        }catch(Exception ex) {}
                     }
 
                     for (int i = 0; i < data.getNumRows(); i++) {
