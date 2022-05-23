@@ -105,21 +105,23 @@ public abstract class BNBuilder {
 
     public BNBuilder(Graph initialGraph, DataSet data, int nThreads, int maxIterations, int nItInterleaving) {
         this(data, nThreads, maxIterations, nItInterleaving);
-        initialGraph = GraphUtils.replaceNodes(initialGraph, problem.getVariables());
-        if (initialGraph != null) {
-            if (!new HashSet<>(initialGraph.getNodes()).equals(new HashSet<>(problem.getVariables()))) {
-                throw new IllegalArgumentException("Variables aren't the same.");
-            }
-
-            this.initialGraph = initialGraph;
-            this.currentGraph = GraphUtils.replaceNodes(initialGraph, problem.getVariables());
-        }
+        checkForConsistenciesInInitialGraphWithProblem(initialGraph);
     }
+
 
     public BNBuilder(Graph initialGraph, String path, int nThreads, int maxIterations, int nItInterleaving) {
         this(initialGraph, Utils.readData(path), nThreads, maxIterations, nItInterleaving);
     }
 
+    public BNBuilder(Graph initialGraph, Problem problem, int nThreads, int maxIterations, int nItInterleaving) {
+        this.problem = problem;
+        this.maxIterations = maxIterations;
+        this.nItInterleaving = nItInterleaving;
+        initialize(nThreads);
+
+        checkForConsistenciesInInitialGraphWithProblem(initialGraph);
+
+    }
 
     private void initialize(int nThreads) {
         this.nThreads = nThreads;
@@ -130,6 +132,17 @@ public abstract class BNBuilder {
         //The total number of arcs of a graph is n*(n-1)/2, where n is the number of nodes in the graph.
         this.setOfArcs = new HashSet<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() - 1));
         this.setOfArcs = Utils.calculateArcs(this.problem.getData());
+    }
+
+    private void checkForConsistenciesInInitialGraphWithProblem(Graph initialGraph) {
+        initialGraph = GraphUtils.replaceNodes(initialGraph, problem.getVariables());
+        if (initialGraph != null) {
+            if (!new HashSet<>(initialGraph.getNodes()).equals(new HashSet<>(problem.getVariables()))) {
+                throw new IllegalArgumentException("Variables aren't the same.");
+            }
+            this.initialGraph = initialGraph;
+            this.currentGraph = GraphUtils.replaceNodes(initialGraph, problem.getVariables());
+        }
     }
 
     protected abstract boolean convergence();
