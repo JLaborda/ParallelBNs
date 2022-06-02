@@ -48,6 +48,7 @@ public class GES_BNBuilder extends BNBuilder {
     public GES_BNBuilder(Graph initialDag, Problem problem, Set<Edge> subsetEdges) {
         super(initialDag, problem, 1, -1,-1);
         super.setOfArcs = subsetEdges;
+        this.initialDag = new EdgeListGraph(initialDag);
     }
 
     @Override

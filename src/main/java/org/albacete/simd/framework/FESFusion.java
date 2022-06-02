@@ -24,10 +24,14 @@ public class FESFusion extends FusionStage{
         this.fesStage = fesStage;
     }
     
+    public FESFusion(Problem problem, Graph currentGraph, ArrayList<Dag> graphs) {
+        super(problem, currentGraph, graphs);
+    }
+    
     public boolean flag = false;
 
     @Override
-    protected Dag fusion() {
+    public Dag fusion() {
         // Applying ConsensusUnion fusion
         ConsensusUnion fusion = new ConsensusUnion(this.graphs);
         Graph fusionGraph = fusion.union();
@@ -86,7 +90,7 @@ public class FESFusion extends FusionStage{
                 System.out.println("  FESFusion -> FUSION, " + fusionScore);
                 return (Dag) this.currentGraph;
             } 
-            
+            /*
             // If the fusion doesn´t improves the result, we check if any previous FESThread has improved the results.
             else {
                 GESThread thread = fesStage.getMaxBDeuThread();
@@ -99,7 +103,7 @@ public class FESFusion extends FusionStage{
                     this.currentGraph = new Dag(this.currentGraph);
                     return (Dag) this.currentGraph;
                 }
-            }
+            }*/
         }
         
         try {

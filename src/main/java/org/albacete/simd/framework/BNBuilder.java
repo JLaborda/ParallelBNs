@@ -3,6 +3,7 @@ package org.albacete.simd.framework;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
+import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.GraphUtils;
 import org.albacete.simd.threads.BESThread;
@@ -105,6 +106,7 @@ public abstract class BNBuilder {
 
     public BNBuilder(Graph initialGraph, DataSet data, int nThreads, int maxIterations, int nItInterleaving) {
         this(data, nThreads, maxIterations, nItInterleaving);
+        this.initialGraph = new EdgeListGraph(initialGraph);
         checkForConsistenciesInInitialGraphWithProblem(initialGraph);
     }
 
@@ -117,6 +119,7 @@ public abstract class BNBuilder {
         this.problem = problem;
         this.maxIterations = maxIterations;
         this.nItInterleaving = nItInterleaving;
+        this.initialGraph = initialGraph;
         initialize(nThreads);
 
         checkForConsistenciesInInitialGraphWithProblem(initialGraph);

@@ -20,8 +20,11 @@ public class CircularFusion {
     private ConcurrentHashMap<Integer, Dag> circularFusionThreadsResults;
     private ExecutorService executor;
     private Dag fusionDag = null;
-    private boolean hasConverged = false;
+    private Convergence hasConverged = new Convergence();
     private int convergenceCounter = 0;
+    
+    private final boolean[] arrayFinishThreads;
+    private final Object[] arraySynchronizeThreads;
 
     public CircularFusion(String path, int numberOfThreads, Clustering clustering){
         this.problem = new Problem(path);
@@ -30,12 +33,19 @@ public class CircularFusion {
         this.numberOfThreads = numberOfThreads;
         this.circularFusionThreadsResults = new ConcurrentHashMap<>(numberOfThreads);
         this.executor = Executors.newWorkStealingPool(numberOfThreads);
+        
+        this.arrayFinishThreads = new boolean[numberOfThreads];
+        this.arraySynchronizeThreads = new Object[numberOfThreads];
+        for (int i = 0; i < numberOfThreads; i++) {
+            arrayFinishThreads[i] = true;
+            arraySynchronizeThreads[i] = new Object();
+        }
     }
 
     public Dag union(){
         setup();
-        runThreads();
-        return fusionDag;
+        hasConverged.waitConverge();
+        return circularFusionThreadsResults.get(0);
     }
 
     private void setup(){
@@ -49,15 +59,18 @@ public class CircularFusion {
         clustering.setProblem(this.problem);
         List<Set<Edge>> subsetEdgesList = clustering.generateEdgeDistribution(numberOfThreads, false);
 
+        System.out.println(" Edges list: "+subsetEdgesList+ "\n");
+        
         subsetEdges = new ConcurrentHashMap<>(numberOfThreads);
         for (int i = 0; i < subsetEdgesList.size(); i++) {
             subsetEdges.put(i, subsetEdgesList.get(i));
         }
+        System.out.println(" Edges MAP: "+subsetEdges+ "\n");
     }
 
     private void initializeValuesInResultsMap(){
         for (int i = 0; i < numberOfThreads; i++) {
-            circularFusionThreadsResults.put(i, new Dag());
+            circularFusionThreadsResults.put(i, new Dag(problem.getVariables()));
         }
     }
 
@@ -68,12 +81,31 @@ public class CircularFusion {
     }
 
     private void addNewSupplier(int index){
+        System.out.println("\n INTENTANDO AÑADIR NEW SUPPLIER  " + index);
+        synchronized(arraySynchronizeThreads[index]) {
+            for (int i = 0; i < arrayFinishThreads.length; i++) {
+                System.out.println("FUERA DE WHILE: i " + i + ": " + arrayFinishThreads[i]);
+            }
+            while (!arrayFinishThreads[index]) {
+                System.out.println("\n");
+                for (int i = 0; i < arrayFinishThreads.length; i++) {
+                    System.out.println("DENTRO DE WHILE: i " + i + ": " + arrayFinishThreads[i]);
+                }
+                try {
+                    arraySynchronizeThreads[index].wait();
+                    
+                } catch (InterruptedException ex) {System.out.println("EXCEPCIÓN");}
+            }
+        }
+        
         CircularFusionSupplier thread;
         Dag initialDag = circularFusionThreadsResults.get(index);
         Dag inputDag = getInputDag(index);
+        System.out.println("\n  NEW SUPPLIER, index " + index + ", Initial DAG edges = " + initialDag.getEdges().size() + ", Input DAG edges = " + inputDag.getEdges().size() + "\n");
         Set<Edge> subset = subsetEdges.get(index);
         thread = new CircularFusionSupplier(problem, initialDag, inputDag, subset, index);
-        circularFusionThreadsList.add(thread);
+        arrayFinishThreads[index] = false;
+        submitThread(thread);
     }
 
     private Dag getInputDag(int i) {
@@ -87,31 +119,26 @@ public class CircularFusion {
         return inputDag;
     }
 
-    private void runThreads(){
-        while(!hasConverged) {
-            submitThreads();
-            clearThreadList();
-        }
-        // Setting fusion dag
-        fusionDag = circularFusionThreadsResults.get(0);
-    }
 
-    private void submitThreads(){
+    private void submitThread(CircularFusionSupplier thread){
         // Submitting threads and then adding a listener to add more threads if necessary
-        for (CircularFusionSupplier thread : circularFusionThreadsList) {
-            CompletableFuture<CircularDag> submitter = CompletableFuture.supplyAsync(thread, executor);
-            submitter.thenAccept(this::listener);
-        }
+        CompletableFuture<CircularDag> submitter = CompletableFuture.supplyAsync(thread, executor);
+        submitter.thenAccept(this::listener);
+        System.out.println("Hace el submitThreads");
     }
 
-    private void clearThreadList(){
-        circularFusionThreadsList.clear();
-    }
 
     private void listener(CircularDag dag){
+        System.out.println("Entra en el listener");
         updateResults(dag);
         if(!checkConvergence(dag)) {
-            addNewSupplier(dag.id);
+            if(dag.id == numberOfThreads-1) {
+                System.out.println("DAG " + dag.id + " añadiendo supplier " + 0);
+                addNewSupplier(0);
+            } else {
+                System.out.println("DAG " + dag.id + " añadiendo supplier " + (dag.id+1));
+                addNewSupplier(dag.id + 1);
+            }
         }
 
     }
@@ -120,15 +147,23 @@ public class CircularFusion {
         int id = dag.id;
         Dag resultingDag = dag.dag;
         this.circularFusionThreadsResults.replace(id,resultingDag);
+
+        synchronized(arraySynchronizeThreads[id]) {
+            arrayFinishThreads[id] = true;
+            System.out.println("\n\n LIBERAMOSSSSSSSSSSSS  " + id);
+            arraySynchronizeThreads[id].notify();
+        }
     }
 
     private boolean checkConvergence(CircularDag dag){
         if(dag.convergence){
             convergenceCounter++;
-            return true;
-        }
-        if(convergenceCounter >= numberOfThreads){
-            hasConverged = true;
+            System.out.println("CONVERGEN: " + convergenceCounter + ", total: " + numberOfThreads);
+            
+            if(convergenceCounter >= numberOfThreads){
+                System.out.println("\n\n\n\nCONVERGEEEE\n\n\n\n");
+                hasConverged.converged();
+            }
             return true;
         }
         return false;

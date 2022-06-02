@@ -1,11 +1,15 @@
 package consensusBN.circularFusion;
 
-import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
+import edu.cmu.tetrad.search.SearchGraphUtils;
+
 import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import org.albacete.simd.utils.Problem;
+import org.albacete.simd.framework.FESFusion;
+import org.albacete.simd.threads.BESThread;
+import org.albacete.simd.threads.GESThread;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -21,14 +25,14 @@ public class CircularFusionSupplier implements Supplier<CircularDag> {
     private Dag fusionDag;
     private Dag gesDag;
     private final Set<Edge> subsetEdges;
-    private int id;
+    private final int id;
 
-    private Problem problem;
-
+    private final Problem problem;
+    
     private boolean fusionFlag;
     private boolean gesFlag;
 
-    CircularFusionSupplier(Problem problem, Dag initialDag, Dag inputDag, Set<Edge> subsetEdges, int id){
+    public CircularFusionSupplier(Problem problem, Dag initialDag, Dag inputDag, Set<Edge> subsetEdges, int id){
         this.problem = problem;
         this.currentDag = initialDag;
         this.inputDag = inputDag;
@@ -47,7 +51,13 @@ public class CircularFusionSupplier implements Supplier<CircularDag> {
     }
 
     private CircularDag run(){
-        fusionStage();
+        // In the first iteration, we only do runGES()
+        if (!currentDag.equals(inputDag))
+            fusionStage();
+        else {
+            fusionDag = currentDag;
+            fusionFlag = true;
+        }
         runGES();
         return updateInitialDag();
     }
@@ -56,10 +66,24 @@ public class CircularFusionSupplier implements Supplier<CircularDag> {
         ArrayList<Dag> dags = new ArrayList<>();
         dags.add(currentDag);
         dags.add(inputDag);
-        ConsensusUnion bnFusionMethod = new ConsensusUnion(dags);
-        fusionDag = bnFusionMethod.union();
-        //TODO: ¿Hay que añadir BES intersección?
-        //TODO: Calcular la convergencia de la fusión
+
+        // Do the consesus fusion + FESThread
+        FESFusion fusion = new FESFusion(problem, currentDag, dags);
+        fusionDag = fusion.fusion();
+        
+        // Do the BESThread to complete the GES of the fusion
+        BESThread bes = new BESThread(problem, fusionDag, fusionDag.getEdges());
+        bes.run();
+        try {
+            Graph graph = bes.getCurrentGraph();
+            SearchGraphUtils.pdagToDag(graph);
+            fusionDag = new Dag(graph);
+        } catch (InterruptedException ex) {System.out.println("Cannot do the BES stage");}
+
+        // Flag to see if fusion had changued the result
+        if (fusionDag.equals(currentDag) || fusionDag.equals(inputDag)) {
+            fusionFlag = true;
+        } else fusionFlag = false;
     }
 
     private void runGES(){
@@ -75,6 +99,7 @@ public class CircularFusionSupplier implements Supplier<CircularDag> {
     private CircularDag updateInitialDag(){
         currentDag = new Dag(gesDag);
         result = new CircularDag(currentDag, id, hasConverged());
+        result.setBDeu(GESThread.scoreGraph(currentDag, problem));
         return result;
     }
 
@@ -83,10 +108,8 @@ public class CircularFusionSupplier implements Supplier<CircularDag> {
     }
 
     private boolean hasConverged(){
-        // No changes in either ges or fusion
-        return !(gesFlag || fusionFlag);
+        // Convergence in both GES and fusion
+        return gesFlag && fusionFlag;
     }
-
-
 
 }
