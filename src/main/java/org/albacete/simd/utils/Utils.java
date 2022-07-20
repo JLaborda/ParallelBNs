@@ -91,6 +91,30 @@ public class Utils {
         }
         return setOfArcs;
     }
+    
+    /**
+     * Calculates the amount of possible edges between the variables of the dataset and stores it.
+     *
+     * @param data DataSet used to calculate the edges between its columns (nodes).
+     */
+    public static Set<Edge> calculateEdges(DataSet data) {
+        //0. Accumulator
+        Set<Edge> setOfArcs = new HashSet<>(data.getNumColumns() * (data.getNumColumns() - 1));
+        //1. Get edges (variables)
+        List<Node> variables = data.getVariables();
+        //2. Iterate over variables and save pairs
+        for (int i = 0; i < data.getNumColumns() - 1; i++) {
+            for (int j = i + 1; j < data.getNumColumns(); j++) {
+                // Getting pair of variables (Each variable is different)
+                Node var_A = variables.get(i);
+                Node var_B = variables.get(j);
+
+                //3. Storing both pairs
+                setOfArcs.add(Edges.directedEdge(var_A, var_B));
+            }
+        }
+        return setOfArcs;
+    }
 
 
     /**
