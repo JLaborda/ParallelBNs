@@ -269,10 +269,12 @@ public class HierarchicalClustering extends Clustering{
                         if (edgeDistribution.get(clusterID1).size() <= edgeDistribution.get(clusterID2).size()) {
                             Set<Edge> edgeCluster1 = edgeDistribution.get(clusterID1);
                             edgeCluster1.add(edge);
+                            edgeCluster1.add(edge.reverse());
                             outer.add(edge.reverse());
                         } else {
                             Set<Edge> edgeCluster2 = edgeDistribution.get(clusterID2);
                             edgeCluster2.add(edge);
+                            edgeCluster2.add(edge.reverse());
                             outer.add(edge.reverse());
                         }
                     }
