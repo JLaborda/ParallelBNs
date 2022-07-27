@@ -57,7 +57,7 @@ public class ExperimentPGES2 extends Experiment {
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
             Clustering clustering = new RandomClustering(42);
-            this.algorithm = new PGESwithStages(dataSet, clustering, nThreads, maxIterations, nItInterleaving);
+            this.algorithm = new PGESwithStages(dataSet, clustering, null, nThreads, maxIterations, nItInterleaving);
 
             // Search is executed
             algorithm.search();

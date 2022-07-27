@@ -6,11 +6,8 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
-import org.albacete.simd.algorithms.ParallelFHCBES;
 import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
-import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
-import org.albacete.simd.algorithms.bnbuilders.PHC_BNBuilder;
 import org.albacete.simd.clustering.Clustering;
 import org.albacete.simd.clustering.HierarchicalClustering;
 import org.albacete.simd.clustering.RandomClustering;
@@ -26,6 +23,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.albacete.simd.clustering.ClusteringBES;
+import org.albacete.simd.clustering.LabelPropagationClustering;
 
 /*We are checking the following hyperparameters:
  * Threads: [1, 2, 4, 8, 16]
@@ -100,11 +99,16 @@ public class ExperimentBNBuilder {
         switch(algName) {
             case "pges":
                 Clustering randomClustering = new RandomClustering(seed);
-                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                algorithm = new PGESwithStages(databasePath, randomClustering, null, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
                 break;
             case "pges_clustering":
                 Clustering hierarchicalClustering = new HierarchicalClustering();
-                algorithm = new PGESwithStages(databasePath, hierarchicalClustering, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClustering, null, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                break;
+            case "pges_clustering_lp":
+                Clustering hierarchicalClustering2 = new HierarchicalClustering();
+                ClusteringBES labelPropagation = new LabelPropagationClustering();
+                algorithm = new PGESwithStages(databasePath, hierarchicalClustering2, labelPropagation, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
                 break;
             case "ges":
                 algorithm = new GES_BNBuilder(databasePath);

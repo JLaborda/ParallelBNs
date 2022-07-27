@@ -3,8 +3,8 @@ package org.albacete.simd.algorithms.bnbuilders;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.clustering.Clustering;
+import org.albacete.simd.clustering.ClusteringBES;
 import org.albacete.simd.framework.*;
-import org.albacete.simd.utils.Utils;
 
 public class PGESwithStages extends BNBuilder {
 
@@ -14,32 +14,37 @@ public class PGESwithStages extends BNBuilder {
     private FESStage fesStage;
     private BESStage besStage;
 
-    private Clustering clustering;
+    private Clustering clusteringFES;
+    private ClusteringBES clusteringBES;
 
 
 
-    public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(DataSet data, Clustering clusteringFES, ClusteringBES clusteringBES, int nThreads, int maxIterations, int nItInterleaving) {
         super(data, nThreads, maxIterations, nItInterleaving);
-        this.clustering = clustering;
-        this.clustering.setProblem(super.getProblem());
+        this.clusteringFES = clusteringFES;
+        this.clusteringBES = clusteringBES;
+        this.clusteringFES.setProblem(super.getProblem());
     }
 
-    public PGESwithStages(String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(String path, Clustering clusteringFES, ClusteringBES clusteringBES, int nThreads, int maxIterations, int nItInterleaving) {
         super(path, nThreads, maxIterations, nItInterleaving);
-        this.clustering = clustering;
-        this.clustering.setProblem(super.getProblem());
+        this.clusteringFES = clusteringFES;
+        this.clusteringBES = clusteringBES;
+        this.clusteringFES.setProblem(super.getProblem());
     }
 
-    public PGESwithStages(Graph initialGraph, String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(Graph initialGraph, String path, Clustering clusteringFES, ClusteringBES clusteringBES, int nThreads, int maxIterations, int nItInterleaving) {
         super(initialGraph, path, nThreads, maxIterations, nItInterleaving);
-        this.clustering = clustering;
-        this.clustering.setProblem(super.getProblem());
+        this.clusteringFES = clusteringFES;
+        this.clusteringBES = clusteringBES;
+        this.clusteringFES.setProblem(super.getProblem());
     }
 
-    public PGESwithStages(Graph initialGraph, DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(Graph initialGraph, DataSet data, Clustering clusteringFES, ClusteringBES clusteringBES, int nThreads, int maxIterations, int nItInterleaving) {
         super(initialGraph, data, nThreads, maxIterations, nItInterleaving);
-        this.clustering = clustering;
-        this.clustering.setProblem(super.getProblem());
+        this.clusteringFES = clusteringFES;
+        this.clusteringBES = clusteringBES;
+        this.clusteringFES.setProblem(super.getProblem());
     }
 
     @Override
@@ -65,7 +70,7 @@ public class PGESwithStages extends BNBuilder {
 
     @Override
     protected void repartition() {
-        this.subSets = clustering.generateEdgeDistribution(nThreads, false);
+        this.subSets = clusteringFES.generateEdgeDistribution(nThreads, false);
     }
 
     @Override
@@ -85,7 +90,12 @@ public class PGESwithStages extends BNBuilder {
 
     @Override
     protected void backwardStage() throws InterruptedException {
-        besStage = new BESStage(problem, currentGraph, nThreads, nItInterleaving, subSets);
+        if (clusteringBES != null) {
+            this.clusteringBES.setProblem(super.getProblem());
+            this.clusteringBES.setGraph(currentGraph);
+            besStage = new BESStage(problem, currentGraph, nThreads, nItInterleaving, clusteringBES.generateEdgeDistribution(nThreads, false));
+        } else
+            besStage = new BESStage(problem, currentGraph, nThreads, nItInterleaving, subSets);
         besFlag = besStage.run();
         graphs = besStage.getGraphs();
     }
