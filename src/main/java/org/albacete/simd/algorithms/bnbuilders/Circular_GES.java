@@ -31,9 +31,11 @@ public class Circular_GES extends BNBuilder {
     private final Convergence hasConverged = new Convergence();
     private int convergenceCounter = 0;
     private final Object finishLock;
+    
+    int executing = 0;
 
-    public Circular_GES(String path, Clustering clustering, int nThreads){
-        super(path, nThreads, -1, -1);
+    public Circular_GES(String path, Clustering clustering, int nThreads, int nItInterleaving){
+        super(path, nThreads, -1, nItInterleaving);
        
         this.clustering = clustering;
         this.circularFusionThreadsResults = new ConcurrentHashMap<>(nThreads);
@@ -42,8 +44,8 @@ public class Circular_GES extends BNBuilder {
         finishLock = new Object();
     }
     
-    public Circular_GES(DataSet data, Clustering clustering, int nThreads){
-        super(data, nThreads, -1, -1);
+    public Circular_GES(DataSet data, Clustering clustering, int nThreads, int nItInterleaving){
+        super(data, nThreads, -1, nItInterleaving);
 
         this.clustering = clustering;
         this.circularFusionThreadsResults = new ConcurrentHashMap<>(nThreads);
@@ -122,7 +124,7 @@ public class Circular_GES extends BNBuilder {
         Dag initialDag = circularFusionThreadsResults.get(index);
         Dag inputDag = getInputDag(index);
         Set<Edge> subset = subsetEdges.get(index);
-        thread = new CircularFusionSupplier(problem, initialDag, inputDag, subset, index);
+        thread = new CircularFusionSupplier(problem, initialDag, inputDag, subset, index, this.nItInterleaving);
         submitThread(thread);
     }
 
@@ -141,11 +143,17 @@ public class Circular_GES extends BNBuilder {
     private void submitThread(CircularFusionSupplier thread){
         // Submitting threads and then adding a listener to add more threads if necessary
         CompletableFuture<CircularDag> submitter = CompletableFuture.supplyAsync(thread, executor);
+        synchronized(finishLock) {
+            executing++;
+        }
         submitter.thenAccept(this::listener);
     }
 
 
     private void listener(CircularDag dag){
+        synchronized(finishLock) {
+            executing--;
+        }
         calculateBestGraph(dag);
         if(!convergence(dag)) {
             if(dag.id == nThreads-1) {
@@ -158,17 +166,19 @@ public class Circular_GES extends BNBuilder {
     }
 
     protected boolean convergence(CircularDag dag) {
-        it++;
         int id = dag.id;
         Dag resultingDag = dag.dag;
         this.circularFusionThreadsResults.replace(id,resultingDag);
 
         synchronized(finishLock) {
+            it++;
+            
             if(dag.convergence){
                 convergenceCounter++;
             }
             
-            if(it % nThreads == 0) {
+            
+            if(it % nThreads == 0 || executing == 0) {
                 if(convergenceCounter >= nThreads){
                     hasConverged.converged();
                 } else {

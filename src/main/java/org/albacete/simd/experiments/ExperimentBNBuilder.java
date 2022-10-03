@@ -112,7 +112,7 @@ public class ExperimentBNBuilder {
                 break;
             case "circular_ges":
                 Clustering hierarchicalClusteringGES = new HierarchicalClustering();
-                algorithm = new Circular_GES(databasePath, hierarchicalClusteringGES, numberOfThreads);
+                algorithm = new Circular_GES(databasePath, hierarchicalClusteringGES, numberOfThreads, interleaving);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);
