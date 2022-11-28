@@ -47,6 +47,7 @@ public class BESThread extends GESThread {
     @Override
     public void run() {
         this.currentGraph = search();
+        SearchGraphUtils.pdagToDag(this.currentGraph);
     }
 
     /**

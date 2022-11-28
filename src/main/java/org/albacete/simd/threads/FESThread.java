@@ -3,6 +3,7 @@ package org.albacete.simd.threads;
 import consensusBN.PowerSetFabric;
 import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.utils.Problem;
 
 import java.util.*;
@@ -55,6 +56,7 @@ public class FESThread extends GESThread{
      */
     public void run(){
         this.currentGraph = search();
+        SearchGraphUtils.pdagToDag(this.currentGraph);
     }
 
 

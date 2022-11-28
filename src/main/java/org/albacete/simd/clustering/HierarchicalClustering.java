@@ -50,6 +50,7 @@ public class HierarchicalClustering extends Clustering{
             double score = GESThread.localBdeuScore(childIndex, new int[]{parentIndex}, problem) -
                     GESThread.localBdeuScore(childIndex, new int[]{}, problem);
             edgeScores.put(edge, score);
+            //edgeScores.put(edge.reverse(), score);  // Debería funcionar con Utils.calculateEdges, pero no da buenos resultados
         });
         return edgeScores;
     }
@@ -234,9 +235,12 @@ public class HierarchicalClustering extends Clustering{
     }
 
 
+    @Override
     public List<Set<Edge>> generateEdgeDistribution(int numClusters, boolean duplicate) {
         // Generating node clusters
         clusters = this.clusterize(numClusters);
+        
+        Set<Edge> outer = new HashSet<>();
 
         List<Set<Edge>> edgeDistribution = new ArrayList<>(clusters.size());
         for (int i = 0; i < clusters.size(); i++) {
@@ -261,12 +265,18 @@ public class HierarchicalClustering extends Clustering{
                     Set<Edge> edgeCluster2 = edgeDistribution.get(clusterID2);
                     edgeCluster2.add(edge);
                 } else {
-                    if (edgeDistribution.get(clusterID1).size() <= edgeDistribution.get(clusterID2).size()) {
-                        Set<Edge> edgeCluster1 = edgeDistribution.get(clusterID1);
-                        edgeCluster1.add(edge);
-                    } else {
-                        Set<Edge> edgeCluster2 = edgeDistribution.get(clusterID2);
-                        edgeCluster2.add(edge);
+                    if (!outer.contains(edge.reverse())){
+                        if (edgeDistribution.get(clusterID1).size() <= edgeDistribution.get(clusterID2).size()) {
+                            Set<Edge> edgeCluster1 = edgeDistribution.get(clusterID1);
+                            edgeCluster1.add(edge);
+                            edgeCluster1.add(edge.reverse());
+                            outer.add(edge.reverse());
+                        } else {
+                            Set<Edge> edgeCluster2 = edgeDistribution.get(clusterID2);
+                            edgeCluster2.add(edge);
+                            edgeCluster2.add(edge.reverse());
+                            outer.add(edge.reverse());
+                        }
                     }
                 }
             }
