@@ -61,3 +61,6 @@ hyperparams_*
 
 #Github keys script
 scripts/git-keys-update.bash
+
+# .DS-Files
+*.DS_Store
