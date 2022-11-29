@@ -4,15 +4,14 @@ import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Edges;
 import edu.cmu.tetrad.graph.Graph;
-import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import org.albacete.simd.threads.GESThread;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 public class BESFusion extends FusionStage{
     
@@ -82,7 +81,7 @@ public class BESFusion extends FusionStage{
             e1.printStackTrace();
         }
 
-        SearchGraphUtils.pdagToDag(this.currentGraph);
+        pdagToDag(this.currentGraph);
         return new Dag(this.currentGraph);
         //return Utils.removeInconsistencies(this.currentGraph);
     }

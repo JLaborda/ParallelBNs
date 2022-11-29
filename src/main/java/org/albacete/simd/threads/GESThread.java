@@ -13,6 +13,7 @@ import org.albacete.simd.utils.Problem;
 
 import java.text.NumberFormat;
 import java.util.*;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 /*
   GESThread is an abstract class that encapsulates the common attributes and methods of the threads executed in both the FES
@@ -354,7 +355,7 @@ public abstract class GESThread implements Runnable{
      * @param graph Graph being rebuilt.
      */
     protected void rebuildPattern(Graph graph) {
-        SearchGraphUtils.basicPattern(graph);
+        SearchGraphUtils.basicCPDAG(graph);
         pdag(graph);
     }
 
@@ -394,7 +395,7 @@ public abstract class GESThread implements Runnable{
 
 //        Graph dag = SearchGraphUtils.dagFromPattern(graph);
         Graph dag = new EdgeListGraph(graph);
-        SearchGraphUtils.pdagToDag(dag);
+        pdagToDag(dag);
         double score = 0.;
 
         for (Node next : dag.getNodes()) {

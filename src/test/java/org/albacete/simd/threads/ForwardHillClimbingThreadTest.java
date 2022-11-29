@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 import static org.junit.Assert.*;
 
@@ -117,7 +118,7 @@ public class ForwardHillClimbingThreadTest {
      */
     private Graph removeInconsistencies(Graph graph){
         // Transforming the current graph into a DAG
-        SearchGraphUtils.pdagToDag(graph);
+        pdagToDag(graph);
 
         Node nodeT, nodeH;
         for (Edge e : graph.getEdges()){

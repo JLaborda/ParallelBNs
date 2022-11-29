@@ -20,6 +20,73 @@ public class Utils {
 
 
     private static Random random = new Random();
+    
+    /**
+     * Transforms a maximally directed pattern (PDAG) represented in graph
+     * <code>g</code> into an arbitrary DAG by modifying <code>g</code> itself.
+     * Based on the algorithm described in </p> Chickering (2002) "Optimal
+     * structure identification with greedy search" Journal of Machine Learning
+     * Research. </p> R. Silva, June 2004
+     */
+    public static void pdagToDag(Graph g) {
+        Graph p = new EdgeListGraph(g);
+        List<Edge> undirectedEdges = new ArrayList<>();
+
+        for (Edge edge : g.getEdges()) {
+            if (edge.getEndpoint1() == Endpoint.TAIL
+                    && edge.getEndpoint2() == Endpoint.TAIL
+                    && !undirectedEdges.contains(edge)) {
+                undirectedEdges.add(edge);
+            }
+        }
+        g.removeEdges(undirectedEdges);
+        List<Node> pNodes = p.getNodes();
+
+        do {
+            Node x = null;
+
+            for (Node pNode : pNodes) {
+                x = pNode;
+
+                if (p.getChildren(x).size() > 0) {
+                    continue;
+                }
+
+                Set<Node> neighbors = new HashSet<>();
+
+                for (Edge edge : p.getEdges()) {
+                    if (edge.getNode1() == x || edge.getNode2() == x) {
+                        if (edge.getEndpoint1() == Endpoint.TAIL
+                                && edge.getEndpoint2() == Endpoint.TAIL) {
+                            if (edge.getNode1() == x) {
+                                neighbors.add(edge.getNode2());
+                            } else {
+                                neighbors.add(edge.getNode1());
+                            }
+                        }
+                    }
+                }
+                if (neighbors.size() > 0) {
+                    Collection<Node> parents = p.getParents(x);
+                    Set<Node> all = new HashSet<>(neighbors);
+                    all.addAll(parents);
+                    if (!GraphUtils.isClique(all, p)) {
+                        continue;
+                    }
+                }
+
+                for (Node neighbor : neighbors) {
+                    Node node1 = g.getNode(neighbor.getName());
+                    Node node2 = g.getNode(x.getName());
+
+                    g.addDirectedEdge(node1, node2);
+                }
+                p.removeNode(x);
+                break;
+            }
+            pNodes.remove(x);
+        } while (pNodes.size() > 0);
+    }
 
     /**
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem.
@@ -353,7 +420,7 @@ public class Utils {
      */
     public static Dag removeInconsistencies(Graph g){
         // Transforming the current graph into a DAG
-        SearchGraphUtils.pdagToDag(g);
+        SearchGraphUtils.dagFromCPDAG(g);
 
         // Checking Consistency
         Node nodeT, nodeH;

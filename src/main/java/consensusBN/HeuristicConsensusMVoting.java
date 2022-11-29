@@ -2,16 +2,14 @@ package consensusBN;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Endpoint;
 import edu.cmu.tetrad.graph.Graph;
-import edu.cmu.tetrad.graph.GraphUtils;
 import edu.cmu.tetrad.graph.Node;
-import edu.cmu.tetrad.search.SearchGraphUtils;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 public class HeuristicConsensusMVoting {
 
@@ -35,7 +33,7 @@ public HeuristicConsensusMVoting(ArrayList<Dag> setOfdags, double percentage) {
 			for(Edge e: g.getEdges()){
 				pd.addEdge(e);
 			}
-			SearchGraphUtils.dagToPdag(pd);
+			pdagToDag(pd);
 			pdags.add(pd);
 		}
 	

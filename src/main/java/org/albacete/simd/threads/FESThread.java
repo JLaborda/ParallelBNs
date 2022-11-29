@@ -7,6 +7,7 @@ import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.utils.Problem;
 
 import java.util.*;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 @SuppressWarnings("DuplicatedCode")
 public class FESThread extends GESThread{
@@ -56,7 +57,7 @@ public class FESThread extends GESThread{
      */
     public void run(){
         this.currentGraph = search();
-        SearchGraphUtils.pdagToDag(this.currentGraph);
+        pdagToDag(this.currentGraph);
     }
 
 

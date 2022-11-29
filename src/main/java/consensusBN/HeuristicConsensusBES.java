@@ -17,6 +17,7 @@ import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
 import edu.cmu.tetrad.search.MeekRules;
 import edu.cmu.tetrad.search.SearchGraphUtils;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 
 
@@ -161,7 +162,7 @@ public class HeuristicConsensusBES {
 		} while (x != null);
 		
 //		System.out.println("Pdag: "+ graph.toString());
-		SearchGraphUtils.pdagToDag(graph);
+		pdagToDag(graph);
 //		System.out.println("PdagToDag"+graph.toString());
 		this.outputDag = new Dag();
 		for (Node node : graph.getNodes()) this.outputDag.addNode(node);
@@ -198,7 +199,7 @@ public class HeuristicConsensusBES {
 
 
     private void rebuildPattern(Graph graph) {
-        SearchGraphUtils.basicPattern(graph);
+        SearchGraphUtils.basicCPDAG(graph);
         pdag(graph);
       }
 

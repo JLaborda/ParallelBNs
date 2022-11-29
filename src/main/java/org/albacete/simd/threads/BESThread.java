@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.albacete.simd.utils.Utils;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 @SuppressWarnings("DuplicatedCode")
 public class BESThread extends GESThread {
@@ -47,7 +48,7 @@ public class BESThread extends GESThread {
     @Override
     public void run() {
         this.currentGraph = search();
-        SearchGraphUtils.pdagToDag(this.currentGraph);
+        pdagToDag(this.currentGraph);
     }
 
     /**
