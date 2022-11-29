@@ -29,7 +29,7 @@ public class Utils {
      * Research. </p> R. Silva, June 2004
      */
     public static void pdagToDag(Graph g) {
-        Graph p = new EdgeListGraph(g);
+        Graph p = new EdgeListGraph_n(g);
         List<Edge> undirectedEdges = new ArrayList<>();
 
         for (Edge edge : g.getEdges()) {
@@ -275,8 +275,8 @@ public class Utils {
         dags.add(bn2);
         ensureVariables(dags);
 
-        Graph g1 = new EdgeListGraph(dags.get(0));
-        Graph g2 = new EdgeListGraph(dags.get(1));
+        Graph g1 = new EdgeListGraph_n(dags.get(0));
+        Graph g2 = new EdgeListGraph_n(dags.get(1));
 
         for(Node n: dags.get(0).getNodes()) {
             List<Node> p = dags.get(0).getParents(n);

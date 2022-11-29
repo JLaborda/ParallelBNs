@@ -309,7 +309,7 @@ public abstract class GESThread implements Runnable{
         
 //        // nueva forma de calcular los caminos semidirigidos.
 //        
-        Graph aux = new EdgeListGraph(graph);
+        Graph aux = new EdgeListGraph_n(graph);
         aux.removeNodes(naYXT);
         
         LinkedList<Node> open = new LinkedList<Node>();
@@ -394,7 +394,7 @@ public abstract class GESThread implements Runnable{
         }
 
 //        Graph dag = SearchGraphUtils.dagFromPattern(graph);
-        Graph dag = new EdgeListGraph(graph);
+        Graph dag = new EdgeListGraph_n(graph);
         pdagToDag(dag);
         double score = 0.;
 
@@ -800,6 +800,23 @@ public abstract class GESThread implements Runnable{
             System.out.println("Timeout! Finishing Thread");
         return zScore > 3;
 
+    }
+    
+    class EdgeSearch implements Comparable {
+        public Double score;
+        public SubSet hSubset;
+        public Edge edge;
+        
+        public EdgeSearch (double score, SubSet hSubSet, Edge edge) { 
+            this.score = score;
+            this.hSubset = hSubSet;
+            this.edge = edge;
+        }
+        
+        @Override
+        public int compareTo(Object o){
+            return this.score.compareTo(((EdgeSearch)o).score);
+        }
     }
 
 }

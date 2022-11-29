@@ -62,7 +62,7 @@ public class BESFusion extends FusionStage{
             // If the fusion doesn´t improves the result, we check if any previous BESThread has improved the results.
             else {
                 GESThread thread = besStage.getMaxBDeuThread();
-                if (thread.getScoreBDeu() > currentScore) {
+                if (thread.getScoreBDeu() != 0 && thread.getScoreBDeu() > currentScore) {
                     try {
                         this.currentGraph = thread.getCurrentGraph();
                         flag = true;

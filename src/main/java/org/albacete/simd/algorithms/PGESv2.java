@@ -386,7 +386,7 @@ public class PGESv2
             }
         }
 
-        Graph graph = new EdgeListGraph(this.currentGraph);
+        Graph graph = new EdgeListGraph_n(this.currentGraph);
         // Looping over each edge of the currentGraph and checking if it has been deleted in any of the resulting graphs of the BES stage.
         // If it has been deleted, then it is removed from the currentGraph.
         for(Edge e: graph.getEdges()) {

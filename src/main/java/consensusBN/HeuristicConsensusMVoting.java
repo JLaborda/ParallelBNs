@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
-import edu.cmu.tetrad.graph.EdgeListGraph;
+import edu.cmu.tetrad.graph.EdgeListGraph_n;
 import edu.cmu.tetrad.graph.Endpoint;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
@@ -29,7 +29,7 @@ public HeuristicConsensusMVoting(ArrayList<Dag> setOfdags, double percentage) {
 		this.weight = new double[this.variables.size()][this.variables.size()];
 		ArrayList<Graph> pdags = new ArrayList<Graph>();
 		for(Dag g: this.setOfdags){
-			Graph pd = new EdgeListGraph(new LinkedList<Node>(g.getNodes()));
+			Graph pd = new EdgeListGraph_n(new LinkedList<Node>(g.getNodes()));
 			for(Edge e: g.getEdges()){
 				pd.addEdge(e);
 			}

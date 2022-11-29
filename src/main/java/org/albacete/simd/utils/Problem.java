@@ -2,7 +2,7 @@ package org.albacete.simd.utils;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DiscreteVariable;
-import edu.cmu.tetrad.graph.EdgeListGraph;
+import edu.cmu.tetrad.graph.EdgeListGraph_n;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
 
@@ -85,7 +85,7 @@ public class Problem {
         samplePrior = 10.0;
 
         //building index
-        Graph graph = new EdgeListGraph(new LinkedList<Node>(this.variables));
+        Graph graph = new EdgeListGraph_n(new LinkedList<Node>(this.variables));
         buildIndexing(graph);
     }
 
@@ -100,7 +100,7 @@ public class Problem {
      * @param g Graph being indexed.
      */
     private void buildIndexing(Graph g) {
-        Graph graph = new EdgeListGraph(g);
+        Graph graph = new EdgeListGraph_n(g);
         this.hashIndices = new HashMap<>();
         for (Node next : graph.getNodes()) {
             for (int i = 0; i < varNames.length; i++) {

@@ -10,7 +10,7 @@ import java.util.Set;
 
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
-import edu.cmu.tetrad.graph.EdgeListGraph;
+import edu.cmu.tetrad.graph.EdgeListGraph_n;
 import edu.cmu.tetrad.graph.Edges;
 import edu.cmu.tetrad.graph.Endpoint;
 import edu.cmu.tetrad.graph.Graph;
@@ -91,7 +91,7 @@ public class ConsensusBES implements Runnable {
 		
 		consensusUnion();
 		
-		graph = new EdgeListGraph(new LinkedList<Node>(this.union.getNodes()));
+		graph = new EdgeListGraph_n(new LinkedList<>(this.union.getNodes()));
 		for(Edge e: this.union.getEdges()){
 			graph.addEdge(e);
 		}
@@ -311,7 +311,7 @@ public class ConsensusBES implements Runnable {
 			}
 		}
 		
-		Graph aux = new EdgeListGraph();
+		Graph aux = new EdgeListGraph_n();
 		
 		for (Node node : g.getNodes()) aux.addNode(node);
 		Node nodeT, nodeH;

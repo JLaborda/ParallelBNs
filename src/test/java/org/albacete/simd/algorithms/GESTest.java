@@ -57,7 +57,7 @@ public class GESTest {
         DataSet dataSet = reader.parseTabular(new File(Resources.CANCER_BBDD_PATH));
         GES ges1 = new GES(dataSet);
 
-        ges1.search(100);
+        ges1.search();
         Graph g = ges1.getCurrentGraph();
         assertNotNull(g);
 

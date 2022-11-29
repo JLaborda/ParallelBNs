@@ -3,6 +3,7 @@ package edu.cmu.tetrad.graph;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -13,26 +14,56 @@ import java.util.Set;
  */
 public class EdgeListGraph_n extends EdgeListGraph {
     
-    final HashMap<Node,Set<Node>> neighboursMap;
+    private HashMap<Node,Set<Node>> neighboursMap;
+    private HashSet<Node> nodesHash;
         
     public EdgeListGraph_n(){
         super();
         this.neighboursMap = new HashMap();
+        this.nodesHash = new HashSet();
     }
     
     public EdgeListGraph_n(Graph graph){
-        super(graph);        
-        this.neighboursMap = new HashMap();
-        for (Node node : this.nodes) {
-            this.neighboursMap.put(node, new HashSet<>());
+        this();
+
+        if (graph == null) {
+            throw new NullPointerException("Graph must not be null.");
         }
+
+        transferNodesAndEdges(graph);
+
+        // Keep attributes from the original graph
+        transferAttributes(graph);
+
+        this.ambiguousTriples = graph.getAmbiguousTriples();
+        this.underLineTriples = graph.getUnderLines();
+        this.dottedUnderLineTriples = graph.getDottedUnderlines();
+
+        for (Edge edge : graph.getEdges()) {
+            if (graph.isHighlighted(edge)) {
+                setHighlighted(edge, true);
+            }
+        }
+
+        for (Node node : this.nodes) {
+            this.namesHash.put(node.getName(), node);
+        }
+
+        this.setPag(graph.isPag());
+        this.setCPDAG(graph.isCPDAG());
     }
     
     public EdgeListGraph_n(List<Node> nodes){
-        super(nodes);
-        this.neighboursMap = new HashMap();
-        for (Node node : this.nodes) {
-            this.neighboursMap.put(node, new HashSet<>());
+        this();
+
+        if (nodes == null) {
+            throw new NullPointerException();
+        }
+
+        for (Node variable : nodes) {
+            if (!addNode(variable)) {
+                throw new IllegalArgumentException();
+            }
         }
     }
     
@@ -159,6 +190,89 @@ public class EdgeListGraph_n extends EdgeListGraph {
         return _edges;
     }
     
+    /**
+     * Adds a node to the graph. Precondition: The proposed name of the node
+     * cannot already be used by any other node in the same graph.
+     *
+     * @param node the node to be added.
+     * @return true if the the node was added, false if not.
+     */
+    @Override
+    public boolean addNode(Node node) {
+        if (node == null) {
+            throw new NullPointerException();
+        }
+        
+        if (!this.nodesHash.add(node)) {
+            return false;
+        }
+
+        if (this.edgeLists.containsKey(node)) {
+            return false;
+        }
+
+        this.edgeLists.put(node, new HashSet<>());
+        this.nodes.add(node);
+        this.namesHash.put(node.getName(), node);
+        
+        this.neighboursMap.put(node, new HashSet<>());
+
+        if (node.getNodeType() != NodeType.ERROR) {
+            getPcs().firePropertyChange("nodeAdded", null, node);
+        }
+
+        return true;
+    }
+    
+    /**
+     * Removes a node from the graph.
+     * @param node
+     * @return 
+     */
+    @Override
+    public boolean removeNode(Node node) {
+        if (!this.nodesHash.remove(node)) {
+            return false;
+        }
+
+        boolean changed = false;
+        Set<Edge> edgeList1 = this.edgeLists.get(node);    //list of edges connected to that node
+        edgesSet.removeAll(edgeList1);
+
+        for (Iterator<Edge> i = edgeList1.iterator(); i.hasNext(); ) {
+            Edge edge = (i.next());
+            Node node2 = edge.getDistalNode(node);
+
+            if (node2 != node) {
+                Set<Edge> edgeList2 = this.edgeLists.get(node2);
+                edgeList2.remove(edge);
+                this.edgesSet.remove(edge);
+                changed = true;
+            }
+
+            i.remove();
+            getPcs().firePropertyChange("edgeRemoved", edge, null);
+        }
+
+        this.edgeLists.remove(node);
+        this.nodes.remove(node);
+        this.namesHash.remove(node.getName());
+        this.neighboursMap.remove(node);
+        this.stuffRemovedSinceLastTripleAccess = true;
+
+        getPcs().firePropertyChange("nodeRemoved", node, null);
+        return changed;
+    }
+    
+    /**
+     * Determines whether the graph contains a particular node.
+     * @param node
+     * @return 
+     */
+    @Override
+    public boolean containsNode(Node node) {
+        return this.nodesHash.contains(node);
+    }
     
     
     

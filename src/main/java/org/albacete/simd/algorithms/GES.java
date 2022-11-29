@@ -2,7 +2,7 @@ package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Edge;
-import edu.cmu.tetrad.graph.EdgeListGraph;
+import edu.cmu.tetrad.graph.EdgeListGraph_n;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
@@ -28,7 +28,7 @@ public class GES{
     public GES(DataSet dataSet){
         this.problem = new Problem(dataSet);
         this.combinations = Utils.calculateArcs(problem.getData());
-        this.initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
+        this.initialDag = new EdgeListGraph_n(new LinkedList<>(problem.getVariables()));
     }
 
     public GES(DataSet dataSet, Graph initialDag){
