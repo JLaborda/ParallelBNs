@@ -1,7 +1,9 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
+import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
+import java.util.Set;
 import org.albacete.simd.clustering.Clustering;
 import org.albacete.simd.framework.*;
 import org.albacete.simd.utils.Utils;
@@ -66,6 +68,11 @@ public class PGESwithStages extends BNBuilder {
     @Override
     protected void repartition() {
         this.subSets = clustering.generateEdgeDistribution(nThreads, false);
+        System.out.println("\n\n\n");
+        for (Set<Edge> subSet : subSets) {
+            System.out.println(subSet);
+        }
+        System.out.println("\n\n\n");
     }
 
     @Override

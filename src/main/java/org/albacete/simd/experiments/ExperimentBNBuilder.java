@@ -26,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.albacete.simd.algorithms.bnbuilders.Circular_GES;
 
 /*We are checking the following hyperparameters:
  * Threads: [1, 2, 4, 8, 16]
@@ -103,11 +104,15 @@ public class ExperimentBNBuilder {
                 algorithm = new PGESwithStages(databasePath, randomClustering, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
                 break;
             case "pges_clustering":
-                Clustering hierarchicalClustering = new HierarchicalClustering();
-                algorithm = new PGESwithStages(databasePath, hierarchicalClustering, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                Clustering hierarchicalClusteringPGES = new HierarchicalClustering();
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
                 break;
             case "ges":
                 algorithm = new GES_BNBuilder(databasePath);
+                break;
+            case "circular_ges":
+                Clustering hierarchicalClusteringGES = new HierarchicalClustering();
+                algorithm = new Circular_GES(databasePath, hierarchicalClusteringGES, numberOfThreads, interleaving);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);

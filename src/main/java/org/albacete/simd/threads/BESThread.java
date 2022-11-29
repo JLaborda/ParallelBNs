@@ -23,8 +23,8 @@ public class BESThread extends GESThread {
      * Constructor of ThFES with an initial DAG
      *
      * @param problem    object containing information of the problem such as data or variables.
-     * @param initialDag initial DAG with which the FES stage starts with.
-     * @param subset     subset of edges the fes stage will try to add to the resulting graph
+     * @param initialDag initial DAG with which the BES stage starts with.
+     * @param subset     subset of edges the fes stage will try to remove 
      */
     public BESThread(Problem problem, Graph initialDag, Set<Edge> subset) {
 

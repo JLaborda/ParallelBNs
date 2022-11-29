@@ -38,7 +38,6 @@ target/
 #results/
 
 # Thread errors
-*.log
 *-error
 *-output
 
@@ -56,8 +55,8 @@ run_experiments_cluster*
 # Singularity Image
 *.sif
 
-#Hyperparams
-hyperparams_*
-
 #Github keys script
 scripts/git-keys-update.bash
+
+# .DS-Files
+*.DS_Store

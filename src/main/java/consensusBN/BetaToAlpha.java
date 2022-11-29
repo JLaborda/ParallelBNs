@@ -90,10 +90,10 @@ public class BetaToAlpha {
 		this.G_aux = new Dag(this.G);
 		this.beta = new ArrayList<Node>();
 		ArrayList<Node> sinkNodes = getSinkNodes(this.G_aux);
-		this.beta.add(sinkNodes.get(0));
+		this.beta.add(sinkNodes.get(0)); 
 		List<Node> pa = G_aux.getParents(sinkNodes.get(0));
 		this.G_aux.removeNode(sinkNodes.get(0));
-		sinkNodes.remove(0);
+		sinkNodes.remove(0); 
 		// Compute the new sink nodes
 		for(Node nodep: pa){
 			List<Node> chld = G_aux.getChildren(nodep);
