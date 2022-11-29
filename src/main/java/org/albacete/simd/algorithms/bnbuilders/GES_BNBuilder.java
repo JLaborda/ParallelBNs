@@ -1,6 +1,7 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
+import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.framework.BNBuilder;
@@ -8,14 +9,19 @@ import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
+import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 
 import java.util.LinkedList;
+import java.util.Set;
 
 public class GES_BNBuilder extends BNBuilder {
 
 
     private Graph initialDag;
+
+    private boolean fesFlag = false;
+    private boolean besFlag = false;
 
     public GES_BNBuilder(DataSet data) {
         super(data, 1, -1, -1);
@@ -39,9 +45,16 @@ public class GES_BNBuilder extends BNBuilder {
         this.currentGraph = new EdgeListGraph(initialDag);
     }
 
+    public GES_BNBuilder(Graph initialDag, Problem problem, Set<Edge> subsetEdges) {
+        super(initialDag, problem, 1, -1,-1);
+        super.setOfArcs = subsetEdges;
+        this.initialDag = new EdgeListGraph(initialDag);
+    }
+
     @Override
-    protected boolean convergence() {
-        return true;
+    public boolean convergence() {
+        // No changes in either fes or bes stages
+        return !(fesFlag || besFlag);
     }
 
     @Override
@@ -59,6 +72,7 @@ public class GES_BNBuilder extends BNBuilder {
         FESThread fes = new FESThread(problem, initialDag, setOfArcs, Integer.MAX_VALUE);
         fes.run();
         currentGraph = fes.getCurrentGraph();
+        fesFlag = fes.getFlag();
         score = fes.getScoreBDeu();
     }
 
@@ -73,6 +87,7 @@ public class GES_BNBuilder extends BNBuilder {
         BESThread bes = new BESThread(problem, currentGraph, setOfArcs);
         bes.run();
         currentGraph = bes.getCurrentGraph();
+        besFlag = bes.getFlag();
         score = bes.getScoreBDeu();
         currentGraph = Utils.removeInconsistencies(currentGraph);
     }

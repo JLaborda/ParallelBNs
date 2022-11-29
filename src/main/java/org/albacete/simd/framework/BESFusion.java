@@ -29,22 +29,6 @@ public class BESFusion extends FusionStage{
     protected Dag fusion() {
         Dag fusionGraph = this.fusionIntersection();
 
-        // Getting Scores
-        /*
-        double fusionScore = GESThread.scoreGraph(fusionGraph, problem);
-        double currentScore = GESThread.scoreGraph(this.currentGraph, problem);
-
-        System.out.println("Fusion Score: " + fusionScore);
-        System.out.println("Current Score: " + currentScore);
-
-
-        // Checking if the score has improved
-
-        if (fusionScore > currentScore) {
-            this.currentGraph = fusionGraph;
-            return (Dag) this.currentGraph;
-        }
-        */
         System.out.println("BES to obtain the fusion: ");
 
         Set<Edge> candidates = new HashSet<>();
@@ -56,8 +40,6 @@ public class BESFusion extends FusionStage{
             }
         }
 
-        
-        
         BESThread fuse = new BESThread(this.problem,this.currentGraph,candidates);
 
         fuse.run();
