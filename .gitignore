@@ -38,7 +38,6 @@ target/
 #results/
 
 # Thread errors
-*.log
 *-error
 *-output
 
@@ -64,3 +63,6 @@ scripts/git-keys-update.bash
 
 # Adding galgo results
 !results/raw-galgo.zip
+
+# ignore notebook checkpoints
+.ipynb_checkpoints/
