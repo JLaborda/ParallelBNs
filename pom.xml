@@ -41,9 +41,9 @@
 
       <!-- Librería de Tetrad -->
       <dependency>
-          <groupId>edu.cmu</groupId>
-          <artifactId>tetrad</artifactId>
-          <version>6.9.0</version>
+          <groupId>io.github.cmu-phil</groupId>
+          <artifactId>tetrad-lib</artifactId>
+          <version>7.1.2-2</version>
       </dependency>
       <!--librería de Fusión y Tetrad manipulado por José Miguel Puerta-->
 
@@ -167,12 +167,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>local-repo-tetrad</id>
-      <url>file://${project.basedir}/repos/tetrad</url>
-    </repository>
-  </repositories>
 
 </project>

@@ -6,16 +6,15 @@ import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Edges;
 import edu.cmu.tetrad.graph.Graph;
-import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import org.albacete.simd.threads.GESThread;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 public class FESFusion extends FusionStage{
     
@@ -115,7 +114,7 @@ public class FESFusion extends FusionStage{
             e1.printStackTrace();
         }
 
-        SearchGraphUtils.pdagToDag(this.currentGraph);
+        pdagToDag(this.currentGraph);
         return new Dag(this.currentGraph);
         //return Utils.removeInconsistencies(this.currentGraph);
     }

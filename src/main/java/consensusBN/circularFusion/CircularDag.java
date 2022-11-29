@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 public class CircularDag {
     public Dag dag;
@@ -87,7 +88,7 @@ public class CircularDag {
         BESThread bes = new BESThread(problem, dag, dag.getEdges());
         bes.run();
         Graph graph = bes.getCurrentGraph();
-        SearchGraphUtils.pdagToDag(graph);
+        pdagToDag(graph);
         dag = new Dag(graph);
     }
 
@@ -120,7 +121,7 @@ public class CircularDag {
     }
 
     private Dag transformPDAGtoDAG(Graph besGraph) {
-        SearchGraphUtils.pdagToDag(besGraph);
+        pdagToDag(besGraph);
         return new Dag(besGraph);
     }
     

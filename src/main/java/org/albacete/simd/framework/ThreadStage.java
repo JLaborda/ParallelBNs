@@ -3,7 +3,6 @@ package org.albacete.simd.framework;
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
-import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.threads.GESThread;
@@ -11,6 +10,7 @@ import org.albacete.simd.utils.Problem;
 
 import java.util.List;
 import java.util.Set;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 public abstract class ThreadStage extends Stage{
     /**
@@ -72,7 +72,7 @@ public abstract class ThreadStage extends Stage{
             score_threads = score_threads + gesThreads[i].getScoreBDeu();
 
             // Removing Inconsistencies and transforming it to a DAG
-            SearchGraphUtils.pdagToDag(g);
+            pdagToDag(g);
             Dag gdag = new Dag(g);
             //Dag gdag = Utils.removeInconsistencies(g);
 
