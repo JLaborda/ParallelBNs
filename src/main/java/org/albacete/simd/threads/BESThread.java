@@ -81,7 +81,7 @@ public class BESThread extends GESThread {
                 this.flag = true;
                 return graph;
             } else {
-                System.out.println("   ["+getId()+"] ELSE");
+                //System.out.println("   ["+getId()+"] ELSE");
                 this.modelBDeu = scoreInitial;
                 this.flag = false;
                 return this.initialDag;
@@ -101,7 +101,7 @@ public class BESThread extends GESThread {
      *         the backward equivalence search.
      */
     private double bes(Graph graph, double score) {
-        System.out.println("** BACKWARD EQUIVALENCE SEARCH");
+        //System.out.println("** BACKWARD EQUIVALENCE SEARCH");
         double bestScore = score;
         double bestDelete;
 
@@ -109,7 +109,7 @@ public class BESThread extends GESThread {
         y_d = null;
         h_0 = null;
 
-        System.out.println("Initial Score = " + nf.format(bestScore));
+        //System.out.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
         bestDelete = bs(graph,bestScore);
 
@@ -132,12 +132,13 @@ public class BESThread extends GESThread {
                 System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_d, y_d) + " " + h_0);
             else
                 System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_d, y_d));
+            
             bestScore = bestDelete;
             //System.out.println("    Real Score" + scoreGraph(graph, problem));
 
             // Checking that the maximum number of edges has not been reached
             if (getMaxNumEdges() != -1 && graph.getNumEdges() > getMaxNumEdges()) {
-                System.out.println("Maximum edges reached");
+                //System.out.println("Maximum edges reached");
                 break;
             }
 

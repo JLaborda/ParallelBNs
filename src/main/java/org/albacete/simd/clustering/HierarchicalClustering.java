@@ -46,9 +46,11 @@ public class HierarchicalClustering extends Clustering{
             Node child = edge.getNode2();
             int parentIndex = index.get(parent);
             int childIndex = index.get(child);
-
-            double score = GESThread.localBdeuScore(childIndex, new int[]{parentIndex}, problem) -
-                    GESThread.localBdeuScore(childIndex, new int[]{}, problem);
+            
+            HashSet<Node> hashParent = new HashSet<>();
+            hashParent.add(parent);
+            double score = GESThread.localBdeuScore(childIndex, new int[]{parentIndex}, hashParent, problem) -
+                    GESThread.localBdeuScore(childIndex, new int[]{}, new HashSet<>(), problem);
             edgeScores.put(edge, score);
             //edgeScores.put(edge.reverse(), score);  // Debería funcionar con Utils.calculateEdges, pero no da buenos resultados
         });

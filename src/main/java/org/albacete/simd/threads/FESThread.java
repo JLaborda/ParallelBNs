@@ -96,7 +96,7 @@ public class FESThread extends GESThread {
                 this.flag = true;
                 return graph;
             } else {
-                System.out.println("   [" + getId() + "] ELSE");
+                //System.out.println("   [" + getId() + "] ELSE");
                 this.modelBDeu = scoreInitial;
                 this.flag = false;
                 return this.initialDag;
@@ -117,7 +117,7 @@ public class FESThread extends GESThread {
      * search.
      */
     private double fes(Graph graph, double score) {
-        System.out.println("** FORWARD EQUIVALENCE SEARCH");
+        //System.out.println("** FORWARD EQUIVALENCE SEARCH");
         double bestScore = score;
         double bestInsert;
 
@@ -126,7 +126,7 @@ public class FESThread extends GESThread {
         t_0 = null;
         iterations = 0;
 
-        System.out.println("Initial Score = " + nf.format(bestScore));
+        //System.out.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
         bestInsert = fs(graph, bestScore);
 
@@ -153,7 +153,7 @@ public class FESThread extends GESThread {
 
             // Checking that the maximum number of edges has not been reached
             if (getMaxNumEdges() != -1 && graph.getNumEdges() >= getMaxNumEdges()) {
-                System.out.println("Maximum edges reached");
+                //System.out.println("Maximum edges reached");
                 break;
             }
 

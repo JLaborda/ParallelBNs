@@ -187,13 +187,13 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage where the edge will be inserted into.
      */
     public static void insert(Node x, Node y, Set<Node> subset, Graph graph) {
-        System.out.println("Insert: " + x + " -> " + y);
+        //System.out.println("Insert: " + x + " -> " + y);
         graph.addDirectedEdge(x, y);
 
         for (Node node : subset) {
-            System.out.println("Delete: " + node + " -- " + y);
+            //System.out.println("Delete: " + node + " -- " + y);
             graph.removeEdge(node, y);
-            System.out.println("Insert: " + node + " -> " + y);
+            //System.out.println("Insert: " + node + " -> " + y);
             graph.addDirectedEdge(node, y);
         }
     }
@@ -206,20 +206,20 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage where the edge will be deleted from.
      */
     public static void delete(Node x, Node y, Set<Node> subset, Graph graph) {
-        System.out.println("Delete: " + x + " -- " + y);
+        //System.out.println("Delete: " + x + " -- " + y);
         graph.removeEdges(x, y);
 
         for (Node aSubset : subset) {
-            System.out.println("Deleting Edges in subset");
+            //System.out.println("Deleting Edges in subset");
             if (!graph.isParentOf(aSubset, x) && !graph.isParentOf(x, aSubset)) {
-                System.out.println("Delete: " + x + " -- " + aSubset);
+                //System.out.println("Delete: " + x + " -- " + aSubset);
                 graph.removeEdge(x, aSubset);
-                System.out.println("Insert: " + x + " -> " + aSubset);
+                //System.out.println("Insert: " + x + " -> " + aSubset);
                 graph.addDirectedEdge(x, aSubset);
             }
-            System.out.println("Delete: " + y + " -- " + aSubset);
+            //System.out.println("Delete: " + y + " -- " + aSubset);
             graph.removeEdge(y, aSubset);
-            System.out.println("Insert: " + y + " -> " + aSubset);
+            //System.out.println("Insert: " + y + " -> " + aSubset);
             graph.addDirectedEdge(y, aSubset);
         }
     }
@@ -307,9 +307,9 @@ public abstract class GESThread implements Runnable{
             return false;
         }
         
-//        // nueva forma de calcular los caminos semidirigidos.
-//        
-        Graph aux = new EdgeListGraph_n(graph);
+        // nueva forma de calcular los caminos semidirigidos (tarda mucho el new EdgeListGraph_n(graph))
+      
+        /*Graph aux = new EdgeListGraph_n(graph);
         aux.removeNodes(naYXT);
         
         LinkedList<Node> open = new LinkedList<Node>();
@@ -328,25 +328,25 @@ public abstract class GESThread implements Runnable{
         			open.addLast(n);
         	}
         }
-        return true;
+        return true;*/
 
-//        for (Node node1 : graph.getNodes()) {
-//            if (node1 == y || marked.contains(node1)) {
-//                continue;
-//            }
-//
-//            if (graph.isAdjacentTo(y, node1) && !graph.isParentOf(node1, y)) {
-//                marked.add(node1);
-//
-//                if (!isSemiDirectedBlocked(x, node1, naYXT, graph, marked)) {
-//                    return false;
-//                }
-//
-//                marked.remove(node1);
-//            }
-//        }
-//
-//        return true;
+        for (Node node1 : graph.getNodes()) {
+            if (node1 == y || marked.contains(node1)) {
+                continue;
+            }
+
+            if (graph.isAdjacentTo(y, node1) && !graph.isParentOf(node1, y)) {
+                marked.add(node1);
+
+                if (!isSemiDirectedBlocked(x, node1, naYXT, graph, marked)) {
+                    return false;
+                }
+
+                marked.remove(node1);
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -399,7 +399,7 @@ public abstract class GESThread implements Runnable{
         double score = 0.;
 
         for (Node next : dag.getNodes()) {
-            Collection<Node> parents = dag.getParents(next);
+            Set<Node> parents = new HashSet<>(dag.getParents(next));
             int nextIndex = -1;
             for (int i = 0; i < problem.getVariables().size(); i++) {
                 String[] varNames = problem.getVarNames();
@@ -421,7 +421,7 @@ public abstract class GESThread implements Runnable{
                     }
                 }
             }
-            score += localBdeuScore(nextIndex, parentIndices, problem);
+            score += localBdeuScore(nextIndex, parentIndices, parents, problem);
         }
         return score;
     }
@@ -485,8 +485,8 @@ public abstract class GESThread implements Runnable{
         }
 
         // Calculating the scores of both possibilities and returning the difference
-        double score1 = localBdeuScore(yIndex, parentIndices1, problem);
-        double score2 = localBdeuScore(yIndex, parentIndices2, problem);
+        double score1 = localBdeuScore(yIndex, parentIndices1, parents1, problem);
+        double score2 = localBdeuScore(yIndex, parentIndices2, parents2, problem);
         return score1 - score2;
     }
 
@@ -497,15 +497,16 @@ public abstract class GESThread implements Runnable{
      *
      * @param nNode    index of the child node
      * @param nParents index of the parents of the node being considered as child.
+     * @param setParents set with the parent of the node being considered as child.
      * @return The Bdeu score of the combination.
      */
 
-    public static double localBdeuScore(int nNode, int[] nParents, Problem problem) {
+    public static double localBdeuScore(int nNode, int[] nParents, Set<Node> setParents, Problem problem) {
         numTotalCalls++;
 
         LocalScoreCacheConcurrent localScoreCache = problem.getLocalScoreCache();
 
-        double oldScore = localScoreCache.get(nNode, nParents);
+        double oldScore = localScoreCache.get(nNode, setParents);
         if (!Double.isNaN(oldScore)) {
             return oldScore;
         }
@@ -565,7 +566,7 @@ public abstract class GESThread implements Runnable{
         }
         fLogScore += Math.log(kappa) * cardinality * (numValues - 1);
 
-        localScoreCache.add(nNode, nParents, fLogScore);
+        localScoreCache.add(nNode, setParents, fLogScore);
         return fLogScore;
     }
 

@@ -50,7 +50,6 @@ public class PGESwithStages extends BNBuilder {
         if (it >= this.maxIterations)
             return true;
 
-        System.out.println("      Comprobando convergencia. FES: " + fesFlag + ", BES: " + besFlag);
         // Checking working status
         if(!fesFlag && !besFlag){
             return true;
@@ -68,11 +67,6 @@ public class PGESwithStages extends BNBuilder {
     @Override
     protected void repartition() {
         this.subSets = clustering.generateEdgeDistribution(nThreads, false);
-        System.out.println("\n\n\n");
-        for (Set<Edge> subSet : subSets) {
-            System.out.println(subSet);
-        }
-        System.out.println("\n\n\n");
     }
 
     @Override

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -29,6 +28,9 @@ public class EdgeListGraph_n extends EdgeListGraph {
         if (graph == null) {
             throw new NullPointerException("Graph must not be null.");
         }
+        
+        this.neighboursMap = new HashMap(graph.getNumNodes());
+        this.nodesHash = new HashSet(graph.getNumNodes());
 
         transferNodesAndEdges(graph);
 
@@ -45,7 +47,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
             }
         }
 
-        for (Node node : this.nodes) {
+        for (Node node : this.nodesHash) {
             this.namesHash.put(node.getName(), node);
         }
 
@@ -59,6 +61,9 @@ public class EdgeListGraph_n extends EdgeListGraph {
         if (nodes == null) {
             throw new NullPointerException();
         }
+        
+        this.neighboursMap = new HashMap(nodes.size());
+        this.nodesHash = new HashSet(nodes.size());
 
         for (Node variable : nodes) {
             if (!addNode(variable)) {
@@ -75,7 +80,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
      */
     @Override
     public boolean isAdjacentTo(Node node1, Node node2) {
-        if (node1 == null || node2 == null || this.edgeLists.get(node1) == null || this.edgeLists.get(node2) == null) {
+        if (node1 == null || node2 == null) {
             return false;
         }
 
@@ -207,12 +212,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
             return false;
         }
 
-        if (this.edgeLists.containsKey(node)) {
-            return false;
-        }
-
         this.edgeLists.put(node, new HashSet<>());
-        this.nodes.add(node);
         this.namesHash.put(node.getName(), node);
         
         this.neighboursMap.put(node, new HashSet<>());
@@ -255,7 +255,6 @@ public class EdgeListGraph_n extends EdgeListGraph {
         }
 
         this.edgeLists.remove(node);
-        this.nodes.remove(node);
         this.namesHash.remove(node.getName());
         this.neighboursMap.remove(node);
         this.stuffRemovedSinceLastTripleAccess = true;
@@ -274,42 +273,147 @@ public class EdgeListGraph_n extends EdgeListGraph {
         return this.nodesHash.contains(node);
     }
     
-    
-    
-    class nodesPair {
-        Node node1;
-        Node node2;
-        
-        public nodesPair(Node node1, Node node2){
-            this.node1 = node1;
-            this.node2 = node2;
-        }
-        
-        @Override
-        public boolean equals(Object o) {
-            // self check
-            if (this == o)
-                return true;
-            // null check
-            if (o == null)
-                return false;
-            // type check and cast
-            if (getClass() != o.getClass())
-                return false;
-            nodesPair nodes = (nodesPair) o;
-            // field comparison
-            return node1.equals(nodes.node1)
-                    && node2.equals(nodes.node2);
+    /**
+     * @return a matrix of endpoints for the nodes in this graph, with nodes in
+     * the same order as getNodes().
+     */
+    @Override
+    public Endpoint[][] getEndpointMatrix() {
+        Node[] arrNodes = (Node[])this.nodesHash.toArray();
+        int size = arrNodes.length;
+        Endpoint[][] endpoints = new Endpoint[size][size];
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (i == j) {
+                    continue;
+                }
+                endpoints[i][j] = getEndpoint(arrNodes[i], arrNodes[j]);
+            }
         }
 
-        @Override
-        public int hashCode() {
-            int hash = 3;
-            hash = 23 * hash + Objects.hashCode(this.node1);
-            hash = 23 * hash + Objects.hashCode(this.node2);
-            return hash;
+        return endpoints;
+    }
+    
+        
+    /**
+     * Resets the graph so that it is fully connects it using #-# edges, where #
+     * is the given endpoint.
+     * @param endpoint
+     */
+    @Override
+    public void fullyConnect(Endpoint endpoint) {
+        this.edgesSet.clear();
+        this.edgeLists.clear();
+
+        for (Node node : this.nodesHash) {
+            this.edgeLists.put(node, new HashSet<>());
+        }
+        
+        Node[] arrNodes = (Node[])this.nodesHash.toArray();
+        int size = arrNodes.length;
+
+        for (int i = 0; i < size; i++) {
+            for (int j = i + 1; j < size; j++) {
+                Edge edge = new Edge(arrNodes[i], arrNodes[j], endpoint, endpoint);
+                addEdge(edge);
+            }
+        }
+    }
+    
+    /**
+     * @return the number of nodes in the graph.
+     */
+    @Override
+    public int getNumNodes() {
+        return this.nodesHash.size();
+    }
+    
+    @Override
+    public List<Node> getNodes() {
+        return new ArrayList<>(this.nodesHash);
+    }
+    
+    @Override
+    public void setNodes(List<Node> nodes) {
+        if (nodes.size() != this.nodesHash.size()) {
+            throw new IllegalArgumentException("Sorry, there is a mismatch in the number of variables "
+                    + "you are trying to set.");
         }
 
+        this.nodesHash.clear();
+        this.nodesHash.addAll(nodes);
+    }
+    
+    public void setNodes(HashSet<Node> nodesHash) {
+        if (nodesHash.size() != this.nodesHash.size()) {
+            throw new IllegalArgumentException("Sorry, there is a mismatch in the number of variables "
+                    + "you are trying to set.");
+        }
+
+        this.nodesHash.clear();
+        this.nodesHash.addAll(nodes);
+    }
+
+    /**
+     * Removes all nodes (and therefore all edges) from the graph.
+     */
+    @Override
+    public void clear() {
+        Iterator<Edge> it = getEdges().iterator();
+
+        while (it.hasNext()) {
+            Edge edge = it.next();
+            it.remove();
+            getPcs().firePropertyChange("edgeRemoved", edge, null);
+        }
+
+        Iterator<Node> it2 = this.nodesHash.iterator();
+
+        while (it2.hasNext()) {
+            Node node = it2.next();
+            it2.remove();
+            this.namesHash.remove(node.getName());
+            getPcs().firePropertyChange("nodeRemoved", node, null);
+        }
+
+        this.edgeLists.clear();
+    }
+
+    
+    @Override
+    public int hashCode() {
+        int hashCode = 0;
+
+        for (Edge edge : getEdges()) {
+            hashCode += edge.hashCode();
+        }
+
+        return (new HashSet<>(this.nodesHash)).hashCode() + hashCode;
+    }
+
+    /**
+     * @return true iff the given object is a graph that is equal to this graph,
+     * in the sense that it contains the same nodes and the edges are
+     * isomorphic.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        if (o instanceof EdgeListGraph_n) {
+            EdgeListGraph_n _o = (EdgeListGraph_n) o;
+            boolean nodesEqual = new HashSet<>(_o.nodesHash).equals(new HashSet<>(this.nodesHash));
+            boolean edgesEqual = new HashSet<>(_o.edgesSet).equals(new HashSet<>(this.edgesSet));
+            return (nodesEqual && edgesEqual);
+        } else {
+            Graph graph = (Graph) o;
+            return new HashSet<>(graph.getNodeNames()).equals(new HashSet<>(getNodeNames()))
+                    && new HashSet<>(graph.getEdges()).equals(new HashSet<>(getEdges()));
+
+        }
     }
     
 }
