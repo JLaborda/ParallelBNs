@@ -1,5 +1,6 @@
 package org.albacete.simd.experiments;
 
+import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
@@ -12,27 +13,20 @@ import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExperimentPGES extends Experiment{
 
-    private PGESv2 alg;
 
-    public ExperimentPGES(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
-        super(net_path,bbdd_path,nThreads,maxIterations,nItInterleaving);
+    private PGESv2 algorithm;
+
+    public ExperimentPGES(String net_path, String bbdd_path, String test_path, int nThreads, int maxIterations, int nItInterleaving, long partition_seed) {
+        super(net_path,bbdd_path, test_path, nThreads,maxIterations,nItInterleaving, partition_seed);
         this.algName = "pges";
+
     }
-
-    public ExperimentPGES(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
-        this(net_path, bbdd_path, nThreads, 15, nItInterleaving);
-    }
-
-
-
 
 
     public void runExperiment() {
@@ -52,21 +46,23 @@ public class ExperimentPGES extends Experiment{
             long startTime = System.currentTimeMillis();
             BIFReader bf = new BIFReader();
             bf.processFile(this.net_path);
-            BayesNet bn = (BayesNet) bf;
-            System.out.println("Numero de variables: "+bn.getNrOfNodes());
-            MlBayesIm bn2 = new MlBayesIm(bn);
+            BayesNet bn = bf;
+            System.out.println("Numero de variables: " + bn.getNrOfNodes());
+            //Transforming the BayesNet into a BayesPm
+            BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bn);
+            MlBayesIm bn2 = new MlBayesIm(bayesPm);
             DataReader reader = new DataReader();
             reader.setDelimiter(DelimiterType.COMMA);
             reader.setMaxIntegralDiscrete(100);
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new PGESv2(dataSet,this.nThreads);
-            this.alg.setMaxIterations(this.maxIterations);
-            this.alg.setNFESItInterleaving(this.nItInterleaving);
+            this.algorithm = new PGESv2(dataSet, this.nThreads);
+            this.algorithm.setMaxIterations(this.maxIterations);
+            this.algorithm.setNFESItInterleaving(this.nItInterleaving);
 
             // Search is executed
-            alg.search();
+            algorithm.search();
 
             // Measuring time
             long endTime = System.currentTimeMillis();
@@ -93,13 +89,15 @@ public class ExperimentPGES extends Experiment{
             // System.out.println(cond);
 
 
+            //Metrics
+            Dag original = new Dag(bn2.getDag());
+            Dag result = new Dag(algorithm.getCurrentGraph());
+            this.shd = Utils.SHD(original, result);
+            this.dfmm = Utils.avgMarkovBlanquetdif(original, result);
+            this.nIterations = algorithm.getIterations();
+            this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
+            this.LLscore = Utils.LL(result, test_dataset);
 
-            this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
-            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
-            this.nIterations = alg.getIterations();
-            this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem());
-
-            //printResults();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,12 +109,13 @@ public class ExperimentPGES extends Experiment{
         // Report
         System.out.println(this);
         System.out.println("Resulting DAG:");
-        System.out.println(alg.getCurrentGraph());
+        System.out.println(algorithm.getCurrentGraph());
         System.out.println("Total Nodes of Resulting DAG");
-        System.out.println(alg.getCurrentGraph().getNodes().size());
+        System.out.println(algorithm.getCurrentGraph().getNodes().size());
         System.out.println("-------------------------\nMetrics: ");
 
         System.out.println("SHD: "+shd);
+        System.out.println("LLScore: " + this.LLscore);
         System.out.println("Final BDeu: " +this.score);
         System.out.println("Total execution time (s): " + elapsedTime/1000);
         System.out.println("Total number of Iterations: " + this.nIterations);
@@ -126,6 +125,7 @@ public class ExperimentPGES extends Experiment{
 
     }
 
+    /*
     @Override
     public void saveExperiment() {
         try {
@@ -167,12 +167,11 @@ public class ExperimentPGES extends Experiment{
             csvWriter_global.close();
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
     }
-
+*/
     public static ArrayList<String> getNetworkPaths(String netFolder){
         // Getting networks
 

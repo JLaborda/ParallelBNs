@@ -9,34 +9,43 @@ import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Set;
 
-public class GES {
+public class GES{
 
     private FESThread fes;
     private BESThread bes;
     private Graph initialDag;
     private long elapsedTime;
     private double modelBDeu;
-
-    private int maxIt = 15;
-    private List<Edge> combinations;
+    //private int interleaving = Integer.MAX_VALUE;
+    private Set<Edge> combinations;
     private Graph graph;
     private Problem problem;
 
 
     public GES(DataSet dataSet){
-
         this.problem = new Problem(dataSet);
         this.combinations = Utils.calculateArcs(problem.getData());
         this.initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
-
     }
 
     public GES(DataSet dataSet, Graph initialDag){
         this(dataSet);
         this.initialDag = initialDag;
     }
+/*
+    public GES(DataSet dataSet, int interleaving){
+        this(dataSet);
+        this.interleaving = interleaving;
+    }
+
+    public GES(DataSet dataSet, Graph initialDag, int interleaving){
+        this(dataSet, initialDag);
+        this.interleaving = interleaving;
+    }
+*/
 
 /*
     */
@@ -91,7 +100,7 @@ public class GES {
      *
      * @return the resulting Pattern.
      */
-    public Graph search(int interleaving) throws InterruptedException {
+    public Graph search() throws InterruptedException {
         long startTime = System.currentTimeMillis();
 
 
@@ -100,9 +109,9 @@ public class GES {
         // Method 1-- original.
         double score = 0;
 
-        // Doing forward search
+        // Doing forward search without interleaving
         System.out.println("FES stage: ");
-        fes = new FESThread(problem, combinations, interleaving);
+        fes = new FESThread(problem, initialDag, combinations, Integer.MAX_VALUE);
         fes.run();
         graph = fes.getCurrentGraph();
 
@@ -119,10 +128,8 @@ public class GES {
 
         // Measuring stats
         long endTime = System.currentTimeMillis();
-        this.elapsedTime = endTime - startTime;
+        this.elapsedTime =  endTime - startTime;
         this.modelBDeu = score;
-
-
         return graph;
     }
 
@@ -137,5 +144,13 @@ public class GES {
 
     public Problem getProblem() {
         return problem;
+    }
+
+    public double getModelBDeu(){
+        return modelBDeu;
+    }
+
+    public long getElapsedTime() {
+        return elapsedTime;
     }
 }

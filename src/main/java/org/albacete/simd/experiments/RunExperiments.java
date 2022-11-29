@@ -1,131 +1,125 @@
+
 package org.albacete.simd.experiments;
 
-import java.awt.*;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class RunExperiments {
 
-    public static final String networksFolder = "res/networks/";
-    public static final String bbddFolder = networksFolder + "BBDD/";
-    public static final String endingNetwork = ".xbif";
-    public static final String endingbbdd10k = "10k.csv";
-    public static final String endingbbdd50k = "50k.csv";
+    public static final String NET_FOLDER = "./res/networks/";
+    public static final String BBDD_FOLDER = "./res/networks/BBDD/";
+    public static final String TEST_FOLDER = "./res/networks/BBDD/tests/";
+    // Redes pequeñas - medianas (20-50 nodos)
+    public static final String[] NET_NAMES = {"alarm", "child", "insurance", "water", "hailfinder", "hepar2", "win95pts", "link", "pigs"};/*,
+            {"alarm","andes", "barley", "cancer", "child", "earthquake",
+    "hailfinder", "hepar2", "insurance", "link", "mildew", "munin", "pigs", "water", "win95pts"};*/
+    // barley da problemas (OutOfMemoryError)
+    public static final String EXPERIMENTS_FOLDER = "./experiments/MACJorge/";
 
-    public static void runAllExperiments(int[] nThreads, int[] nInterleavings, HashMap<String, HashMap<String,String>> map) {
-        for(int j=0; j<nThreads.length; j++) {
-            int nThread = nThreads[j];
-            for(int k=0; k<nInterleavings.length; k++) {
-                int nInterleaving = nInterleavings[k];
-                for(String key1 : map.keySet()) {
-                    HashMap<String,String> aux = map.get(key1);
-                    for (String net_path: aux.keySet()) {
-                        System.out.println("***********************************");
-                        System.out.println("***********NEW EXPERIMENT**********");
-                        System.out.println("***********************************");
-                        String bbdd_path = aux.get(net_path);
-                        System.out.println("Net_Path: " + net_path);
-                        System.out.println("BBDD_Path: " + bbdd_path);
 
-                        // Running Experiment
-                        Experiment experiment = new ExperimentPGES(net_path, bbdd_path, nThread, 15, nInterleaving);
-                        experiment.runExperiment();
-                        //Saving Experiment
-                        experiment.saveExperiment();
-
-                    }
-                }
-            }
-        }
-    }
-
-    public static void runExperiments(List<Experiment> experiments){
-        for(Experiment experiment : experiments){
-            System.out.println(experiment);
-            experiment.runExperiment();
-            experiment.printResults();
-            experiment.saveExperiment();
-        }
-    }
-
-    public static void runAndSaveExperiment(Experiment experiment){
-        System.out.println(experiment);
-        experiment.runExperiment();
-        experiment.printResults();
-        experiment.saveExperiment();
-    }
-
-    public static void createAndRunExperiments(String[] networks, int[] threads, int[] interleavings, int maxIterations ){
-        Experiment experiment;
-        for(String net : networks){
-            String netPath = networksFolder + net + endingNetwork;
-            String bbddPath50k = bbddFolder + net + endingbbdd50k;
-            String bbddPath10k = bbddFolder + net + endingbbdd10k;
-            for(int interleaving: interleavings){
-                for(int nThread : threads){
-                    //pges
-                    experiment = new ExperimentPGES(netPath, bbddPath50k, nThread, maxIterations, interleaving);
-                    runAndSaveExperiment(experiment);
-                    experiment = new ExperimentPGES(netPath, bbddPath10k, nThread, maxIterations, interleaving);
-                    runAndSaveExperiment(experiment);
-
-                    //phc
-                    experiment = new ExperimentPHC(netPath, bbddPath50k, nThread, maxIterations, interleaving);
-                    runAndSaveExperiment(experiment);
-                    experiment = new ExperimentPHC(netPath, bbddPath10k, nThread, maxIterations, interleaving);
-                    runAndSaveExperiment(experiment);
-
-                    //pfhcbes
-                    experiment = new ExperimentPFHCBES(netPath, bbddPath50k, nThread, maxIterations, interleaving);
-                    runAndSaveExperiment(experiment);
-                    experiment = new ExperimentPFHCBES(netPath, bbddPath10k, nThread, maxIterations, interleaving);
-                    runAndSaveExperiment(experiment);
-                }
-
-                // hc
-                experiment = new ExperimentHC(netPath, bbddPath50k, 0, maxIterations, interleaving);
-                runAndSaveExperiment(experiment);
-                experiment = new ExperimentHC(netPath, bbddPath10k, 0, maxIterations, interleaving);
-                runAndSaveExperiment(experiment);
-            }
-            //ges
-            experiment = new ExperimentGES(netPath, bbddPath50k);
-            runAndSaveExperiment(experiment);
-            experiment = new ExperimentGES(netPath, bbddPath10k);
-            runAndSaveExperiment(experiment);
-        }
+    public static String createNetworkPath(String net_name){
+        // Adding net paths
+        return NET_FOLDER + net_name + ".xbif";
 
     }
+
+
+    public static List<String>  createBBDDPaths(String net_name){
+        List<String> bbdd_paths = new ArrayList<>();
+        bbdd_paths.add(BBDD_FOLDER + net_name + ".xbif50001_.csv");
+        bbdd_paths.add(BBDD_FOLDER + net_name + ".xbif50002_.csv");
+        bbdd_paths.add(BBDD_FOLDER + net_name + ".xbif50003_.csv");
+        bbdd_paths.add(BBDD_FOLDER + net_name + ".xbif50004_.csv");
+        bbdd_paths.add(BBDD_FOLDER + net_name + ".xbif50005_.csv");
+        bbdd_paths.add(BBDD_FOLDER + net_name + ".xbif50006_.csv");
+        bbdd_paths.add(BBDD_FOLDER + net_name + ".xbif50007_.csv");
+        bbdd_paths.add(BBDD_FOLDER + net_name + ".xbif50008_.csv");
+        bbdd_paths.add(BBDD_FOLDER + net_name + ".xbif50009_.csv");
+        bbdd_paths.add(BBDD_FOLDER + net_name + ".xbif50001246_.csv");
+        return bbdd_paths;
+
+    }
+
+    public static String createTestPath(String net_name){
+        return TEST_FOLDER + net_name + "_test.csv";
+    }
+
 
 
     public static void main(String[] args) throws FileNotFoundException {
+        try {
+            String savePathBase = EXPERIMENTS_FOLDER  + "total/experiments_";
+            // Initial variables
+            int[] threads = {1, 2, 4, 6, 8};
+            int maxIterations = 100;
+            int[] interleavings = {5, 10, 15};
+            int[] seeds = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
 
-        String net_name = "barley";
-        String fileName = "outputs/output_experiments_" + net_name + ".txt";
-        PrintStream fileStream = new PrintStream(fileName);
-        System.setOut(fileStream);
+            //StringBuilder result = new StringBuilder(header);
+            Experiment experiment;
+            for (String netName : NET_NAMES){
+                String savePath = savePathBase + netName + ".csv";
+                File file = new File(savePath);
+                FileWriter csvWriter = new FileWriter(file,true);
+                if(file.length() == 0) {
+                    String header = "algorithm, network, bbdd, thread, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, Total iterations, Total time(s)\n";
+                    csvWriter.append(header);
+                }
+                // Creating Experiments
+                //List<Experiment> experiments = new ArrayList<Experiment>();
+                String netPath = createNetworkPath(netName);
+                List<String> bbddPaths = createBBDDPaths(netName);
+                String testPath = createTestPath(netName);
+                for (String bbddPath : bbddPaths){
+                    // GES
+                    experiment = new ExperimentGES(netPath, bbddPath, testPath);
+                    experiment.runExperiment();
+                    experiment.printResults();
+                    csvWriter.append(experiment.getResults());
+                    csvWriter.flush();
+                    for(Integer interleaving : interleavings){
+
+                        //HC
+                        experiment = new ExperimentHC(netPath, bbddPath, testPath, maxIterations, interleaving);
+                        experiment.runExperiment();
+                        experiment.printResults();
+                        csvWriter.append(experiment.getResults());
+                        csvWriter.flush();
 
 
-        //String[] nets = new String[]{"cancer", "earthquake",
-        //"alarm", "barley", "child", "insurance", "mildew", "water"};
-        String[] nets = new String[]{net_name};
-        int[] threads = new int[]{2, 4, 6, 8};
-        int[] interleavings = new int[]{5, 10, 15};
-        int maxIt = 25;
+                        for (Integer thread : threads){
+                            for (Integer seed: seeds){
+                                //PFHCBES
+                                experiment = new ExperimentPFHCBES(netPath, bbddPath, testPath, thread, maxIterations, interleaving, seed);
+                                experiment.runExperiment();
+                                experiment.printResults();
+                                csvWriter.append(experiment.getResults());
+                                csvWriter.flush();
 
-        // Creating Experiments
-        //List<Experiment> experimentList = createExperiments(nets, threads, interleavings, maxIt);
+                                //PGES
+                                experiment = new ExperimentPGES(netPath, bbddPath, testPath, thread, maxIterations, interleaving, seed);
+                                experiment.runExperiment();
+                                experiment.printResults();
+                                csvWriter.append(experiment.getResults());
+                                //PHC
+                                experiment = new ExperimentPHC(netPath, bbddPath, testPath, thread, maxIterations, interleaving, seed);
+                                experiment.runExperiment();
+                                experiment.printResults();
+                                csvWriter.append(experiment.getResults());
+                                csvWriter.flush();
 
-        // Running Experiments
-        // runExperiments(experimentList);
 
-        // Running Experiments
-        createAndRunExperiments(nets, threads, interleavings, maxIt);
-
-        Toolkit.getDefaultToolkit().beep();
-
+                            }
+                        }
+                    }
+                }
+                //Saving and closing writer
+                csvWriter.flush();
+                csvWriter.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

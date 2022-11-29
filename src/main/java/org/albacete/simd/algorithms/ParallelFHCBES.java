@@ -44,7 +44,7 @@ public class ParallelFHCBES extends BNBuilder {
     @Override
     protected void repartition() {
         // Random Partition
-        subSets = Utils.split(listOfArcs, nThreads);
+        subSets = Utils.split(setOfArcs, nThreads);
     }
 
     @Override
@@ -70,9 +70,9 @@ public class ParallelFHCBES extends BNBuilder {
 
     @Override
     protected void backwardFusion() throws InterruptedException {
-        Stage besFusion = new BESFusion(problem, currentGraph, graphs);
-        besFusion.run();
-        currentGraph = besFusion.getCurrentGraph();
+        //Stage besFusion = new BESFusion(problem, currentGraph, graphs);
+        //besFusion.run();
+        //currentGraph = besFusion.getCurrentGraph();
     }
 
 

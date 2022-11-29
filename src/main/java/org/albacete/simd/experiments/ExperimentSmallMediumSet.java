@@ -73,7 +73,7 @@ public class ExperimentSmallMediumSet {
         names.add("insurance");
         names.add("water");
         */
-        HashMap<String, HashMap<String, String>> map =  hashNetworks(net_paths, bbdd_paths, names);
+        //HashMap<String, HashMap<String, String>> map =  hashNetworks(net_paths, bbdd_paths, names);
 
         /*
         for (String key: map.keySet() ) {
@@ -86,8 +86,8 @@ public class ExperimentSmallMediumSet {
         }
          */
 
-        int[] nThreads = {1,2,4,8};
-        int[] nInterleavings = {5, 10, 15};
+        //int[] nThreads = {1,2,4,8};
+        //int[] nInterleavings = {5, 10, 15};
 
         //Experiment.runAllExperiments(nThreads, nInterleavings, map);
     }

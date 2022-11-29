@@ -1,23 +1,31 @@
 package org.albacete.simd.framework;
 
 import edu.cmu.tetrad.graph.Edge;
-import org.albacete.simd.algorithms.HillClimbingSearch;
+import org.albacete.simd.Resources;
+import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
 public class BNBuilderTest {
 
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
+
     @Test
     public void settersAndGettersTest(){
-        String path = "src/test/resources/alarm.xbif_.csv";
+        String path = Resources.CANCER_BBDD_PATH;
         BNBuilder algorithm = new HillClimbingSearch(path, 15, 5);
-        Problem problem = new Problem(path);
-        List<Edge> arcs = Utils.calculateArcs(problem.getData());
+        Problem problem = algorithm.getProblem();
+        Set<Edge> arcs = Utils.calculateArcs(problem.getData());
 
         algorithm.setSeed(30);
         algorithm.setMaxIterations(30);
@@ -25,7 +33,7 @@ public class BNBuilderTest {
 
 
         assertEquals(30, algorithm.getSeed());
-        assertEquals(arcs, algorithm.getListOfArcs());
+        assertEquals(arcs, algorithm.getSetOfArcs());
         assertTrue(algorithm.getSubSets().isEmpty());
         assertEquals(problem.getData(), algorithm.getData());
         assertEquals(30, algorithm.getMaxIterations());
@@ -34,7 +42,7 @@ public class BNBuilderTest {
         assertNull(algorithm.getCurrentGraph());
         assertEquals(1, algorithm.getIterations());
         assertEquals(problem, algorithm.getProblem());
-        assertEquals(1, algorithm.getnThreads());
+        assertEquals(0, algorithm.getnThreads());
 
 
     }

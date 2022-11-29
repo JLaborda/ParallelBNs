@@ -5,18 +5,29 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Graph;
-import org.albacete.simd.algorithms.GES;
+import org.albacete.simd.Resources;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Problem;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class GESTest {
+
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
+
 
     @Test
     public void constructorTests() throws IOException {
@@ -25,7 +36,7 @@ public class GESTest {
         reader.setMaxIntegralDiscrete(100);
 
         // Creating GES with the first constructor
-        DataSet dataSet = reader.parseTabular(new File("res/networks/BBDD/alarm.xbif_.csv"));
+        DataSet dataSet = reader.parseTabular(new File(Resources.CANCER_BBDD_PATH));
         GES ges1 = new GES(dataSet);
 
         // Creating GES with the second constructor
@@ -43,7 +54,7 @@ public class GESTest {
         reader.setMaxIntegralDiscrete(100);
 
         // Creating GES with the first constructor
-        DataSet dataSet = reader.parseTabular(new File("res/networks/BBDD/cancer.xbif_.csv"));
+        DataSet dataSet = reader.parseTabular(new File(Resources.CANCER_BBDD_PATH));
         GES ges1 = new GES(dataSet);
 
         ges1.search(100);
@@ -60,7 +71,7 @@ public class GESTest {
         reader.setMaxIntegralDiscrete(100);
 
         // Creating GES with the first constructor
-        DataSet dataSet = reader.parseTabular(new File("res/networks/BBDD/cancer.xbif_.csv"));
+        DataSet dataSet = reader.parseTabular(new File(Resources.CANCER_BBDD_PATH));
         Problem expected = new Problem(dataSet);
 
         GES ges1 = new GES(dataSet);

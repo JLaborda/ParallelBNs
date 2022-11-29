@@ -1,25 +1,38 @@
 package org.albacete.simd.experiments;
 
+import org.albacete.simd.Resources;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import static org.junit.Assert.*;
 
 public class ExperimentsTest {
+    String net_path = Resources.CANCER_NET_PATH;
+    String bbdd_path = Resources.CANCER_BBDD_PATH;
+    String test_path = Resources.CANCER_TEST_PATH;
+    int nThreads = 2;
+    int nItInterleaving = 5;
+    int seed = 42;
+    int maxIterations = 15;
+
+
+    @Before
+    public void restartMeans() {
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
+
 
     @Test
     public void ExperimentsConstructorTest(){
-        String net_path = "./res/networks/cancer.xbif";
-        String bbdd_path = "./res/networks/BBDD/cancer.xbif50000_.csv";
-        int nThreads = 2;
-        int nItInterleaving = 5;
 
-        Experiment exp = new ExperimentPGES(net_path, bbdd_path, nThreads, nItInterleaving);
+        Experiment exp = new ExperimentPGES(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving, seed);
 
         //Asserting
         assertNotNull(exp);
@@ -30,12 +43,7 @@ public class ExperimentsTest {
 
     @Test
     public void runExperiment(){
-        String net_path = "./res/networks/cancer.xbif";
-        String bbdd_path = "./res/networks/BBDD/cancer.xbif50000_.csv";
-        int nThreads = 2;
-        int nItInterleaving = 5;
-
-        Experiment exp = new ExperimentPGES(net_path, bbdd_path, nThreads, nItInterleaving);
+        Experiment exp = new ExperimentPGES(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving, seed);
         exp.runExperiment();
 
         assertNotEquals(0.0, exp.getScore(), 0.000001);
@@ -45,7 +53,7 @@ public class ExperimentsTest {
         assertNotEquals(Integer.MAX_VALUE,exp.getShd());
     }
 
-
+/*
     @Test
     public void getNetworkPathsTest(){
         // Arrange
@@ -56,6 +64,9 @@ public class ExperimentsTest {
         assertTrue(net_paths.contains(netFolder + "munin.xbif"));
         assertFalse(net_paths.contains(netFolder + "munin1.net"));
     }
+ */
+
+    /*
     @Test
     public void getBBDDPathsTest(){
         // Arrange
@@ -63,16 +74,17 @@ public class ExperimentsTest {
         // Act
         ArrayList<String> bbdd_paths = Experiment.getBBDDPaths(bbddFolder);
         // Assert
-        assertTrue(bbdd_paths.contains(bbddFolder + "alarm.xbif50000_.csv"));
+        assertTrue(bbdd_paths.contains(bbddFolder + "alarm.xbif50001_.csv"));
         assertFalse(bbdd_paths.contains(bbdd_paths + "munin1.net"));
     }
+
 
     @Test
     public void hashNetworksTest(){
 
         //TEST: Hashing correctly bbdd paths and net paths.
         //Arrange
-        List<String> bbddPaths = Arrays.asList("res/networks/BBDD/alarm.xbif50000_.csv");
+        List<String> bbddPaths = Arrays.asList("res/networks/BBDD/alarm.xbif50001_.csv");
         List<String> netPaths = Arrays.asList("res/networks/alarm.xbif");
 
 
@@ -93,7 +105,7 @@ public class ExperimentsTest {
 
         //TEST: When a bbdd path and a net path don't share the same name, they should not be assigned together.
         //Arrange
-        bbddPaths = Arrays.asList("res/networks/BBDD/munin.xbif50000_.csv");
+        bbddPaths = Arrays.asList("res/networks/BBDD/munin_test.csv");
         netPaths = Arrays.asList("res/networks/alarm.net");
 
         //Act
@@ -107,24 +119,39 @@ public class ExperimentsTest {
         result2 = result.get("xbif50000_");
         assertTrue(result2.isEmpty());
     }
-
+*/
 
     @Test
     public void saveExperimentTest(){
-        //Arrange: Creating Experiment
-        Experiment experiment = new ExperimentPGES("res/networks/cancer.xbif", "res/networks/BBDD/cancer.xbif_.csv", 2, 5);
-        experiment.runExperiment();
-
-        //Act: Saving Experiment
-        experiment.saveExperiment();
+        String savePath = "./test.txt";
+        File file = new File(savePath);
+        try {
+            //Arrange: Creating Experiment and deleting previous file
+            Files.deleteIfExists(file.toPath());
+            Experiment experiment = new ExperimentPGES(net_path, bbdd_path, test_path, nThreads, maxIterations, nItInterleaving, seed);
+            experiment.runExperiment();
+            String results = experiment.getResults();
+            
+            //Act: Saving Experiment
+            Experiment.saveExperiment(savePath, results);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         //Assert: Checking if the file has been saved
-        String path = "./experiments/networks/cancer/pges/cancer.xbif_T2_I5_global_results.csv";
-
-        File temp = new File(path);
-
+        File temp = new File(savePath);
         assertTrue(temp.exists());
 
+        // Deleting again
+        try {
+            Files.deleteIfExists(temp.toPath());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+            
+        
     }
 
 

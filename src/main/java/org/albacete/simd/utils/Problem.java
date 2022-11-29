@@ -85,7 +85,7 @@ public class Problem {
         samplePrior = 10.0;
 
         //building index
-        Graph graph = new EdgeListGraph(new LinkedList(this.variables));
+        Graph graph = new EdgeListGraph(new LinkedList<Node>(this.variables));
         buildIndexing(graph);
     }
 

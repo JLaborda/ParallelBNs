@@ -3,27 +3,35 @@ package org.albacete.simd.framework;
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
+import org.albacete.simd.Resources;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 
 public class GESStagesTest {
+
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
 
     @Test
     public void runTest() throws InterruptedException{
         //Arrange
-        String path = "src/test/resources/alarm.xbif_.csv";
+        String path = Resources.CANCER_BBDD_PATH;
         Problem problem = new Problem(path);
         int nThreads = 2;
         int itInterleaving = 5;
-        List<List<Edge>> subsets = Utils.split(Utils.calculateArcs(problem.getData()), nThreads);
-        Stage fesStage = new FESStage(problem, nThreads, itInterleaving, subsets);
+        List<Set<Edge>> subsets = Utils.split(Utils.calculateArcs(problem.getData()), nThreads);
+        FESStage fesStage = new FESStage(problem, nThreads, itInterleaving, subsets);
 
         // TESTING FESStage
         // Act
@@ -37,7 +45,7 @@ public class GESStagesTest {
         assertNotNull(fesStage.getGraphs().get(1));
 
         //TESTING FESFusion
-        Stage fesFusion = new FESFusion(problem, fesStage.getCurrentGraph(), fesStage.getGraphs());
+        Stage fesFusion = new FESFusion(problem, fesStage.getCurrentGraph(), fesStage.getGraphs(), fesStage);
         flag = fesFusion.run();
         Graph g = fesFusion.getCurrentGraph();
         double fesFusionScore = GESThread.scoreGraph(g, problem);
@@ -49,7 +57,7 @@ public class GESStagesTest {
         assertTrue(fesFusionScore >= fesStageScore);
 
         //TESTING BESStage
-        Stage besStage = new BESStage(problem,
+        BESStage besStage = new BESStage(problem,
                 g,
                 nThreads,
                 itInterleaving,
@@ -66,7 +74,7 @@ public class GESStagesTest {
         assertTrue(besStageScore >= fesFusionScore);
 
         //TESTING BESFusion
-        Stage besFusion = new BESFusion(problem, besStage.getCurrentGraph(), besStage.getGraphs());
+        Stage besFusion = new BESFusion(problem, besStage.getCurrentGraph(), besStage.getGraphs(), besStage);
         flag = besFusion.run();
         Graph g2 = besFusion.getCurrentGraph();
         double besFusionScore = GESThread.scoreGraph(g2, problem);
@@ -87,7 +95,7 @@ public class GESStagesTest {
         double fesStageScore2 = (GESThread.scoreGraph(fesStage2.getGraphs().get(0), problem) + GESThread.scoreGraph(fesStage2.getGraphs().get(1), problem)) / 2;
         //Assert
         // No new edges added
-        assertTrue(flag);
+        assertFalse(flag);
         assertEquals(nThreads, fesStage2.getGraphs().size());
         assertNotNull(fesStage2.getGraphs().get(0));
         assertNotNull(fesStage2.getGraphs().get(1));

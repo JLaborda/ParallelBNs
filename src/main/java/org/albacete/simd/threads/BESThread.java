@@ -4,10 +4,15 @@ import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
 import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
+import edu.cmu.tetrad.search.MeekRules;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import org.albacete.simd.utils.Utils;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 @SuppressWarnings("DuplicatedCode")
 public class BESThread extends GESThread {
@@ -17,11 +22,12 @@ public class BESThread extends GESThread {
 
     /**
      * Constructor of ThFES with an initial DAG
-     * @param problem object containing information of the problem such as data or variables.
-     * @param initialDag initial DAG with which the FES stage starts with.
-     * @param subset subset of edges the fes stage will try to add to the resulting graph
+     *
+     * @param problem    object containing information of the problem such as data or variables.
+     * @param initialDag initial DAG with which the BES stage starts with.
+     * @param subset     subset of edges the fes stage will try to remove 
      */
-    public BESThread(Problem problem, Graph initialDag, List<Edge> subset) {
+    public BESThread(Problem problem, Graph initialDag, Set<Edge> subset) {
 
         this.problem = problem;
         setInitialGraph(initialDag);
@@ -32,6 +38,7 @@ public class BESThread extends GESThread {
         setSamplePrior(10.0);
         this.id = threadCounter;
         threadCounter++;
+        this.isForwards = false;
     }
 
     /**
@@ -41,6 +48,7 @@ public class BESThread extends GESThread {
     @Override
     public void run() {
         this.currentGraph = search();
+        pdagToDag(this.currentGraph);
     }
 
     /**
@@ -48,7 +56,7 @@ public class BESThread extends GESThread {
      * @return PDAG that contains either the result of the BES or FES method.
      */
     private Graph search() {
-        long startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         numTotalCalls=0;
         numNonCachedCalls=0;
         //localScoreCache.clear();
@@ -57,17 +65,28 @@ public class BESThread extends GESThread {
         //buildIndexing(graph);
 
         // Method 1-- original.
-        double score = scoreGraph(graph, problem);
+        double scoreInitial = scoreGraph(graph, problem);
 
         // Do backward search.
-        score = bes(graph, score);
+        double score = bes(graph, scoreInitial);
 
         long endTime = System.currentTimeMillis();
         this.elapsedTime = endTime - startTime;
-        this.modelBDeu = score;
-        return graph;
+        
+        double newScore = scoreGraph(graph, problem);
+        System.out.println(" ["+getId()+"] BES New Score: " + newScore + ", Initial Score: " + scoreInitial);
+        // If we improve the score, return the new graph
+        if (newScore > scoreInitial+0.1) {
+            this.modelBDeu = score;
+            this.flag = true;
+            return graph;
+        } else {
+            System.out.println("   ["+getId()+"] ELSE");
+            this.modelBDeu = scoreInitial;
+            this.flag = false;
+            return this.initialDag;
+        }
     }
-
 
     /**
      * Backward equivalence search.
@@ -94,25 +113,34 @@ public class BESThread extends GESThread {
         bestDelete = bs(graph,bestScore);
 
         while(x_d != null){
+
+            //Checking time
+            /*if(isTimeout()) {
+                System.out.println("Timeout in BESTHREAD id: " + getId());
+                break;
+            }*/
+
             // Changing best score because x_d, and y_d are not null
             bestScore = bestDelete;
 
             // Deleting edge
             System.out.println("Thread " + getId() + " deleting: (" + x_d + ", " + y_d + ", " + h_0+ ")");
             delete(x_d,y_d,h_0, graph);
-
+            
             // Checking cycles?
-            // boolean cycles = graph.existsDirectedCycle();
+            //System.out.println("  Ciclos: " + graph.existsDirectedCycle());
 
+            //System.out.println("    Real Score antes Rebuild" + scoreGraph(graph, problem));
             //PDAGtoCPDAG
             rebuildPattern(graph);
-
+            
             // Printing score
             if (!h_0.isEmpty())
                 System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_d, y_d) + " " + h_0);
             else
                 System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_d, y_d));
             bestScore = bestDelete;
+            //System.out.println("    Real Score" + scoreGraph(graph, problem));
 
             // Checking that the maximum number of edges has not been reached
             if (getMaxNumEdges() != -1 && graph.getNumEdges() > getMaxNumEdges()) {
@@ -162,6 +190,12 @@ public class BESThread extends GESThread {
         }
 */
         for (Edge edge : edges) {
+
+            //Checking time
+            /*if(isTimeout()) {
+                System.out.println("Timeout in BESTHREAD id: " + getId());
+                break;
+            }*/
 
             // Checking if the edge is actually inside the graph
             if(!graph.containsEdge(edge))

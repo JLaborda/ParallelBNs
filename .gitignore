@@ -27,16 +27,42 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-#idea
+# idea
 .idea/
 
-#other settings
+# other settings
 .settings/
 target/
 
-#experiment folder
-experiments/
-#thread errors
-*.log
-parallel-error
-parallel-output
+# Experiment folder
+#results/
+
+# Thread errors
+*-error
+*-output
+
+# Large Datasets
+*10k.csv
+*50k.csv
+
+# Individual results
+experiment_results*
+
+# Outputs and errors
+run_experiments_cluster*
+*.bash.[eo]*
+
+# Singularity Image
+*.sif
+
+#Github keys script
+scripts/git-keys-update.bash
+
+# .DS-Files
+*.DS_Store
+
+# Adding galgo results
+!results/raw-galgo.zip
+
+# ignore notebook checkpoints
+.ipynb_checkpoints/

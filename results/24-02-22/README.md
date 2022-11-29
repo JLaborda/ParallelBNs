@@ -1,0 +1,2 @@
+## Experimentos Pequeñas sobre modificación de Fusion y Particionamiento inicial
+Estos experimentos han sido ejecutados sobre redes pequeñas con un interleaving de 5, y con los cambios en la fusión FES y BES de que no se compruebe la puntuación para hacer FES o BES respectivamente. También se ha cambiado el particionamiento para que se haga un único particionamiento.

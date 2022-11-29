@@ -9,15 +9,16 @@ import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-public class BESStage extends ThreadStage {
+public class BESStage extends BackwardStage {
 
-    public BESStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<List<Edge>> subsets) {
+    public BESStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
         super(problem, currentGraph, nThreads, itInterleaving, subsets);
     }
 
-    @Override
-    protected void config() {
+
+    private void config() {
         // Initializing Graphs structure
         this.graphs = new ArrayList<>();
         this.gesThreads = new GESThread[this.nThreads];
@@ -26,7 +27,7 @@ public class BESStage extends ThreadStage {
         //problem.buildIndexing(currentGraph);
 
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
-        List<List<Edge>> subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads);
+        List<Set<Edge>> subsets_BES = Utils.split(this.currentGraph.getEdges(), this.nThreads);
         for (int i = 0; i < this.nThreads; i++) {
             this.gesThreads[i] = new BESThread(this.problem, this.currentGraph, subsets_BES.get(i));
         }

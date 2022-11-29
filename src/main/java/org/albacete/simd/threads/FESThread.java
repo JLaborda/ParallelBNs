@@ -1,14 +1,13 @@
 package org.albacete.simd.threads;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-
-import edu.cmu.tetrad.graph.*;
-import consensusBN.SubSet;
 import consensusBN.PowerSetFabric;
+import consensusBN.SubSet;
+import edu.cmu.tetrad.graph.*;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.utils.Problem;
+
+import java.util.*;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 @SuppressWarnings("DuplicatedCode")
 public class FESThread extends GESThread{
@@ -18,33 +17,32 @@ public class FESThread extends GESThread{
 
     /**
      * Constructor of FESThread with an initial DAG
-     * @param problem object containing all the information of the problem
+     *
+     * @param problem    object containing all the information of the problem
      * @param initialDag initial DAG with which the FES stage starts with, if it's null, use the other constructor
-     * @param subset subset of edges the fes stage will try to add to the resulting graph
-     * @param maxIt maximum number of iterations allowed in the fes stage
+     * @param subset     subset of edges the fes stage will try to add to the resulting graph
+     * @param maxIt      maximum number of iterations allowed in the fes stage
      */
-    public FESThread(Problem problem, Graph initialDag, List<Edge> subset, int maxIt) {
-        this.problem = problem;
-        setInitialGraph(initialDag);
-        setSubSetSearch(subset);
-        setMaxIt(maxIt);
-        this.id = threadCounter;
-        threadCounter++;
+    public FESThread(Problem problem, Graph initialDag, Set<Edge> subset, int maxIt) {
+        this(problem, subset, maxIt);
+        this.initialDag = initialDag;
     }
 
     /**
      * Constructor of FESThread with an initial DataSet
+     *
      * @param problem object containing information of the problem such as data or variables.
-     * @param subset subset of edges the fes stage will try to add to the resulting graph
-     * @param maxIt maximum number of iterations allowed in the fes stage
+     * @param subset  subset of edges the fes stage will try to add to the resulting graph
+     * @param maxIt   maximum number of iterations allowed in the fes stage
      */
-    public FESThread(Problem problem, List<Edge> subset, int maxIt) {
+    public FESThread(Problem problem, Set<Edge> subset, int maxIt) {
         this.problem = problem;
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
         setMaxIt(maxIt);
         this.id = threadCounter;
         threadCounter++;
+        this.isForwards = true;
     }
 
 
@@ -59,6 +57,7 @@ public class FESThread extends GESThread{
      */
     public void run(){
         this.currentGraph = search();
+        pdagToDag(this.currentGraph);
     }
 
 
@@ -73,7 +72,7 @@ public class FESThread extends GESThread{
      * @return the resulting Pattern.
      */
     private Graph search() {
-        long startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         numTotalCalls=0;
         numNonCachedCalls=0;
         //localScoreCache.clear();
@@ -81,17 +80,28 @@ public class FESThread extends GESThread{
         Graph graph = new EdgeListGraph(this.initialDag);
         //buildIndexing(graph);
 
-        // Method 1-- original.
-        double score = scoreGraph(graph, problem);
+         // Method 1-- original.
+        double scoreInitial = scoreGraph(graph, problem);
 
-        // Do forward search.
-        score = fes(graph, score);
+        // Do backward search.
+        double score = fes(graph, scoreInitial);
 
         long endTime = System.currentTimeMillis();
         this.elapsedTime = endTime - startTime;
-        this.modelBDeu = score;
-        return graph;
-
+        
+        double newScore = scoreGraph(graph, problem);
+        System.out.println(" ["+getId()+"] FES New Score: " + newScore + ", Initial Score: " + scoreInitial);
+        // If we improve the score, return the new graph
+        if (newScore > scoreInitial+0.1) {
+            this.modelBDeu = score;
+            this.flag = true;
+            return graph;
+        } else {
+            System.out.println("   ["+getId()+"] ELSE");
+            this.modelBDeu = scoreInitial;
+            this.flag = false;
+            return this.initialDag;
+        }
     }
 
     /**
@@ -121,6 +131,13 @@ public class FESThread extends GESThread{
         bestInsert = fs(graph,bestScore);
 
         while((x_i != null) && (iterations < this.maxIt)){
+
+            // Checking Time
+            /*if(isTimeout()) {
+                System.out.println("Timeout in FESTHREAD id: " + getId());
+                break;
+            }*/
+
             // Changing best score because x_i, and therefore, y_i is not null
             bestScore = bestInsert;
 
@@ -186,6 +203,12 @@ public class FESThread extends GESThread{
         List<Edge> edges = new ArrayList<>(S);
 
         for(Edge edge : edges){
+
+            //Checking time
+            /*if(isTimeout()) {
+                System.out.println("Timeout in FESTHREAD id: " + getId());
+                break;
+            }*/
 
             Node _x = Edges.getDirectedEdgeTail(edge);
             Node _y = Edges.getDirectedEdgeHead(edge);
@@ -297,7 +320,6 @@ public class FESThread extends GESThread{
         return bestScore;
 
     }
-
 
 
 }

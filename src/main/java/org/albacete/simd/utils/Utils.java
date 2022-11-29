@@ -2,6 +2,7 @@ package org.albacete.simd.utils;
 
 import consensusBN.PairWiseConsensusBES;
 import edu.cmu.tetrad.bayes.BayesIm;
+import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
@@ -9,6 +10,7 @@ import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
+import weka.classifiers.bayes.BayesNet;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,19 +19,86 @@ import java.util.*;
 public class Utils {
 
 
-    private static Random random = new Random(42);
+    private static Random random = new Random();
+    
+    /**
+     * Transforms a maximally directed pattern (PDAG) represented in graph
+     * <code>g</code> into an arbitrary DAG by modifying <code>g</code> itself.
+     * Based on the algorithm described in </p> Chickering (2002) "Optimal
+     * structure identification with greedy search" Journal of Machine Learning
+     * Research. </p> R. Silva, June 2004
+     */
+    public static void pdagToDag(Graph g) {
+        Graph p = new EdgeListGraph(g);
+        List<Edge> undirectedEdges = new ArrayList<>();
+
+        for (Edge edge : g.getEdges()) {
+            if (edge.getEndpoint1() == Endpoint.TAIL
+                    && edge.getEndpoint2() == Endpoint.TAIL
+                    && !undirectedEdges.contains(edge)) {
+                undirectedEdges.add(edge);
+            }
+        }
+        g.removeEdges(undirectedEdges);
+        List<Node> pNodes = p.getNodes();
+
+        do {
+            Node x = null;
+
+            for (Node pNode : pNodes) {
+                x = pNode;
+
+                if (p.getChildren(x).size() > 0) {
+                    continue;
+                }
+
+                Set<Node> neighbors = new HashSet<>();
+
+                for (Edge edge : p.getEdges()) {
+                    if (edge.getNode1() == x || edge.getNode2() == x) {
+                        if (edge.getEndpoint1() == Endpoint.TAIL
+                                && edge.getEndpoint2() == Endpoint.TAIL) {
+                            if (edge.getNode1() == x) {
+                                neighbors.add(edge.getNode2());
+                            } else {
+                                neighbors.add(edge.getNode1());
+                            }
+                        }
+                    }
+                }
+                if (neighbors.size() > 0) {
+                    Collection<Node> parents = p.getParents(x);
+                    Set<Node> all = new HashSet<>(neighbors);
+                    all.addAll(parents);
+                    if (!GraphUtils.isClique(all, p)) {
+                        continue;
+                    }
+                }
+
+                for (Node neighbor : neighbors) {
+                    Node node1 = g.getNode(neighbor.getName());
+                    Node node2 = g.getNode(x.getName());
+
+                    g.addDirectedEdge(node1, node2);
+                }
+                p.removeNode(x);
+                break;
+            }
+            pNodes.remove(x);
+        } while (pNodes.size() > 0);
+    }
 
     /**
      * Separates the set of possible arcs into as many subsets as threads we use to solve the problem.
+     *
      * @param listOfArcs List of {@link Edge Edges} containing all the possible edges for the actual problem.
-     * @param numSplits The number of splits to do in the listOfArcs.
+     * @param numSplits  The number of splits to do in the listOfArcs.
      * @return The subsets of the listOfArcs in an ArrayList of TupleNode.
      */
-    @SuppressWarnings("unchecked")
-    public static List<List<Edge>> split(List<Edge> listOfArcs, int numSplits){
+    public static List<Set<Edge>> split(Set<Edge> listOfArcs, int numSplits) {
 
 
-        List<List<Edge>> subSets = new ArrayList<>(numSplits);
+        List<Set<Edge>> subSets = new ArrayList<>(numSplits);
 
         // Shuffling arcs
         List<Edge> shuffledArcs = new ArrayList<>(listOfArcs);
@@ -38,7 +107,7 @@ public class Utils {
         // Splitting Arcs into subsets
         int n = 0;
         for(int s = 0; s< numSplits-1; s++){
-            List<Edge> sub = new ArrayList<>();
+            Set<Edge> sub = new HashSet<>();
             for(int i = 0; i < Math.floorDiv(shuffledArcs.size(),numSplits) ; i++){
                 sub.add(shuffledArcs.get(n));
                 n++;
@@ -47,7 +116,7 @@ public class Utils {
         }
 
         // Adding leftovers
-        ArrayList<Edge> sub = new ArrayList<>();
+        Set<Edge> sub = new HashSet<>();
         for(int i = n; i < shuffledArcs.size(); i++ ){
             sub.add(shuffledArcs.get(i));
         }
@@ -63,30 +132,55 @@ public class Utils {
 
     /**
      * Calculates the amount of possible arcs between the variables of the dataset and stores it.
+     *
      * @param data DataSet used to calculate the arcs between its columns (nodes).
      */
-    public static List<Edge> calculateArcs(DataSet data){
+    public static Set<Edge> calculateArcs(DataSet data) {
         //0. Accumulator
-        List<Edge> listOfArcs = new ArrayList<>(data.getNumColumns() * (data.getNumColumns() -1));
+        Set<Edge> setOfArcs = new HashSet<>(data.getNumColumns() * (data.getNumColumns() - 1));
         //1. Get edges (variables)
         List<Node> variables = data.getVariables();
-        int index = 0;
+        //int index = 0;
         //2. Iterate over variables and save pairs
-        for(int i=0; i<data.getNumColumns()-1; i++){
-            for(int j=i+1; j<data.getNumColumns(); j++){
+        for (int i = 0; i < data.getNumColumns() - 1; i++) {
+            for (int j = i + 1; j < data.getNumColumns(); j++) {
                 // Getting pair of variables (Each variable is different)
                 Node var_A = variables.get(i);
                 Node var_B = variables.get(j);
 
                 //3. Storing both pairs
-                listOfArcs.add(Edges.directedEdge(var_A,var_B));
-                listOfArcs.add(Edges.directedEdge(var_B,var_A));
-                index++;
-                //this.listOfArcs[index] = new TupleNode(var_B,var_A);
+                setOfArcs.add(Edges.directedEdge(var_A, var_B));
+                setOfArcs.add(Edges.directedEdge(var_B, var_A));
+                //index++;
+                //this.setOfArcs[index] = new TupleNode(var_B,var_A);
                 //index++;
             }
         }
-        return listOfArcs;
+        return setOfArcs;
+    }
+    
+    /**
+     * Calculates the amount of possible edges between the variables of the dataset and stores it.
+     *
+     * @param data DataSet used to calculate the edges between its columns (nodes).
+     */
+    public static Set<Edge> calculateEdges(DataSet data) {
+        //0. Accumulator
+        Set<Edge> setOfArcs = new HashSet<>(data.getNumColumns() * (data.getNumColumns() - 1));
+        //1. Get edges (variables)
+        List<Node> variables = data.getVariables();
+        //2. Iterate over variables and save pairs
+        for (int i = 0; i < data.getNumColumns() - 1; i++) {
+            for (int j = i + 1; j < data.getNumColumns(); j++) {
+                // Getting pair of variables (Each variable is different)
+                Node var_A = variables.get(i);
+                Node var_B = variables.get(j);
+
+                //3. Storing both pairs
+                setOfArcs.add(Edges.directedEdge(var_A, var_B));
+            }
+        }
+        return setOfArcs;
     }
 
 
@@ -136,9 +230,9 @@ public class Utils {
 
         List<Node> nodes = setofbns.get(0).getNodes();
         //System.out.println("Nodes: " + nodes);
-        for(int i = 1 ; i< setofbns.size(); i++){
+        for(int i = 1 ; i< setofbns.size(); i++) {
             Dag oldDag = setofbns.get(i);
-            List<Edge> oldEdges = oldDag.getEdges();
+            Set<Edge> oldEdges = oldDag.getEdges();
             Dag newdag = new Dag(nodes);
             for(Edge e: oldEdges){
                 /*
@@ -248,19 +342,32 @@ public class Utils {
         return mb;
     }
 
+    /**
+     * Gives back the percentages of markov's blanquet difference with the original bayesian network. It gives back the
+     * percentage of difference with the blanquet of the original bayesian network, the percentage of extra nodes added
+     * to the blanquet and the percentage of missing nodes in the blanquet compared with the original.
+     * @param original
+     * @param created
+     * @return
+     */
     public static double [] avgMarkovBlanquetdif(Dag original, Dag created) {
 
         if (original.getNodes().size() != created.getNodes().size())
             return null;
 
+        for (String originalNodeName : original.getNodeNames()) {
+            if (!created.getNodeNames().contains(originalNodeName))
+                return null;
+        }
+
         // First number is the average dfMB, the second one is the amount of more variables in each MB, the last number is the the amount of missing variables in each MB
-        double [] result = new double[3];
-        double res1 = 0;
-        double res2 = 0;
-        double res3 = 0;
+        double[] result = new double[3];
+        double differenceNodes = 0;
+        double plusNodes = 0;
+        double minusNodes = 0;
 
 
-        for( Node e1 : original.getNodes()) {
+        for (Node e1 : original.getNodes()) {
             Node e2 = created.getNode(e1.getName());
 
             // Creating Markov's Blanket
@@ -283,147 +390,28 @@ public class Utils {
             //Variables de más
             for(String s2: names2) {
                 if(!names1.contains(s2)) {
-                    res1++;
-                    res2++;
+                    differenceNodes++;
+                    plusNodes++;
                 }
             }
             // Variables de menos
             for(String s1: names1) {
                 if(!names2.contains(s1)) {
-                    res1++;
-                    res3++;
+                    differenceNodes++;
+                    minusNodes++;
                 }
             }
         }
 
-        // Avg difference
-        res1 = res1 / original.getNodes().size();
+        // Differences of MM
 
-        result[0] = res1;
-        result[1] = res2;
-        result[2] = res3;
+        result[0] = differenceNodes;
+        result[1] = plusNodes;
+        result[2] = minusNodes;
 
         return result;
 
     }
-/*
-    public static double scoreGraph(Graph graph, DataSet dataSet) {
-
-        if (graph == null){
-            return Double.NEGATIVE_INFINITY;
-        }
-
-        // Setting up Scorer
-        List<String> _varNames = dataSet.getVariableNames();
-
-        varNames = _varNames.toArray(new String[0]);
-        List<Node> variables = dataSet.getVariables();
-
-        cases=new int[dataSet.getNumRows()][dataSet.getNumColumns()];
-        for(int i=0;i<dataSet.getNumRows();i++) {
-            for(int j=0;j<dataSet.getNumColumns();j++) {
-                cases[i][j]=dataSet.getInt(i, j);
-            }
-        }
-        nValues=new int[dataSet.getNumColumns()];
-        for(int i=0;i<dataSet.getNumColumns();i++)
-            nValues[i]=((DiscreteVariable)dataSet.getVariable(i)).getNumCategories();
-
-//      Graph dag = SearchGraphUtils.dagFromPattern(graph);
-        Graph dag = new EdgeListGraph(graph);
-        SearchGraphUtils.pdagToDag(dag);
-        double score = 0.;
-
-        for (Node next : dag.getNodes()) {
-            Collection<Node> parents = dag.getParents(next);
-            int nextIndex = -1;
-            for (int i = 0; i < variables.size(); i++) {
-                if (varNames[i].equals(next.getName())) {
-                    nextIndex = i;
-                    break;
-                }
-            }
-            int parentIndices[] = new int[parents.size()];
-            Iterator<Node> pi = parents.iterator();
-            int count = 0;
-            while (pi.hasNext()) {
-                Node nextParent = pi.next();
-                for (int i = 0; i < variables.size(); i++) {
-                    if (varNames[i].equals(nextParent.getName())) {
-                        parentIndices[count++] = i;
-                        break;
-                    }
-                }
-            }
-            score += Utils.localBdeuScore(nextIndex, parentIndices);
-        }
-        return score;
-    }
-*/
-
-/*
-    public static double localBdeuScore(int nNode, int[] nParents) {
-        //numTotalCalls++;
-        double oldScore = localScoreCache.get(nNode, nParents);
-        if (!Double.isNaN(oldScore)) {
-            return oldScore;
-        }
-        //numNonCachedCalls++;
-        int numValues=nValues[nNode];
-        int numParents=nParents.length;
-
-        double ess=samplePrior;
-        double kappa=structurePrior;
-
-        int[] numValuesParents=new int[nParents.length];
-        int cardinality=1;
-        for(int i=0;i<numValuesParents.length;i++) {
-            numValuesParents[i]=nValues[nParents[i]];
-            cardinality*=numValuesParents[i];
-        }
-
-        int[][] Ni_jk = new int[cardinality][numValues];
-        double Np_ijk = (1.0*ess) / (numValues*cardinality);
-        double Np_ij = (1.0*ess) / cardinality;
-
-        // initialize
-        for (int j = 0; j < cardinality;j++)
-            for(int k= 0; k<numValues; k++)
-                Ni_jk[j][k] = 0;
-
-        for(int i=0;i<cases.length;i++) {
-            int iCPT = 0;
-            for (int iParent = 0; iParent < numParents; iParent++) {
-                iCPT = iCPT * numValuesParents[iParent] + cases[i][nParents[iParent]];
-            }
-            Ni_jk[iCPT][cases[i][nNode]]++;
-        }
-
-        double fLogScore = 0.0;
-
-        for (int iParent = 0; iParent < cardinality; iParent++) {
-            double N_ij = 0;
-            double N_ijk = 0;
-
-            for (int iSymbol = 0; iSymbol < numValues; iSymbol++) {
-                if (Ni_jk[iParent][iSymbol] != 0) {
-                    N_ijk = Ni_jk[iParent][iSymbol];
-                    fLogScore += ProbUtils.lngamma(N_ijk + Np_ijk);
-                    fLogScore -= ProbUtils.lngamma(Np_ijk);
-                    N_ij += N_ijk;
-                }
-            }
-            if (Np_ij != 0)
-                fLogScore += ProbUtils.lngamma(Np_ij);
-            if (Np_ij + N_ij != 0)
-                fLogScore -= ProbUtils.lngamma(Np_ij + N_ij);
-        }
-        fLogScore += Math.log(kappa) * cardinality * (numValues - 1);
-
-        localScoreCache.add(nNode, nParents, fLogScore);
-        return fLogScore;
-    }
-*/
 
     /**
      * Transforms a graph to a DAG, and removes any possible inconsistency found throughout its structure.
@@ -432,7 +420,7 @@ public class Utils {
      */
     public static Dag removeInconsistencies(Graph g){
         // Transforming the current graph into a DAG
-        SearchGraphUtils.pdagToDag(g);
+        SearchGraphUtils.dagFromCPDAG(g);
 
         // Checking Consistency
         Node nodeT, nodeH;
@@ -521,7 +509,9 @@ public class Utils {
                     int[] parValues = bayesIm.getParentValues(varIndex, row);
 
                     for (int col = 0; col < var.getNumCategories(); col++) {
-                        observedCounts[varIndex][row][col] = 0;
+                        try{
+                            observedCounts[varIndex][row][col] = 0;
+                        }catch(Exception ex) {}
                     }
 
                     for (int i = 0; i < data.getNumRows(); i++) {
@@ -583,6 +573,41 @@ public class Utils {
 
         }
 
-        return sum/data.getNumRows()/data.getNumColumns();
+        return sum / data.getNumRows() / data.getNumColumns();
     }
+
+    public static double LL(Dag g, DataSet data) {
+        BayesPm bnaux = new BayesPm(g);
+        MlBayesIm bnOut = new MlBayesIm(bnaux, MlBayesIm.MANUAL);
+        return LL(bnOut, data);
+    }
+
+    /**
+     * Transforms a BayesNet read from a xbif file into a BayesPm object for tetrad
+     *
+     * @param wekabn BayesNet read from an xbif file
+     * @return The BayesPm of the BayesNet
+     */
+    public static BayesPm transformBayesNetToBayesPm(BayesNet wekabn) {
+        Dag graph = new Dag();
+
+        // Getting nodes from weka network and adding them to a GraphNode
+        for (int indexNode = 0; indexNode < wekabn.getNrOfNodes(); indexNode++) {
+            GraphNode node = new GraphNode(wekabn.getNodeName(indexNode));
+            graph.addNode(node);
+        }
+        // Adding all of the edges from the wekabn into the new Graph
+        for (int indexNode = 0; indexNode < wekabn.getNrOfNodes(); indexNode++) {
+            int nParent = wekabn.getNrOfParents(indexNode);
+            for (int np = 0; np < nParent; np++) {
+                int indexp = wekabn.getParent(indexNode, np);
+                Edge ed = new Edge(graph.getNode(wekabn.getNodeName(indexp)), graph.getNode(wekabn.getNodeName(indexNode)), Endpoint.TAIL, Endpoint.ARROW);
+                graph.addEdge(ed);
+            }
+        }
+        //System.out.println(graph);
+        return new BayesPm(graph);
+
+    }
+
 }

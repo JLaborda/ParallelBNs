@@ -3,12 +3,17 @@ package org.albacete.simd.algorithms;
 import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.threads.*;
+import org.albacete.simd.threads.BESThread;
+import org.albacete.simd.threads.BackwardsHillClimbingThread;
+import org.albacete.simd.threads.ForwardHillClimbingThread;
+import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ParallelHillClimbingSearch {
 
@@ -52,7 +57,7 @@ public class ParallelHillClimbingSearch {
     /**
      * Subsets of {@link Edge Edges}. Each subset will be assigned to {@link GESThread GESThread}
      */
-    private List<List<Edge>> subSets = null;
+    private List<Set<Edge>> subSets = null;
 
     /**
      * {@link ArrayList ArrayList} of graphs. This contains the list of {@link Graph graphs} created for each stage,
@@ -73,7 +78,7 @@ public class ParallelHillClimbingSearch {
     /**
      * List of {@link Edge Edges} containing the list of all the possible edges for the resulting bayesian network.
      */
-    private List<Edge> listOfArcs = null;
+    private Set<Edge> setOfArcs = null;
 
     private boolean fhcFlag = false;
 
@@ -107,7 +112,6 @@ public class ParallelHillClimbingSearch {
      * Initializes the general parameters of the class.
      * @param nThreads number of threads used in the problem.
      */
-    @SuppressWarnings("unchecked")
     private void initialize(int nThreads){
         this.nThreads = nThreads;
         this.gesThreads = new GESThread[this.nThreads];
@@ -115,7 +119,7 @@ public class ParallelHillClimbingSearch {
         this.subSets = new ArrayList<>(this.nThreads);
 
         //The total number of arcs of a graph is n*(n-1)/2, where n is the number of nodes in the graph.
-        this.listOfArcs = new ArrayList<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() -1));
+        this.setOfArcs = new HashSet<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() - 1));
     }
 
 
@@ -127,7 +131,7 @@ public class ParallelHillClimbingSearch {
         // Initial Configuration: Cases
         //GESThread.setProblem(this.data);
         // 1. Calculating Edges
-        this.listOfArcs = Utils.calculateArcs(this.problem.getData());
+        this.setOfArcs = Utils.calculateArcs(this.problem.getData());
 
         do {
             try {
@@ -136,7 +140,7 @@ public class ParallelHillClimbingSearch {
             System.out.println("============================");
 
             // 2 Random Repartitioning
-            this.subSets = Utils.split(listOfArcs, nThreads);
+                this.subSets = Utils.split(setOfArcs, nThreads);
 
             //System.out.println("----------------------------");
             //System.out.println("Splits: ");
@@ -249,7 +253,7 @@ public class ParallelHillClimbingSearch {
         //problem.buildIndexing(currentGraph);
 
         // Rearranging the subsets, so that the BES stage only deletes edges of the current graph.
-        List<List<Edge>> subsets_BHC = Utils.split(this.currentGraph.getEdges(), this.nThreads);
+        List<Set<Edge>> subsets_BHC = Utils.split(this.currentGraph.getEdges(), this.nThreads);
         for (int i = 0; i < this.nThreads; i++) {
             this.gesThreads[i] = new BackwardsHillClimbingThread(this.problem, this.currentGraph, subsets_BHC.get(i));
         }
@@ -355,7 +359,7 @@ public class ParallelHillClimbingSearch {
         System.out.println("FHC to obtain the fusion: ");
 
 
-        List<Edge> candidates = new ArrayList<>();
+        Set<Edge> candidates = new HashSet<>();
 
 
         for (Edge e: fusionGraph.getEdges()){
@@ -381,7 +385,7 @@ public class ParallelHillClimbingSearch {
     }
 
     public Dag fusionIntersection(){
-        ArrayList<Node> order = new ArrayList<>(this.currentGraph.getTierOrdering());
+        ArrayList<Node> order = new ArrayList<>(this.currentGraph.getCausalOrdering());
         for(Dag g: this.graphs) {
             for(Edge e:g.getEdges()) {
                 if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW))
@@ -432,12 +436,12 @@ public class ParallelHillClimbingSearch {
         // Checking if the score has improved
         if (fusionScore > currentScore) {
             this.currentGraph = fusionGraph;
-            return (Dag) this.currentGraph;
+            return this.currentGraph;
         }
 
         System.out.println("BHC to obtain the fusion: ");
 
-        List<Edge> candidates = new ArrayList<>();
+        Set<Edge> candidates = new HashSet<>();
 
         for (Edge e: this.currentGraph.getEdges()){
             if(fusionGraph.getEdge(e.getNode1(), e.getNode2())==null && fusionGraph.getEdge(e.getNode2(),e.getNode1())==null ) {
@@ -503,17 +507,19 @@ public class ParallelHillClimbingSearch {
 
     /**
      * Gets the list of possible edges of the problem
+     *
      * @return List of {@link Edge Edges} representing all the possible edges of the problem.
      */
-    public List<Edge> getListOfArcs() {
-        return listOfArcs;
+    public Set<Edge> getSetOfArcs() {
+        return setOfArcs;
     }
 
     /**
      * Gets the current subsets of edges.
+     *
      * @return List of Lists of {@link Edge Edges} containing the edges of each subset.
      */
-    public List<List<Edge>> getSubSets() {
+    public List<Set<Edge>> getSubSets() {
         return subSets;
     }
 

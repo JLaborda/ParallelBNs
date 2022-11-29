@@ -3,12 +3,19 @@ package org.albacete.simd.threads;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
+import org.albacete.simd.Resources;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 import static org.junit.Assert.*;
 
@@ -19,7 +26,7 @@ public class FESThreadTest {
      * cancer Bayesian Network @see
      * <a href="https://www.bnlearn.com/bnrepository/discrete-small.html">https://www.bnlearn.com/bnrepository/discrete-small.html</a>
      */
-    final String path = "src/test/resources/cancer.xbif_.csv";
+    final String path = Resources.CANCER_BBDD_PATH;
     /**
      * Dataset created from the data file
      */
@@ -48,11 +55,11 @@ public class FESThreadTest {
     /**
      * Subset1 of pairs of nodes or variables.
      */
-    final List<Edge> subset1 = new ArrayList<>();
+    final Set<Edge> subset1 = new HashSet<>();
     /**
      * Subset2 of pairs of nodes or variables.
      */
-    final List<Edge> subset2 = new ArrayList<>();
+    final Set<Edge> subset2 = new HashSet<>();
 
     private Problem problem;
 
@@ -65,6 +72,12 @@ public class FESThreadTest {
         initializeSubsets();
     }
 
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
+
     /**
      * Method used to remove inconsistencies in the graph passed as a parameter.
      * @param graph Graph that will have its inconsistencies removed
@@ -72,7 +85,7 @@ public class FESThreadTest {
      */
     private Graph removeInconsistencies(Graph graph){
         // Transforming the current graph into a DAG
-        SearchGraphUtils.pdagToDag(graph);
+        pdagToDag(graph);
 
         Node nodeT, nodeH;
         for (Edge e : graph.getEdges()){
@@ -149,7 +162,8 @@ public class FESThreadTest {
      */
     @Test
     public void searchTwoThreadsTest() throws InterruptedException {
-
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
         // ThFES objects
         FESThread thread1 = new FESThread(problem, subset1, 15);
         FESThread thread2 = new FESThread(problem, subset2, 15);
@@ -222,19 +236,20 @@ public class FESThreadTest {
 
     /**
      * Tests that the algorithm works correct with the Alarm network.
-     * @result The resulting graph has the same number of edges as the set maximum number of edges.
+     *
      * @throws InterruptedException Caused by an external interruption.
+     * @result The resulting graph has the same number of edges as the set maximum number of edges.
      */
     @Test
-    public void alarmExecutionTest() throws InterruptedException {
+    public void cancerExecutionTest() throws InterruptedException {
         // ThFES objects
-        String alarmPath = "src/test/resources/alarm.xbif_.csv";
+        String alarmPath = Resources.CANCER_BBDD_PATH;
         DataSet alarmDataset = Utils.readData(alarmPath);
-        List<Edge> listOfArcs = Utils.calculateArcs(alarmDataset);
+        Set<Edge> setOfArcs = Utils.calculateArcs(alarmDataset);
         Utils.setSeed(42);
-        List<List<Edge>> subsets = Utils.split(listOfArcs,2);
-        List<Edge> subset1 = subsets.get(0);
-        List<Edge> subset2 = subsets.get(1);
+        List<Set<Edge>> subsets = Utils.split(setOfArcs, 2);
+        Set<Edge> subset1 = subsets.get(0);
+        Set<Edge> subset2 = subsets.get(1);
 
         Problem pAlarm = new Problem(alarmDataset);
         FESThread thread1 = new FESThread(pAlarm, subset1, 100);
@@ -258,11 +273,12 @@ public class FESThreadTest {
      */
     @Test
     public void xAndYAreEqualShouldContinueTest() throws InterruptedException {
+        //BOOKMARK!
         // Arrange
         Edge edge1 = Edges.directedEdge(this.cancer,this.cancer);
         Edge edge2 = Edges.directedEdge(this.cancer, this.smoker);
 
-        List<Edge> S = new ArrayList<>();
+        Set<Edge> S = new HashSet<>();
         S.add(edge1);
         S.add(edge2);
 
@@ -273,15 +289,15 @@ public class FESThreadTest {
         tFES.start();
         tFES.join();
         Graph result = fes.getCurrentGraph();
-
+        Set<Edge> edgesResult = result.getEdges();
         // Assert
         Edge badEdge1 = Edges.undirectedEdge(this.cancer, this.cancer);
         Edge badEdge2 = Edges.directedEdge(this.cancer, this.cancer);
-        Edge goodEdge1 = Edges.undirectedEdge(this.smoker, this.cancer);
+        Edge goodEdge1 = Edges.undirectedEdge(this.cancer, this.smoker);
 
-        assertFalse(result.getEdges().contains(badEdge1));
-        assertFalse(result.getEdges().contains(badEdge2));
-        assertTrue(result.getEdges().contains(goodEdge1));
+        assertFalse(edgesResult.contains(badEdge1));
+        assertFalse(edgesResult.contains(badEdge2));
+        assertTrue(edgesResult.contains(goodEdge1));
     }
 
 
@@ -431,8 +447,7 @@ public class FESThreadTest {
         // Arrange
         FESThread thfes = new FESThread(problem, subset1, 15);
         // Act
-        long expected = 23;
-        thfes.setElapsedTime(expected);
+        long expected = 0;
         long actual = thfes.getElapsedTime();
         // Assert
         assertEquals(expected, actual, 0);

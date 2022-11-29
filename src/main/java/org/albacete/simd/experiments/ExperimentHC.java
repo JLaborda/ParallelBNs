@@ -1,35 +1,29 @@
 package org.albacete.simd.experiments;
 
+import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
-import org.albacete.simd.algorithms.HillClimbingSearch;
-import org.albacete.simd.algorithms.ParallelHillClimbingSearch;
+import org.albacete.simd.algorithms.bnbuilders.HillClimbingSearch;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class ExperimentHC extends Experiment {
 
-    private HillClimbingSearch alg;
+    private HillClimbingSearch algorithm;
 
 
-    public ExperimentHC(String net_path, String bbdd_path, int nThreads, int maxIterations, int nItInterleaving) {
-        super(net_path, bbdd_path, nThreads, maxIterations, nItInterleaving);
+    public ExperimentHC(String net_path, String bbdd_path, String test_path, int maxIterations, int nItInterleaving) {
+        super(net_path, bbdd_path, test_path, 1, maxIterations, nItInterleaving);
         this.algName = "hc";
     }
 
-    public ExperimentHC(String net_path, String bbdd_path, int nThreads, int nItInterleaving) {
-        super(net_path, bbdd_path, nThreads, nItInterleaving);
-        this.algName = "hc";
-    }
 
     @Override
     public void runExperiment(){
@@ -48,19 +42,21 @@ public class ExperimentHC extends Experiment {
             long startTime = System.currentTimeMillis();
             BIFReader bf = new BIFReader();
             bf.processFile(this.net_path);
-            BayesNet bn = (BayesNet) bf;
-            System.out.println("Numero de variables: "+bn.getNrOfNodes());
-            MlBayesIm bn2 = new MlBayesIm(bn);
+            BayesNet bn = bf;
+            System.out.println("Numero de variables: " + bn.getNrOfNodes());
+            //Transforming the BayesNet into a BayesPm
+            BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bn);
+            MlBayesIm bn2 = new MlBayesIm(bayesPm);
             DataReader reader = new DataReader();
             reader.setDelimiter(DelimiterType.COMMA);
             reader.setMaxIntegralDiscrete(100);
 
             // Running Experiment
             DataSet dataSet = reader.parseTabular(new File(this.bbdd_path));
-            this.alg = new HillClimbingSearch(dataSet, maxIterations, nItInterleaving);
+            this.algorithm = new HillClimbingSearch(dataSet, maxIterations, nItInterleaving);
 
             // Search is executed
-            alg.search();
+            algorithm.search();
 
             // Measuring time
             long endTime = System.currentTimeMillis();
@@ -87,12 +83,12 @@ public class ExperimentHC extends Experiment {
             // System.out.println(cond);
 
 
-
-            this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
-            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
-            this.nIterations = alg.getIterations();
-            this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem()); //alg.getFinalScore();
-
+            //Metrics
+            this.shd = Utils.SHD((Dag) bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            this.dfmm = Utils.avgMarkovBlanquetdif((Dag) bn2.getDag(), (Dag) algorithm.getCurrentGraph());
+            this.nIterations = algorithm.getIterations();
+            this.score = GESThread.scoreGraph(algorithm.getCurrentGraph(), algorithm.getProblem());
+            this.LLscore = Utils.LL((Dag) algorithm.getCurrentGraph(), test_dataset);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,26 +97,22 @@ public class ExperimentHC extends Experiment {
     }
     @Override
     public void printResults(){
-        //try {
         // Report
         System.out.println(this);
-        System.out.println("Current DAG:");
-        System.out.println(alg.getCurrentGraph());
-        System.out.println("Total Nodes Current DAG");
-        System.out.println(alg.getCurrentGraph().getNodes().size());
+        System.out.println("Resulting DAG:");
+        System.out.println(algorithm.getCurrentGraph());
+        System.out.println("Total Nodes of Resulting DAG");
+        System.out.println(algorithm.getCurrentGraph().getNodes().size());
         System.out.println("-------------------------\nMetrics: ");
 
-        System.out.println("SHD: " + shd);
-        System.out.println("Final BDeu: " + this.score);
-        System.out.println("Total execution time (s): " + elapsedTime / 1000);
+        System.out.println("SHD: "+shd);
+        System.out.println("LLScore: " + this.LLscore);
+        System.out.println("Final BDeu: " +this.score);
+        System.out.println("Total execution time (s): " + elapsedTime/1000);
         System.out.println("Total number of Iterations: " + this.nIterations);
-        System.out.println("dfMM: " + dfmm[0]);
-        System.out.println("dfMM plus: " + dfmm[1]);
-        System.out.println("dfMM minus: " + dfmm[2]);
-        //}
-        //catch(InterruptedException e){
-        //    e.printStackTrace();
-        //}
+        System.out.println("dfMM: "+ dfmm[0]);
+        System.out.println("dfMM plus: "+ dfmm[1]);
+        System.out.println("dfMM minus: "+ dfmm[2]);
 
     }
 

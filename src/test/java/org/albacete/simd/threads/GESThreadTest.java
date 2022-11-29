@@ -2,17 +2,21 @@ package org.albacete.simd.threads;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
+import org.albacete.simd.Resources;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.LocalScoreCacheConcurrent;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
+import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for the GESThread class
@@ -25,7 +29,7 @@ public class GESThreadTest {
      * cancer Bayesian Network @see
      * <a href="https://www.bnlearn.com/bnrepository/discrete-small.html">https://www.bnlearn.com/bnrepository/discrete-small.html</a>
      */
-    final String path = "src/test/resources/cancer.xbif_.csv";
+    final String path = Resources.CANCER_BBDD_PATH;
     /**
      * Dataset created from the data file
      */
@@ -54,12 +58,17 @@ public class GESThreadTest {
     /**
      * Subset1 of pairs of nodes or variables.
      */
-    final List<Edge> subset1 = new ArrayList<>();
+    final Set<Edge> subset1 = new HashSet<>();
     /**
      * Subset2 of pairs of nodes or variables.
      */
-    final List<Edge> subset2 = new ArrayList<>();
+    final Set<Edge> subset2 = new HashSet<>();
 
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
 
     /**
      * Constructor of the test. It initializes the subsets
@@ -460,11 +469,10 @@ public class GESThreadTest {
     }
 
 
-    /**
+
+    /*
      * Testing that a buildingIndexing is built when asked to.
      * @result Test should be true
-     */
-    /*
     @Test
     public void buildIndexingNotBuiltTest(){
         // Arrange

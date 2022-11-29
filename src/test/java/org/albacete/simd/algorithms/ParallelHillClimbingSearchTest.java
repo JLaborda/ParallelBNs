@@ -1,9 +1,13 @@
 package org.albacete.simd.algorithms;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.*;
-import org.albacete.simd.algorithms.ParallelHillClimbingSearch;
+import edu.cmu.tetrad.graph.Edge;
+import edu.cmu.tetrad.graph.Node;
+import org.albacete.simd.Resources;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Utils;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -15,35 +19,29 @@ import static org.junit.Assert.*;
 public class ParallelHillClimbingSearchTest {
 
     /**
-     * String containing the path to the data used in the test. The data used in these tests is made by sampling the
-     * cancer Bayesian Network @see
-     * <a href="https://www.bnlearn.com/bnrepository/discrete-small.html">https://www.bnlearn.com/bnrepository/discrete-small.html</a>
-     */
-    final String path = "src/test/resources/cancer.xbif_.csv";
-    /**
      * Dataset created from the data file
      */
-    final DataSet dataset = Utils.readData(path);
+    final DataSet cancerDataset = Utils.readData(Resources.CANCER_BBDD_PATH);
     /**
      * Variable X-Ray
      */
-    final Node xray = dataset.getVariable("Xray");
+    final Node xray = cancerDataset.getVariable("Xray");
     /**
      * Variable Dysponea
      */
-    final Node dyspnoea = dataset.getVariable("Dyspnoea");
+    final Node dyspnoea = cancerDataset.getVariable("Dyspnoea");
     /**
      * Variabe Cancer
      */
-    final Node cancer = dataset.getVariable("Cancer");
+    final Node cancer = cancerDataset.getVariable("Cancer");
     /**
      * Variable Pollution
      */
-    final Node pollution = dataset.getVariable("Pollution");
+    final Node pollution = cancerDataset.getVariable("Pollution");
     /**
      * Variable Smoker
      */
-    final Node smoker = dataset.getVariable("Smoker");
+    final Node smoker = cancerDataset.getVariable("Smoker");
 
     /**
      * Subset1 of pairs of nodes or variables.
@@ -54,11 +52,11 @@ public class ParallelHillClimbingSearchTest {
      */
     final List<Edge> subset2 = new ArrayList<>();
 
-
-    /**
-     * This method initializes the subsets, splitting the nodes in what is expected to happen when the seed is 42
-     */
-
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
 
     /**
      * Testing both possible constructors of the Main class
@@ -70,10 +68,10 @@ public class ParallelHillClimbingSearchTest {
         int num_cols = 5;
 
         // Act
-        ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(path, 1);
-        ParallelHillClimbingSearch phc2 = new ParallelHillClimbingSearch(dataset, 2);
-        ParallelHillClimbingSearch phc3 = new ParallelHillClimbingSearch(path,4, 30, 8);
-        ParallelHillClimbingSearch phc4 = new ParallelHillClimbingSearch(dataset,8, 35, 10);
+        ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(Resources.CANCER_BBDD_PATH, 1);
+        ParallelHillClimbingSearch phc2 = new ParallelHillClimbingSearch(cancerDataset, 2);
+        ParallelHillClimbingSearch phc3 = new ParallelHillClimbingSearch(Resources.CANCER_BBDD_PATH,4, 30, 8);
+        ParallelHillClimbingSearch phc4 = new ParallelHillClimbingSearch(cancerDataset,8, 35, 10);
 
         DataSet data1 = phc1.getData();
         DataSet data2 = phc2.getData();
@@ -128,7 +126,7 @@ public class ParallelHillClimbingSearchTest {
         int num_cols = 5;
         List<Node> columns = new ArrayList<>(Arrays.asList(xray, dyspnoea, cancer, pollution, smoker));
         //Act
-        ParallelHillClimbingSearch alg = new ParallelHillClimbingSearch(path, 1);
+        ParallelHillClimbingSearch alg = new ParallelHillClimbingSearch(Resources.CANCER_BBDD_PATH, 1);
         DataSet data = alg.getData();
         int result = data.getNumColumns();
         //Assert
@@ -145,15 +143,10 @@ public class ParallelHillClimbingSearchTest {
     @Test(expected = Exception.class)
     public void exceptionReadDataTest(){
         String path = "";
-        //noinspection unused
-        ParallelHillClimbingSearch alg = new ParallelHillClimbingSearch(path, 1);
+        new ParallelHillClimbingSearch(path, 1);
         fail();
     }
 
-    
-
-
-   
     /**
      * Testing the setter and getter of MaxIterations
      * @result MaxIterations is changed to 21 and obtained as such.
@@ -162,7 +155,7 @@ public class ParallelHillClimbingSearchTest {
     public void setgetMaxIterations(){
         // Arrange
         int expected = 21;
-        ParallelHillClimbingSearch alg = new ParallelHillClimbingSearch(path, 1);
+        ParallelHillClimbingSearch alg = new ParallelHillClimbingSearch(Resources.CANCER_BBDD_PATH, 1);
         // Act
         alg.setMaxIterations(21);
         int actual = alg.getMaxIterations();
@@ -178,7 +171,7 @@ public class ParallelHillClimbingSearchTest {
     public void setgetSeedTest(){
         // Arrange
         long newSeed = 21;
-        ParallelHillClimbingSearch pGESv2 = new ParallelHillClimbingSearch(path, 1);
+        ParallelHillClimbingSearch pGESv2 = new ParallelHillClimbingSearch(Resources.CANCER_BBDD_PATH, 1);
         // Act
         pGESv2.setSeed(newSeed);
         // Assert
@@ -186,35 +179,13 @@ public class ParallelHillClimbingSearchTest {
     }
 
 
-    /**
-     * Tests the search method of the Main class.
-     * @result The resulting graph is equal to the expected graph for the cancer dataset.
-     */
-    @Test
-    public void searchCancerTest(){
-        //Arrange
-        ParallelHillClimbingSearch pGESv2 = new ParallelHillClimbingSearch(path, 2);
-
-        //Expectation
-        List<Node> nodes = Arrays.asList(cancer, dyspnoea, pollution, xray, smoker);
-        EdgeListGraph expectation = new EdgeListGraph(nodes);
-        expectation.addDirectedEdge(cancer, dyspnoea);
-        expectation.addDirectedEdge(pollution, cancer);
-        expectation.addDirectedEdge(cancer, smoker);
-        expectation.addDirectedEdge(cancer, xray);
-
-        // Act
-        pGESv2.search();
-
-        //Assert
-        assertEquals(expectation, pGESv2.getCurrentGraph());
-
-    }
-
     @Test
     public void searchAlarmTest(){
         //Arrange
-        String alarmPath = "src/test/resources/alarm.xbif_.csv";
+        Utils.setSeed(42);
+        ForwardStage.meanTimeTotal=0;
+        BackwardStage.meanTimeTotal=0;
+        String alarmPath = Resources.CANCER_BBDD_PATH;
         ParallelHillClimbingSearch pGESv2 = new ParallelHillClimbingSearch(alarmPath, 2);
 
         // Act
@@ -228,20 +199,26 @@ public class ParallelHillClimbingSearchTest {
 
     @Test
     public void gettersTest(){
-        ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(dataset, 1);
+        Utils.setSeed(42);
+        ForwardStage.meanTimeTotal=0;
+        BackwardStage.meanTimeTotal=0;
+        ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(cancerDataset, 1);
         phc1.search();
-        assertEquals(5*4, phc1.getListOfArcs().size());
+        assertEquals(5 * 4, phc1.getSetOfArcs().size());
         assertEquals(1, phc1.getSubSets().size());
         assertEquals(1,phc1.getGraphs().size());
         assertNotEquals(1, phc1.getIterations());
-        assertEquals(dataset, phc1.getProblem().getData());
+        assertEquals(cancerDataset, phc1.getProblem().getData());
 
 
     }
     @Test
     public void convergenceTest(){
         //Arrange
-        DataSet datasetAlarm = Utils.readData("src/test/resources/alarm.xbif_.csv");
+        Utils.setSeed(42);
+        ForwardStage.meanTimeTotal=0;
+        BackwardStage.meanTimeTotal=0;
+        DataSet datasetAlarm = Utils.readData(Resources.CANCER_BBDD_PATH);
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
         phc1.setMaxIterations(2);
         //Act
@@ -253,7 +230,7 @@ public class ParallelHillClimbingSearchTest {
 
     @Test
     public void interruptedExceptionTest(){
-        DataSet datasetAlarm = Utils.readData("src/test/resources/alarm.xbif_.csv");
+        DataSet datasetAlarm = Utils.readData(Resources.CANCER_BBDD_PATH);
         ParallelHillClimbingSearch phc1 = new ParallelHillClimbingSearch(datasetAlarm, 1);
         phc1.setMaxIterations(30);
         phc1.search();

@@ -4,7 +4,10 @@ import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.utils.Problem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class ForwardHillClimbingThread extends GESThread {
 
@@ -19,13 +22,14 @@ public class ForwardHillClimbingThread extends GESThread {
      * @param subset     subset of edges the fes stage will try to add to the resulting graph
      * @param maxIt      maximum number of iterations allowed in the fes stage
      */
-    public ForwardHillClimbingThread(Problem problem, Graph initialDag, List<Edge> subset, int maxIt) {
+    public ForwardHillClimbingThread(Problem problem, Graph initialDag, Set<Edge> subset, int maxIt) {
         this.problem = problem;
         setInitialGraph(initialDag);
         setSubSetSearch(subset);
         this.maxIt = maxIt;
         this.id = threadCounter;
         threadCounter++;
+        this.isForwards = true;
     }
 
     /**
@@ -35,7 +39,7 @@ public class ForwardHillClimbingThread extends GESThread {
      * @param subset  subset of edges the fes stage will try to add to the resulting graph
      * @param maxIt   maximum number of iterations allowed in the fes stage
      */
-    public ForwardHillClimbingThread(Problem problem, List<Edge> subset, int maxIt) {
+    public ForwardHillClimbingThread(Problem problem, Set<Edge> subset, int maxIt) {
         this.problem = problem;
         this.initialDag = new EdgeListGraph(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
@@ -51,7 +55,7 @@ public class ForwardHillClimbingThread extends GESThread {
     }
 
     private Graph search() {
-        long startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         numTotalCalls=0;
         numNonCachedCalls=0;
 
@@ -92,6 +96,11 @@ public class ForwardHillClimbingThread extends GESThread {
             Edge bestEdge = null;
             SubSet bestSubSet = null;
             for(Edge edge : edges) {
+
+                //Checking Time
+                if(isTimeout())
+                    break;
+
                 //System.out.println("[FHC " + getId() + "]" + "Checking edge: " + edge);
 
                 if (graph.containsEdge(edge)) {

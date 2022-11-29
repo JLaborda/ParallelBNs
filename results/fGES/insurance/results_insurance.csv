@@ -1,0 +1,12 @@
+algorithm, network, bbdd, SHD, BDeu Score, dfMM, dfMM plus, dfMM minus, Total time(s)
+fges,insurance,.xbif50001246_.csv,24,-71013.5372155353,52.0,4.0,48.0,0.598
+fges,insurance,.xbif50001_.csv,20,-70975.68240790274,44.0,0.0,44.0,0.641
+fges,insurance,.xbif50002_.csv,24,-70639.4326544954,50.0,4.0,46.0,0.94
+fges,insurance,.xbif50003_.csv,20,-70850.31072322611,44.0,0.0,44.0,0.679
+fges,insurance,.xbif50004_.csv,22,-70575.37008642133,46.0,4.0,42.0,0.652
+fges,insurance,.xbif50005_.csv,20,-71047.85301589519,44.0,0.0,44.0,0.682
+fges,insurance,.xbif50006_.csv,24,-71221.32892289154,52.0,4.0,48.0,0.651
+fges,insurance,.xbif50007_.csv,24,-70814.90645730979,52.0,4.0,48.0,0.628
+fges,insurance,.xbif50008_.csv,24,-70855.57887353569,52.0,4.0,48.0,0.601
+fges,insurance,.xbif50009_.csv,25,-70915.61913702227,54.0,4.0,50.0,0.651
+fges,insurance,.xbif_.csv,24,-71313.30469754152,52.0,4.0,48.0,0.653

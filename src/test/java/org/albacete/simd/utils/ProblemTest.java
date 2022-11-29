@@ -2,9 +2,7 @@ package org.albacete.simd.utils;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Node;
-import org.albacete.simd.utils.LocalScoreCacheConcurrent;
-import org.albacete.simd.utils.Problem;
-import org.albacete.simd.utils.Utils;
+import org.albacete.simd.Resources;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -16,7 +14,7 @@ import static org.junit.Assert.*;
 
 public class ProblemTest {
 
-    final String path = "src/test/resources/cancer.xbif_.csv";
+    final String path = Resources.CANCER_BBDD_PATH;
     /**
      * Dataset created from the data file
      */
@@ -60,6 +58,7 @@ public class ProblemTest {
             for(String cName : cancerNames){
                 if (name.equals(cName)){
                     isCancerName = true;
+                    break;
                 }
             }
             assertTrue(isCancerName);
@@ -109,18 +108,18 @@ public class ProblemTest {
 
     @Test
     public void equalsTest(){
-        String path1 = "src/test/resources/cancer.xbif_.csv";
-        String path2 = "src/test/resources/alarm.xbif_.csv";
+        String path1 = Resources.CANCER_BBDD_PATH;
+        String path2 = Resources.EARTHQUAKE_BBDD_PATH;
         Problem p = new Problem(path1);
         Problem p2 = new Problem(path2);
         Problem p3 = p;
         Problem p4 = new Problem(path1);
         Object obj1 = new Object();
-        assertTrue(p.equals(p3));
-        assertFalse(p.equals(p2));
-        assertFalse(p.equals(null));
-        assertTrue(p.equals(p4));
-        assertFalse(p.equals(obj1));
+        assertEquals(p, p3);
+        assertNotEquals(p, p2);
+        assertNotEquals(null, p);
+        assertEquals(p, p4);
+        assertNotEquals(p, obj1);
 
     }
 

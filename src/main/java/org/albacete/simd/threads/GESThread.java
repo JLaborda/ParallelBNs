@@ -6,22 +6,25 @@ import edu.cmu.tetrad.search.MeekRules;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.NumberFormatUtil;
 import edu.cmu.tetrad.util.ProbUtils;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.LocalScoreCacheConcurrent;
 import org.albacete.simd.utils.Problem;
 
 import java.text.NumberFormat;
 import java.util.*;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 /*
   GESThread is an abstract class that encapsulates the common attributes and methods of the threads executed in both the FES
   and BES stage. For future versions, there could be more types of threads other than {@link ThFES ThFES} and {@link ThBES ThBES}.
  */
-@SuppressWarnings({"DuplicatedCode", "unused"})
+//@SuppressWarnings({"DuplicatedCode", "unused"})
 public abstract class GESThread implements Runnable{
     /**
-     * Tuple of Nodes that will be checked by this thread in the FES method
+     * Set of edges that will be checked over the GESThread
      */
-    protected List<Edge> S;
+    protected Set<Edge> S;
 
     /**
      * Problem the thread is solving
@@ -62,6 +65,11 @@ public abstract class GESThread implements Runnable{
      * Elapsed time of the most recent search.
      */
     protected long elapsedTime;
+
+    /**
+     * Start time of the search
+     */
+    protected long startTime;
 
     /**
      * True if cycles are to be aggressively prevented. May be expensive
@@ -124,6 +132,22 @@ public abstract class GESThread implements Runnable{
     protected int id = -1;
 
     private String log = "";
+
+    /**
+     * Boolean value that says if the thread is from a forward stage (true) or from a backwards stage (false)
+     */
+    protected boolean isForwards;
+
+    /**
+     * Timeout provided by the time it takes the first thread of the stage to finish
+     */
+    //public static long forwardTimeout = -1;
+
+    /**
+     * Timeout provided by the time it takes the first thread of the stage to finish
+     */
+    //public static long backwardTimeout = -1;
+
 
 
 
@@ -229,10 +253,11 @@ public abstract class GESThread implements Runnable{
      * @return List of nodes that are connected to Y and adjacent to X.
      */
     protected static List<Node> findNaYX(Node x, Node y, Graph graph) {
-        List<Node> naYX = new LinkedList<>(graph.getAdjacentNodes(y));
+        List<Node> adjY = graph.getAdjacentNodes(y);
+        List<Node> naYX = new LinkedList<>(adjY);
         naYX.retainAll(graph.getAdjacentNodes(x));
 
-        for (int i = naYX.size()-1; i >= 0; i--) {
+        for (int i = naYX.size() - 1; i >= 0; i--) {
             Node z = naYX.get(i);
             Edge edge = graph.getEdge(y, z);
 
@@ -330,7 +355,7 @@ public abstract class GESThread implements Runnable{
      * @param graph Graph being rebuilt.
      */
     protected void rebuildPattern(Graph graph) {
-        SearchGraphUtils.basicPattern(graph);
+        SearchGraphUtils.basicCPDAG(graph);
         pdag(graph);
     }
 
@@ -370,7 +395,7 @@ public abstract class GESThread implements Runnable{
 
 //        Graph dag = SearchGraphUtils.dagFromPattern(graph);
         Graph dag = new EdgeListGraph(graph);
-        SearchGraphUtils.pdagToDag(dag);
+        pdagToDag(dag);
         double score = 0.;
 
         for (Node next : dag.getNodes()) {
@@ -469,17 +494,18 @@ public abstract class GESThread implements Runnable{
 
     /**
      * Bdeu Score function for a {@link Node node} and a set of parent nodes.
-     * @param nNode index of the child node
+     *
+     * @param nNode    index of the child node
      * @param nParents index of the parents of the node being considered as child.
      * @return The Bdeu score of the combination.
      */
 
-    protected static double localBdeuScore(int nNode, int[] nParents, Problem problem) {
+    public static double localBdeuScore(int nNode, int[] nParents, Problem problem) {
         numTotalCalls++;
 
         LocalScoreCacheConcurrent localScoreCache = problem.getLocalScoreCache();
 
-        double oldScore =localScoreCache.get(nNode, nParents);
+        double oldScore = localScoreCache.get(nNode, nParents);
         if (!Double.isNaN(oldScore)) {
             return oldScore;
         }
@@ -611,13 +637,6 @@ public abstract class GESThread implements Runnable{
         return elapsedTime;
     }
 
-    /**
-     * Sets the elapsed time
-     * @param elapsedTime the elapsed time the thread has spent running.
-     */
-    public void setElapsedTime(long elapsedTime) {
-        this.elapsedTime = elapsedTime;
-    }
 
     /**
      * Gets the maximum number of edges allowed
@@ -650,10 +669,11 @@ public abstract class GESThread implements Runnable{
 
     /**
      * Sets the subset that is searched by the thread.
+     *
      * @param subset Subset of {@link Edge Edges}.
      */
-    public void setSubSetSearch(List<Edge> subset) {
-        this.S=subset;
+    public void setSubSetSearch(Set<Edge> subset) {
+        this.S = subset;
 
     }
 
@@ -758,4 +778,28 @@ public abstract class GESThread implements Runnable{
     public LocalScoreCacheConcurrent getLocalScoreCache() {
         return problem.getLocalScoreCache();
     }
+
+    protected boolean isTimeout(){
+        //return ((timeout != -1) &&
+        //        ((System.currentTimeMillis() - startTime) > timeout));
+        long time = (System.currentTimeMillis() - startTime);
+        double zScore = 0;
+        //System.out.println("Forward Meantime: " + ForwardStage.meanTimeTotal);
+        //System.out.println("Backward Meantime: " + BackwardStage.meanTimeTotal);
+
+        if(isForwards) {
+            if (ForwardStage.meanTimeTotal != 0)
+                zScore = (time - ForwardStage.meanTimeTotal) / Math.sqrt(ForwardStage.varianceTimeTotal);
+        }
+        else{
+            if (BackwardStage.meanTimeTotal != 0)
+                zScore = (time - BackwardStage.meanTimeTotal) / Math.sqrt(BackwardStage.varianceTimeTotal);
+
+        }
+        if(zScore > 3)
+            System.out.println("Timeout! Finishing Thread");
+        return zScore > 3;
+
+    }
+
 }

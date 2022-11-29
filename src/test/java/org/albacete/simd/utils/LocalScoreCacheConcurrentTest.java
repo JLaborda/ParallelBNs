@@ -1,6 +1,5 @@
 package org.albacete.simd.utils;
 
-import org.albacete.simd.utils.LocalScoreCacheConcurrent;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

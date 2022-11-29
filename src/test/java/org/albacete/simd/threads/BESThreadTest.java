@@ -3,14 +3,16 @@ package org.albacete.simd.threads;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
-
+import org.albacete.simd.Resources;
+import org.albacete.simd.framework.BackwardStage;
+import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import static org.albacete.simd.utils.Utils.pdagToDag;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -24,7 +26,7 @@ public class BESThreadTest {
      * cancer Bayesian Network @see
      * <a href="https://www.bnlearn.com/bnrepository/discrete-small.html">https://www.bnlearn.com/bnrepository/discrete-small.html</a>
      */
-    final String path = "src/test/resources/cancer.xbif_.csv";
+    final String path = Resources.CANCER_BBDD_PATH;
     /**
      * Dataset created from the data file
      */
@@ -53,11 +55,11 @@ public class BESThreadTest {
     /**
      * Subset1 of pairs of nodes or variables.
      */
-    final List<Edge> subset1 = new ArrayList<>();
+    final Set<Edge> subset1 = new HashSet<>();
     /**
      * Subset2 of pairs of nodes or variables.
      */
-    final List<Edge> subset2 = new ArrayList<>();
+    final Set<Edge> subset2 = new HashSet<>();
 
     Problem problem;
 
@@ -71,6 +73,12 @@ public class BESThreadTest {
         initializeSubsets();
     }
 
+    @Before
+    public void restartMeans(){
+        BackwardStage.meanTimeTotal = 0;
+        ForwardStage.meanTimeTotal = 0;
+    }
+
     /**
      * Method used to remove inconsistencies in the graph passed as a parameter.
      * @param graph Graph that will have its inconsistencies removed
@@ -78,7 +86,7 @@ public class BESThreadTest {
      */
     private Graph removeInconsistencies(Graph graph){
         // Transforming the current graph into a DAG
-        SearchGraphUtils.pdagToDag(graph);
+        pdagToDag(graph);
 
         Node nodeT, nodeH;
         for (Edge e : graph.getEdges()){

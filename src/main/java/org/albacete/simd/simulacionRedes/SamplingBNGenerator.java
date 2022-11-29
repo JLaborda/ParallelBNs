@@ -210,7 +210,7 @@ public class SamplingBNGenerator {
    public static ArrayList<String> listarFicherosdeCarpeta(File carpeta) {
         ArrayList<String> ficheros = new ArrayList<String>();
 
-        File[] ficherosF = carpeta.listFiles();
+        //File[] ficherosF = carpeta.listFiles();
 
         for (final File ficheroEntrada : carpeta.listFiles()) {
             if (ficheroEntrada.isDirectory()) {

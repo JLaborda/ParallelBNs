@@ -1,15 +1,17 @@
 package org.albacete.simd.utils;
 
+import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
+import org.albacete.simd.Resources;
 import org.junit.Test;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
-import static org.junit.Assert.*;
-
 import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  * Test cases for the Utils class
@@ -17,13 +19,13 @@ import java.util.*;
 public class UtilsTest {
 
 
-    final String path1 = "src/test/resources/repeatedNames.csv";
-    final String path2 = "src/test/resources/cancer.xbif_.csv";
+    //final String path1 = "src/test/resources/repeatedNames.csv";
+    final String path = Resources.CANCER_BBDD_PATH;
     /**
      * Dataset created from the data file1
      */
     //final DataSet datasetRepeated = Utils.readData(path1);
-    final DataSet dataset = Utils.readData(path2);
+    final DataSet dataset = Utils.readData(path);
 
 
 
@@ -49,18 +51,20 @@ public class UtilsTest {
      * @result An ArrayList with two subset of TupleNode
      */
     @Test
-    public void splitTest(){
+    public void splitTest() {
         //Arrange
         Node n1 = new GraphNode("n1");
         Node n2 = new GraphNode("n2");
         Node n3 = new GraphNode("n3");
-        List<Edge> edges = Arrays.asList(Edges.directedEdge(n1,n2), Edges.directedEdge(n1,n3));
+        Set<Edge> edges = new HashSet<>();
+        edges.add(Edges.directedEdge(n1, n2));
+        edges.add(Edges.directedEdge(n1, n3));
         int seed = 42;
         int expectedSize = 2;
 
         //Act
         Utils.setSeed(seed);
-        List<List<Edge>> result = Utils.split(edges, 2);
+        List<Set<Edge>> result = Utils.split(edges, 2);
 
         //Assert
         assertEquals(expectedSize, result.size());
@@ -74,8 +78,6 @@ public class UtilsTest {
      */
     @Test
     public void readDataTest(){
-        // Arrange
-        String path = "src/test/resources/cancer.xbif_.csv";
 
         //Act
         DataSet result = Utils.readData(path);
@@ -92,20 +94,23 @@ public class UtilsTest {
 
         /*TEST: Comparing the same bn should return 0*/
         // Arrange
-        String net_path = "./res/networks/cancer.xbif";
+        String net_path = Resources.CANCER_NET_PATH;
         BIFReader bf = new BIFReader();
         bf.processFile(net_path);
-        BayesNet bn = (BayesNet) bf;
-        MlBayesIm bn2 = new MlBayesIm(bn);
+        BayesNet bn = bf;
+
+        //Transforming the BayesNet into a BayesPm
+        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bn);
+        MlBayesIm bn2 = new MlBayesIm(bayesPm);
 
         // Act
-        double result = Utils.compare(bn2.getDag(), bn2.getDag());
+        double result = Utils.compare(new Dag(bn2.getDag()), new Dag(bn2.getDag()));
 
         // Assert
         assertEquals(0.0, result, 0.000001);
 
         /*TEST: Empty Dag against normal Dag should return the number of edges of the normal Dag*/
-        Dag dag1 = bn2.getDag();
+        Dag dag1 = new Dag(bn2.getDag());
         Dag dag2 = new Dag(bn2.getDag().getNodes());
 
         int expected = dag1.getNumEdges();
@@ -118,24 +123,26 @@ public class UtilsTest {
     @Test
     public void markovBlanquetTest() throws Exception {
         // Arranging: Loading the cancer network
-        String net_path1 = "./res/networks/cancer.xbif";
+        String net_path1 = Resources.CANCER_NET_PATH;
         BIFReader bf = new BIFReader();
         bf.processFile(net_path1);
-        MlBayesIm bn1 = new MlBayesIm((BayesNet) bf);
-        Dag dag = bn1.getDag();
+        BayesNet bn = bf;
+        //Transforming the BayesNet into a BayesPm
+        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bn);
+        MlBayesIm bn1 = new MlBayesIm(bayesPm);
+        Dag dag = new Dag(bn1.getDag());
 
         // Setting expected outcome
-        Map<Node,List<Node>> expected = new HashMap<>();
+        Map<Node, List<Node>> expected = new HashMap<>();
         expected.put(dag.getNode("Pollution"), Arrays.asList(dag.getNode("Cancer"), dag.getNode("Smoker")));
         expected.put(dag.getNode("Smoker"), Arrays.asList(dag.getNode("Cancer"), dag.getNode("Pollution")));
         expected.put(dag.getNode("Cancer"), Arrays.asList(dag.getNode("Pollution"), dag.getNode("Smoker"),
                 dag.getNode("Xray"), dag.getNode("Dyspnoea")));
-        expected.put(dag.getNode("Xray"), Arrays.asList(dag.getNode("Cancer")));
-        expected.put(dag.getNode("Dyspnoea"), Arrays.asList(dag.getNode("Cancer")));
+        expected.put(dag.getNode("Xray"), Collections.singletonList(dag.getNode("Cancer")));
+        expected.put(dag.getNode("Dyspnoea"), Collections.singletonList(dag.getNode("Cancer")));
 
 
         // Acting: Getting MB for every node
-        Map<String,List<Node>> mbs = new HashMap<>();
         for (Node n: dag.getNodes() ) {
             List<Node> result = Utils.getMarkovBlanket(dag,n);
             List<Node> exp = expected.get(n);
@@ -158,39 +165,53 @@ public class UtilsTest {
     @Test
     public void avgMarkovBlanquetDifTest() throws Exception {
         /*TEST: Different Dags should return null*/
-        String net_path1 = "./res/networks/cancer.xbif";
-        String net_path2 = "./res/networks/alarm.xbif";
+        String net_path1 = Resources.CANCER_NET_PATH;
+        String net_path2 = Resources.EARTHQUAKE_NET_PATH;
         BIFReader bf = new BIFReader();
 
         // Arranging dags of alarm and cancer
         bf.processFile(net_path1);
-        MlBayesIm bn1 = new MlBayesIm((BayesNet) bf);
+        BayesNet net1 = bf;
+
+        //Transforming the BayesNet into a BayesPm
+        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(net1);
+        MlBayesIm bn1 = new MlBayesIm(bayesPm);
+
         bf.processFile(net_path2);
-        MlBayesIm bn2 = new MlBayesIm((BayesNet) bf);
+        BayesNet net2 = bf;
+        //Transforming the BayesNet into a BayesPm
+        BayesPm bayesPm2 = Utils.transformBayesNetToBayesPm(net2);
+        MlBayesIm bn2 = new MlBayesIm(bayesPm2);
 
         // Acting: Getting the avgMarkovBlanquetDif:
-        double[] result = Utils.avgMarkovBlanquetdif(bn1.getDag(), bn2.getDag());
+        double[] result = Utils.avgMarkovBlanquetdif(new Dag(bn1.getDag()), new Dag(bn2.getDag()));
         // Asserting
         assertNull(result);
 
         /*TEST: Same DAGs should return the following array [0.0,0.0,0.0]*/
         // Arranging dags for the same data
         bf.processFile(net_path1);
-        bn1 = new MlBayesIm((BayesNet) bf);
-        bn2 = new MlBayesIm((BayesNet) bf);
+        BayesNet bn = bf;
+        //Transforming the BayesNet into a BayesPm
+        BayesPm bayesPm3 = Utils.transformBayesNetToBayesPm(bn);
+        MlBayesIm bn3 = new MlBayesIm(bayesPm3);
+
+        bn1 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
+        bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
         // Acting: Getting the avgMarkovBlanquetDif:
-        result = Utils.avgMarkovBlanquetdif(bn1.getDag(), bn2.getDag());
+        result = Utils.avgMarkovBlanquetdif(new Dag(bn1.getDag()), new Dag(bn2.getDag()));
         // Asserting
-        for(double r: result){
-            assertEquals(0,r,0.000001);
+        assertNotNull(result);
+        for (double r : result) {
+            assertEquals(0, r, 0.000001);
         }
 
         /*TEST: Same nodes but different DAGs should return it's avg difference*/
         // Arranging dags
         bf.processFile(net_path1);
-        Dag dag1 = (new MlBayesIm((BayesNet) bf)).getDag();
-        Dag dag2 = (new MlBayesIm((BayesNet) bf)).getDag();
+        Dag dag1 = new Dag(new MlBayesIm(Utils.transformBayesNetToBayesPm(bf)).getDag());
+        Dag dag2 = new Dag(new MlBayesIm(Utils.transformBayesNetToBayesPm(bf)).getDag());
 
         // Changing the original dag
         dag2.removeEdge(dag2.getNode("Cancer"), dag2.getNode("Dyspnoea"));
@@ -202,24 +223,25 @@ public class UtilsTest {
         result = Utils.avgMarkovBlanquetdif(dag1, dag2);
 
         // Asserting
-        double expected_mbavg = 4.0/5.0;
-        double expected_mbplus = 2;
-        double expected_mbminus = 2;
 
-        assertEquals(expected_mbavg, result[0], 0.000001);
+        double expected_mbdiff = 0 + 0 + 1 + 1 + 2;//(0 + 0 +(double)1/4 + 1 + 2)/5.0 *100;
+        double expected_mbplus = 0 + 0 + 0 + 1 + 1;//(0+0+0+1+1)/5.0 * 100;
+        double expected_mbminus = 0 + 0 + 1 + 0 + 1;//(0+0+(double)1/4+0+1)/5.0 * 100;
+        assertNotNull(result);
+        assertEquals(expected_mbdiff, result[0], 0.000001);
         assertEquals(expected_mbplus, result[1], 0.000001);
-        assertEquals(expected_mbminus, result[2 ], 0.000001);
+        assertEquals(expected_mbminus, result[2], 0.000001);
     }
 
     @Test
     public void getNodeByNameTest() throws Exception {
         BIFReader bf = new BIFReader();
-        bf.processFile("res/networks/cancer.xbif");
-        BayesNet bn = (BayesNet) bf;
+        bf.processFile(Resources.CANCER_NET_PATH);
+        BayesNet bn = bf;
         System.out.println("Numero de variables: "+bn.getNrOfNodes());
-        MlBayesIm bn2 = new MlBayesIm(bn);
+        MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bn));
 
-        Dag dag = bn2.getDag();
+        Dag dag = new Dag(bn2.getDag());
 
         Node n = Utils.getNodeByName(dag.getNodes(), "Pollution");
         Node n2 = Utils.getNodeByName(dag.getNodes(), "");
@@ -231,12 +253,12 @@ public class UtilsTest {
     @Test
     public void getIndexOfNodesByNameTest() throws Exception {
         BIFReader bf = new BIFReader();
-        bf.processFile("res/networks/cancer.xbif");
-        BayesNet bn = (BayesNet) bf;
+        bf.processFile(Resources.CANCER_NET_PATH);
+        BayesNet bn = bf;
         System.out.println("Numero de variables: "+bn.getNrOfNodes());
-        MlBayesIm bn2 = new MlBayesIm(bn);
+        MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bn));
 
-        Dag dag = bn2.getDag();
+        Dag dag = new Dag(bn2.getDag());
         List<Node> nodes = dag.getNodes();
 
         int result1 = Utils.getIndexOfNodeByName(nodes, "Pollution");
@@ -306,7 +328,7 @@ public class UtilsTest {
                 Edges.directedEdge(pollution, dypnoea), Edges.directedEdge(dypnoea, pollution)
         );
         //Act
-        List<Edge> result = Utils.calculateArcs(dataset);
+        Set<Edge> result = Utils.calculateArcs(dataset);
         for(Edge e: result){
             assertTrue(expected.contains(e));
         }
@@ -318,7 +340,7 @@ public class UtilsTest {
     /*
     @Test
     public void scoreGraph(){
-        String path = "./res/networks/BBDD/cancer.xbif50000_.csv";
+        String path = "./res/networks/BBDD/cancer_test.csv";
         DataSet data = Utils.readData(path);
         Graph g = null;
 
@@ -333,7 +355,7 @@ public class UtilsTest {
     @Test
     public void scoreGraph() throws Exception {
         //TEST: Empty graph should give back a score of 0
-        String path = "./res/networks/BBDD/cancer.xbif50000_.csv";
+        String path = "./res/networks/BBDD/cancer_test.csv";
         DataSet data = Utils.readData(path);
         Graph g = new EdgeListGraph();
 
