@@ -307,34 +307,34 @@ public abstract class GESThread implements Runnable{
             return false;
         }
         
-        // nueva forma de calcular los caminos semidirigidos (tarda mucho el new EdgeListGraph_n(graph))
-      
-        /*Graph aux = new EdgeListGraph_n(graph);
-        aux.removeNodes(naYXT);
-        
-        LinkedList<Node> open = new LinkedList<Node>();
-        HashMap<String,Node> close = new HashMap<String,Node>();
+        // nueva forma de calcular los caminos semidirigidos
+
+        LinkedHashSet<Node> open = new LinkedHashSet<>();
+        HashSet<Node> close = new HashSet<>();
         open.add(y);
+        close.addAll(naYXT);
         
         while(!open.isEmpty()) {
-        	Node a = open.getFirst();
-        	if(a.equals(x)) return false;
-        	open.remove(a);
-        	close.put(a.toString(), a);
-        	List<Node> nb = aux.getAdjacentNodes(a);
-        	for(Node n: nb) {
-        		Edge e = aux.getEdge(a,n);
-        		if (close.get(n.toString()) == null && !e.pointsTowards(a) && !open.contains(n)) 
-        			open.addLast(n);
-        	}
+            Node a = open.iterator().next();
+            if(a.equals(x)) return false;
+            open.remove(a);
+            close.add(a);
+            
+            for(Edge e: graph.getEdges(a)) {
+                Node n = e.getNode1();
+                Node n2 = e.getNode2();
+                if (n.equals(a)) n = n2;
+                if (!close.contains(n) && !open.contains(n) && !e.pointsTowards(a)) 
+                    open.add(n);
+            }
         }
-        return true;*/
+        return true;
 
-        for (Node node1 : graph.getNodes()) {
+        /*for (Node node1 : graph.getNodes()) {
             if (node1 == y || marked.contains(node1)) {
                 continue;
             }
-
+            
             if (graph.isAdjacentTo(y, node1) && !graph.isParentOf(node1, y)) {
                 marked.add(node1);
 
@@ -346,9 +346,9 @@ public abstract class GESThread implements Runnable{
             }
         }
 
-        return true;
+        return true;*/
     }
-
+    
     /**
      * Completes a pattern that was modified by an insertion/deletion operator
      * Based on the algorithm described on @see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf">Appendix C of (Chickering, 2002)</a>.
