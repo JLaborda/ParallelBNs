@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.albacete.simd.algorithms.bnbuilders.Circular_GES;
+import org.albacete.simd.algorithms.bnbuilders.Fges_BNBuilder;
 
 /*We are checking the following hyperparameters:
  * Threads: [1, 2, 4, 8, 16]
@@ -43,6 +44,7 @@ public class ExperimentBNBuilder {
     protected DataSet testDataset;
 
     protected int numberOfThreads;
+    protected int numberOfPGESThreads;
     protected int interleaving;
     protected int maxIterations;
     //protected static HashMap<String, HashMap<String,String>> map;
@@ -61,7 +63,7 @@ public class ExperimentBNBuilder {
     protected String algName;
     protected long seed = -1;
     private MlBayesIm controlBayesianNetwork;
-    private Dag resultingBayesianNetwork;
+    public Dag resultingBayesianNetwork;
 
 
     public ExperimentBNBuilder(String[] parameters) throws Exception {
@@ -76,11 +78,12 @@ public class ExperimentBNBuilder {
         databasePath = parameters[3];
         databaseName = getDatabaseNameFromPattern();
         testDatabasePath = parameters[4];
+        numberOfThreads = Runtime.getRuntime().availableProcessors();
 
-        if(!algName.equals("ges")) {
-            numberOfThreads = Runtime.getRuntime().availableProcessors();
-            interleaving = Integer.parseInt(parameters[5]);
-            seed = Integer.parseInt(parameters[6]);
+        if(algName.equals("pges") || algName.equals("pges_random") || algName.equals("circular_ges")) {
+            numberOfPGESThreads = Integer.parseInt(parameters[5]);
+            interleaving = Integer.parseInt(parameters[6]);
+            seed = Integer.parseInt(parameters[7]);
         }
     }
 
@@ -96,20 +99,23 @@ public class ExperimentBNBuilder {
 
     private void createBNBuilder() throws Exception {
         switch(algName) {
-            case "pges":
+            case "pges_random":
                 Clustering randomClustering = new RandomClustering(seed);
-                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
                 break;
-            case "pges_clustering":
+            case "pges":
                 Clustering hierarchicalClusteringPGES = new HierarchicalClustering();
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
                 break;
             case "ges":
                 algorithm = new GES_BNBuilder(databasePath);
                 break;
             case "circular_ges":
                 Clustering hierarchicalClusteringGES = new HierarchicalClustering();
-                algorithm = new Circular_GES(databasePath, hierarchicalClusteringGES, numberOfThreads, interleaving);
+                algorithm = new Circular_GES(databasePath, hierarchicalClusteringGES, numberOfPGESThreads, interleaving);
+                break;
+            case "fges":
+                algorithm = new Fges_BNBuilder(databasePath);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);

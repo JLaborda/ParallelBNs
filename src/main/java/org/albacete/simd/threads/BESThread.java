@@ -9,6 +9,7 @@ import org.albacete.simd.utils.Problem;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import static org.albacete.simd.utils.Utils.pdagToDag;
@@ -55,7 +56,7 @@ public class BESThread extends GESThread {
      * @return PDAG that contains either the result of the BES or FES method.
      */
     private Graph search() {
-        if (S.size() > 0) {
+        if (!S.isEmpty()) {
             startTime = System.currentTimeMillis();
             numTotalCalls=0;
             numNonCachedCalls=0;
@@ -169,8 +170,9 @@ public class BESThread extends GESThread {
         x_d = y_d = null;
         h_0 = null;
         
-        EdgeSearch[] scores = new EdgeSearch[S.size()];
-        List<Edge> edges = new ArrayList<>(S);
+        Set<Edge> edgesInGraph = graph.getEdges();
+        EdgeSearch[] scores = new EdgeSearch[edgesInGraph.size()];
+        List<Edge> edges = new ArrayList<>(edgesInGraph);
         
         Arrays.parallelSetAll(scores, e->{
             return scoreEdge(graph, edges.get(e), initialScore);
@@ -189,7 +191,7 @@ public class BESThread extends GESThread {
     
     private EdgeSearch scoreEdge(Graph graph, Edge edge, double initialScore) {
         // Checking if the edge is actually inside the graph
-        if(!graph.containsEdge(edge)) {
+        if(S.contains(edge)) {
             Node _x = Edges.getDirectedEdgeTail(edge);
             Node _y = Edges.getDirectedEdgeHead(edge);
 

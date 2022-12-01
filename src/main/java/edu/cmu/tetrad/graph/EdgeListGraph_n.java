@@ -1,6 +1,7 @@
 package edu.cmu.tetrad.graph;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -168,6 +169,43 @@ public class EdgeListGraph_n extends EdgeListGraph {
             getPcs().firePropertyChange("edgeRemoved", edge, null);
             return true;
         }
+    }
+    
+    /**
+     * Removes the edge connecting the two given nodes.
+     * @param node1
+     * @param node2
+     * @return 
+     */
+    @Override
+    public boolean removeEdge(Node node1, Node node2) {
+        List<Edge> edges = getEdges(node1, node2);
+
+        if (edges.size() > 1) {
+            throw new IllegalStateException(
+                    "There is more than one edge between " + node1 + " and "
+                            + node2);
+        }
+
+        return removeEdge(edges.get(0));
+    }
+    
+    /**
+     * Removes any relevant edge objects found in this collection. G
+     *
+     * @param edges the collection of edges to remove.
+     * @return true if any edges in the collection were removed, false if not.
+     */
+    @Override
+    public boolean removeEdges(Collection<Edge> edges) {
+        boolean change = false;
+
+        for (Edge edge : edges) {
+            boolean _change = removeEdge(edge);
+            change = change || _change;
+        }
+
+        return change;
     }
     
     /**

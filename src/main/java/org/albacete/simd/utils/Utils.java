@@ -420,7 +420,7 @@ public class Utils {
      */
     public static Dag removeInconsistencies(Graph g){
         // Transforming the current graph into a DAG
-        SearchGraphUtils.dagFromCPDAG(g);
+        pdagToDag(g);
 
         // Checking Consistency
         Node nodeT, nodeH;
