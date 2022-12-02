@@ -9,11 +9,11 @@ import org.albacete.simd.framework.*;
 public class Fges_BNBuilder extends BNBuilder {
 
     public Fges_BNBuilder(DataSet data) {
-        super(data, -1, -1, -1);
+        super(data, 1, -1, -1);
     }
 
     public Fges_BNBuilder(String path) {
-        super(path, -1, -1, -1);
+        super(path, 1, -1, -1);
     }
 
     @Override

@@ -66,8 +66,9 @@ public class ExperimentBNBuilder {
     public Dag resultingBayesianNetwork;
 
 
-    public ExperimentBNBuilder(String[] parameters) throws Exception {
+    public ExperimentBNBuilder(String[] parameters, int threads) throws Exception {
         extractParametersForClusterExperiment(parameters);
+        this.numberOfThreads = threads;
         createBNBuilder();
     }
 
@@ -78,7 +79,6 @@ public class ExperimentBNBuilder {
         databasePath = parameters[3];
         databaseName = getDatabaseNameFromPattern();
         testDatabasePath = parameters[4];
-        numberOfThreads = Runtime.getRuntime().availableProcessors();
 
         if(algName.equals("pges") || algName.equals("pges_random") || algName.equals("circular_ges")) {
             numberOfPGESThreads = Integer.parseInt(parameters[5]);
@@ -86,6 +86,14 @@ public class ExperimentBNBuilder {
             seed = Integer.parseInt(parameters[7]);
         }
     }
+    
+    public boolean checkExistentFile(String savePath) throws IOException{
+        File file = new File(savePath);
+
+        if(file.length() != 0) return true;
+        else return false;
+    }
+    
 
     private String getDatabaseNameFromPattern(){
         // Matching the end of the csv file to get the name of the database
@@ -136,7 +144,8 @@ public class ExperimentBNBuilder {
         if (matcher.find()) {
             databaseName = matcher.group(1);
         }
-        this.numberOfThreads = algorithm.getnThreads();
+        this.numberOfThreads = Runtime.getRuntime().availableProcessors();
+        this.numberOfPGESThreads = algorithm.getnThreads();
         this.maxIterations = algorithm.getMaxIterations();
         this.interleaving = algorithm.getItInterleaving();
     }
@@ -175,6 +184,7 @@ public class ExperimentBNBuilder {
         System.out.println("\tBBDD Name: " + databaseName);
         //System.out.println("\tFusion Consensus: " + fusion_consensus);
         System.out.println("\tnThreads: " + numberOfThreads);
+        System.out.println("\tnPGESThreads: " + numberOfPGESThreads);
         System.out.println("\tnItInterleaving: " + interleaving);
         System.out.println("-----------------------------------------");
 
@@ -234,7 +244,7 @@ public class ExperimentBNBuilder {
         BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
         //FileWriter csvWriter = new FileWriter(savePath, true);
         if(file.length() == 0) {
-            String header = "algorithm, network, bbdd, threads, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, dfMM minus, Total iterations, Total time(s)\n";
+            String header = "algorithm,network,bbdd,threads,PGESthreads,interleaving,seed,SHD,LL Score,BDeu Score,dfMM,dfMM plus,dfMM minus,Total iterations,Total time(s)\n";
             csvWriter.append(header);
         }
         csvWriter.append(this.getResults());
@@ -277,6 +287,7 @@ public class ExperimentBNBuilder {
                 + this.netName + ","
                 + this.databaseName + ","
                 + this.numberOfThreads + ","
+                + this.numberOfPGESThreads + ","
                 + this.interleaving + ","
                 + this.seed + ","
                 + this.structuralHamiltonDistanceValue + ","

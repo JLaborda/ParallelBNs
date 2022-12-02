@@ -119,7 +119,7 @@ public class BESThread extends GESThread {
             bestScore = bestDelete;
 
             // Deleting edge
-            System.out.println("Thread " + getId() + " deleting: (" + x_d + ", " + y_d + ", " + h_0+ ")");
+            //System.out.println("Thread " + getId() + " deleting: (" + x_d + ", " + y_d + ", " + h_0+ ")");
             delete(x_d,y_d,h_0, graph);
             
             // Checking cycles?
@@ -129,11 +129,11 @@ public class BESThread extends GESThread {
             rebuildPattern(graph);
             
             // Printing score
-            if (!h_0.isEmpty())
+            /*if (!h_0.isEmpty())
                 System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_d, y_d) + " " + h_0);
             else
                 System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_d, y_d));
-            
+            */
             bestScore = bestDelete;
             //System.out.println("    Real Score" + scoreGraph(graph, problem));
 

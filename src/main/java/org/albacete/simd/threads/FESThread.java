@@ -135,7 +135,7 @@ public class FESThread extends GESThread {
             bestScore = bestInsert;
 
             // Inserting edge
-            System.out.println("Thread " + getId() + " inserting: (" + x_i + ", " + y_i + ", " + t_0 + ")");
+            //System.out.println("Thread " + getId() + " inserting: (" + x_i + ", " + y_i + ", " + t_0 + ")");
             insert(x_i, y_i, t_0, graph);
 
             // Checking cycles?
@@ -144,11 +144,11 @@ public class FESThread extends GESThread {
             rebuildPattern(graph);
 
             // Printing score
-            if (!t_0.isEmpty()) {
+            /*if (!t_0.isEmpty()) {
                 System.out.println("[" + getId() + "] Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert - score) + ")\tOperator: " + graph.getEdge(x_i, y_i) + " " + t_0);
             } else {
                 System.out.println("[" + getId() + "] Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert - score) + ")\tOperator: " + graph.getEdge(x_i, y_i));
-            }
+            }*/
             bestScore = bestInsert;
 
             // Checking that the maximum number of edges has not been reached
