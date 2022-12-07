@@ -16,7 +16,7 @@ public class PGESwithStages extends BNBuilder {
     private FESStage fesStage;
     private BESStage besStage;
 
-    private Clustering clustering;
+    private final Clustering clustering;
 
 
 
@@ -66,11 +66,11 @@ public class PGESwithStages extends BNBuilder {
 
     @Override
     protected void repartition() {
-        this.subSets = clustering.generateEdgeDistribution(nThreads, false);
+        this.subSets = clustering.generateEdgeDistribution(nThreads, true);
     }
 
     @Override
-    protected void forwardStage() throws InterruptedException {
+    protected void forwardStage(){
         fesStage = new FESStage(problem, currentGraph,nThreads,nItInterleaving, subSets);
         fesFlag = fesStage.run();
         graphs = fesStage.getGraphs();
@@ -85,7 +85,7 @@ public class PGESwithStages extends BNBuilder {
     }
 
     @Override
-    protected void backwardStage() throws InterruptedException {
+    protected void backwardStage(){
         besStage = new BESStage(problem, currentGraph, nThreads, nItInterleaving, subSets);
         besFlag = besStage.run();
         graphs = besStage.getGraphs();

@@ -47,8 +47,8 @@ public class HierarchicalClusteringTest {
         Set<Node> cluster2 = p.getVariables().stream().filter(node -> names2.contains(node.getName())).collect(Collectors.toSet());
 
 
-        List<Set<Node>> clusters = clustering.clusterize(2);
-        List<Set<Node>> clustersParallel = clustering2.clusterize(2);
+        List<Set<Node>> clusters = clustering.clusterize(2, false);
+        List<Set<Node>> clustersParallel = clustering2.clusterize(2, false);
 
         assertEquals(clusters.size(), clustersParallel.size());
         assertEquals(clusters.get(0).size(), clustersParallel.get(0).size());
@@ -83,17 +83,52 @@ public class HierarchicalClusteringTest {
 
     @Test
     public void edgeDistributionDuplicateTest() {
-        HierarchicalClustering clustering = new HierarchicalClustering(p);
+        Problem alarmProblem = new Problem(Resources.ALARM_BBDD_PATH);
+        HierarchicalClustering clustering = new HierarchicalClustering(alarmProblem,true);
 
-        //List<Set<Node>> clusters = clustering.clusterize(2);
         List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(2, true);
 
         assertEquals(2, edgeDistribution.size());
 
+
+        Set<Edge> edgeCluster1 = edgeDistribution.get(0);
+        Set<Edge> edgeCluster2 = edgeDistribution.get(1);
+
+        boolean duplicate = false;
+        for (Edge edge : edgeCluster1) {
+            if(edgeCluster2.contains(edge)) {
+                duplicate = true;
+                break;
+            }
+        }
+        assertTrue(duplicate);
+
         System.out.println("edgeDistribution0: " + edgeDistribution.get(0).size());
         System.out.println("edgeDistribution1: " + edgeDistribution.get(1).size());
 
-        assertTrue(edgeDistribution.get(0).size() >= 3 && edgeDistribution.get(0).size() <= 20);
-        assertTrue(edgeDistribution.get(1).size() >= 3 && edgeDistribution.get(1).size() <= 20);
+        assertTrue(Math.abs(edgeDistribution.get(0).size() - edgeDistribution.get(1).size()) <= 30);
+
+    }
+
+    @Test
+    public void paralellAndSequentialClusteringProduceTheSameResults() {
+        HierarchicalClustering clusteringSeq = new HierarchicalClustering(p, false);
+        HierarchicalClustering clusteringPar = new HierarchicalClustering(p, true);
+
+        List<Set<Node>> clustersSeq = clusteringSeq.clusterize(2, false);
+        List<Set<Node>> clustersPar = clusteringPar.clusterize(2, false);
+
+        assertEquals(clustersSeq.size(), clustersPar.size());
+
+        for (int i = 0; i < clustersSeq.size(); i++) {
+            assertEquals(clustersSeq.get(i).size(), clustersPar.get(i).size());
+        }
+
+        for (int i = 0; i < clustersSeq.size(); i++) {
+            for (Node node : clustersSeq.get(i)) {
+                assertTrue(clustersPar.get(i).contains(node));
+            }
+
+        }
     }
 }
