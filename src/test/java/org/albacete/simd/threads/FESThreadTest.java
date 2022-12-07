@@ -2,7 +2,6 @@ package org.albacete.simd.threads;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
-import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.Resources;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
@@ -61,7 +60,7 @@ public class FESThreadTest {
      */
     final Set<Edge> subset2 = new HashSet<>();
 
-    private Problem problem;
+    private final Problem problem;
 
 
     /**
@@ -138,7 +137,7 @@ public class FESThreadTest {
 
     /**
      * Checks that both constructors work perfectly.
-     * @result  Both constructors create a ThFES object.
+     * @result  Both constructors create a FESThread object.
      * @throws InterruptedException Exception caused by thread interruption.
      */
     @Test
