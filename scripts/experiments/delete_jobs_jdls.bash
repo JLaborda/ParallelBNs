@@ -1,2 +1,2 @@
 #!/bin/bash
-qselect -u jdls | xargs qdel
+qselect -u jorlabs | xargs qdel
