@@ -123,7 +123,13 @@ public class ExperimentBNBuilder {
                 algorithm = new Circular_GES(databasePath, hierarchicalClusteringGES, numberOfPGESThreads, interleaving);
                 break;
             case "fges":
-                algorithm = new Fges_BNBuilder(databasePath);
+                algorithm = new Fges_BNBuilder(databasePath, true, false);
+                break;
+            case "fges2":
+                algorithm = new Fges_BNBuilder(databasePath, false, false);
+                break;
+            case "fges3":
+                algorithm = new Fges_BNBuilder(databasePath, true, true);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);
