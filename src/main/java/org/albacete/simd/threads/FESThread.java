@@ -1,12 +1,17 @@
 package org.albacete.simd.threads;
 
+import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
 import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.utils.Problem;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+
+import java.util.stream.Collectors;
+import static org.albacete.simd.threads.GESThread.findNaYX;
+import static org.albacete.simd.threads.GESThread.getSubsetOfNeighbors;
+import static org.albacete.simd.threads.GESThread.isClique;
 
 import static org.albacete.simd.utils.Utils.pdagToDag;
 
@@ -124,7 +129,7 @@ public class FESThread extends GESThread {
         y_i = null;
         t_0 = null;
         iterations = 0;
-
+        
         //System.out.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
         bestInsert = fs(graph, bestScore);
@@ -265,7 +270,6 @@ public class FESThread extends GESThread {
                     double greedyScore = evalScore;
                     int bestNodeIndex;
                     Node bestNode = null;
-                    int subsetTsize = 0;
 
                     do {
                         bestNodeIndex = -1;
@@ -309,10 +313,9 @@ public class FESThread extends GESThread {
                         if (bestNodeIndex != -1) {
                             tSubset.add(bestNode);
                             tNeighbors.remove(bestNodeIndex);
-                            subsetTsize++;
                         }
 
-                    } while ((bestNodeIndex != -1) && (subsetTsize <= 1));
+                    } while ((bestNodeIndex != -1) && (tSubset.size() <= 1));
                     
                     if(greedyScore > bestScore) {
                         bestScore = greedyScore;
@@ -466,5 +469,104 @@ public class FESThread extends GESThread {
         return bestScore;
 
     }
+    
+    private double fes2(Graph graph, double score) {
+        System.out.println("** FORWARD EQUIVALENCE SEARCH (FES)");
+        double bestScore = score;
+        System.out.println("Initial Score = " + nf.format(bestScore));
+        PowerSetFabric.setMode(PowerSetFabric.MODE_FES);
+        Node x = null;
+        Node y = null;
+        Set<Node> t = new HashSet<>();
+
+        do {
+              x = null;
+            List<Node> nodes = graph.getNodes();
+
+            for (int i = 0; i < nodes.size(); i++) {
+                Node _x = nodes.get(i);
+
+                for (Node _y : nodes) {
+                    if (_x == _y) {
+                        continue;
+                    }
+
+                    if (graph.isAdjacentTo(_x, _y)) {
+                        continue;
+                    }
+
+                    List<Node> tNeighbors = getSubsetOfNeighbors(_x, _y, graph);
+                    
+                    //List<Set<Node>> tSubsets = powerSet(tNeighbors);
+                    PowerSet tSubsets= PowerSetFabric.getPowerSet(_x,_y,tNeighbors);
+
+                    while(tSubsets.hasMoreElements()) {
+                            SubSet tSubset=tSubsets.nextElement();
+                            
+                        double insertEval = insertEval(_x,_y, tSubset, graph, problem);
+                        double evalScore = score + insertEval;
+
+                        if (!(evalScore > bestScore && evalScore > score)) {
+                            continue;
+                        }
+
+                        List<Node> naYXT = new LinkedList<Node>(tSubset);
+                        naYXT.addAll(findNaYX(_x,_y, graph));
+                        
+                        // INICIO TEST 1
+                        if(tSubset.firstTest==SubSet.TEST_NOT_EVALUATED) {
+                            if (!isClique(naYXT, graph)) {
+//                                       tSubsets.firstTest(false); // Si falla para T entonces falla para cualquier T' | T' contiene T
+                            continue;
+                            }
+                        }
+                        else if (tSubset.firstTest==SubSet.TEST_FALSE) {
+                            continue;
+                       }
+                        // FIN TEST 1
+                        
+                        // INICIO TEST 2
+                        if(tSubset.secondTest==SubSet.TEST_NOT_EVALUATED) {
+                            if (!isSemiDirectedBlocked(_x, _y, naYXT, graph, new HashSet<Node>())) {
+                            continue;
+                            }
+                            else {
+//                                       tSubsets.secondTest(true);  // Si pasa para T entonces pasa para cualquier T' | T' contiene T
+                            }
+                        }
+                        else if (tSubset.secondTest==SubSet.TEST_FALSE) { // No puede ocurrir
+                            //System.out.println("ERROR");
+                            continue;
+                        }
+                        // FIN TEST 2
+
+                        bestScore = evalScore;
+                        x=_x;
+                        y=_y;
+                        t=tSubset;
+
+//                        System.out.println("Best score = " + bestScore);
+                    }
+                }
+            }
+
+            if (x != null) {
+                insert(x,y,t, graph);
+//                Edge prevEdge=graph.getEdge(x, y);
+                rebuildPattern(graph);
+                if (!t.isEmpty())
+                            System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestScore-score) +")\tOperator: " + graph.getEdge(x, y) + " " + t);
+                else
+                            System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestScore-score) +")\tOperator: " + graph.getEdge(x, y));
+                score = bestScore;
+
+                if (getMaxNumEdges() != -1 && graph.getNumEdges() > getMaxNumEdges()) {
+                    break;
+                }
+            }
+        } while (x != null);
+        return score;
+    }
+
 
 }
