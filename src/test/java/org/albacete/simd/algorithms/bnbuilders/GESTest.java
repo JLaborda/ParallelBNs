@@ -2,25 +2,23 @@ package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Dag;
-import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.Resources;
 import org.albacete.simd.clustering.Clustering;
 import org.albacete.simd.clustering.RandomClustering;
+import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.Utils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class PHC_BNBuilderTest {
+public class GESTest {
 
     String path = Resources.CANCER_BBDD_PATH;
     DataSet dataSet = Utils.readData(path);
@@ -32,19 +30,18 @@ public class PHC_BNBuilderTest {
         ForwardStage.meanTimeTotal = 0;
     }
 
-
     @Test
     public void testConstructor() {
-        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5);
-        PGESwithStages alg2 = new PGESwithStages(path, clustering, 2, 100, 5);
+        BNBuilder alg1 = new GES_BNBuilder(dataSet);
+        BNBuilder alg2 = new GES_BNBuilder(path);
 
         List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
         Dag initialGraph = new Dag(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
-        PGESwithStages alg3 = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5);
-        PGESwithStages alg4 = new PGESwithStages(initialGraph, Resources.CANCER_DATASET, clustering, 2, 100, 5);
+        BNBuilder alg3 = new GES_BNBuilder(initialGraph, Resources.CANCER_BBDD_PATH);
+        BNBuilder alg4 = new GES_BNBuilder(initialGraph, Resources.CANCER_DATASET);
 
 
         assertNotNull(alg1);
@@ -52,68 +49,54 @@ public class PHC_BNBuilderTest {
         assertNotNull(alg3);
         assertNotNull(alg4);
 
-        assertEquals(2, alg1.getnThreads());
-        assertEquals(2, alg2.getnThreads());
-        assertEquals(2, alg3.getnThreads());
-        assertEquals(2, alg4.getnThreads());
-        assertEquals(100, alg1.getMaxIterations());
-        assertEquals(100, alg2.getMaxIterations());
-        assertEquals(100, alg3.getMaxIterations());
-        assertEquals(100, alg4.getMaxIterations());
-        assertEquals(5, alg1.getItInterleaving());
-        assertEquals(5, alg2.getItInterleaving());
-        assertEquals(5, alg3.getItInterleaving());
-        assertEquals(5, alg4.getItInterleaving());
+        assertEquals(1, alg1.getnThreads());
+        assertEquals(1, alg2.getnThreads());
+        assertEquals(1, alg3.getnThreads());
+        assertEquals(1, alg4.getnThreads());
+        assertEquals(-1, alg1.getMaxIterations());
+        assertEquals(-1, alg2.getMaxIterations());
+        assertEquals(-1, alg3.getMaxIterations());
+        assertEquals(-1, alg4.getMaxIterations());
+        assertEquals(-1, alg1.getItInterleaving());
+        assertEquals(-1, alg2.getItInterleaving());
+        assertEquals(-1, alg3.getItInterleaving());
+        assertEquals(-1, alg4.getItInterleaving());
         assertNull(alg1.getCurrentGraph());
         assertNull(alg2.getCurrentGraph());
         assertNotNull(alg3.getCurrentGraph());
         assertNotNull(alg4.getCurrentGraph());
+        assertEquals(initialGraph.getNodes(), alg3.getCurrentGraph().getNodes());
+        assertEquals(initialGraph.getEdges(), alg3.getCurrentGraph().getEdges());
+        assertEquals(initialGraph.getNodes(), alg4.getCurrentGraph().getNodes());
+        assertEquals(initialGraph.getEdges(), alg4.getCurrentGraph().getEdges());
+
 
     }
 
     @Test
     public void searchTest() {
+        BNBuilder ges = new GES_BNBuilder(Resources.CANCER_BBDD_PATH);
         Utils.setSeed(42);
-        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5);
-        List<Node> nodes = new ArrayList<>();
-        nodes.add(Resources.CANCER);
-        nodes.add(Resources.DYSPNOEA);
-        nodes.add(Resources.XRAY);
-        nodes.add(Resources.POLLUTION);
-        nodes.add(Resources.SMOKER);
-        Dag expected = new Dag(nodes);
-        expected.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
-        expected.addDirectedEdge(Resources.CANCER, Resources.XRAY);
-        expected.addDirectedEdge(Resources.CANCER, Resources.POLLUTION);
-        expected.addDirectedEdge(Resources.SMOKER, Resources.CANCER);
 
-        alg1.search();
+        System.out.println("Searching...");
+        ges.search();
 
-        System.out.println((alg1.getCurrentGraph()));
+        //System.out.println((alg1.getCurrentGraph()));
 
-        assertNotNull(alg1.getCurrentGraph());
-        assertTrue(alg1.getCurrentGraph() instanceof Dag);
+        assertNotNull(ges.getCurrentGraph());
+        assertTrue(ges.getCurrentGraph() instanceof Dag);
 
-        Set<Edge> resultingEdges = alg1.getCurrentGraph().getEdges();
-        for (Edge edge : resultingEdges) {
-            assertTrue(expected.containsEdge(edge));
-        }
     }
 
 
     @Test
     public void convergenceTest() {
-        PGESwithStages alg = new PGESwithStages(Utils.readData(Resources.CANCER_BBDD_PATH),
-                clustering,
-                2,
-                1,
-                5
-        );
+        BNBuilder alg = new GES_BNBuilder(Utils.readData(Resources.CANCER_BBDD_PATH));
         alg.search();
 
         assertNotNull(alg.getCurrentGraph());
+        assertNotEquals(0, alg.getCurrentGraph().getEdges());
         assertTrue(alg.getCurrentGraph() instanceof Dag);
-        assertEquals(1, alg.getIterations());
 
     }
 
@@ -124,8 +107,7 @@ public class PHC_BNBuilderTest {
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
-        Clustering clustering = new RandomClustering(42);
-        PGESwithStages alg = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5);
+        BNBuilder alg = new GES_BNBuilder(initialGraph, Resources.CANCER_DATASET);
 
         Dag result = alg.getCurrentDag();
         // Equals is never gonna work. Because tetrad doesn't have a proper equals

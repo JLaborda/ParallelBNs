@@ -20,14 +20,9 @@ import org.albacete.simd.utils.Utils;
 import static org.albacete.simd.utils.Utils.pdagToDag;
 
 public class FESFusion extends FusionStage{
-    
-    ThreadStage fesStage;
 
-    public FESFusion(Problem problem, Graph currentGraph, ArrayList<Dag> graphs, FESStage fesStage) {
-        super(problem, currentGraph, graphs);
-        this.fesStage = fesStage;
-    }
-    
+
+
     public FESFusion(Problem problem, Graph currentGraph, ArrayList<Dag> graphs) {
         super(problem, currentGraph, graphs);
     }
@@ -40,23 +35,7 @@ public class FESFusion extends FusionStage{
         ConsensusUnion fusion = new ConsensusUnion(this.graphs);
         Graph fusionGraph = fusion.union();
 
-        // Getting Scores
-        /*
-        double fusionScore = GESThread.scoreGraph(fusionGraph, problem);
-        double currentScore = GESThread.scoreGraph(this.currentGraph, problem);
-
-        System.out.println("Fusion Score FES: " + fusionScore);
-        System.out.println("Current Score FES: " + currentScore + "\n");
-
-
-
-        // Checking if the score has improved
-        if (fusionScore > currentScore) {
-            this.currentGraph = fusionGraph;
-            System.out.println((Dag)fusionGraph);
-            return (Dag) this.currentGraph;
-        }
-        */
+        // Applying FES to the fusion graph
         if (currentGraph == null) {
             flag = true;
             this.currentGraph = new EdgeListGraph(new LinkedList<>(fusionGraph.getNodes()));
@@ -82,7 +61,9 @@ public class FESFusion extends FusionStage{
         // We obtain the flag of the FES. If true, FESThread has improve the result.
         try {
             flag = flag || fuse.getFlag();
-        } catch (InterruptedException ex) {}
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
         
         // If the FESThread has not improved the previous result, we check if the fusion improves it.
         if (!flag) {

@@ -76,7 +76,7 @@ public class PGESwithStages extends BNBuilder {
 
     @Override
     protected void forwardFusion() throws InterruptedException {
-        FESFusion fesFusion = new FESFusion(problem, currentGraph, graphs, fesStage);
+        FESFusion fesFusion = new FESFusion(problem, currentGraph, graphs);
         fesFusion.run();
         fesFlag = fesFusion.flag;
         currentGraph = fesFusion.getCurrentGraph();
