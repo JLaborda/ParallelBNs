@@ -16,7 +16,7 @@ public class ExperimentBNLauncher {
 
     public static final int MAXITERATIONS = 100;
 
-    private static final String EXPERIMENTS_FOLDER = "/home/jorlabs/projects/ParallelBNs/results/galgo/clustering/ ";
+    private static final String EXPERIMENTS_FOLDER = "results/";
     private int index;
     private String paramsFileName;
     private int threads;
