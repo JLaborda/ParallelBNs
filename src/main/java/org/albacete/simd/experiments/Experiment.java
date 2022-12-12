@@ -163,7 +163,7 @@ public abstract class Experiment {
             BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
             //FileWriter csvWriter = new FileWriter(savePath, true);
             if(file.length() == 0) {
-                String header = "algorithm, network, bbdd, threads, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, dfMM minus, Total iterations, Total time(s)\n";
+                String header = "algorithm,network,bbdd,threadsCPU,threadsPGES,interleaving,seed,SHD,LL Score,BDeu Score,dfMM,dfMM plus,dfMM minus,Total iterations,Total time(s)\n";
                 csvWriter.append(header);
             }
             csvWriter.append(results);

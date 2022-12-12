@@ -69,7 +69,7 @@ public class Circular_GES extends BNBuilder {
     protected void repartition() {
         // Splitting edges with the clustering algorithm and then adding them to its corresponding index
         clustering.setProblem(this.problem);
-        List<Set<Edge>> subsetEdgesList = clustering.generateEdgeDistribution(nThreads, false);
+        List<Set<Edge>> subsetEdgesList = clustering.generateEdgeDistribution(nThreads);
 
         subsetEdges = new ConcurrentHashMap<>(nThreads);
         for (int i = 0; i < subsetEdgesList.size(); i++) {

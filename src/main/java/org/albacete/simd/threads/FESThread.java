@@ -208,11 +208,13 @@ public class FESThread extends GESThread {
         EdgeSearch max =  S.parallelStream()
                 .map(e -> scoreEdge(graph, e, initialScore))
                 .max(Comparator.comparing(EdgeSearch::getScore))
-                .orElseThrow(NullPointerException::new);
+                .orElse(new EdgeSearch(initialScore, new SubSet(), null));
 
-        x_i = max.edge.getNode1();
-        y_i = max.edge.getNode2();
-        t_0 = max.gethSubset();
+        if (max.score > initialScore) {
+            x_i = max.edge.getNode1();
+            y_i = max.edge.getNode2();
+            t_0 = max.hSubset;
+        }
 
 
         //ArrayList<EdgeSearch> arrScores = new ArrayList<>(Arrays.asList(scores));

@@ -47,8 +47,8 @@ public class HierarchicalClusteringTest {
         Set<Node> cluster2 = p.getVariables().stream().filter(node -> names2.contains(node.getName())).collect(Collectors.toSet());
 
 
-        List<Set<Node>> clusters = clustering.generateNodeClusters(2, false);
-        List<Set<Node>> clustersParallel = clustering2.generateNodeClusters(2, false);
+        List<Set<Node>> clusters = clustering.generateNodeClusters(2);
+        List<Set<Node>> clustersParallel = clustering2.generateNodeClusters(2);
 
         assertEquals(clusters.size(), clustersParallel.size());
         assertEquals(clusters.get(0).size(), clustersParallel.get(0).size());
@@ -69,7 +69,7 @@ public class HierarchicalClusteringTest {
         HierarchicalClustering clustering = new HierarchicalClustering(p);
 
         //List<Set<Node>> clusters = clustering.clusterize(2);
-        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(2, false);
+        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(2);
 
         System.out.println("edgeDistribution0: " + edgeDistribution.get(0).size());
         System.out.println("edgeDistribution1: " + edgeDistribution.get(1).size());
@@ -84,9 +84,10 @@ public class HierarchicalClusteringTest {
     @Test
     public void edgeDistributionDuplicateTest() {
 
-        HierarchicalClustering clustering = new HierarchicalClustering(alarmProblem,true);
+        HierarchicalClustering clustering = new HierarchicalClustering(true, true);
+        clustering.setProblem(alarmProblem);
 
-        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(2, true);
+        List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(2);
 
         assertEquals(2, edgeDistribution.size());
 
@@ -115,8 +116,8 @@ public class HierarchicalClusteringTest {
         HierarchicalClustering clusteringSeq = new HierarchicalClustering(p, false);
         HierarchicalClustering clusteringPar = new HierarchicalClustering(p, true);
 
-        List<Set<Node>> clustersSeq = clusteringSeq.generateNodeClusters(2, false);
-        List<Set<Node>> clustersPar = clusteringPar.generateNodeClusters(2, false);
+        List<Set<Node>> clustersSeq = clusteringSeq.generateNodeClusters(2);
+        List<Set<Node>> clustersPar = clusteringPar.generateNodeClusters(2);
 
         assertEquals(clustersSeq.size(), clustersPar.size());
 
@@ -128,17 +129,18 @@ public class HierarchicalClusteringTest {
             for (Node node : clustersSeq.get(i)) {
                 assertTrue(clustersPar.get(i).contains(node));
             }
-
         }
     }
 
     @Test
     public void checkingThatTheJointClusteringIsDeterministic(){
-        HierarchicalClustering clustering1 = new HierarchicalClustering(alarmProblem, true);
-        HierarchicalClustering clustering2 = new HierarchicalClustering(alarmProblem, true);
+        HierarchicalClustering clustering1 = new HierarchicalClustering(true, true);
+        clustering1.setProblem(alarmProblem);
+        HierarchicalClustering clustering2 = new HierarchicalClustering(true, true);
+        clustering2.setProblem(alarmProblem);
 
-        List<Set<Node>> clusters1 = clustering1.generateNodeClusters(4, true);
-        List<Set<Node>> clusters2 = clustering2.generateNodeClusters(4, true);
+        List<Set<Node>> clusters1 = clustering1.generateNodeClusters(4);
+        List<Set<Node>> clusters2 = clustering2.generateNodeClusters(4);
 
         assertEquals(clusters1.size(), clusters2.size());
 
@@ -152,8 +154,8 @@ public class HierarchicalClusteringTest {
             }
         }
 
-        List<Set<Edge>> edgeDistribution1 = clustering1.generateEdgeDistribution(4, true);
-        List<Set<Edge>> edgeDistribution2 = clustering2.generateEdgeDistribution(4, true);
+        List<Set<Edge>> edgeDistribution1 = clustering1.generateEdgeDistribution(4);
+        List<Set<Edge>> edgeDistribution2 = clustering2.generateEdgeDistribution(4);
 
         assertEquals(edgeDistribution1.size(), edgeDistribution2.size());
 

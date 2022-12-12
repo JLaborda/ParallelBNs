@@ -16,6 +16,7 @@ public class HierarchicalClustering extends Clustering{
     private Set<Edge> allEdges;
     private double[][] simMatrix;
     private boolean isParallel = false;
+    private boolean isJoint = false;
     private final Map<Edge, Double> edgeScores = new ConcurrentHashMap<>();
     private List<Set<Node>> clusters;
     private final Map<Node, Set<Integer>> nodeClusterMap = new HashMap<>();
@@ -33,8 +34,13 @@ public class HierarchicalClustering extends Clustering{
         this(problem);
         this.isParallel = isParallel;
     }
+    public HierarchicalClustering(boolean isParallel, boolean isJoint) {
+        this.isParallel = isParallel;
+        this.isJoint = isJoint;
+    }
+    
 
-    public List<Set<Node>> generateNodeClusters(int numClusters, boolean isJoint) {
+    public List<Set<Node>> generateNodeClusters(int numClusters) {
         //Initial setup
         if(edgeScores.isEmpty()) {
             calculateEdgesScore();
@@ -92,7 +98,7 @@ public class HierarchicalClustering extends Clustering{
         }
 
         // Creating joint clusters if necessary
-        if(isJoint){
+        if(this.isJoint){
             createJointClusters();
         }
 
@@ -267,10 +273,10 @@ public class HierarchicalClustering extends Clustering{
     }
 
     @Override
-    public List<Set<Edge>> generateEdgeDistribution(int numClusters, boolean jointClusters) {
+    public List<Set<Edge>> generateEdgeDistribution(int numClusters) {
         // Generating node clusters
         if(clusters == null) {
-            generateNodeClusters(numClusters, jointClusters);
+            generateNodeClusters(numClusters);
         }
         // Generating edge distribution
         List<Set<Edge>> edgeDistribution = new ArrayList<>(clusters.size());

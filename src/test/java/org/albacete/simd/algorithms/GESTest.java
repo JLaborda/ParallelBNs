@@ -47,6 +47,7 @@ public class GESTest {
 
     }
 
+    /*
     @Test
     public void searchTest() throws IOException, InterruptedException {
         DataReader reader = new DataReader();
@@ -62,7 +63,7 @@ public class GESTest {
         assertNotNull(g);
 
     }
-
+    */
     @Test
     public void getProblemTest() throws IOException {
 

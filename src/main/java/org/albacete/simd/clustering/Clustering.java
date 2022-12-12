@@ -18,7 +18,7 @@ public abstract class Clustering {
         this.problem = problem;
     }
 
-    public abstract List<Set<Edge>> generateEdgeDistribution(int numClusters, boolean duplicate);
+    public abstract List<Set<Edge>> generateEdgeDistribution(int numClusters);
 
     public Problem getProblem() {
         return problem;

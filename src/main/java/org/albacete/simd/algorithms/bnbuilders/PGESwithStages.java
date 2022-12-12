@@ -18,8 +18,6 @@ public class PGESwithStages extends BNBuilder {
 
     private final Clustering clustering;
 
-
-
     public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(data, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
@@ -66,7 +64,7 @@ public class PGESwithStages extends BNBuilder {
 
     @Override
     protected void repartition() {
-        this.subSets = clustering.generateEdgeDistribution(nThreads, true);
+        this.subSets = clustering.generateEdgeDistribution(nThreads);
     }
 
     @Override
