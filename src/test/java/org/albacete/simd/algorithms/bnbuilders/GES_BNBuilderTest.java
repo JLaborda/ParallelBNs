@@ -92,6 +92,7 @@ public class GES_BNBuilderTest {
         expected.addDirectedEdge(Resources.CANCER, Resources.POLLUTION);
         expected.addDirectedEdge(Resources.SMOKER, Resources.CANCER);
 
+        System.out.println("Searching...");
         alg1.search();
 
         //System.out.println((alg1.getCurrentGraph()));

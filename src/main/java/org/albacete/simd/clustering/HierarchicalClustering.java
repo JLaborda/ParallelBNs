@@ -299,7 +299,8 @@ public class HierarchicalClustering extends Clustering{
             innerClusterIndexes.retainAll(clusterIndexes2);
             // To calculate the outer edges, we need to check where the nodes don't repeat themselves in the clusters by means of a difference.
             Set<Integer> outerClusterIndexes = new HashSet<>(clusterIndexes1);
-            outerClusterIndexes.removeAll(clusterIndexes2);
+            outerClusterIndexes.addAll(clusterIndexes2);
+            outerClusterIndexes.removeAll(innerClusterIndexes);
 
             // Adding the edge to each cluster in the inner-cluster indexes to create inner edges:
             for (Integer innerClusterIndex : innerClusterIndexes) {

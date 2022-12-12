@@ -45,6 +45,12 @@
           <artifactId>tetrad-lib</artifactId>
           <version>7.1.2-2</version>
       </dependency>
+
+      <dependency>
+        <groupId>io.github.cmu-phil</groupId>
+        <artifactId>data-reader</artifactId>
+        <version>7.1.2-2</version>
+      </dependency>
       <!--librería de Fusión y Tetrad manipulado por José Miguel Puerta-->
 
     <dependency>
