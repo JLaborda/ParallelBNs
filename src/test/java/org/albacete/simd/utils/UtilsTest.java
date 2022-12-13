@@ -30,21 +30,6 @@ public class UtilsTest {
 
 
 
-    /**
-     * Tests that a Utils object can be created
-     * @result  Utils object not null
-     */
-    @Test
-    public void constructorTest(){
-        //Arrange
-        Utils utils;
-
-        //Act
-        utils = new Utils();
-
-        //Assert
-        assertNotNull(utils);
-    }
 
     /**
      * Tests that the method split for tuple nodes splits an array of TupleNode into two subsets correctly.
@@ -89,36 +74,6 @@ public class UtilsTest {
 
     }
 
-    @Test
-    public void compareTest() throws Exception {
-
-        /*TEST: Comparing the same bn should return 0*/
-        // Arrange
-        String net_path = Resources.CANCER_NET_PATH;
-        BIFReader bf = new BIFReader();
-        bf.processFile(net_path);
-        BayesNet bn = bf;
-
-        //Transforming the BayesNet into a BayesPm
-        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bn);
-        MlBayesIm bn2 = new MlBayesIm(bayesPm);
-
-        // Act
-        double result = Utils.compare(new Dag(bn2.getDag()), new Dag(bn2.getDag()));
-
-        // Assert
-        assertEquals(0.0, result, 0.000001);
-
-        /*TEST: Empty Dag against normal Dag should return the number of edges of the normal Dag*/
-        Dag dag1 = new Dag(bn2.getDag());
-        Dag dag2 = new Dag(bn2.getDag().getNodes());
-
-        int expected = dag1.getNumEdges();
-
-        result = Utils.compare(dag1, dag2);
-        assertEquals(expected,result,0.000001);
-
-    }
 
     @Test
     public void markovBlanquetTest() throws Exception {
@@ -126,9 +81,8 @@ public class UtilsTest {
         String net_path1 = Resources.CANCER_NET_PATH;
         BIFReader bf = new BIFReader();
         bf.processFile(net_path1);
-        BayesNet bn = bf;
         //Transforming the BayesNet into a BayesPm
-        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bn);
+        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bf);
         MlBayesIm bn1 = new MlBayesIm(bayesPm);
         Dag dag = new Dag(bn1.getDag());
 
@@ -171,16 +125,14 @@ public class UtilsTest {
 
         // Arranging dags of alarm and cancer
         bf.processFile(net_path1);
-        BayesNet net1 = bf;
 
         //Transforming the BayesNet into a BayesPm
-        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(net1);
+        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bf);
         MlBayesIm bn1 = new MlBayesIm(bayesPm);
 
         bf.processFile(net_path2);
-        BayesNet net2 = bf;
         //Transforming the BayesNet into a BayesPm
-        BayesPm bayesPm2 = Utils.transformBayesNetToBayesPm(net2);
+        BayesPm bayesPm2 = Utils.transformBayesNetToBayesPm(bf);
         MlBayesIm bn2 = new MlBayesIm(bayesPm2);
 
         // Acting: Getting the avgMarkovBlanquetDif:
@@ -191,9 +143,8 @@ public class UtilsTest {
         /*TEST: Same DAGs should return the following array [0.0,0.0,0.0]*/
         // Arranging dags for the same data
         bf.processFile(net_path1);
-        BayesNet bn = bf;
         //Transforming the BayesNet into a BayesPm
-        BayesPm bayesPm3 = Utils.transformBayesNetToBayesPm(bn);
+        BayesPm bayesPm3 = Utils.transformBayesNetToBayesPm(bf);
         MlBayesIm bn3 = new MlBayesIm(bayesPm3);
 
         bn1 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
@@ -224,9 +175,9 @@ public class UtilsTest {
 
         // Asserting
 
-        double expected_mbdiff = 0 + 0 + 1 + 1 + 2;//(0 + 0 +(double)1/4 + 1 + 2)/5.0 *100;
-        double expected_mbplus = 0 + 0 + 0 + 1 + 1;//(0+0+0+1+1)/5.0 * 100;
-        double expected_mbminus = 0 + 0 + 1 + 0 + 1;//(0+0+(double)1/4+0+1)/5.0 * 100;
+        double expected_mbdiff = 1 + 1 + 2;//(0 + 0 +(double)1/4 + 1 + 2)/5.0 *100;
+        double expected_mbplus = 1 + 1;//(0+0+0+1+1)/5.0 * 100;
+        double expected_mbminus = 1 + 1;//(0+0+(double)1/4+0+1)/5.0 * 100;
         assertNotNull(result);
         assertEquals(expected_mbdiff, result[0], 0.000001);
         assertEquals(expected_mbplus, result[1], 0.000001);
@@ -237,9 +188,9 @@ public class UtilsTest {
     public void getNodeByNameTest() throws Exception {
         BIFReader bf = new BIFReader();
         bf.processFile(Resources.CANCER_NET_PATH);
-        BayesNet bn = bf;
-        System.out.println("Numero de variables: "+bn.getNrOfNodes());
-        MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bn));
+
+        System.out.println("Numero de variables: "+bf.getNrOfNodes());
+        MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
         Dag dag = new Dag(bn2.getDag());
 
@@ -254,9 +205,9 @@ public class UtilsTest {
     public void getIndexOfNodesByNameTest() throws Exception {
         BIFReader bf = new BIFReader();
         bf.processFile(Resources.CANCER_NET_PATH);
-        BayesNet bn = bf;
-        System.out.println("Numero de variables: "+bn.getNrOfNodes());
-        MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bn));
+
+        System.out.println("Numero de variables: "+bf.getNrOfNodes());
+        MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
         Dag dag = new Dag(bn2.getDag());
         List<Node> nodes = dag.getNodes();

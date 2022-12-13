@@ -376,7 +376,7 @@ public class FESThreadTest {
     public void getBDeuScoreTest(){
         // Arrange
         FESThread thfes = new FESThread(problem, subset1, 15);
-        double expected = -10591.313506863182;
+        double expected = -10552.755166951392;
         // Act
         thfes.run();
         thfes.resetFlag();
