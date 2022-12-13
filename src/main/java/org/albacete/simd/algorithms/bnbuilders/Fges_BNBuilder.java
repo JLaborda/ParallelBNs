@@ -32,6 +32,7 @@ public class Fges_BNBuilder extends BNBuilder {
             this.score = fges.scoreDag(currentGraph);
         } else {
             Fges2 fges = new Fges2(bdeu);
+            fges.setFaithfulnessAssumed(true);
             this.currentGraph = fges.search();
             this.score = fges.scoreDag(currentGraph);
         }

@@ -138,10 +138,10 @@ public class ExperimentBNBuilder {
             case "fges":
                 algorithm = new Fges_BNBuilder(databasePath, true, false);
                 break;
-            case "fges2":
+            case "fges-faithfulness":
                 algorithm = new Fges_BNBuilder(databasePath, false, false);
                 break;
-            case "fges3":
+            case "ges-tetrad":
                 algorithm = new Fges_BNBuilder(databasePath, true, true);
                 break;
             case "pges-jc":

@@ -25,6 +25,11 @@ public abstract class GESThread implements Runnable{
      * Set of edges that will be checked over the GESThread
      */
     protected Set<Edge> S;
+    
+    /**
+     * Set of edges that will be checked over the GESThread
+     */
+    protected Set<EdgeSearch> scores = new HashSet<>();
 
     /**
      * Problem the thread is solving
@@ -409,6 +414,35 @@ public abstract class GESThread implements Runnable{
             }
         return score;
     }
+    
+    public double scoreDag(Graph graph) {
+        
+        if (graph == null){
+            return Double.NEGATIVE_INFINITY;
+        }
+        
+        Graph dag = new EdgeListGraph_n(graph);
+        pdagToDag(dag);
+        HashMap<Node,Integer> hashIndices = problem.getHashIndices();
+
+        double _score = 0;
+
+        for (Node node : getVariables()) {
+            List<Node> x = dag.getParents(node);
+
+            int[] parentIndices = new int[x.size()];
+
+            int count = 0;
+            for (Node parent : x) {
+                parentIndices[count++] = hashIndices.get(parent);
+            }
+
+            final double nodeScore = problem.getBDeu().localScore(hashIndices.get(node), parentIndices);
+
+            _score += nodeScore;
+        }
+        return _score;
+    }
 
     /**
      * Score difference of the node y when it is associated as child with one set of parents and when it is associated with another one.
@@ -787,6 +821,4 @@ public abstract class GESThread implements Runnable{
         return zScore > 3;
 
     }
-    
-
 }

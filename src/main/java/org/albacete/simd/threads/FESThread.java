@@ -84,7 +84,7 @@ public class FESThread extends GESThread {
             //buildIndexing(graph);
 
             // Method 1-- original.
-            double scoreInitial = scoreGraph(graph, problem);
+            double scoreInitial = scoreDag(graph);
 
             // Do backward search.
             double score = fes(graph, scoreInitial);
@@ -92,7 +92,7 @@ public class FESThread extends GESThread {
             long endTime = System.currentTimeMillis();
             this.elapsedTime = endTime - startTime;
 
-            double newScore = scoreGraph(graph, problem);
+            double newScore = scoreDag(graph);
             System.out.println(" [" + getId() + "] FES New Score: " + newScore + ", Initial Score: " + scoreInitial);
             // If we improve the score, return the new graph
             if (newScore > scoreInitial + 0.1) {
@@ -194,8 +194,7 @@ public class FESThread extends GESThread {
         x_i = y_i = null;
         t_0 = null;
 
-        /* // Versión de Pablo
-        EdgeSearch[] scores = new EdgeSearch[S.size()];
+        /*EdgeSearch[] scores = new EdgeSearch[S.size()];
         List<Edge> edges = new ArrayList<>(S);
 
         Arrays.parallelSetAll(scores, e -> {
@@ -211,28 +210,25 @@ public class FESThread extends GESThread {
         }
         */
 
-        EdgeSearch max =  S.parallelStream()
-                .map(e -> scoreEdge(graph, e, initialScore))
-                .max(Comparator.comparing(EdgeSearch::getScore))
-                .orElse(new EdgeSearch(initialScore, new SubSet(), null));
-
-        
-        /*Set<EdgeSearch> newScores = S.parallelStream()
+        Set<EdgeSearch> newScores = S.parallelStream()
                 .map(e -> scoreEdge(graph, e, initialScore))
                 .collect(Collectors.toSet());
-        this.scores.addAll(newScores);
         
-        EdgeSearch max = Collections.max(this.scores);*/
+        HashSet temp = new HashSet();
+        temp.addAll(newScores);
+        temp.addAll(this.scores);
+        this.scores = temp;
         
+        EdgeSearch max = Collections.max(this.scores);
 
         if (max.score > initialScore) {
             x_i = max.edge.getNode1();
             y_i = max.edge.getNode2();
             t_0 = max.hSubset;
             
-            /*this.scores.remove(max);
+            //this.scores.remove(max);
             
-            this.nodes = new HashSet<>();
+            /*this.nodes = new HashSet<>();
             this.nodes.add(x_i);
             this.nodes.add(y_i);
             Set<Node> adj = ((EdgeListGraph_n)graph).getCommonAdjacents(x_i, y_i);
