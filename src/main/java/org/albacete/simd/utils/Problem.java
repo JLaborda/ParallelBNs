@@ -5,6 +5,7 @@ import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.EdgeListGraph_n;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
+import edu.cmu.tetrad.search.BDeuScore;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -57,7 +58,10 @@ public class Problem {
      */
     protected LocalScoreCacheConcurrent localScoreCache = new LocalScoreCacheConcurrent();
 
-
+    /**
+     * BDeu Score.
+     */
+    protected BDeuScore bdeu;
 
 
     public Problem(DataSet dataSet){
@@ -87,6 +91,8 @@ public class Problem {
         //building index
         Graph graph = new EdgeListGraph_n(new LinkedList<Node>(this.variables));
         buildIndexing(graph);
+        
+        bdeu = new BDeuScore(data);
     }
 
 
@@ -171,6 +177,10 @@ public class Problem {
 
     public LocalScoreCacheConcurrent getLocalScoreCache() {
         return localScoreCache;
+    }
+    
+    public BDeuScore getBDeu() {
+        return bdeu;
     }
 
 }
