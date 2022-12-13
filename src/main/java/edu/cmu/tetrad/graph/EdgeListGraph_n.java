@@ -89,6 +89,33 @@ public class EdgeListGraph_n extends EdgeListGraph {
     }
     
     /**
+     * @return the set of nodes adjacent to the given node. If there are
+     * multiple edges between X and Y, Y will show up twice in the list of
+     * adjacencies for X, for optimality; simply create a list an and array from
+     * these to eliminate the duplication.
+     */
+    @Override
+    public List<Node> getAdjacentNodes(Node node) {
+        return new ArrayList(neighboursMap.get(node));
+    }
+    
+    /**
+     * @return the set of nodes adjacent to the given node. If there are
+     * multiple edges between X and Y, Y will show up twice in the list of
+     * adjacencies for X, for optimality; simply create a list an and array from
+     * these to eliminate the duplication.
+     */
+    public Set<Node> getAdjacentNodesSet(Node node) {
+        return neighboursMap.get(node);
+    }
+    
+    public Set<Node> getCommonAdjacents(Node x, Node y) {
+        Set<Node> adj = this.getAdjacentNodesSet(x);
+        adj.retainAll(this.getAdjacentNodes(y));
+        return adj;
+    }
+
+    /**
      * Adds an edge to the graph.
      *
      * @param edge the edge to be added
@@ -150,7 +177,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
             edgeList2 = new HashSet<>(edgeList2);
             
             // Si no existe el enlace inverso, dejan de ser vecinos
-            if (edgesSet.contains(edge.reverse())){
+            if (!edgesSet.contains(edge.reverse())){
                 this.neighboursMap.get(edge.getNode1()).remove(edge.getNode2());
                 this.neighboursMap.get(edge.getNode2()).remove(edge.getNode1());
             }

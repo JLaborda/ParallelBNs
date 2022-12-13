@@ -31,8 +31,9 @@ public class SimpleBNExperiment {
         //BNBuilder algorithm = new GES_BNBuilder(bbdd_path);
         Clustering clustering = new HierarchicalClustering();
         //Clustering clustering = new RandomClustering();
-        //BNBuilder algorithm = new PGESwithStages(ds, clustering, 4, 30, 100);
-        BNBuilder algorithm = new PGESwithStages(ds, clustering, 16, 100, 100);
+
+        BNBuilder algorithm = new PGESwithStages(ds, clustering, 4, 30, 100);
+        //BNBuilder algorithm = new GES_BNBuilder(ds);
         //BNBuilder algorithm = new Circular_GES(ds, clustering, 8, 100);
         //BNBuilder algorithm = new Fges_BNBuilder(ds);
         

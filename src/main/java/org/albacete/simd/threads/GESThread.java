@@ -241,7 +241,7 @@ public abstract class GESThread implements Runnable{
         List<Node> adjY = graph.getAdjacentNodes(y);
         List<Node> naYX = new LinkedList<>(adjY);
         naYX.retainAll(graph.getAdjacentNodes(x));
-
+        
         for (int i = naYX.size() - 1; i >= 0; i--) {
             Node z = naYX.get(i);
             Edge edge = graph.getEdge(y, z);
@@ -405,8 +405,8 @@ public abstract class GESThread implements Runnable{
                     }
                 }
             }
-            score += localBdeuScore(nextIndex, parentIndices, parents, problem);
-        }
+                score += localBdeuScore(nextIndex, parentIndices, parents, problem);
+            }
         return score;
     }
 
@@ -495,68 +495,71 @@ public abstract class GESThread implements Runnable{
             return oldScore;
         }
         numNonCachedCalls++;
-        int[] nValues = problem.getnValues();
-        int[][] cases = problem.getCases();
 
-        int numValues=nValues[nNode];
-        int numParents=nParents.length;
+        double fLogScore = problem.getBDeu().localScore(nNode, nParents);
+        
+        /*  int[] nValues = problem.getnValues();
+            int[][] cases = problem.getCases();
 
-        double ess= problem.getSamplePrior();
-        double essPenalty = 1.0;
-        double kappa= problem.getStructurePrior();
 
-        int[] numValuesParents=new int[nParents.length];
-        int cardinality=1;
-        for(int i=0;i<numValuesParents.length;i++) {
+            int numValues=nValues[nNode];
+            int numParents=nParents.length;
 
-            numValuesParents[i]=nValues[nParents[i]];
-            cardinality*=numValuesParents[i];
-        }
+            double ess= problem.getSamplePrior();
+            double essPenalty = 1.0;
+            double kappa= problem.getStructurePrior();
 
-        int[][] Ni_jk = new int[cardinality][numValues];
+            int[] numValuesParents=new int[nParents.length];
+            int cardinality=1;
+            for(int i=0;i<numValuesParents.length;i++) {
 
-        double Np_ijk = (essPenalty * ess) / (numValues*cardinality);
-        double Np_ij = (essPenalty *ess) / cardinality;
-
-        // initialize
-        for (int j = 0; j < cardinality;j++)
-            for(int k= 0; k<numValues; k++)
-                Ni_jk[j][k] = 0;
-
-        for (int[] aCase : cases) {
-            int iCPT = 0;
-            for (int iParent = 0; iParent < numParents; iParent++) {
-                iCPT = iCPT * numValuesParents[iParent] + aCase[nParents[iParent]];
+                numValuesParents[i]=nValues[nParents[i]];
+                cardinality*=numValuesParents[i];
             }
-            Ni_jk[iCPT][aCase[nNode]]++;
-        }
 
-        double fLogScore = 0.0;
+            int[][] Ni_jk = new int[cardinality][numValues];
+    
+            double Np_ijk = (essPenalty * ess) / (numValues*cardinality);
+            double Np_ij = (essPenalty *ess) / cardinality;
 
-        for (int iParent = 0; iParent < cardinality; iParent++) {
-            double N_ij = 0;
-            double N_ijk;
+            // initialize
+            for (int j = 0; j < cardinality;j++)
+                for(int k= 0; k<numValues; k++)
+                    Ni_jk[j][k] = 0;
 
-            for (int iSymbol = 0; iSymbol < numValues; iSymbol++) {
-                if (Ni_jk[iParent][iSymbol] != 0) {
-                    N_ijk = Ni_jk[iParent][iSymbol];
-                    fLogScore += ProbUtils.lngamma(N_ijk + Np_ijk);
-                    fLogScore -= ProbUtils.lngamma(Np_ijk);
-                    N_ij += N_ijk;
+            for (int[] aCase : cases) {
+                int iCPT = 0;
+                for (int iParent = 0; iParent < numParents; iParent++) {
+                    iCPT = iCPT * numValuesParents[iParent] + aCase[nParents[iParent]];
                 }
+                Ni_jk[iCPT][aCase[nNode]]++;
             }
-            if (Np_ij != 0)
-                fLogScore += ProbUtils.lngamma(Np_ij);
-            if (Np_ij + N_ij != 0)
-                fLogScore -= ProbUtils.lngamma(Np_ij + N_ij);
-        }
-        fLogScore += Math.log(kappa) * cardinality * (numValues - 1);
+
+            for (int iParent = 0; iParent < cardinality; iParent++) {
+                double N_ij = 0;
+                double N_ijk;
+
+                for (int iSymbol = 0; iSymbol < numValues; iSymbol++) {
+                    if (Ni_jk[iParent][iSymbol] != 0) {
+                        N_ijk = Ni_jk[iParent][iSymbol];
+                        fLogScore += ProbUtils.lngamma(N_ijk + Np_ijk);
+                        fLogScore -= ProbUtils.lngamma(Np_ijk);
+                        N_ij += N_ijk;
+                    }
+                }
+                if (Np_ij != 0)
+                    fLogScore += ProbUtils.lngamma(Np_ij);
+                if (Np_ij + N_ij != 0)
+                    fLogScore -= ProbUtils.lngamma(Np_ij + N_ij);
+            }
+            fLogScore += Math.log(kappa) * cardinality * (numValues - 1);
+        */
 
         localScoreCache.add(nNode, setParents, fLogScore);
         return fLogScore;
     }
-
-
+    
+    
 
     //==========================SETTERS AND GETTERS=========================//
 
@@ -740,8 +743,8 @@ public abstract class GESThread implements Runnable{
         for (int i = tNeighbors.size() - 1; i >= 0; i--) {
             Node z = tNeighbors.get(i);
             Edge edge = graph.getEdge(y, z);
-
-            if (!Edges.isUndirectedEdge(edge)) {
+            
+            if (edge != null && !Edges.isUndirectedEdge(edge)) {
                 tNeighbors.remove(z);
             }
         }

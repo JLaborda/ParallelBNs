@@ -203,6 +203,7 @@ public class FESThread extends GESThread {
         });
 
         EdgeSearch max = Collections.max(Arrays.asList(scores));
+
         if (max.score > initialScore) {
             x_i = max.edge.getNode1();
             y_i = max.edge.getNode2();
@@ -215,10 +216,27 @@ public class FESThread extends GESThread {
                 .max(Comparator.comparing(EdgeSearch::getScore))
                 .orElse(new EdgeSearch(initialScore, new SubSet(), null));
 
+        
+        /*Set<EdgeSearch> newScores = S.parallelStream()
+                .map(e -> scoreEdge(graph, e, initialScore))
+                .collect(Collectors.toSet());
+        this.scores.addAll(newScores);
+        
+        EdgeSearch max = Collections.max(this.scores);*/
+        
+
         if (max.score > initialScore) {
             x_i = max.edge.getNode1();
             y_i = max.edge.getNode2();
             t_0 = max.hSubset;
+            
+            /*this.scores.remove(max);
+            
+            this.nodes = new HashSet<>();
+            this.nodes.add(x_i);
+            this.nodes.add(y_i);
+            Set<Node> adj = ((EdgeListGraph_n)graph).getCommonAdjacents(x_i, y_i);
+            this.nodes.addAll(adj);*/
         }
 
 

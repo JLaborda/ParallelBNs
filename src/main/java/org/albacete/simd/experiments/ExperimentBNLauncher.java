@@ -8,8 +8,11 @@ import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class ExperimentBNLauncher {
@@ -110,10 +113,25 @@ public class ExperimentBNLauncher {
                 experiment.databaseName + "_t" + experiment.numberOfThreads + "_PGESt" + experiment.numberOfPGESThreads +
                 "_i" + experiment.interleaving + "_s" + experiment.seed + ".csv";
         try {
-            Experiment.saveExperiment(savePath, results);
+            saveExperiment(savePath, results);
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error saving results at: " + savePath);
         }
+    }
+    
+    public static void saveExperiment(String savePath, String results) throws IOException{
+        File file = new File(savePath);
+            BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
+            //FileWriter csvWriter = new FileWriter(savePath, true);
+            if(file.length() == 0) {
+                String header = "algorithm, network, bbdd, threads, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, dfMM minus, Total iterations, Total time(s)\n";
+                csvWriter.append(header);
+            }
+            csvWriter.append(results);
+
+            csvWriter.flush();
+            csvWriter.close();
+            System.out.println("Results saved at: " + savePath);
     }
 }
