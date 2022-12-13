@@ -2,7 +2,6 @@ package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Dag;
-import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.Resources;
 import org.albacete.simd.clustering.Clustering;
@@ -14,14 +13,12 @@ import org.albacete.simd.utils.Utils;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class GES_BNBuilderTest {
+public class GESTest {
 
     String path = Resources.CANCER_BBDD_PATH;
     DataSet dataSet = Utils.readData(path);
@@ -78,31 +75,17 @@ public class GES_BNBuilderTest {
 
     @Test
     public void searchTest() {
-        BNBuilder alg1 = new GES_BNBuilder(dataSet);
+        BNBuilder ges = new GES_BNBuilder(Resources.CANCER_BBDD_PATH);
         Utils.setSeed(42);
-        List<Node> nodes = new ArrayList<>();
-        nodes.add(Resources.CANCER);
-        nodes.add(Resources.DYSPNOEA);
-        nodes.add(Resources.XRAY);
-        nodes.add(Resources.POLLUTION);
-        nodes.add(Resources.SMOKER);
-        Dag expected = new Dag(nodes);
-        expected.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
-        expected.addDirectedEdge(Resources.CANCER, Resources.XRAY);
-        expected.addDirectedEdge(Resources.CANCER, Resources.POLLUTION);
-        expected.addDirectedEdge(Resources.SMOKER, Resources.CANCER);
 
-        alg1.search();
+        System.out.println("Searching...");
+        ges.search();
 
         //System.out.println((alg1.getCurrentGraph()));
 
-        assertNotNull(alg1.getCurrentGraph());
-        assertTrue(alg1.getCurrentGraph() instanceof Dag);
+        assertNotNull(ges.getCurrentGraph());
+        assertTrue(ges.getCurrentGraph() instanceof Dag);
 
-        Set<Edge> resultingEdges = alg1.getCurrentGraph().getEdges();
-        for (Edge edge : resultingEdges) {
-            assertTrue(expected.containsEdge(edge));
-        }
     }
 
 

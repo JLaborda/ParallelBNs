@@ -7,10 +7,12 @@ import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.utils.Problem;
 
 import java.util.*;
+
 import java.util.stream.Collectors;
 import static org.albacete.simd.threads.GESThread.findNaYX;
 import static org.albacete.simd.threads.GESThread.getSubsetOfNeighbors;
 import static org.albacete.simd.threads.GESThread.isClique;
+
 import static org.albacete.simd.utils.Utils.pdagToDag;
 
 @SuppressWarnings("DuplicatedCode")
@@ -177,7 +179,7 @@ public class FESThread extends GESThread {
      *
      * @param graph The graph in the state prior to the forward equivalence
      * search.
-     * @param score The score in the state prior to the forward equivalence
+     * @param initialScore The score in the state prior to the forward equivalence
      * search
      * @return the score in the state after the forward equivalence search. Note
      * that the graph is changed as a side-effect to its state after the forward
@@ -192,6 +194,7 @@ public class FESThread extends GESThread {
         x_i = y_i = null;
         t_0 = null;
 
+        /* // Versión de Pablo
         EdgeSearch[] scores = new EdgeSearch[S.size()];
         List<Edge> edges = new ArrayList<>(S);
 
@@ -199,9 +202,20 @@ public class FESThread extends GESThread {
             return scoreEdge(graph, edges.get(e), initialScore);
         });
 
-        //ArrayList<EdgeSearch> arrScores = new ArrayList<>(Arrays.asList(scores));
-        //arrScores.removeIf(Objects::isNull);
         EdgeSearch max = Collections.max(Arrays.asList(scores));
+
+        if (max.score > initialScore) {
+            x_i = max.edge.getNode1();
+            y_i = max.edge.getNode2();
+            t_0 = max.hSubset;
+        }
+        */
+
+        EdgeSearch max =  S.parallelStream()
+                .map(e -> scoreEdge(graph, e, initialScore))
+                .max(Comparator.comparing(EdgeSearch::getScore))
+                .orElse(new EdgeSearch(initialScore, new SubSet(), null));
+
         
         /*Set<EdgeSearch> newScores = S.parallelStream()
                 .map(e -> scoreEdge(graph, e, initialScore))
@@ -210,6 +224,7 @@ public class FESThread extends GESThread {
         
         EdgeSearch max = Collections.max(this.scores);*/
         
+
         if (max.score > initialScore) {
             x_i = max.edge.getNode1();
             y_i = max.edge.getNode2();
@@ -223,6 +238,11 @@ public class FESThread extends GESThread {
             Set<Node> adj = ((EdgeListGraph_n)graph).getCommonAdjacents(x_i, y_i);
             this.nodes.addAll(adj);*/
         }
+
+
+        //ArrayList<EdgeSearch> arrScores = new ArrayList<>(Arrays.asList(scores));
+        //arrScores.removeIf(Objects::isNull);
+
 
         return max.score;
     }

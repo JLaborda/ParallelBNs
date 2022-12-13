@@ -17,11 +17,6 @@ public abstract class BackwardStage extends ThreadStage{
     public static double meanTimeTotal=0;
     public static double varianceTimeTotal =0;
 
-
-    public BackwardStage(Problem problem, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
-        super(problem, nThreads, itInterleaving, subsets);
-    }
-
     public BackwardStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
         super(problem, currentGraph, nThreads, itInterleaving, subsets);
     }

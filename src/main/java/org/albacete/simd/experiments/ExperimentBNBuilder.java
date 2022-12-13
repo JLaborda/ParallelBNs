@@ -73,17 +73,30 @@ public class ExperimentBNBuilder {
     }
 
     private void extractParametersForClusterExperiment(String[] parameters){
+        System.out.println("Extracting parameters...");
+        System.out.println("Number of hyperparams: " + parameters.length);
+        int i=0;
+        for (String string : parameters) {
+            System.out.println("Param[" + i + "]: " + string);
+            i++;
+        }
         algName = parameters[0];
         netName = parameters[1];
         netPath = parameters[2];
         databasePath = parameters[3];
         databaseName = getDatabaseNameFromPattern();
         testDatabasePath = parameters[4];
-
+        testDataset = Utils.readData(testDatabasePath);
         if(algName.equals("pges") || algName.equals("pges_random") || algName.equals("circular_ges")) {
             numberOfPGESThreads = Integer.parseInt(parameters[5]);
             interleaving = Integer.parseInt(parameters[6]);
             seed = Integer.parseInt(parameters[7]);
+        }
+
+        if(algName.equals("pges-jc")){
+            numberOfPGESThreads = Integer.parseInt(parameters[5]);
+            interleaving = Integer.parseInt(parameters[6]);
+            seed = -1;
         }
     }
     
@@ -130,6 +143,10 @@ public class ExperimentBNBuilder {
                 break;
             case "fges3":
                 algorithm = new Fges_BNBuilder(databasePath, true, true);
+                break;
+            case "pges-jc":
+                Clustering hierarchicalClusteringJC = new HierarchicalClustering(true, true);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);

@@ -131,25 +131,10 @@ public abstract class GESThread implements Runnable{
      */
     protected int id = -1;
 
-    private String log = "";
-
     /**
      * Boolean value that says if the thread is from a forward stage (true) or from a backwards stage (false)
      */
     protected boolean isForwards;
-
-    /**
-     * Timeout provided by the time it takes the first thread of the stage to finish
-     */
-    //public static long forwardTimeout = -1;
-
-    /**
-     * Timeout provided by the time it takes the first thread of the stage to finish
-     */
-    //public static long backwardTimeout = -1;
-
-
-
 
     /**
      * Evaluate the Insert(X, Y, T) operator (@see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf"> Definition 12 from Chickering 2002</a>,
@@ -310,9 +295,8 @@ public abstract class GESThread implements Runnable{
         // nueva forma de calcular los caminos semidirigidos
 
         LinkedHashSet<Node> open = new LinkedHashSet<>();
-        HashSet<Node> close = new HashSet<>();
         open.add(y);
-        close.addAll(naYXT);
+        HashSet<Node> close = new HashSet<>(naYXT);
         
         while(!open.isEmpty()) {
             Node a = open.iterator().next();
@@ -511,10 +495,12 @@ public abstract class GESThread implements Runnable{
             return oldScore;
         }
         numNonCachedCalls++;
+
         double fLogScore = problem.getBDeu().localScore(nNode, nParents);
         
         /*  int[] nValues = problem.getnValues();
             int[][] cases = problem.getCases();
+
 
             int numValues=nValues[nNode];
             int numParents=nParents.length;
@@ -775,10 +761,6 @@ public abstract class GESThread implements Runnable{
         return this.id;
     }
 
-    public String getLog(){
-        return this.log;
-    }
-
     public LocalScoreCacheConcurrent getLocalScoreCache() {
         return problem.getLocalScoreCache();
     }
@@ -806,21 +788,5 @@ public abstract class GESThread implements Runnable{
 
     }
     
-    class EdgeSearch implements Comparable {
-        public Double score;
-        public SubSet hSubset;
-        public Edge edge;
-        
-        public EdgeSearch (double score, SubSet hSubSet, Edge edge) { 
-            this.score = score;
-            this.hSubset = hSubSet;
-            this.edge = edge;
-        }
-        
-        @Override
-        public int compareTo(Object o){
-            return this.score.compareTo(((EdgeSearch)o).score);
-        }
-    }
 
 }

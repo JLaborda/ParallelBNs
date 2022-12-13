@@ -3,10 +3,12 @@ package org.albacete.simd.framework;
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
+import org.albacete.simd.utils.Utils;
 
 import java.util.List;
 import java.util.Set;
@@ -72,12 +74,24 @@ public abstract class ThreadStage extends Stage{
             score_threads = score_threads + gesThreads[i].getScoreBDeu();
 
             // Removing Inconsistencies and transforming it to a DAG
-            pdagToDag(g);
-            Dag gdag = new Dag(g);
+            // THIS THROWS AN ILLEGAL ARGUMENT EXCEPTION
+            //pdagToDag(g);
+            try {
+                //g = SearchGraphUtils.dagFromCPDAG(g);
+                Dag gdag = Utils.removeInconsistencies(g);
+                this.graphs.add(gdag);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Error in dagFromCPDAG");
+                System.out.println("Trying to convert the graph " + i + " to a DAG");
+                System.out.println("The original graph is: " + g);
+                System.exit(-1);
+            }
+            //Dag gdag = new Dag(g);
             //Dag gdag = Utils.removeInconsistencies(g);
 
             // Adding the new dag to the graph list
-            this.graphs.add(gdag);
+            //this.graphs.add(gdag);
 
             //Debug
             //System.out.println("Graph of Thread " + (i +1) + ": \n" + gdag);
@@ -103,7 +117,7 @@ public abstract class ThreadStage extends Stage{
         GESThread best = gesThreads[0];
         double bdeu = gesThreads[0].getScoreBDeu();
 
-        for (int i = 1; i > gesThreads.length; i++) {
+        for (int i = 1; i < gesThreads.length; i++) {
             if (gesThreads[i].getScoreBDeu() > bdeu) {
                 bdeu = gesThreads[i].getScoreBDeu();
                 best = gesThreads[i];

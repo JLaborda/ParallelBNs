@@ -36,15 +36,27 @@ public class ExperimentBNLauncher {
         ExperimentBNLauncher experimentBNLauncher = getExperimentBNLauncherFromCommandLineArguments(args);
         String[] parameters = experimentBNLauncher.readParameters();
 
+        System.out.println("Launching experiment");
         experimentBNLauncher.createExperiment(parameters);
         
         if (!experimentBNLauncher.checkExistentFile()){
+            System.out.println("Starting experiment");
             experimentBNLauncher.runExperiment();
             experimentBNLauncher.saveExperiment();
+            System.out.println("Experiment finished");
+        }
+        else{
+            System.out.println("Experiment has already been done. Therefore, it has not been run again.");
         }
     }
 
     private static ExperimentBNLauncher getExperimentBNLauncherFromCommandLineArguments(String[] args) {
+        int i = 1;
+        System.out.println("Number of args: "  + args.length);
+        for (String string : args) {
+            System.out.println("Args " + i + ": " + string);
+            i++;
+        }
         int index = Integer.parseInt(args[0]);
         String paramsFileName = args[1];
         int threads = Integer.parseInt(args[2]);
@@ -73,6 +85,11 @@ public class ExperimentBNLauncher {
             experiment = new ExperimentBNBuilder(parameters, threads);
         } catch (Exception e) {
             System.out.println("Exception when creating the experiment");
+            int i=0;
+            for (String string : parameters) {
+                System.out.println("Param[" + i + "]: " + string);
+                i++;
+            }
             e.printStackTrace();
         }
     }

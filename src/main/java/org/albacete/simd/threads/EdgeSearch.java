@@ -18,7 +18,6 @@ public class EdgeSearch implements Comparable<EdgeSearch> {
         public int compareTo(EdgeSearch o){
             return Double.compare(this.score, (o).score);
         }
-        
         @Override
         public boolean equals(Object other){
             if (other instanceof EdgeSearch){
@@ -33,7 +32,7 @@ public class EdgeSearch implements Comparable<EdgeSearch> {
         public double getScore(){
             return this.score;
         }
-        
+
         public SubSet gethSubset(){
             return this.hSubset;
         }

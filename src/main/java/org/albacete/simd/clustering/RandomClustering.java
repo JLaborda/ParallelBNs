@@ -18,7 +18,7 @@ public class RandomClustering extends Clustering{
     }
 
     @Override
-    public List<Set<Edge>> generateEdgeDistribution(int numClusters, boolean duplicate) {
+    public List<Set<Edge>> generateEdgeDistribution(int numClusters) {
         return Utils.split(Utils.calculateArcs(problem.getData()), numClusters);
     }
 }

@@ -4,3 +4,5 @@ ignore:
   - "src/main/java/org/albacete/simd/consensusBN" # Ignore consensusBN code
   - "src/main/java/org/albacete/simd/framework/FHC*" # Ignore FHC stage and fusion
   - "src/main/java/org/albacete/simd/framework/BHC*" # Ignore BHC stage and fusion
+  - "src/main/java/edu/cmu/tetrad" # Ignore Tetrad code
+  -

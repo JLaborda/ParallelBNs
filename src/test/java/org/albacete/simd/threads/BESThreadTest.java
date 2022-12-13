@@ -13,9 +13,7 @@ import org.junit.Test;
 
 import java.util.*;
 import static org.albacete.simd.utils.Utils.pdagToDag;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Tests that the ThBES class works as expected.
@@ -164,12 +162,7 @@ public class BESThreadTest {
     @Test
     public void searchTwoThreadsTest() throws InterruptedException {
         //Arrange
-        /*
-        Dag [] fesGraphs = fesStageExperiment();
-        ArrayList<Dag> graphs = new ArrayList<>();
-        Collections.addAll(graphs,fesGraphs);
-        Dag fusionGraph = (new ConsensusUnion(graphs)).union();
-        */
+
         List<Node> nodes = Arrays.asList(cancer, xray, dyspnoea, pollution, smoker);
         Graph fusionGraph = new EdgeListGraph(nodes);
         fusionGraph.addDirectedEdge(cancer, dyspnoea);
@@ -179,20 +172,17 @@ public class BESThreadTest {
         fusionGraph.addDirectedEdge(xray, dyspnoea);
         fusionGraph.addDirectedEdge(pollution, smoker);
 
-
-        //System.out.println("Initial Graph");
-        //System.out.println(fusionGraph);
-
+        double scoreFusionGraph = GESThread.scoreGraph(fusionGraph, problem);
 
         BESThread thread1 = new BESThread(problem, fusionGraph, subset1);
-
+/*
         List<Edge> expected = new ArrayList<>();
         expected.add(new Edge(cancer,xray,Endpoint.TAIL, Endpoint.ARROW));
         expected.add(new Edge(pollution,cancer,Endpoint.TAIL, Endpoint.ARROW));
         expected.add(new Edge(smoker,cancer,Endpoint.TAIL, Endpoint.ARROW));
         expected.add(new Edge(smoker,pollution,Endpoint.TAIL, Endpoint.ARROW));
         expected.add(new Edge(xray,dyspnoea,Endpoint.TAIL, Endpoint.ARROW));
-
+*/
         // Act
         thread1.run();
         Graph g1 = thread1.getCurrentGraph();
@@ -200,13 +190,16 @@ public class BESThreadTest {
         // Getting dag
         Dag gdag1 = new Dag(removeInconsistencies(g1));
 
-        System.out.println("ThBES");
-        System.out.println(gdag1);
+        //System.out.println("ThBES");
+        //System.out.println(gdag1);
+
+        double scoreBES = GESThread.scoreGraph(gdag1, problem);
+
 
         // Asserting
-        for(Edge edge : expected){
-            assertTrue(gdag1.getEdges().contains(edge));
-        }
+       assertNotNull(gdag1);
+       assertEquals(gdag1.getNodes().size(),5);
+       assertTrue(scoreBES >= scoreFusionGraph);
 
     }
 

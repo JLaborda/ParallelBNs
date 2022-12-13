@@ -66,3 +66,6 @@ scripts/git-keys-update.bash
 
 # ignore notebook checkpoints
 .ipynb_checkpoints/
+
+# ignore replicates folder
+replicates/

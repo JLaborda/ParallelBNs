@@ -35,22 +35,21 @@ public class GESStagesTest {
 
         // TESTING FESStage
         // Act
-        boolean flag = false;
-        flag = fesStage.run();
+        fesStage.run();
         double fesStageScore = (GESThread.scoreGraph(fesStage.getGraphs().get(0), problem) + GESThread.scoreGraph(fesStage.getGraphs().get(1), problem)) / 2;
         //Assert
-        assertTrue(flag);
+        //assertTrue(flag);
         assertEquals(nThreads, fesStage.getGraphs().size());
         assertNotNull(fesStage.getGraphs().get(0));
         assertNotNull(fesStage.getGraphs().get(1));
 
         //TESTING FESFusion
-        Stage fesFusion = new FESFusion(problem, fesStage.getCurrentGraph(), fesStage.getGraphs(), fesStage);
-        flag = fesFusion.run();
+        Stage fesFusion = new FESFusion(problem, fesStage.getCurrentGraph(), fesStage.getGraphs());
+        fesFusion.run();
         Graph g = fesFusion.getCurrentGraph();
         double fesFusionScore = GESThread.scoreGraph(g, problem);
 
-        assertTrue(flag);
+        //assertTrue(flag);
         assertNotNull(g);
         assertTrue(g instanceof Dag);
         assertEquals(g.getNumNodes(), problem.getVariables().size());
@@ -64,10 +63,10 @@ public class GESStagesTest {
                 subsets
         );
         // No edge is deleted
-        flag = besStage.run();
+        besStage.run();
         double besStageScore = (GESThread.scoreGraph(besStage.getGraphs().get(0), problem) + GESThread.scoreGraph(besStage.getGraphs().get(1), problem)) / 2;
 
-        assertFalse(flag);
+        //assertFalse(flag);
         assertEquals(nThreads, besStage.getGraphs().size());
         assertNotNull(besStage.getGraphs().get(0));
         assertNotNull(besStage.getGraphs().get(1));
@@ -75,11 +74,11 @@ public class GESStagesTest {
 
         //TESTING BESFusion
         Stage besFusion = new BESFusion(problem, besStage.getCurrentGraph(), besStage.getGraphs(), besStage);
-        flag = besFusion.run();
+        besFusion.run();
         Graph g2 = besFusion.getCurrentGraph();
         double besFusionScore = GESThread.scoreGraph(g2, problem);
 
-        assertTrue(flag);
+        //assertTrue(flag);
         assertNotNull(g2);
         assertTrue(g2 instanceof Dag);
         assertEquals(g2.getNumNodes(), problem.getVariables().size());
@@ -91,11 +90,11 @@ public class GESStagesTest {
                 nThreads,
                 itInterleaving,
                 subsets);
-        flag = fesStage2.run();
+        fesStage2.run();
         double fesStageScore2 = (GESThread.scoreGraph(fesStage2.getGraphs().get(0), problem) + GESThread.scoreGraph(fesStage2.getGraphs().get(1), problem)) / 2;
         //Assert
         // No new edges added
-        assertFalse(flag);
+        //assertFalse(flag);
         assertEquals(nThreads, fesStage2.getGraphs().size());
         assertNotNull(fesStage2.getGraphs().get(0));
         assertNotNull(fesStage2.getGraphs().get(1));
