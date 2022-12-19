@@ -72,6 +72,11 @@ public abstract class BNBuilder {
     protected Graph currentGraph = null;
 
     /**
+     * Previous {@link Graph Graph} containing the previous bayesian network that has been constructed so far.
+     */
+    protected double prevScore = Double.NEGATIVE_INFINITY;
+
+    /**
      * An initial graph to start from.
      */
     private Graph initialGraph;
@@ -180,6 +185,8 @@ public abstract class BNBuilder {
 
         return this.currentGraph;
     }
+
+
 
     /**
      * Sets the seed for the random generator.

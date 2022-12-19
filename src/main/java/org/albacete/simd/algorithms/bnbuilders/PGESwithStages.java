@@ -6,6 +6,7 @@ import edu.cmu.tetrad.graph.Graph;
 import java.util.Set;
 import org.albacete.simd.clustering.Clustering;
 import org.albacete.simd.framework.*;
+import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
 
 public class PGESwithStages extends BNBuilder {
@@ -48,13 +49,21 @@ public class PGESwithStages extends BNBuilder {
         if (it >= this.maxIterations)
             return true;
 
-        // Checking working status
-        if(!fesFlag && !besFlag){
-            return true;
-        }
         it++;
         System.out.println("\n\nIterations: " + it);
-        return false;
+
+        // Checking working status
+        /*if(!fesFlag && !besFlag){
+            return true;
+        }*/
+        double currentScore = GESThread.scoreGraph(this.currentGraph, this.problem);
+        if(currentScore > prevScore){
+            prevScore = currentScore;
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
     @Override

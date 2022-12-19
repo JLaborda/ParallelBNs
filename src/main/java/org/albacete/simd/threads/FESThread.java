@@ -4,6 +4,8 @@ import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
 import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
+import edu.cmu.tetrad.search.MeekRules;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.utils.Problem;
 
 import java.util.*;
@@ -95,7 +97,7 @@ public class FESThread extends GESThread {
             double newScore = scoreDag(graph);
             System.out.println(" [" + getId() + "] FES New Score: " + newScore + ", Initial Score: " + scoreInitial);
             // If we improve the score, return the new graph
-            if (newScore > scoreInitial + 0.1) {
+            if (newScore > scoreInitial) {
                 this.modelBDeu = score;
                 this.flag = true;
                 return graph;
@@ -125,15 +127,15 @@ public class FESThread extends GESThread {
         double bestScore = score;
         double bestInsert;
 
-        x_i = null;
-        y_i = null;
-        t_0 = null;
+        //x_i = null;
+        //y_i = null;
+        //t_0 = null;
         iterations = 0;
         
         //System.out.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
         bestInsert = fs(graph, bestScore);
-
+        int edgesAdded = 0;
         while ((x_i != null) && (iterations < this.maxIt)) {
             // Changing best score because x_i, and therefore, y_i is not null
             bestScore = bestInsert;
@@ -141,11 +143,18 @@ public class FESThread extends GESThread {
             // Inserting edge
             //System.out.println("Thread " + getId() + " inserting: (" + x_i + ", " + y_i + ", " + t_0 + ")");
             insert(x_i, y_i, t_0, graph);
+            edgesAdded++;
+
+            //Updating edges
 
             // Checking cycles?
             // boolean cycles = graph.existsDirectedCycle();
+
             //PDAGtoCPDAG
             rebuildPattern(graph);
+            //updateEdges(graph);
+
+            // BOOKMARK!
 
             // Printing score
             /*if (!t_0.isEmpty()) {
@@ -169,6 +178,7 @@ public class FESThread extends GESThread {
             iterations++;
 
         }
+        System.out.println("Thread " + getId() + " added " + edgesAdded + " edges");
         return bestScore;
 
     }
@@ -211,49 +221,71 @@ public class FESThread extends GESThread {
         */
 
         Set<EdgeSearch> newScores = S.parallelStream()
-                .map(e -> scoreEdge(graph, e, initialScore))
+                .map(e -> scoreEdge(graph, e))
                 .collect(Collectors.toSet());
         
-        HashSet temp = new HashSet();
+        HashSet<EdgeSearch> temp = new HashSet<>();
         temp.addAll(newScores);
         temp.addAll(this.scores);
         this.scores = temp;
         
         EdgeSearch max = Collections.max(this.scores);
 
-        if (max.score > initialScore) {
+        if (max.score > 0) {
+        //    updateEdges(max, graph);
+            //Assigning values to x_i, y_i and t_0
             x_i = max.edge.getNode1();
             y_i = max.edge.getNode2();
             t_0 = max.hSubset;
-            
-            //this.scores.remove(max);
-            
-            /*this.nodes = new HashSet<>();
-            this.nodes.add(x_i);
-            this.nodes.add(y_i);
-            Set<Node> adj = ((EdgeListGraph_n)graph).getCommonAdjacents(x_i, y_i);
-            this.nodes.addAll(adj);*/
+
+            // Deleting the selected edge from S
+            S.remove(max.edge);
+            this.scores.remove(max);
+
         }
-
-
-        //ArrayList<EdgeSearch> arrScores = new ArrayList<>(Arrays.asList(scores));
-        //arrScores.removeIf(Objects::isNull);
-
 
         return max.score;
     }
 
-    private EdgeSearch scoreEdge(Graph graph, Edge edge, double bestScore) {
+    private void updateEdges(Graph graph){
+
+        // Getting the common adjacents of x_i and y_i
+        Set<Node> process = revertToCPDAG(graph);
+        process.add(x_i);
+        process.add(y_i);
+
+        Set<Node> adj = new HashSet<>(graph.getAdjacentNodes(x_i));
+        adj.retainAll(graph.getAdjacentNodes(y_i));
+
+        process.addAll(adj);
+
+        S.removeIf(edge -> {
+            Node x = edge.getNode1();
+            Node y = edge.getNode2();
+            return !process.contains(x) && !process.contains(y);
+            //return (!(x.equals(x_i)) || (x.equals(y_i)) || (y.equals(x_i) || y.equals(y_i)));
+        });
+    }
+
+
+    private Set<Node> revertToCPDAG(Graph graph) {
+        SearchGraphUtils.basicCPDAG(graph);
+        MeekRules rules = new MeekRules();
+        rules.setAggressivelyPreventCycles(this.aggressivelyPreventCycles);
+        return rules.orientImplied(graph);
+    }
+
+    private EdgeSearch scoreEdge(Graph graph, Edge edge) {
         Node _x = Edges.getDirectedEdgeTail(edge);
         Node _y = Edges.getDirectedEdgeHead(edge);
-        
+
         if (!graph.isAdjacentTo(_x, _y)) {
             List<Node> tNeighbors = getSubsetOfNeighbors(_x, _y, graph);
 
             SubSet tSubset = new SubSet();
             double insertEval = insertEval(_x, _y, tSubset, graph, problem);
-            double evalScore = bestScore + insertEval;
-            if (evalScore > bestScore) {
+            //System.out.println("InsertEval: " + insertEval);
+            if (insertEval > 0) {
                 List<Node> naYXT = new LinkedList<>(tSubset);
                 List<Node> naYX = findNaYX(_x, _y, graph);
                 naYXT.addAll(naYX);
@@ -281,7 +313,7 @@ public class FESThread extends GESThread {
                 // END TEST 2
 
                 if (passTests) {
-                    double greedyScore = evalScore;
+                    double greedyScore = insertEval;
                     int bestNodeIndex;
                     Node bestNode = null;
 
@@ -292,9 +324,8 @@ public class FESThread extends GESThread {
                             SubSet newT = new SubSet(tSubset);
                             newT.add(node);
                             insertEval = insertEval(_x, _y, newT, graph, problem);
-                            evalScore = bestScore + insertEval;
 
-                            if (evalScore <= greedyScore) {
+                            if (insertEval <= greedyScore) {
                                 continue;
                             }
 
@@ -322,7 +353,7 @@ public class FESThread extends GESThread {
 
                             bestNodeIndex = k;
                             bestNode = node;
-                            greedyScore = evalScore;
+                            greedyScore = insertEval;
                         }
                         if (bestNodeIndex != -1) {
                             tSubset.add(bestNode);
@@ -330,16 +361,18 @@ public class FESThread extends GESThread {
                         }
 
                     } while ((bestNodeIndex != -1) && (tSubset.size() <= 1));
-                    
-                    if(greedyScore > bestScore) {
-                        bestScore = greedyScore;
-                    }
 
-                    return new EdgeSearch(bestScore, tSubset, edge);
+                    if (greedyScore > insertEval) {
+                        insertEval = greedyScore;
+                    }
+                    //System.out.println("InsertEval: " + insertEval);
+                    return new EdgeSearch(insertEval, tSubset, edge);
+
                 }
             }
         }
-        return new EdgeSearch(bestScore, new SubSet(), edge);
+        return new EdgeSearch(0, new SubSet(), edge);
+
     }
 
     /**
