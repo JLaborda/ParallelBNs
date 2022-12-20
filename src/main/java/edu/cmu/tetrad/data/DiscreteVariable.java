@@ -147,6 +147,8 @@ public final class DiscreteVariable extends AbstractVariable
     private transient PropertyChangeSupport pcs;
 
     private Map<String, Object> attributes = new HashMap<>();
+    
+    private int hash;
 
     //=========================CONSTRUCTORS=============================//
     /**
@@ -303,8 +305,11 @@ public final class DiscreteVariable extends AbstractVariable
     // The identity of a node can't be changed by changing its name, etc. Otherwise the deleting
     // of nodes and edges in graphs won't work.
     public final int hashCode() {
+        if (hash == 0) {
+            hash = super.hashCode();
+        }
 //        if (NodeEqualityMode.getEqualityType() == NodeEqualityMode.Type.OBJECT) {
-        return super.hashCode();
+        return hash;
 //        } else if (NodeEqualityMode.getEqualityType() == NodeEqualityMode.Type.NAME) {
 //            int hashCode = 39;
 //            hashCode = 17 * hashCode + getName().hashCode();
@@ -351,7 +356,7 @@ public final class DiscreteVariable extends AbstractVariable
         if (!(getName().equals(variable.getName()))) {
             return false;
         }
-
+/*
         if (!(getNumCategories() == variable.getNumCategories())) {
             return false;
         }
@@ -360,7 +365,7 @@ public final class DiscreteVariable extends AbstractVariable
             if (!(getCategory(i).equals(variable.getCategory(i)))) {
                 return false;
             }
-        }
+        }*/
 
         return getNodeType() == variable.getNodeType();
 //        }

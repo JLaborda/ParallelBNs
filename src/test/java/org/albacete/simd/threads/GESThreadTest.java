@@ -124,7 +124,7 @@ public class GESThreadTest {
         nodes.add(cancer);
         nodes.add(pollution);
 
-        Graph g = new Dag(nodes);
+        Graph g = new Dag_n(nodes);
         Set<Node> setNode = new HashSet<>();
         setNode.add(dyspnoea);
         setNode.add(smoker);

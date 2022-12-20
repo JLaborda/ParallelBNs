@@ -90,8 +90,8 @@ public class Circular_GES extends BNBuilder {
                 dag.fusionGES(getInputDag(dag.id));
             } catch (InterruptedException ex) {
                 System.out.println("Error with InterruptedException: " +
-                        "\n Dag Id: " + dag.id +
-                        "\n Dag graph: " + dag.dag);
+                        "\n Dag_n Id: " + dag.id +
+                        "\n Dag_n graph: " + dag.dag);
             }
         });
     }

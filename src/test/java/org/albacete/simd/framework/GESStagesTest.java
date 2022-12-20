@@ -1,6 +1,6 @@
 package org.albacete.simd.framework;
 
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.Resources;
@@ -51,7 +51,7 @@ public class GESStagesTest {
 
         //assertTrue(flag);
         assertNotNull(g);
-        assertTrue(g instanceof Dag);
+        assertTrue(g instanceof Dag_n);
         assertEquals(g.getNumNodes(), problem.getVariables().size());
         assertTrue(fesFusionScore >= fesStageScore);
 
@@ -80,7 +80,7 @@ public class GESStagesTest {
 
         //assertTrue(flag);
         assertNotNull(g2);
-        assertTrue(g2 instanceof Dag);
+        assertTrue(g2 instanceof Dag_n);
         assertEquals(g2.getNumNodes(), problem.getVariables().size());
         assertTrue(besFusionScore >= besStageScore);
 

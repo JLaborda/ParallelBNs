@@ -1,6 +1,6 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
@@ -34,7 +34,7 @@ public class HillClimbingSearchTest {
         HillClimbingSearch hc4 = new HillClimbingSearch(problem.getData());
 
         List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
-        Dag initialGraph = new Dag(nodes);
+        Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
@@ -85,13 +85,13 @@ public class HillClimbingSearchTest {
         hc1.search();
 
         assertNotNull(hc1.getCurrentGraph());
-        assertTrue(hc1.getCurrentGraph() instanceof Dag);
+        assertTrue(hc1.getCurrentGraph() instanceof Dag_n);
     }
 
     @Test
     public void searchTestWithInitialGraph() {
         List<Node> nodes = Arrays.asList(Resources.XRAY, Resources.DYSPNOEA, Resources.CANCER, Resources.POLLUTION, Resources.SMOKER);
-        Dag initialGraph = new Dag(nodes);
+        Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
         //initialGraph.addDirectedEdge(Resources.POLLUTION, Resources.CANCER);
@@ -99,7 +99,7 @@ public class HillClimbingSearchTest {
 
 
         HillClimbingSearch hc1 = new HillClimbingSearch(initialGraph, Resources.CANCER_BBDD_PATH);
-        Dag result = hc1.getCurrentDag();
+        Dag_n result = hc1.getCurrentDag();
         // Equals is never gonna work. Because tetrad doesn't have a proper equals
         assertEquals(initialGraph.getNodes(), result.getNodes());
 

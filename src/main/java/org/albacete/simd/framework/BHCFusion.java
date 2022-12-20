@@ -1,6 +1,6 @@
 package org.albacete.simd.framework;
 
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Edges;
 import edu.cmu.tetrad.graph.Graph;
@@ -14,14 +14,14 @@ import java.util.Set;
 
 public class BHCFusion extends FusionStage{
 
-    public BHCFusion(Problem problem, Graph currentGraph, ArrayList<Dag> graphs) {
+    public BHCFusion(Problem problem, Graph currentGraph, ArrayList<Dag_n> graphs) {
         super(problem, currentGraph, graphs);
     }
 
     @Override
-    protected Dag fusion() throws InterruptedException {
+    protected Dag_n fusion() throws InterruptedException {
 
-        Dag fusionGraph = this.fusionIntersection();
+        Dag_n fusionGraph = this.fusionIntersection();
 
         // Getting Scores
         double fusionScore = GESThread.scoreGraph(fusionGraph, problem);
@@ -34,7 +34,7 @@ public class BHCFusion extends FusionStage{
         // Checking if the score has improved
         if (fusionScore > currentScore) {
             this.currentGraph = fusionGraph;
-            return (Dag) this.currentGraph;
+            return (Dag_n) this.currentGraph;
         }
 
         System.out.println("BHC to obtain the fusion: ");
@@ -58,7 +58,7 @@ public class BHCFusion extends FusionStage{
         //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
         //System.out.println("Resultado del BHC de la fusion tras removeInconsistencies: "+ BackwardsHillClimbingThread.scoreGraph(this.currentGraph, problem));
 
-        return new Dag(this.currentGraph);
+        return new Dag_n(this.currentGraph);
 
     }
 }

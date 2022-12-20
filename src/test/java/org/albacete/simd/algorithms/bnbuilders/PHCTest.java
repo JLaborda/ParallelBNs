@@ -1,7 +1,7 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.Resources;
@@ -37,7 +37,7 @@ public class PHCTest {
         PGESwithStages alg2 = new PGESwithStages(path, clustering, 2, 100, 5);
 
         List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
-        Dag initialGraph = new Dag(nodes);
+        Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
@@ -78,7 +78,7 @@ public class PHCTest {
 
         //Asserting that there is a result
         assertNotNull(alg1.getCurrentGraph());
-        assertTrue(alg1.getCurrentGraph() instanceof Dag);
+        assertTrue(alg1.getCurrentGraph() instanceof Dag_n);
         assertEquals(5, alg1.getCurrentGraph().getNodes().size());
     }
 
@@ -94,7 +94,7 @@ public class PHCTest {
         alg.search();
 
         assertNotNull(alg.getCurrentGraph());
-        assertTrue(alg.getCurrentGraph() instanceof Dag);
+        assertTrue(alg.getCurrentGraph() instanceof Dag_n);
         assertEquals(1, alg.getIterations());
 
     }
@@ -102,14 +102,14 @@ public class PHCTest {
     @Test
     public void testSearchWithInitialGraph() {
         List<Node> nodes = Arrays.asList(Resources.XRAY, Resources.DYSPNOEA, Resources.CANCER, Resources.POLLUTION, Resources.SMOKER);
-        Dag initialGraph = new Dag(nodes);
+        Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
         Clustering clustering = new RandomClustering(42);
         PGESwithStages alg = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5);
 
-        Dag result = alg.getCurrentDag();
+        Dag_n result = alg.getCurrentDag();
         // Equals is never gonna work. Because tetrad doesn't have a proper equals
         assertEquals(initialGraph.getNodes(), result.getNodes());
         for (Edge edgeInitial : initialGraph.getEdges()) {

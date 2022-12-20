@@ -32,6 +32,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
         
         this.neighboursMap = new HashMap(graph.getNumNodes());
         this.nodesHash = new HashSet(graph.getNumNodes());
+        this.namesHash = new HashMap<>(graph.getNumNodes());
 
         transferNodesAndEdges(graph);
 
@@ -258,6 +259,29 @@ public class EdgeListGraph_n extends EdgeListGraph {
         });
 
         return _edges;
+    }
+    
+     /**
+     * @param node
+     * @return the list of edges connected to a particular node. No particular
+     * ordering of the edges in the list is guaranteed.
+     */
+    @Override
+    public List<Edge> getEdges(Node node) {
+        Set<Edge> list = this.edgeLists.get(node);
+        if (list == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(list);
+    }
+    
+    /**
+     * @return the list of edges in the graph. No particular ordering of the
+     * edges in the list is guaranteed.
+     */
+    @Override
+    public Set<Edge> getEdges() {
+        return new HashSet<>(this.edgesSet);
     }
     
     /**

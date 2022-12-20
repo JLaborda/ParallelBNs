@@ -178,8 +178,8 @@ public class FESThreadTest {
         Graph initialGraphg2 = thread2.getInitialGraph();
 
         // Getting dags
-        Dag gdag1 = new Dag(removeInconsistencies(g1));
-        Dag gdag2 = new Dag(removeInconsistencies(g2));
+        Dag_n gdag1 = new Dag_n(removeInconsistencies(g1));
+        Dag_n gdag2 = new Dag_n(removeInconsistencies(g2));
 
         assertNotNull(gdag1);
         assertEquals(gdag1.getNodes().size(),5);

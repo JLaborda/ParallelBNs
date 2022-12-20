@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.EdgeListGraph_n;
 import edu.cmu.tetrad.graph.Edges;
@@ -25,18 +25,18 @@ import static org.albacete.simd.utils.Utils.pdagToDag;
 public class ConsensusBES implements Runnable {
 	
 	ArrayList<Node> alpha = null;
-	Dag outputDag = null;
+	Dag_n outputDag = null;
 	AlphaOrder heuristic = null;
 	TransformDags imaps2alpha = null;
-	ArrayList<Dag> setOfdags = null;
-	ArrayList<Dag> setOfOutDags = null;
-	Dag union = null;
+	ArrayList<Dag_n> setOfdags = null;
+	ArrayList<Dag_n> setOfOutDags = null;
+	Dag_n union = null;
 	int numberOfInsertedEdges = 0;
 	
 	Map<String, Double> localScore = new HashMap<String,Double>();
 	
 	
-	public ConsensusBES(ArrayList<Dag> dags){
+	public ConsensusBES(ArrayList<Dag_n> dags){
 		this.setOfdags = dags;
 		this.heuristic = new AlphaOrder(this.setOfdags);
 		
@@ -56,9 +56,9 @@ public class ConsensusBES implements Runnable {
 	
 	private void consensusUnion(){
 		
-		this.union = new Dag(this.alpha);
+		this.union = new Dag_n(this.alpha);
 		for(Node nodei: this.alpha){
-			for(Dag d : this.imaps2alpha.setOfOutputDags){
+			for(Dag_n d : this.imaps2alpha.setOfOutputDags){
 				List<Node>parent = d.getParents(nodei);
 				for(Node pa: parent){
 					if(!this.union.isParentOf(pa, nodei)){
@@ -69,7 +69,7 @@ public class ConsensusBES implements Runnable {
 			
 		}
 //		for(Edge e: this.union.getEdges()){
-//			for(Dag d : this.imaps2alpha.setOfOutputDags){
+//			for(Dag_n d : this.imaps2alpha.setOfOutputDags){
 //				if((d.getEdge(e.getNode1(), e.getNode2())==null) && (d.getEdge(e.getNode2(), e.getNode1())==null)) 
 //					this.numberOfInsertedEdges++;
 //				
@@ -177,7 +177,7 @@ public class ConsensusBES implements Runnable {
 //		System.out.println("Pdag: "+ graph.toString());
                 pdagToDag(graph);
 //		System.out.println("PdagToDag"+graph.toString());
-		this.outputDag = new Dag();
+		this.outputDag = new Dag_n();
 		for (Node node : graph.getNodes()) this.outputDag.addNode(node);
 		Node nodeT, nodeH;
 		for (Edge e : graph.getEdges()){
@@ -279,7 +279,7 @@ public class ConsensusBES implements Runnable {
 			double eval = 0.0;
 			LinkedList<Node> conditioning = new LinkedList<Node>();
 			conditioning.addAll(set);
-			for(Dag g: this.setOfdags){
+			for(Dag_n g: this.setOfdags){
 				if(!dSeparated(g,y, x, conditioning)) return 0.0;
 			}
 			eval = 1.0; //eval / (double) this.setOfdags.size();
@@ -292,7 +292,7 @@ public class ConsensusBES implements Runnable {
 	}
 	
 	
-	boolean dSeparated(Dag g, Node x, Node y, LinkedList<Node> cond){
+	boolean dSeparated(Dag_n g, Node x, Node y, LinkedList<Node> cond){
 		
 		LinkedList<Node> open = new LinkedList<Node>();
 		HashMap<String,Node> close = new HashMap<String,Node>();
@@ -406,7 +406,7 @@ public class ConsensusBES implements Runnable {
         return naYX;
     }
     
-    public Dag getFusion(){
+    public Dag_n getFusion(){
     	
     	return this.outputDag;
     }
@@ -446,7 +446,7 @@ public class ConsensusBES implements Runnable {
 //
     	conDag = new ConsensusBES(setOfBNs.setOfRandomDags);
     	conDag.fusion();
-    	Dag g = conDag.getFusion();
+    	Dag_n g = conDag.getFusion();
     	System.out.println("grafo consenso: "+ g +"  Complejidad de la Fusion: "+ conDag.getNumberOfInsertedEdges()
     	+ "  "+ conDag.union.getNumEdges());
     	System.out.println("Orden Inicial Heu: "+conDag.alpha.toString());

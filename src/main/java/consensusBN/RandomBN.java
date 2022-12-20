@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.GraphNode;
 import edu.cmu.tetrad.graph.GraphUtils;
 import edu.cmu.tetrad.graph.Node;
@@ -28,7 +28,7 @@ public class RandomBN {
 	int[][] childMatrix = null;
 	int[][] initialParentMatrix = null;
 	int[][] initialChildMatrix = null;
-	public ArrayList<Dag> setOfRandomDags = null;
+	public ArrayList<Dag_n> setOfRandomDags = null;
 	ArrayList<Node> nodesDags = null;
 	/**
      * Parent of random edge. 0 is the default parent node.
@@ -64,7 +64,7 @@ public class RandomBN {
 		this.initialParentMatrix = null;
 		this.initialChildMatrix = null;
 		
-		this.setOfRandomDags = new ArrayList<Dag>();
+		this.setOfRandomDags = new ArrayList<Dag_n>();
 		this.setOfRandomBNs = new ArrayList<BayesIm>();
 		
 		this.nodesDags = new ArrayList<Node>();
@@ -105,7 +105,7 @@ public RandomBN(int seed, int numNodes, int numEdges, int numBNs, int numIterati
 		this.initialParentMatrix = null;
 		this.initialChildMatrix = null;
 		
-		this.setOfRandomDags = new ArrayList<Dag>();
+		this.setOfRandomDags = new ArrayList<Dag_n>();
 		this.setOfRandomBNs = new ArrayList<BayesIm>();
 		this.dataSamples = null;
 		this.sampleSize = sampleSize;
@@ -270,19 +270,19 @@ public RandomBN(int seed, int numNodes, int numEdges, int numBNs, int numIterati
 	}
 
 
-	public Dag getDag() {
+	public Dag_n getDag() {
 		//System.out.println("Converting to DAG");
 		return getDag(this.nodesDags);
 	}
 
 
-	public Dag getDag(List<Node> nodes) {
+	public Dag_n getDag(List<Node> nodes) {
 		if (nodes.size() != this.numNodes) {
 			throw new IllegalArgumentException("Only " + nodes.size() + " nodes were provided, but the " +
 					"simulated graph has " + this.numNodes + ".");
 		}
 
-		Dag dag = new Dag();
+		Dag_n dag = new Dag_n();
 
 		for (Node node : nodes) {
 			dag.addNode(node);

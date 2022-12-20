@@ -1,7 +1,7 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.Resources;
 import org.albacete.simd.clustering.Clustering;
@@ -36,7 +36,7 @@ public class GESTest {
         BNBuilder alg2 = new GES_BNBuilder(path);
 
         List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
-        Dag initialGraph = new Dag(nodes);
+        Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
@@ -84,7 +84,7 @@ public class GESTest {
         //System.out.println((alg1.getCurrentGraph()));
 
         assertNotNull(ges.getCurrentGraph());
-        assertTrue(ges.getCurrentGraph() instanceof Dag);
+        assertTrue(ges.getCurrentGraph() instanceof Dag_n);
 
     }
 
@@ -96,20 +96,20 @@ public class GESTest {
 
         assertNotNull(alg.getCurrentGraph());
         assertNotEquals(0, alg.getCurrentGraph().getEdges());
-        assertTrue(alg.getCurrentGraph() instanceof Dag);
+        assertTrue(alg.getCurrentGraph() instanceof Dag_n);
 
     }
 
     @Test
     public void testSearchWithInitialGraph() {
         List<Node> nodes = Arrays.asList(Resources.XRAY, Resources.DYSPNOEA, Resources.CANCER, Resources.POLLUTION, Resources.SMOKER);
-        Dag initialGraph = new Dag(nodes);
+        Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
         BNBuilder alg = new GES_BNBuilder(initialGraph, Resources.CANCER_DATASET);
 
-        Dag result = alg.getCurrentDag();
+        Dag_n result = alg.getCurrentDag();
         // Equals is never gonna work. Because tetrad doesn't have a proper equals
         assertEquals(initialGraph.getNodes(), result.getNodes());
         assertEquals(initialGraph.getEdges(), result.getEdges());

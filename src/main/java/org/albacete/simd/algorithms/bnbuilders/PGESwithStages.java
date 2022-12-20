@@ -16,31 +16,37 @@ public class PGESwithStages extends BNBuilder {
     
     private FESStage fesStage;
     private BESStage besStage;
+    
+    private boolean speedUp;
 
     private final Clustering clustering;
 
-    public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp) {
         super(data, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
+        this.speedUp = speedUp;
     }
 
-    public PGESwithStages(String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp) {
         super(path, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
+        this.speedUp = speedUp;
     }
 
-    public PGESwithStages(Graph initialGraph, String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(Graph initialGraph, String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp) {
         super(initialGraph, path, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
+        this.speedUp = speedUp;
     }
 
-    public PGESwithStages(Graph initialGraph, DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(Graph initialGraph, DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp) {
         super(initialGraph, data, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
+        this.speedUp = speedUp;
     }
 
     @Override
@@ -57,6 +63,7 @@ public class PGESwithStages extends BNBuilder {
             return true;
         }*/
         double currentScore = GESThread.scoreGraph(this.currentGraph, this.problem);
+        System.out.println("Current: " + currentScore + ", prev: "+ prevScore);
         if(currentScore > prevScore){
             prevScore = currentScore;
             return false;
@@ -78,7 +85,7 @@ public class PGESwithStages extends BNBuilder {
 
     @Override
     protected void forwardStage(){
-        fesStage = new FESStage(problem, currentGraph,nThreads,nItInterleaving, subSets);
+        fesStage = new FESStage(problem, currentGraph,nThreads,nItInterleaving, subSets, speedUp);
         fesFlag = fesStage.run();
         graphs = fesStage.getGraphs();
     }

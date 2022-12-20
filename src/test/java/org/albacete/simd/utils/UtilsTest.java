@@ -84,7 +84,7 @@ public class UtilsTest {
         //Transforming the BayesNet into a BayesPm
         BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bf);
         MlBayesIm bn1 = new MlBayesIm(bayesPm);
-        Dag dag = new Dag(bn1.getDag());
+        Dag_n dag = new Dag_n(bn1.getDag());
 
         // Setting expected outcome
         Map<Node, List<Node>> expected = new HashMap<>();
@@ -136,7 +136,7 @@ public class UtilsTest {
         MlBayesIm bn2 = new MlBayesIm(bayesPm2);
 
         // Acting: Getting the avgMarkovBlanquetDif:
-        double[] result = Utils.avgMarkovBlanquetdif(new Dag(bn1.getDag()), new Dag(bn2.getDag()));
+        double[] result = Utils.avgMarkovBlanquetdif(new Dag_n(bn1.getDag()), new Dag_n(bn2.getDag()));
         // Asserting
         assertNull(result);
 
@@ -151,7 +151,7 @@ public class UtilsTest {
         bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
         // Acting: Getting the avgMarkovBlanquetDif:
-        result = Utils.avgMarkovBlanquetdif(new Dag(bn1.getDag()), new Dag(bn2.getDag()));
+        result = Utils.avgMarkovBlanquetdif(new Dag_n(bn1.getDag()), new Dag_n(bn2.getDag()));
         // Asserting
         assertNotNull(result);
         for (double r : result) {
@@ -161,8 +161,8 @@ public class UtilsTest {
         /*TEST: Same nodes but different DAGs should return it's avg difference*/
         // Arranging dags
         bf.processFile(net_path1);
-        Dag dag1 = new Dag(new MlBayesIm(Utils.transformBayesNetToBayesPm(bf)).getDag());
-        Dag dag2 = new Dag(new MlBayesIm(Utils.transformBayesNetToBayesPm(bf)).getDag());
+        Dag_n dag1 = new Dag_n(new MlBayesIm(Utils.transformBayesNetToBayesPm(bf)).getDag());
+        Dag_n dag2 = new Dag_n(new MlBayesIm(Utils.transformBayesNetToBayesPm(bf)).getDag());
 
         // Changing the original dag
         dag2.removeEdge(dag2.getNode("Cancer"), dag2.getNode("Dyspnoea"));
@@ -192,7 +192,7 @@ public class UtilsTest {
         System.out.println("Numero de variables: "+bf.getNrOfNodes());
         MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
-        Dag dag = new Dag(bn2.getDag());
+        Dag_n dag = new Dag_n(bn2.getDag());
 
         Node n = Utils.getNodeByName(dag.getNodes(), "Pollution");
         Node n2 = Utils.getNodeByName(dag.getNodes(), "");
@@ -209,7 +209,7 @@ public class UtilsTest {
         System.out.println("Numero de variables: "+bf.getNrOfNodes());
         MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
-        Dag dag = new Dag(bn2.getDag());
+        Dag_n dag = new Dag_n(bn2.getDag());
         List<Node> nodes = dag.getNodes();
 
         int result1 = Utils.getIndexOfNodeByName(nodes, "Pollution");
@@ -244,8 +244,8 @@ public class UtilsTest {
         g2.addEdge(e2);
         g2.addEdge(e3);
 
-        Dag result1 = Utils.removeInconsistencies(g1);
-        Dag result2 = Utils.removeInconsistencies(g2);
+        Dag_n result1 = Utils.removeInconsistencies(g1);
+        Dag_n result2 = Utils.removeInconsistencies(g2);
 
         assertTrue(result1.containsEdge(e1));
         assertTrue(result1.containsEdge(e2));
@@ -318,7 +318,7 @@ public class UtilsTest {
         String net_path1 = "./res/networks/cancer.xbif";
         BIFReader bf = new BIFReader();
         bf.processFile(net_path1);
-        Dag dag1 = (new MlBayesIm((BayesNet) bf)).getDag();
+        Dag_n dag1 = (new MlBayesIm((BayesNet) bf)).getDag();
         Graph g2 = new EdgeListGraph(dag1);
 
         double score2 = Utils.scoreGraph(g2, data);

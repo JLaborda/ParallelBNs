@@ -188,7 +188,7 @@ public class BESThreadTest {
         Graph g1 = thread1.getCurrentGraph();
 
         // Getting dag
-        Dag gdag1 = new Dag(removeInconsistencies(g1));
+        Dag_n gdag1 = new Dag_n(removeInconsistencies(g1));
 
         //System.out.println("ThBES");
         //System.out.println(gdag1);
