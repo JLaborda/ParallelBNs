@@ -1,7 +1,7 @@
 package org.albacete.simd.framework;
 
 import consensusBN.ConsensusUnion;
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Edges;
 import edu.cmu.tetrad.graph.Graph;
@@ -15,12 +15,12 @@ import java.util.Set;
 
 public class FHCFusion extends FusionStage{
 
-    public FHCFusion(Problem problem, Graph currentGraph, ArrayList<Dag> graphs) {
+    public FHCFusion(Problem problem, Graph currentGraph, ArrayList<Dag_n> graphs) {
         super(problem, currentGraph, graphs);
     }
 
     @Override
-    protected Dag fusion() throws InterruptedException {
+    protected Dag_n fusion() throws InterruptedException {
         // Applying ConsensusUnion fusion
         ConsensusUnion fusion = new ConsensusUnion(this.graphs);
         Graph fusionGraph = fusion.union();
@@ -37,7 +37,7 @@ public class FHCFusion extends FusionStage{
         // Checking if the score has improved
         if (fusionScore > currentScore) {
             this.currentGraph = fusionGraph;
-            return (Dag) this.currentGraph;
+            return (Dag_n) this.currentGraph;
         }
 
         System.out.println("FHC to obtain the fusion: ");
@@ -65,6 +65,6 @@ public class FHCFusion extends FusionStage{
         //System.out.println("Score Fusion sin inconsistencias: "+ ForwardHillClimbingThread.scoreGraph(this.currentGraph, problem));
 
 
-        return new Dag(this.currentGraph);
+        return new Dag_n(this.currentGraph);
     }
 }

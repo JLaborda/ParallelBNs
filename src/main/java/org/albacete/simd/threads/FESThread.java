@@ -21,6 +21,8 @@ import static org.albacete.simd.utils.Utils.pdagToDag;
 public class FESThread extends GESThread {
 
     private static int threadCounter = 1;
+    
+    private final boolean speedUp;
 
     /**
      * Constructor of FESThread with an initial DAG
@@ -31,9 +33,10 @@ public class FESThread extends GESThread {
      * @param subset subset of edges the fes stage will try to add to the
      * resulting graph
      * @param maxIt maximum number of iterations allowed in the fes stage
+     * @param speedUp
      */
-    public FESThread(Problem problem, Graph initialDag, Set<Edge> subset, int maxIt) {
-        this(problem, subset, maxIt);
+    public FESThread(Problem problem, Graph initialDag, Set<Edge> subset, int maxIt, boolean speedUp) {
+        this(problem, subset, maxIt, speedUp);
         this.initialDag = initialDag;
     }
 
@@ -45,8 +48,9 @@ public class FESThread extends GESThread {
      * @param subset subset of edges the fes stage will try to add to the
      * resulting graph
      * @param maxIt maximum number of iterations allowed in the fes stage
+     * @param speedUp
      */
-    public FESThread(Problem problem, Set<Edge> subset, int maxIt) {
+    public FESThread(Problem problem, Set<Edge> subset, int maxIt, boolean speedUp) {
         this.problem = problem;
         this.initialDag = new EdgeListGraph_n(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
@@ -54,6 +58,7 @@ public class FESThread extends GESThread {
         this.id = threadCounter;
         threadCounter++;
         this.isForwards = true;
+        this.speedUp = speedUp;
     }
 
     //==========================PUBLIC METHODS==========================//
@@ -89,7 +94,7 @@ public class FESThread extends GESThread {
             double scoreInitial = scoreDag(graph);
 
             // Do backward search.
-            double score = fes(graph, scoreInitial);
+            fes(graph, scoreInitial);
 
             long endTime = System.currentTimeMillis();
             this.elapsedTime = endTime - startTime;
@@ -98,7 +103,7 @@ public class FESThread extends GESThread {
             System.out.println(" [" + getId() + "] FES New Score: " + newScore + ", Initial Score: " + scoreInitial);
             // If we improve the score, return the new graph
             if (newScore > scoreInitial) {
-                this.modelBDeu = score;
+                this.modelBDeu = newScore;
                 this.flag = true;
                 return graph;
             } else {
@@ -134,28 +139,23 @@ public class FESThread extends GESThread {
         
         //System.out.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
+        enlaces = S;
         bestInsert = fs(graph);
-        int edgesAdded = 0;
         while ((x_i != null) && (iterations < this.maxIt)) {
             // Changing best score because x_i, and therefore, y_i is not null
             bestScore = bestInsert;
 
             // Inserting edge
-            //System.out.println("Thread " + getId() + " inserting: (" + x_i + ", " + y_i + ", " + t_0 + ")");
+            System.out.println("Thread " + getId() + " inserting: (" + x_i + ", " + y_i + ", " + t_0 + "), score: " + bestScore);
             insert(x_i, y_i, t_0, graph);
-            edgesAdded++;
-
-            //Updating edges
 
             // Checking cycles?
-            // boolean cycles = graph.existsDirectedCycle();
+            //boolean cycles = graph.existsDirectedCycle();
 
             //PDAGtoCPDAG
-            rebuildPattern(graph);
-            //updateEdges(graph);
-
-            // BOOKMARK!
-
+            //rebuildPattern(graph);
+            updateEdges(graph);
+            
             // Printing score
             /*if (!t_0.isEmpty()) {
                 System.out.println("[" + getId() + "] Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert - score) + ")\tOperator: " + graph.getEdge(x_i, y_i) + " " + t_0);
@@ -176,9 +176,7 @@ public class FESThread extends GESThread {
             // Indicating that the thread has added an edge to the graph
             this.flag = true;
             iterations++;
-
         }
-        System.out.println("Thread " + getId() + " added " + edgesAdded + " edges");
         return bestScore;
 
     }
@@ -217,8 +215,8 @@ public class FESThread extends GESThread {
             t_0 = max.hSubset;
         }
         */
-
-        Set<EdgeSearch> newScores = S.parallelStream()
+        
+        Set<EdgeSearch> newScores = enlaces.parallelStream()
                 .map(e -> scoreEdge(graph, e))
                 .collect(Collectors.toSet());
         
@@ -230,47 +228,56 @@ public class FESThread extends GESThread {
         EdgeSearch max = Collections.max(this.scores);
 
         if (max.score > 0) {
-        //    updateEdges(max, graph);
             //Assigning values to x_i, y_i and t_0
             x_i = max.edge.getNode1();
             y_i = max.edge.getNode2();
             t_0 = max.hSubset;
 
-            // Deleting the selected edge from S
-            S.remove(max.edge);
+            // Deleting the selected edge from enlaces
+            enlaces.remove(max.edge);
             this.scores.remove(max);
         }
+
         return max.score;
     }
 
     private void updateEdges(Graph graph){
+        // Modo normal
+        if (!speedUp) {
+            // Getting the common adjacents of x_i and y_i
+            Set<Node> process = revertToCPDAG(graph);
+            removeEdgesNotNeighbors(graph, process);
+        }
+        // Modo heurístico. No comprobamos los enlaces invertidos en revertToCPDAG
+        else {
+            // Getting the common adjacents of x_i and y_i
+            Set<Node> process = new HashSet<>();
+            removeEdgesNotNeighbors(graph, process);
+        }
+    }
 
-        // Getting the common adjacents of x_i and y_i
-        Set<Node> process = revertToCPDAG(graph);
+    private void removeEdgesNotNeighbors(Graph graph, Set<Node> process) {
+        int tam;
+        tam = process.size();
         process.add(x_i);
         process.add(y_i);
 
-        Set<Node> adj = new HashSet<>(graph.getAdjacentNodes(x_i));
-        adj.retainAll(graph.getAdjacentNodes(y_i));
+        process.addAll(graph.getAdjacentNodes(x_i));
+        process.addAll(graph.getAdjacentNodes(y_i));
 
-        process.addAll(adj);
-        int n = S.size();
-        S.removeIf(edge -> {
+        enlaces = new HashSet<>(S);
+        enlaces.removeIf(edge -> {
             Node x = edge.getNode1();
             Node y = edge.getNode2();
             return !process.contains(x) && !process.contains(y);
-            //return (!(x.equals(x_i)) || (x.equals(y_i)) || (y.equals(x_i) || y.equals(y_i)));
         });
-        if(n- S.size() > 0)
-            System.out.println("[" + getId() + "] Number of edges deleted in S: " + (n - S.size()));
-
+        System.out.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
     }
-
 
     private Set<Node> revertToCPDAG(Graph graph) {
         SearchGraphUtils.basicCPDAG(graph);
         MeekRules rules = new MeekRules();
-        rules.setAggressivelyPreventCycles(this.aggressivelyPreventCycles);
+        rules.setAggressivelyPreventCycles(true);
         return rules.orientImplied(graph);
     }
 
@@ -397,7 +404,7 @@ public class FESThread extends GESThread {
         y_i = null;
         t_0 = null;
 
-        List<Edge> edges = new ArrayList<>(S);
+        List<Edge> edges = new ArrayList<>(enlaces);
 
         for (Edge edge : edges) {
 

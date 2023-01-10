@@ -144,7 +144,7 @@ public class BESThreadTest {
     @Test
     public void constructorTest() throws InterruptedException{
         // Arrange
-        FESThread thread1 = new FESThread(problem, subset1, 15);
+        FESThread thread1 = new FESThread(problem, subset1, 15, false);
         thread1.run();
         Graph graph = thread1.getCurrentGraph();
         // Act
@@ -188,7 +188,7 @@ public class BESThreadTest {
         Graph g1 = thread1.getCurrentGraph();
 
         // Getting dag
-        Dag gdag1 = new Dag(removeInconsistencies(g1));
+        Dag_n gdag1 = new Dag_n(removeInconsistencies(g1));
 
         //System.out.println("ThBES");
         //System.out.println(gdag1);

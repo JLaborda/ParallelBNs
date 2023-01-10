@@ -124,7 +124,7 @@ public class GESThreadTest {
         nodes.add(cancer);
         nodes.add(pollution);
 
-        Graph g = new Dag(nodes);
+        Graph g = new Dag_n(nodes);
         Set<Node> setNode = new HashSet<>();
         setNode.add(dyspnoea);
         setNode.add(smoker);
@@ -506,7 +506,7 @@ public class GESThreadTest {
     public void setMaxNumEdgesNormalTest() {
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new FESThread(problem, subset1, 15);
+        GESThread thread = new FESThread(problem, subset1, 15, false);
 
         // Act
         thread.setMaxNumEdges(5);
@@ -524,7 +524,7 @@ public class GESThreadTest {
     public void setMaxNumEdgesErrorTest() {
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new FESThread(problem, subset1, 15);
+        GESThread thread = new FESThread(problem, subset1, 15, false);
 
         // Act
         thread.setMaxNumEdges(-2);
@@ -537,7 +537,7 @@ public class GESThreadTest {
     public void getCacheTest() {
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new FESThread(problem, subset1, 15);
+        GESThread thread = new FESThread(problem, subset1, 15, false);
 
         LocalScoreCacheConcurrent result = thread.getLocalScoreCache();
         assertNotNull(result);

@@ -142,8 +142,8 @@ public abstract class Experiment {
 //
 //
 //
-//            this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
-//            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
+//            this.shd = Utils.compare(bn2.getDag(),(Dag_n) alg.getCurrentGraph());
+//            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag_n) alg.getCurrentGraph());
 //            this.nIterations = alg.getIterations();
 //            this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem());
 //

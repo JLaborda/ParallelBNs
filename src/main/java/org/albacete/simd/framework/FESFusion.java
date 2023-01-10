@@ -1,7 +1,7 @@
 package org.albacete.simd.framework;
 
 import consensusBN.ConsensusUnion;
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.EdgeListGraph;
 import edu.cmu.tetrad.graph.Edges;
@@ -23,14 +23,14 @@ public class FESFusion extends FusionStage{
 
 
 
-    public FESFusion(Problem problem, Graph currentGraph, ArrayList<Dag> graphs) {
+    public FESFusion(Problem problem, Graph currentGraph, ArrayList<Dag_n> graphs) {
         super(problem, currentGraph, graphs);
     }
     
     public boolean flag = false;
 
     @Override
-    public Dag fusion() {
+    public Dag_n fusion() {
         // Applying ConsensusUnion fusion
         ConsensusUnion fusion = new ConsensusUnion(this.graphs);
         Graph fusionGraph = fusion.union();
@@ -54,7 +54,7 @@ public class FESFusion extends FusionStage{
         }
         
 
-        FESThread fuse = new FESThread(this.problem,this.currentGraph,candidates,candidates.size());
+        FESThread fuse = new FESThread(this.problem,this.currentGraph,candidates,candidates.size(),false);
 
         fuse.run();
         
@@ -74,7 +74,7 @@ public class FESFusion extends FusionStage{
                 flag = true;
                 this.currentGraph = fusionGraph;
                 System.out.println("  FESFusion -> FUSION, " + fusionScore);
-                return (Dag) this.currentGraph;
+                return (Dag_n) this.currentGraph;
             } 
             /*
             // If the fusion doesn´t improves the result, we check if any previous FESThread has improved the results.
@@ -86,8 +86,8 @@ public class FESFusion extends FusionStage{
                         flag = true;
                     } catch (InterruptedException ex) {}
                     System.out.println("  FESFusion -> THREAD, " + thread.getScoreBDeu());
-                    this.currentGraph = new Dag(this.currentGraph);
-                    return (Dag) this.currentGraph;
+                    this.currentGraph = new Dag_n(this.currentGraph);
+                    return (Dag_n) this.currentGraph;
                 }
             }*/
         }
@@ -101,7 +101,7 @@ public class FESFusion extends FusionStage{
         //pdagToDag(this.currentGraph);
         this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
         //this.currentGraph = SearchGraphUtils.dagFromCPDAG(this.currentGraph);
-        return new Dag(this.currentGraph);
+        return new Dag_n(this.currentGraph);
 
         //return Utils.removeInconsistencies(this.currentGraph);
     }

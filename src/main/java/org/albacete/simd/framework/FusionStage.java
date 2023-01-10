@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public abstract class FusionStage extends Stage {
 
 
-    public FusionStage(Problem problem, Graph currentGraph, ArrayList<Dag> graphs) {
+    public FusionStage(Problem problem, Graph currentGraph, ArrayList<Dag_n> graphs) {
         super(problem, currentGraph);
         this.graphs = graphs;
     }
@@ -19,12 +19,12 @@ public abstract class FusionStage extends Stage {
         return true;
     }
 
-    protected abstract Dag fusion() throws InterruptedException;
+    protected abstract Dag_n fusion() throws InterruptedException;
 
 
-    protected Dag fusionIntersection(){
+    protected Dag_n fusionIntersection(){
         ArrayList<Node> order = new ArrayList<>(this.currentGraph.getCausalOrdering()); // currentGraph.getCausalOrdering
-        for(Dag g: this.graphs) {
+        for(Dag_n g: this.graphs) {
             for(Edge e:g.getEdges()) {
                 if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW))
                     continue;
@@ -49,13 +49,13 @@ public abstract class FusionStage extends Stage {
         // Looping over each edge of the currentGraph and checking if it has been deleted in any of the resulting graphs of the BES stage.
         // If it has been deleted, then it is removed from the currentGraph.
         for(Edge e: graph.getEdges()) {
-            for(Dag g: this.graphs)
+            for(Dag_n g: this.graphs)
                 if(!g.containsEdge(e)) {
                     graph.removeEdge(e);
                     break;
                 }
         }
-        return new Dag(graph);
+        return new Dag_n(graph);
     }
 
 }

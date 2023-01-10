@@ -39,6 +39,8 @@ public class LocalScoreCacheConcurrent {
     private class DualKey<K1,K2> {
         private final K1 key1;
         private final K2 key2;
+        
+        private int hash;
     
         public DualKey(K1 key1, K2 key2){
             this.key1 = key1;
@@ -71,8 +73,11 @@ public class LocalScoreCacheConcurrent {
     
         @Override
         public int hashCode() {
+            if (hash == 0){
+                hash = Objects.hash(key1, key2);
+            }
             //return super.hashCode();
-            return Objects.hash(key1, key2);
+            return hash;
         }
     }
 }

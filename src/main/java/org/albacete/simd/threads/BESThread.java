@@ -69,7 +69,7 @@ public class BESThread extends GESThread {
             double scoreInitial = scoreDag(graph);
 
             // Do backward search.
-            double score = bes(graph, scoreInitial);
+            bes(graph, scoreInitial);
 
             long endTime = System.currentTimeMillis();
             this.elapsedTime = endTime - startTime;
@@ -77,8 +77,8 @@ public class BESThread extends GESThread {
             double newScore = scoreDag(graph);
             System.out.println(" ["+getId()+"] BES New Score: " + newScore + ", Initial Score: " + scoreInitial);
             // If we improve the score, return the new graph
-            if (newScore > scoreInitial+0.1) {
-                this.modelBDeu = score;
+            if (newScore > scoreInitial) {
+                this.modelBDeu = newScore;
                 this.flag = true;
                 return graph;
             } else {

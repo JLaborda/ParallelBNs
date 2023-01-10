@@ -5,7 +5,7 @@ import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.clustering.Clustering;
@@ -63,7 +63,7 @@ public class ExperimentBNBuilder {
     protected String algName;
     protected long seed = -1;
     private MlBayesIm controlBayesianNetwork;
-    public Dag resultingBayesianNetwork;
+    public Dag_n resultingBayesianNetwork;
 
 
     public ExperimentBNBuilder(String[] parameters, int threads) throws Exception {
@@ -122,14 +122,14 @@ public class ExperimentBNBuilder {
         switch(algName) {
             case "pges_random":
                 Clustering randomClustering = new RandomClustering(seed);
-                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, false);
                 break;
             case "pges":
                 Clustering hierarchicalClusteringPGES = new HierarchicalClustering();
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, false);
                 break;
             case "ges":
-                algorithm = new GES_BNBuilder(databasePath);
+                algorithm = new GES_BNBuilder(databasePath, false);
                 break;
             case "circular_ges":
                 Clustering hierarchicalClusteringGES = new HierarchicalClustering();
@@ -146,7 +146,7 @@ public class ExperimentBNBuilder {
                 break;
             case "pges-jc":
                 Clustering hierarchicalClusteringJC = new HierarchicalClustering(true, true);
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, false);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);

@@ -177,8 +177,8 @@ public class ForwardHillClimbingThreadTest {
         Graph g2 = thread2.getCurrentGraph();
 
         // Getting dags
-        Dag gdag1 = new Dag(removeInconsistencies(g1));
-        Dag gdag2 = new Dag(removeInconsistencies(g2));
+        Dag_n gdag1 = new Dag_n(removeInconsistencies(g1));
+        Dag_n gdag2 = new Dag_n(removeInconsistencies(g2));
 
 
         for(Edge edge : expected1){
@@ -218,7 +218,7 @@ public class ForwardHillClimbingThreadTest {
     @Test
     public void maximumNumberOfEdgesReachedTest() throws InterruptedException {
         // ThFES objects
-        FESThread thread1 = new FESThread(problem, subset1, 1000);
+        FESThread thread1 = new FESThread(problem, subset1, 1000, false);
         thread1.setMaxNumEdges(2);
 
         //Act

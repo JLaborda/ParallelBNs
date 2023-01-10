@@ -5,7 +5,6 @@ import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.MeekRules;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.NumberFormatUtil;
-import edu.cmu.tetrad.util.ProbUtils;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.LocalScoreCacheConcurrent;
@@ -25,6 +24,8 @@ public abstract class GESThread implements Runnable{
      * Set of edges that will be checked over the GESThread
      */
     protected Set<Edge> S;
+    
+    protected Set<Edge> enlaces;
     
     /**
      * Set of edges that will be checked over the GESThread
@@ -606,8 +607,8 @@ public abstract class GESThread implements Runnable{
     }
 
     /**
-     * Gets the initial Dag of the Thread
-     * @return the initial Dag
+     * Gets the initial Dag_n of the Thread
+     * @return the initial Dag_n
      */
     public Graph getInitialGraph(){
         return this.initialDag;

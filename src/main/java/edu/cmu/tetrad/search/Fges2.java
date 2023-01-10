@@ -590,33 +590,7 @@ public final class Fges2 implements GraphSearch, GraphScorer {
 
                     Node y = nodes.get(_y);
 
-                    List<Node> adj;
-
-                    if (mode == Mode.heuristicSpeedup) {
-                        adj = effectEdgesGraph.getAdjacentNodes(y);
-                    } else if (mode == Mode.coverNoncolliders) {
-                        Set<Node> g = new HashSet<>();
-
-                        for (Node n : graph.getAdjacentNodes(y)) {
-                            for (Node m : graph.getAdjacentNodes(n)) {
-                                if (graph.isAdjacentTo(y, m)) {
-                                    continue;
-                                }
-
-                                if (graph.isDefCollider(m, n, y)) {
-                                    continue;
-                                }
-
-                                g.add(m);
-                            }
-                        }
-
-                        adj = new ArrayList<>(g);
-                    } else if (mode == Mode.allowUnfaithfulness) {
-                        adj = new ArrayList<>(variables);
-                    } else {
-                        throw new IllegalStateException();
-                    }
+                    List<Node> adj = new ArrayList<>(variables);
 
                     for (Node x : adj) {
                         if (adjacencies != null && !(adjacencies.isAdjacentTo(x, y))) {

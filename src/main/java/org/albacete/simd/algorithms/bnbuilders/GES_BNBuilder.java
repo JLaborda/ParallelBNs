@@ -22,33 +22,38 @@ public class GES_BNBuilder extends BNBuilder {
 
     private boolean fesFlag = false;
     private boolean besFlag = false;
+    
+    private boolean speedUp;
 
-    public GES_BNBuilder(DataSet data) {
+    public GES_BNBuilder(DataSet data, boolean speedUp) {
         super(data, 1, -1, -1);
         initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
+        this.speedUp = speedUp;
     }
 
-    public GES_BNBuilder(String path) {
+    public GES_BNBuilder(String path, boolean speedUp) {
         super(path, 1, -1, -1);
         initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
+        this.speedUp = speedUp;
     }
 
-    public GES_BNBuilder(Graph initialDag, DataSet data) {
-        this(data);
+    public GES_BNBuilder(Graph initialDag, DataSet data, boolean speedUp) {
+        this(data, speedUp);
         this.initialDag = new EdgeListGraph(initialDag);
         this.currentGraph = new EdgeListGraph(initialDag);
     }
 
-    public GES_BNBuilder(Graph initialDag, String path) {
-        this(path);
+    public GES_BNBuilder(Graph initialDag, String path, boolean speedUp) {
+        this(path, speedUp);
         this.initialDag = new EdgeListGraph(initialDag);
         this.currentGraph = new EdgeListGraph(initialDag);
     }
 
-    public GES_BNBuilder(Graph initialDag, Problem problem, Set<Edge> subsetEdges) {
+    public GES_BNBuilder(Graph initialDag, Problem problem, Set<Edge> subsetEdges, boolean speedUp) {
         super(initialDag, problem, 1, -1,-1);
         super.setOfArcs = subsetEdges;
         this.initialDag = new EdgeListGraph(initialDag);
+        this.speedUp = speedUp;
     }
 
     @Override
@@ -69,7 +74,7 @@ public class GES_BNBuilder extends BNBuilder {
     @Override
     protected void forwardStage() throws InterruptedException {
         ForwardStage.meanTimeTotal = 0;
-        FESThread fes = new FESThread(problem, initialDag, setOfArcs, Integer.MAX_VALUE);
+        FESThread fes = new FESThread(problem, initialDag, setOfArcs, Integer.MAX_VALUE, speedUp);
         fes.run();
         currentGraph = fes.getCurrentGraph();
         fesFlag = fes.getFlag();

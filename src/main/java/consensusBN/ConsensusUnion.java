@@ -3,7 +3,7 @@ package consensusBN;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Endpoint;
 import edu.cmu.tetrad.graph.Graph;
@@ -14,15 +14,15 @@ import edu.cmu.tetrad.graph.Node;
 public class ConsensusUnion implements Runnable{
 	
 	ArrayList<Node> alpha = null;
-	Dag outputDag = null;
+	Dag_n outputDag = null;
 	AlphaOrder heuristic = null;
 	TransformDags imaps2alpha = null;
-	ArrayList<Dag> setOfdags = null;
-	Dag union = null;
+	ArrayList<Dag_n> setOfdags = null;
+	Dag_n union = null;
 	int numberOfInsertedEdges = 0;
 	
 	
-	public ConsensusUnion(ArrayList<Dag> dags, ArrayList<Node> order){
+	public ConsensusUnion(ArrayList<Dag_n> dags, ArrayList<Node> order){
 		this.setOfdags = dags;
 		this.alpha = order;
 		
@@ -30,7 +30,7 @@ public class ConsensusUnion implements Runnable{
 	
 	
 	
-	public ConsensusUnion(ArrayList<Dag> dags){
+	public ConsensusUnion(ArrayList<Dag_n> dags){
 		this.setOfdags = dags;
 		this.heuristic = new AlphaOrder(this.setOfdags);
 		
@@ -44,7 +44,7 @@ public class ConsensusUnion implements Runnable{
 		return this.numberOfInsertedEdges;
 	}
 	
-	public Dag union(){
+	public Dag_n union(){
 		
 		if(this.alpha == null){
 			
@@ -56,9 +56,9 @@ public class ConsensusUnion implements Runnable{
 		this.imaps2alpha.transform();
 		this.numberOfInsertedEdges = this.imaps2alpha.getNumberOfInsertedEdges();
 	
-		this.union = new Dag(this.alpha);
+		this.union = new Dag_n(this.alpha);
 		for(Node nodei: this.alpha){
-			for(Dag d : this.imaps2alpha.setOfOutputDags){
+			for(Dag_n d : this.imaps2alpha.setOfOutputDags){
 				List<Node>parent = d.getParents(nodei);
 				for(Node pa: parent){
 					if(!this.union.isParentOf(pa, nodei)) this.union.addEdge(new Edge(pa,nodei,Endpoint.TAIL,Endpoint.ARROW));
@@ -70,13 +70,13 @@ public class ConsensusUnion implements Runnable{
 		
 	}
 	
-	public Dag getUnion(){
+	public Dag_n getUnion(){
 	
 		return this.union;
 		
 	}
 	
-	void setDags(ArrayList<Dag> dags){
+	void setDags(ArrayList<Dag_n> dags){
 		this.setOfdags = dags;
 		this.heuristic = new AlphaOrder(this.setOfdags);
 		this.heuristic.computeAlphaH2();
@@ -97,7 +97,7 @@ public class ConsensusUnion implements Runnable{
 				Integer.parseInt(args[2]),Integer.parseInt(args[3]));
 		setOfDags.generate();
 //
-		for( Dag g: setOfDags.setOfRandomDags) System.out.print(g);
+		for( Dag_n g: setOfDags.setOfRandomDags) System.out.print(g);
 		ConsensusUnion conDag= new ConsensusUnion();
 		conDag.setDags(setOfDags.setOfRandomDags);
 		Graph g = conDag.union();

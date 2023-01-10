@@ -1,6 +1,6 @@
 package org.albacete.simd.framework;
 
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.search.SearchGraphUtils;
@@ -78,7 +78,7 @@ public abstract class ThreadStage extends Stage{
             //pdagToDag(g);
             try {
                 //g = SearchGraphUtils.dagFromCPDAG(g);
-                Dag gdag = Utils.removeInconsistencies(g);
+                Dag_n gdag = Utils.removeInconsistencies(g);
                 this.graphs.add(gdag);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -87,8 +87,8 @@ public abstract class ThreadStage extends Stage{
                 System.out.println("The original graph is: " + g);
                 System.exit(-1);
             }
-            //Dag gdag = new Dag(g);
-            //Dag gdag = Utils.removeInconsistencies(g);
+            //Dag_n gdag = new Dag_n(g);
+            //Dag_n gdag = Utils.removeInconsistencies(g);
 
             // Adding the new dag to the graph list
             //this.graphs.add(gdag);

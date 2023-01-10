@@ -1,7 +1,7 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.Resources;
@@ -35,16 +35,16 @@ public class PGESwithStagesTest {
 
     @Test
     public void testConstructor(){
-        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5);
-        PGESwithStages alg2 = new PGESwithStages(path,clustering, 2, 100, 5);
+        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5, false);
+        PGESwithStages alg2 = new PGESwithStages(path,clustering, 2, 100, 5, false);
 
         List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
-        Dag initialGraph = new Dag(nodes);
+        Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
-        PGESwithStages alg3 = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5);
-        PGESwithStages alg4 = new PGESwithStages(initialGraph, Resources.CANCER_DATASET, clustering, 2, 100, 5);
+        PGESwithStages alg3 = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5, false);
+        PGESwithStages alg4 = new PGESwithStages(initialGraph, Resources.CANCER_DATASET, clustering, 2, 100, 5, false);
 
 
         assertNotNull(alg1);
@@ -74,7 +74,7 @@ public class PGESwithStagesTest {
     @Test
     public void searchTest(){
         System.out.println("PGESwithStagesTest: searchTest");
-        PGESwithStages alg1 = new PGESwithStages(Resources.CANCER_DATASET, clustering, 2, 100, 5);
+        PGESwithStages alg1 = new PGESwithStages(Resources.CANCER_DATASET, clustering, 2, 100, 5, false);
         Utils.setSeed(42);
         List<Node> nodes = new ArrayList<>();
         nodes.add(Resources.CANCER);
@@ -82,7 +82,7 @@ public class PGESwithStagesTest {
         nodes.add(Resources.XRAY);
         nodes.add(Resources.POLLUTION);
         nodes.add(Resources.SMOKER);
-        Dag expected = new Dag(nodes);
+        Dag_n expected = new Dag_n(nodes);
         expected.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         expected.addDirectedEdge(Resources.CANCER, Resources.XRAY);
         expected.addDirectedEdge(Resources.CANCER, Resources.POLLUTION);
@@ -93,7 +93,7 @@ public class PGESwithStagesTest {
         System.out.println((alg1.getCurrentGraph()));
 
         assertNotNull(alg1.getCurrentGraph());
-        assertTrue(alg1.getCurrentGraph() instanceof Dag);
+        assertTrue(alg1.getCurrentGraph() instanceof Dag_n);
 
     }
 
@@ -104,12 +104,12 @@ public class PGESwithStagesTest {
                 clustering,
                 2,
                 1,
-                5
+                5, false
         );
         alg.search();
 
         assertNotNull(alg.getCurrentGraph());
-        assertTrue(alg.getCurrentGraph() instanceof Dag);
+        assertTrue(alg.getCurrentGraph() instanceof Dag_n);
         assertEquals(1,alg.getIterations());
 
     }
@@ -117,14 +117,14 @@ public class PGESwithStagesTest {
     @Test
     public void testSearchWithInitialGraph() {
         List<Node> nodes = Arrays.asList(Resources.XRAY, Resources.DYSPNOEA, Resources.CANCER, Resources.POLLUTION, Resources.SMOKER);
-        Dag initialGraph = new Dag(nodes);
+        Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
         Clustering clustering = new RandomClustering(42);
-        PGESwithStages pges = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5);
+        PGESwithStages pges = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5, false);
 
-        Dag result = pges.getCurrentDag();
+        Dag_n result = pges.getCurrentDag();
         // Equals is never gonna work. Because tetrad doesn't have a proper equals
         assertEquals(initialGraph.getNodes(), result.getNodes());
 
