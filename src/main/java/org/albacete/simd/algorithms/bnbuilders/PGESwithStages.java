@@ -1,13 +1,10 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
-import java.util.Set;
 import org.albacete.simd.clustering.Clustering;
 import org.albacete.simd.framework.*;
 import org.albacete.simd.threads.GESThread;
-import org.albacete.simd.utils.Utils;
 
 public class PGESwithStages extends BNBuilder {
 
@@ -18,6 +15,8 @@ public class PGESwithStages extends BNBuilder {
     private BESStage besStage;
 
     private final Clustering clustering;
+
+    private final double EPSILON = Math.pow(10, -9); // 10^-9
 
     public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(data, nThreads, maxIterations, nItInterleaving);
@@ -57,7 +56,7 @@ public class PGESwithStages extends BNBuilder {
             return true;
         }*/
         double currentScore = GESThread.scoreGraph(this.currentGraph, this.problem);
-        if(currentScore > prevScore){
+        if(currentScore - prevScore > EPSILON){
             prevScore = currentScore;
             return false;
         }

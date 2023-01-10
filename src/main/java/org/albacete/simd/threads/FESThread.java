@@ -134,7 +134,7 @@ public class FESThread extends GESThread {
         
         //System.out.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
-        bestInsert = fs(graph, bestScore);
+        bestInsert = fs(graph);
         int edgesAdded = 0;
         while ((x_i != null) && (iterations < this.maxIt)) {
             // Changing best score because x_i, and therefore, y_i is not null
@@ -171,7 +171,7 @@ public class FESThread extends GESThread {
             }
 
             // Executing FS function to calculate the best edge to be added
-            bestInsert = fs(graph, bestScore);
+            bestInsert = fs(graph);
 
             // Indicating that the thread has added an edge to the graph
             this.flag = true;
@@ -189,13 +189,11 @@ public class FESThread extends GESThread {
      *
      * @param graph The graph in the state prior to the forward equivalence
      * search.
-     * @param initialScore The score in the state prior to the forward equivalence
-     * search
      * @return the score in the state after the forward equivalence search. Note
      * that the graph is changed as a side-effect to its state after the forward
      * equivalence search.
      */
-    private double fs(Graph graph, double initialScore) {
+    private double fs(Graph graph) {
         //       System.out.println("** FORWARD EQUIVALENCE SEARCH");
         //       System.out.println("Initial Score = " + nf.format(bestScore));
 
@@ -241,9 +239,7 @@ public class FESThread extends GESThread {
             // Deleting the selected edge from S
             S.remove(max.edge);
             this.scores.remove(max);
-
         }
-
         return max.score;
     }
 
@@ -258,13 +254,16 @@ public class FESThread extends GESThread {
         adj.retainAll(graph.getAdjacentNodes(y_i));
 
         process.addAll(adj);
-
+        int n = S.size();
         S.removeIf(edge -> {
             Node x = edge.getNode1();
             Node y = edge.getNode2();
             return !process.contains(x) && !process.contains(y);
             //return (!(x.equals(x_i)) || (x.equals(y_i)) || (y.equals(x_i) || y.equals(y_i)));
         });
+        if(n- S.size() > 0)
+            System.out.println("[" + getId() + "] Number of edges deleted in S: " + (n - S.size()));
+
     }
 
 
@@ -469,7 +468,7 @@ public class FESThread extends GESThread {
                         continue;
                     }
 
-                    naYXT = new LinkedList<Node>(newT);
+                    naYXT = new LinkedList<>(newT);
                     naYXT.addAll(naYX);
 
                     // START TEST 1
@@ -527,7 +526,6 @@ public class FESThread extends GESThread {
         Set<Node> t = new HashSet<>();
 
         do {
-              x = null;
             List<Node> nodes = graph.getNodes();
 
             for (int i = 0; i < nodes.size(); i++) {
@@ -557,7 +555,7 @@ public class FESThread extends GESThread {
                             continue;
                         }
 
-                        List<Node> naYXT = new LinkedList<Node>(tSubset);
+                        List<Node> naYXT = new LinkedList<>(tSubset);
                         naYXT.addAll(findNaYX(_x,_y, graph));
                         
                         // INICIO TEST 1
@@ -574,12 +572,12 @@ public class FESThread extends GESThread {
                         
                         // INICIO TEST 2
                         if(tSubset.secondTest==SubSet.TEST_NOT_EVALUATED) {
-                            if (!isSemiDirectedBlocked(_x, _y, naYXT, graph, new HashSet<Node>())) {
+                            if (!isSemiDirectedBlocked(_x, _y, naYXT, graph, new HashSet<>())) {
                             continue;
                             }
-                            else {
+                            //else {
 //                                       tSubsets.secondTest(true);  // Si pasa para T entonces pasa para cualquier T' | T' contiene T
-                            }
+                            //}
                         }
                         else if (tSubset.secondTest==SubSet.TEST_FALSE) { // No puede ocurrir
                             //System.out.println("ERROR");
