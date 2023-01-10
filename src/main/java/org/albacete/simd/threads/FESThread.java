@@ -22,7 +22,7 @@ public class FESThread extends GESThread {
 
     private static int threadCounter = 1;
     
-    private boolean speedUp;
+    private final boolean speedUp;
 
     /**
      * Constructor of FESThread with an initial DAG
@@ -141,7 +141,6 @@ public class FESThread extends GESThread {
         // Calling fs to calculate best edge to add.
         enlaces = S;
         bestInsert = fs(graph);
-
         while ((x_i != null) && (iterations < this.maxIt)) {
             // Changing best score because x_i, and therefore, y_i is not null
             bestScore = bestInsert;
@@ -238,51 +237,42 @@ public class FESThread extends GESThread {
             enlaces.remove(max.edge);
             this.scores.remove(max);
         }
+
         return max.score;
     }
 
     private void updateEdges(Graph graph){
-        int tam = 0;
-
         // Modo normal
         if (!speedUp) {
             // Getting the common adjacents of x_i and y_i
             Set<Node> process = revertToCPDAG(graph);
-            tam = process.size();
-            process.add(x_i);
-            process.add(y_i);
-
-            process.addAll(graph.getAdjacentNodes(x_i));
-            process.addAll(graph.getAdjacentNodes(y_i));
-            
-            enlaces = new HashSet(S);
-            enlaces.removeIf(edge -> {
-                Node x = edge.getNode1();
-                Node y = edge.getNode2();
-                return !process.contains(x) && !process.contains(y);
-            });
-            System.out.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
+            removeEdgesNotNeighbors(graph, process);
         }
         // Modo heurístico. No comprobamos los enlaces invertidos en revertToCPDAG
         else {
             // Getting the common adjacents of x_i and y_i
             Set<Node> process = new HashSet<>();
-            process.add(x_i);
-            process.add(y_i);
-
-            process.addAll(graph.getAdjacentNodes(x_i));
-            process.addAll(graph.getAdjacentNodes(y_i));
-            
-            enlaces = new HashSet(S);
-            enlaces.removeIf(edge -> {
-                Node x = edge.getNode1();
-                Node y = edge.getNode2();
-                return !process.contains(x) && !process.contains(y);
-            });
-            System.out.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
+            removeEdgesNotNeighbors(graph, process);
         }
     }
 
+    private void removeEdgesNotNeighbors(Graph graph, Set<Node> process) {
+        int tam;
+        tam = process.size();
+        process.add(x_i);
+        process.add(y_i);
+
+        process.addAll(graph.getAdjacentNodes(x_i));
+        process.addAll(graph.getAdjacentNodes(y_i));
+
+        enlaces = new HashSet<>(S);
+        enlaces.removeIf(edge -> {
+            Node x = edge.getNode1();
+            Node y = edge.getNode2();
+            return !process.contains(x) && !process.contains(y);
+        });
+        System.out.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
+    }
 
     private Set<Node> revertToCPDAG(Graph graph) {
         SearchGraphUtils.basicCPDAG(graph);

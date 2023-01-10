@@ -31,7 +31,7 @@ public class GESStagesTest {
         int nThreads = 2;
         int itInterleaving = 5;
         List<Set<Edge>> subsets = Utils.split(Utils.calculateArcs(problem.getData()), nThreads);
-        FESStage fesStage = new FESStage(problem, nThreads, itInterleaving, subsets);
+        FESStage fesStage = new FESStage(problem, nThreads, itInterleaving, subsets, false);
 
         // TESTING FESStage
         // Act
@@ -89,7 +89,7 @@ public class GESStagesTest {
                 g2,
                 nThreads,
                 itInterleaving,
-                subsets);
+                subsets, false);
         fesStage2.run();
         double fesStageScore2 = (GESThread.scoreGraph(fesStage2.getGraphs().get(0), problem) + GESThread.scoreGraph(fesStage2.getGraphs().get(1), problem)) / 2;
         //Assert

@@ -33,16 +33,16 @@ public class PHCTest {
 
     @Test
     public void testConstructor() {
-        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5);
-        PGESwithStages alg2 = new PGESwithStages(path, clustering, 2, 100, 5);
+        PGESwithStages alg1 = new PGESwithStages(dataSet, clustering, 2, 100, 5, false);
+        PGESwithStages alg2 = new PGESwithStages(path, clustering, 2, 100, 5, false);
 
         List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
         Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
-        PGESwithStages alg3 = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5);
-        PGESwithStages alg4 = new PGESwithStages(initialGraph, Resources.CANCER_DATASET, clustering, 2, 100, 5);
+        PGESwithStages alg3 = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5, false);
+        PGESwithStages alg4 = new PGESwithStages(initialGraph, Resources.CANCER_DATASET, clustering, 2, 100, 5, false);
 
 
         assertNotNull(alg1);
@@ -72,7 +72,7 @@ public class PHCTest {
     @Test
     public void searchTest() {
         Utils.setSeed(42);
-        PGESwithStages alg1 = new PGESwithStages(Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5);
+        PGESwithStages alg1 = new PGESwithStages(Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5, false);
 
         alg1.search();
 
@@ -89,7 +89,8 @@ public class PHCTest {
                 clustering,
                 2,
                 1,
-                5
+                5,
+                false
         );
         alg.search();
 
@@ -107,7 +108,7 @@ public class PHCTest {
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
         Clustering clustering = new RandomClustering(42);
-        PGESwithStages alg = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5);
+        PGESwithStages alg = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5, false);
 
         Dag_n result = alg.getCurrentDag();
         // Equals is never gonna work. Because tetrad doesn't have a proper equals

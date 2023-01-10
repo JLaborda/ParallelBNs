@@ -144,7 +144,7 @@ public class BESThreadTest {
     @Test
     public void constructorTest() throws InterruptedException{
         // Arrange
-        FESThread thread1 = new FESThread(problem, subset1, 15);
+        FESThread thread1 = new FESThread(problem, subset1, 15, false);
         thread1.run();
         Graph graph = thread1.getCurrentGraph();
         // Act
