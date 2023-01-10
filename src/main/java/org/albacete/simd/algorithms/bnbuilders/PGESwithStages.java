@@ -16,7 +16,7 @@ public class PGESwithStages extends BNBuilder {
 
     private final Clustering clustering;
 
-    private final double EPSILON = Math.pow(10, -9); // 10^-9
+    private final double EPSILON = Math.pow(10, -11); // 10^-11
 
     public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(data, nThreads, maxIterations, nItInterleaving);
