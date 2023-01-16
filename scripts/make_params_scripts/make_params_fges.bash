@@ -1,12 +1,12 @@
 #!/bin/bash
-HOME_FOLDER="$HOME/ParallelBNs/";
+HOME_FOLDER="$HOME/projects/ParallelBNs/";
 NETWORKS_FOLDER=${HOME_FOLDER}"res/networks/";
 BBDD_FOLDER=${NETWORKS_FOLDER}"BBDD/";
 TEST_FOLDER=${NETWORKS_FOLDER}"BBDD/tests/";
 PARAMS_FOLDER="res/params/";
 ENDING_NETWORKS=".xbif";
 
-SAVE_FILE="${PARAMS_FOLDER}hyperparams_fges.txt";
+SAVE_FILE="${PARAMS_FOLDER}fges/hyperparams_fges.txt";
 
 #seeds=(2 3 5 7 11 13 17 19 23 29)
 seeds=(2)
