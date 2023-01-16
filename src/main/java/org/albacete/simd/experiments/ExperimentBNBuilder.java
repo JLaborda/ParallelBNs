@@ -119,17 +119,18 @@ public class ExperimentBNBuilder {
     }
 
     private void createBNBuilder() throws Exception {
+        boolean speedUp = true;
         switch(algName) {
             case "pges_random":
                 Clustering randomClustering = new RandomClustering(seed);
-                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, false);
+                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp);
                 break;
             case "pges":
                 Clustering hierarchicalClusteringPGES = new HierarchicalClustering();
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, false);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp);
                 break;
             case "ges":
-                algorithm = new GES_BNBuilder(databasePath, false);
+                algorithm = new GES_BNBuilder(databasePath, speedUp);
                 break;
             case "circular_ges":
                 Clustering hierarchicalClusteringGES = new HierarchicalClustering();
@@ -146,7 +147,7 @@ public class ExperimentBNBuilder {
                 break;
             case "pges-jc":
                 Clustering hierarchicalClusteringJC = new HierarchicalClustering(true, true);
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, false);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);
@@ -267,7 +268,7 @@ public class ExperimentBNBuilder {
         BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
         //FileWriter csvWriter = new FileWriter(savePath, true);
         if(file.length() == 0) {
-            String header = "algorithm,network,bbdd,threads,PGESthreads,interleaving,seed,SHD,LL Score,BDeu Score,dfMM,dfMM plus,dfMM minus,Total iterations,Total time(s)\n";
+            String header = "algorithm,network,bbdd,threads,pges_threads,interleaving,seed,SHD,loglike,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
             csvWriter.append(header);
         }
         csvWriter.append(this.getResults());

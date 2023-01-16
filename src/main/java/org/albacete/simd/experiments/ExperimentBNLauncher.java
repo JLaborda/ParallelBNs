@@ -19,17 +19,18 @@ public class ExperimentBNLauncher {
 
     public static final int MAXITERATIONS = 100;
 
-    private static final String EXPERIMENTS_FOLDER = "results/";
+    private final String EXPERIMENTS_FOLDER;
     private int index;
     private String paramsFileName;
     private int threads;
     private ExperimentBNBuilder experiment;
     private String savepath;
 
-    public ExperimentBNLauncher(int index, String paramsFileName, int threads){
+    public ExperimentBNLauncher(int index, String paramsFileName, int threads, String saveFolder){
         this.index = index;
         this.paramsFileName = paramsFileName;
         this.threads = threads;
+        this.EXPERIMENTS_FOLDER = saveFolder;
     }
 
     public static void main(String[] args) throws Exception {
@@ -60,7 +61,9 @@ public class ExperimentBNLauncher {
         int index = Integer.parseInt(args[0]);
         String paramsFileName = args[1];
         int threads = Integer.parseInt(args[2]);
-        return new ExperimentBNLauncher(index, paramsFileName, threads);
+        String saveFolder = args.length == 4 ? args[3] : "results/";
+        
+        return new ExperimentBNLauncher(index, paramsFileName, threads, saveFolder);
     }
 
     public String[] readParameters() throws Exception {
@@ -125,7 +128,7 @@ public class ExperimentBNLauncher {
             BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
             //FileWriter csvWriter = new FileWriter(savePath, true);
             if(file.length() == 0) {
-                String header = "algorithm, network, bbdd, threads, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, dfMM minus, Total iterations, Total time(s)\n";
+                String header = "algorithm,network,bbdd,threads,pges_threads,interleaving,seed,SHD,loglike,bdeu,deltaMM,deltaMM+,deltaMM-,iterations,time(s)\n";
                 csvWriter.append(header);
             }
             csvWriter.append(results);
