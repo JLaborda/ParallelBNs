@@ -14,6 +14,9 @@ import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
+import org.apache.commons.lang3.time.StopWatch;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
@@ -21,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.albacete.simd.algorithms.bnbuilders.Circular_GES;
@@ -52,8 +56,13 @@ public class ExperimentBNBuilder {
     protected int structuralHamiltonDistanceValue = Integer.MAX_VALUE;
     protected double bdeuScore;
     protected double [] differencesOfMalkovsBlanket;
-    private long startTime;
-    private long endTime;
+    /**
+     * The stop watch that measures the time of the execution of the algorithm
+     */
+    private static StopWatch stopWatch;
+    /**
+     * Time elapsed in milliseconds
+     */
     protected long elapsedTime;
     protected int numberOfIterations;
     protected double LogLikelihoodScore;
@@ -70,6 +79,7 @@ public class ExperimentBNBuilder {
         extractParametersForClusterExperiment(parameters);
         this.numberOfThreads = threads;
         createBNBuilder();
+        setSignalHandler();
     }
 
     private void extractParametersForClusterExperiment(String[] parameters){
@@ -154,6 +164,28 @@ public class ExperimentBNBuilder {
         }
     }
 
+    public void setSignalHandler(){
+        // Setting Signal Handler
+        Signal.handle(new Signal("STOP"), new SignalHandler() {
+                    public void handle(Signal sig) {
+                        System.out.println("Signal handler called for signal " + sig);
+                        // Stop the timer when the stop signal or the interrupt signal is received
+                        if (sig.getName().equals("STOP") || sig.getName().equals("INT")) {
+                            if (stopWatch.isStarted()) {
+                                stopWatch.stop();
+                            }
+                        }
+                        // Resume the timer when the continue signal is received
+                        if(sig.getName().equals("CONT")) {
+                            if (!stopWatch.isStarted()) {
+                                stopWatch.start();
+                            }
+                        }
+                    }
+                }
+        );
+    }
+
     public ExperimentBNBuilder(BNBuilder algorithm, String netName, String netPath, String bbddPath, String testDatabasePath) {
         this.algorithm = algorithm;
         this.netName = netName;
@@ -189,9 +221,11 @@ public class ExperimentBNBuilder {
             controlBayesianNetwork = readOriginalBayesianNetwork();
 
             // Search is executed
+            // Starting startWatch
+            stopWatch = StopWatch.createStarted();
             this.algorithm.search();
             resultingBayesianNetwork =  this.algorithm.getCurrentDag();
-
+            stopWatch.stop();
             // Metrics
             calcuateMeasurements(controlBayesianNetwork);
 
@@ -217,9 +251,6 @@ public class ExperimentBNBuilder {
     }
 
     private MlBayesIm readOriginalBayesianNetwork() throws Exception {
-        // Starting timer
-        startTime = System.currentTimeMillis();
-
         BIFReader bayesianReader = new BIFReader();
         bayesianReader.processFile(this.netPath);
         BayesNet bayesianNet = bayesianReader;
@@ -236,9 +267,8 @@ public class ExperimentBNBuilder {
     }
 
     private void calcuateMeasurements(MlBayesIm controlBayesianNetwork) {
-        // Ending timer
-        endTime = System.currentTimeMillis();
-        this.elapsedTime = endTime - startTime;
+        // Getting time
+        this.elapsedTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
         this.structuralHamiltonDistanceValue = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
         this.differencesOfMalkovsBlanket = Utils.avgMarkovBlanquetdif(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
         this.numberOfIterations = algorithm.getIterations();

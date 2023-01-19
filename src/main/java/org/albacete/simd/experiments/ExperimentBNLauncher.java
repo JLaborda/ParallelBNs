@@ -6,6 +6,8 @@ import org.albacete.simd.clustering.Clustering;
 import org.albacete.simd.clustering.HierarchicalClustering;
 import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -34,6 +36,7 @@ public class ExperimentBNLauncher {
     }
 
     public static void main(String[] args) throws Exception {
+
         ExperimentBNLauncher experimentBNLauncher = getExperimentBNLauncherFromCommandLineArguments(args);
         String[] parameters = experimentBNLauncher.readParameters();
 
