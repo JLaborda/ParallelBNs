@@ -6,9 +6,11 @@ import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class MCTSBN {
 
@@ -27,12 +29,6 @@ public class MCTSBN {
     private double explorationConstant = 1.0 / Math.sqrt(2);
 
     /**
-     * Function that generates a random solution and then evaluates it.
-     * It receives a state and gives back the reward for a random solution.
-     */
-    private final Function<State, Double> rollout;
-
-    /**
      * Problem of the search
      */
     private Problem problem;
@@ -41,12 +37,15 @@ public class MCTSBN {
 
     private TreeNode root;
 
+    private double bestScore = Double.NEGATIVE_INFINITY;
+    private List<Node> bestOrder = null;
+    private Graph bestDag = null;
 
 
-    public MCTSBN(Problem problem, int nThreads, Function<State, Double> rollout){
+
+    public MCTSBN(Problem problem, int nThreads){
         this.problem = problem;
         this.nThreads = nThreads;
-        this.rollout = rollout;
     }
 
 
@@ -69,11 +68,11 @@ public class MCTSBN {
     /**
      * Executes one round of the selection, expansion, rollout and backpropagation iterations.
      */
-    public void executeRound(){
+    private void executeRound(){
         //1. Selection and Expansions
         TreeNode selectedNode = selectNode(this.root);
         //2. Rollout
-        double reward = rollout.apply(selectedNode.getState());
+        double reward = rollout(selectedNode.getState());
         //3. Backpropagation
         backPropagate(selectedNode, reward);
 
@@ -85,7 +84,7 @@ public class MCTSBN {
      * @param node
      * @return
      */
-    public TreeNode selectNode(TreeNode node){
+    private TreeNode selectNode(TreeNode node){
         while(!node.isTerminal()){
             if(node.isFullyExpanded())
                 node = getBestChild(node, explorationConstant);
@@ -93,7 +92,7 @@ public class MCTSBN {
                 return expand(node);
             }
         }
-        return null;
+        throw new IllegalStateException("No state was selected while using " + node + " as a starting point");
     }
 
     public TreeNode expand(TreeNode node){
@@ -115,6 +114,34 @@ public class MCTSBN {
             }
         }
         throw new IllegalStateException("No node to expand exception on Node: " + node);
+    }
+
+    /**
+     * Random policy rollout. Given a state with a partial order, we generate a random order that starts off with the initial order
+     * @param state State that provides the partial order for a final randomly generated order.
+     * @return
+     */
+    public double rollout(State state){
+        // Generating candidates and shuffling
+        List<Node> order = state.getOrder();
+        List<Node> candidates = problem.getVariables();
+        candidates = candidates.stream().filter(node -> !order.contains(node)).collect(Collectors.toList());
+        Collections.shuffle(candidates);
+
+        // Creating order for HC
+        List<Node> finalOrder = new ArrayList<>(order);
+        finalOrder.addAll(candidates);
+
+        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, finalOrder);
+        double score = hc.search();
+
+        // Setting best score, order and graph
+        if(score > bestScore){
+            bestScore = score;
+            bestOrder = finalOrder;
+            bestDag = hc.getGraph();
+        }
+        return score;
     }
 
     public void backPropagate(TreeNode node, double reward){

@@ -16,7 +16,6 @@ public class Main {
 
         Problem problem = new Problem(bbdd_path);
 
-        RandomPolicy policy = new RandomPolicy(problem);
-        MCTSBN mctsbn = new MCTSBN()
+        MCTSBN mctsbn = new MCTSBN(problem, 1);
     }
 }

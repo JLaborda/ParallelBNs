@@ -183,4 +183,12 @@ public class Problem {
         return bdeu;
     }
 
+    public Node getNode(String name){
+        for (Node node: variables) {
+            if(node.getName().equals(name))
+                return node;
+        }
+        return null;
+    }
+
 }

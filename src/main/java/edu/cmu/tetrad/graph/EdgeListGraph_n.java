@@ -123,7 +123,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
      * @return true if the edge was added, false if not.
      */
     @Override
-    public boolean addEdge(Edge edge) {
+    public synchronized boolean addEdge(Edge edge) {
         synchronized (this.edgeLists) {
             if (edge == null) {
                 throw new NullPointerException();
@@ -165,7 +165,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
      * @return true if the edge was removed, false if not.
      */
     @Override
-    public boolean removeEdge(Edge edge) {
+    public synchronized boolean removeEdge(Edge edge) {
         synchronized (this.edgeLists) {
             if (!this.edgesSet.contains(edge)) {
                 return false;
@@ -225,7 +225,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
      * @return true if any edges in the collection were removed, false if not.
      */
     @Override
-    public boolean removeEdges(Collection<Edge> edges) {
+    public synchronized boolean removeEdges(Collection<Edge> edges) {
         boolean change = false;
 
         for (Edge edge : edges) {
@@ -242,7 +242,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
      * @return the edges connecting node1 and node2.
      */
     @Override
-    public List<Edge> getEdges(Node node1, Node node2) {
+    public synchronized List<Edge> getEdges(Node node1, Node node2) {
         if (!isAdjacentTo(node1, node2)) {
             return new ArrayList<>();
         }
@@ -267,7 +267,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
      * ordering of the edges in the list is guaranteed.
      */
     @Override
-    public List<Edge> getEdges(Node node) {
+    public synchronized List<Edge> getEdges(Node node) {
         Set<Edge> list = this.edgeLists.get(node);
         if (list == null) {
             return new ArrayList<>();
@@ -280,7 +280,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
      * edges in the list is guaranteed.
      */
     @Override
-    public Set<Edge> getEdges() {
+    public synchronized Set<Edge> getEdges() {
         return new HashSet<>(this.edgesSet);
     }
     
