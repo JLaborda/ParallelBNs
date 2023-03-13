@@ -1,239 +1,198 @@
 package org.albacete.simd.mctsbn;
 
-import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.BDeuScore;
-import org.albacete.simd.threads.EdgeSearch;
-import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class HillClimbingEvaluator {
 
     private final Problem problem;
+    
+    private final ConcurrentHashMap<String,Double> localScoreCache;
 
-    private final List<Node> order;
-
+    private final List<Integer> order;
 
     private Graph graph;
 
-    private double score = 0;
+    private double finalScore = 0;
 
     private final static int MAX_ITERATIONS = 1000;
 
-    private BDeuScore metric;
-
-    private enum Operation {ADD, DELETE}
-
-    private double scorePart1;
-    private double scorePart2;
-
-    private double s1;
-    private double s2;
+    private final BDeuScore metric;
 
 
-    public HillClimbingEvaluator(Problem problem, List<Node> order){
+    public HillClimbingEvaluator(Problem problem, List<Node> order, ConcurrentHashMap<String,Double> localScoreCache){
         this.problem = problem;
-        this.order = order;
+        this.localScoreCache = localScoreCache;
+        this.order = new ArrayList(order.size());
+        for (Node node : order) {
+            this.order.add(problem.getHashIndices().get(node));
+        }
         this.graph = new EdgeListGraph_n();
         metric = new BDeuScore(problem.getData());
     }
 
 
 
-    private void evaluate(Node child, List<Node> parents, Graph graph){
-        boolean improvement = true;
-        int indexChild = problem.getHashIndices().get(child);
+    private Set<Integer> evaluate(int child, Set<Integer> candidates){
         int iteration = 0;
 
-        System.out.println("Starting evaluation of " + child + " with parents: " + parents);
+        //System.out.println("\n-------------- " + child + " --------------");
+        
+        Set<Integer> parents = new HashSet<>();
 
-        while(improvement && iteration < MAX_ITERATIONS) {
-            //System.out.println("Iteration " + iteration);
-            improvement = false;
-            double bestScore = Double.NEGATIVE_INFINITY;
-            Operation bestOperation = null;
-            Edge bestEdge = null;
+        while(iteration < MAX_ITERATIONS) {
+            //System.out.println("\nITERATION " + iteration);
+            AtomicReference<Double> bestScore = new AtomicReference<>(Double.NEGATIVE_INFINITY);
+            AtomicInteger bestParent = new AtomicInteger();
+            
+            // Generate parents array
+            Integer[] parentsArr = new Integer[parents.size()];
+            parents.toArray(parentsArr);
+            Arrays.sort(parentsArr);
 
-            for (Node parent : parents) {
-                //System.out.println("Checking " + child + " -> " + parent + " ...");
-                // Defining score and operation variables
-                double score = 0;
-                Operation operation = null;
-
-                // Creating edge from parent to child: parent -> child
-                Edge edge = Edges.directedEdge(parent, child);
-
-                // Getting indexes of the parent and the parents inside the graph
-                int indexParent = problem.getHashIndices().get(parent);
-                List<Node> parentsGraph = graph.getParents(child);
-                int[] indexParentsGraph = new int[parentsGraph.size()];
-                for (int i = 0; i < parentsGraph.size(); i++) {
-                    indexParentsGraph[i] = problem.getHashIndices().get(parentsGraph.get(i));
-                }
+            candidates.parallelStream().forEach(candidate -> {
+                double score;
 
                 // OPERATION ADD
-                if (!graph.containsEdge(edge)) {
-                    score = getAdditionScore(indexChild, indexParent, parentsGraph, indexParentsGraph);
-                    operation = Operation.ADD;
+                if (!parents.contains(candidate)) {
+                    //System.out.println("ADD: " + candidate + " -> " + child + ", " + parents);
+                    score = getAdditionScore(child, candidate, new HashSet(parents), parentsArr);
                 }
+                    
                 // OPERATION DELETE
-                else{
-                    score = getDeleteScore(indexChild, parent, parentsGraph, indexParentsGraph);
-                    operation = Operation.DELETE;
+                else {
+                    //System.out.println("DELETE: " + candidate + " -> " + child + ", " + parents);
+                    score = getDeleteScore(child, candidate, new HashSet(parents), parentsArr);
                 }
-
-                //System.out.println("Score of edge " + edge + " (" + operation + ")"+ " is: " + score);
-                if(score > bestScore && score > 0){
-                    //System.out.println("Prev Best Score: " + bestScore);
-                    //System.out.println("Changing best score, bestOperation and bestEdge: ");
-                    //System.out.println("New Best Score: " + score);
-                    //System.out.println("New Best Operation: " + operation);
-                    //System.out.println("New Best Edge: " + edge);
-                    bestScore = score;
-                    bestOperation = operation;
-                    bestEdge = edge;
-                    s1 = scorePart1;
-                    s2 = scorePart2;
+                if(score > bestScore.get()){
+                    bestScore.set(score);
+                    bestParent.set(candidate);
                 }
-            }
-
-            System.out.println("Iteration: " + iteration + " - Best Edge found: " + bestEdge);
-            System.out.println("Iteration: " + iteration + " - Best Score found: " + bestScore);
-            System.out.println("Iteration: " + iteration + " - Best Operation found: " + bestOperation);
-            System.out.println("Iteration: " + iteration + " - ScorePart1: " + s1);
-            System.out.println("Iteration: " + iteration + " - ScorePart2: " + s2);
-
+                 
+            });
+            
             // Updating graph
-            if(bestScore > 0){
-                System.out.println("Improvement is true");
-                improvement = true;
-                // ¿Esto sería así? El resultado debería ser la suma de todos los enlaces y operaciones realizadas?
-                //result+=bestScore;
-                if(bestOperation.equals(Operation.ADD)){
-                    graph.addEdge(bestEdge);
+            if(bestScore.get() > 0){
+                int bp = bestParent.get();
+                if(parents.contains(bp)) {
+                    parents.remove(bp);
+                    //System.out.println("   BEST PARENT DEL: " + bp + ", SCORE: " + bestScore.get());
                 }
-                else{
-                    graph.removeEdge(bestEdge);
+                else {
+                    parents.add(bp);
+                    //System.out.println("   BEST PARENT ADD: " + bp + ", SCORE: " + bestScore.get());
                 }
+                iteration++;
+            } 
+            else {
+                //System.out.println("     FIN DE LA ITERACIÓN: " + bestParent.get() + ", SCORE: " + bestScore.get());
+                break;
             }
-            iteration++;
         }
-        System.out.println("END OF EVALUATION");
+        
+        return parents;
     }
 
-    private double getDeleteScore(int indexChild, Node parent, List<Node> parentsGraph, int[] indexParentsGraph) {
-        double score;
-        // Calculating indexes for the difference set of parents
-        List<Node> parentsAux = new ArrayList<>(parentsGraph);
-        parentsAux.remove(parent);
-        int[] indexDifference = new int[parentsGraph.size() -1];
-        for (int i = 0; i < indexDifference.length; i++) {
-            Node p = parentsAux.get(i);
-            indexDifference[i] = problem.getHashIndices().get(p);
+    
+    private double getAdditionScore(int indexChild, int indexParent, Set<Integer> parents, Integer[] indexParents) {
+        // Creating an array adding the index of the parent
+        int[] indexUnion = new int[indexParents.length + 1];
+        for (int i = 0; i < indexParents.length; i++) {
+            indexUnion[i] = indexParents[i];
         }
-
-
-
-        // Score = localbdeu(x,P(G) - {x_p}) - localbdeu(x,P(G))
-        scorePart1 = metric.localScore(indexChild, indexDifference);
-        scorePart2 = metric.localScore(indexChild, indexParentsGraph);
-        score = metric.localScore(indexChild, indexDifference) - metric.localScore(indexChild, indexParentsGraph);
-        return score;
-    }
-
-    private double getAdditionScore(int indexChild, int indexParent, List<Node> parentsGraph, int[] indexParentsGraph) {
-        double score;
-        // Transforming indexes of parent and child node, as well as the parents of the graph
-        int[] indexUnion = new int[parentsGraph.size() + 1];
-        for (int i = 0; i < parentsGraph.size(); i++) {
-            Node p = parentsGraph.get(i);
-            indexParentsGraph[i] = problem.getHashIndices().get(p);
-            indexUnion[i] = problem.getHashIndices().get(p);
-        }
-        // Adding the parent to the end of the indexUnion array
-        indexUnion[parentsGraph.size()] = indexParent;
-
-        // Calculating the score of this edge
+        indexUnion[indexUnion.length - 1] = indexParent;
+        parents.add(indexParent);
+        if (indexUnion.length > 1)
+            Arrays.sort(indexUnion);
+        
+        double scorePart1 = localBdeuScore(indexChild, indexUnion, parents);
+        
+        // Removing again the parent to the set
+        parents.remove(indexParent);
+        double scorePart2 = localBdeuScore(indexChild, ArrayUtils.toPrimitive(indexParents), parents);
+        
         // Score = localbdeu(x,P(G) + {x_p}) - localbdeu(x,P(G))
-        //System.out.println("Add  Con padre: " + metric.localScore(indexChild, indexUnion));
-        //System.out.println("Add  Sin padre: " + metric.localScore(indexChild, indexParentsGraph));
+        return scorePart1 - scorePart2;
+    }
+    
+    
+    private double getDeleteScore(int indexChild, int indexParent, Set<Integer> parents, Integer[] indexParents) {
+        // Calculating indexes for the difference set of parents
+        parents.remove(indexParent);    
+        Integer[] indexParentsAux = new Integer[parents.size()];
+        parents.toArray(indexParentsAux);
+        if (indexParentsAux.length > 1)
+            Arrays.sort(indexParentsAux);
 
-        scorePart1 = metric.localScore(indexChild, indexUnion);
-        scorePart2 = metric.localScore(indexChild, indexParentsGraph);
-        score = metric.localScore(indexChild, indexUnion) - metric.localScore(indexChild, indexParentsGraph);
-        return score;
+        double scorePart1 = localBdeuScore(indexChild, ArrayUtils.toPrimitive(indexParentsAux), parents);
+        
+        // Adding again the parent to the set
+        parents.add(indexParent);
+        double scorePart2 = localBdeuScore(indexChild, ArrayUtils.toPrimitive(indexParents), parents);
+        
+        // Score = localbdeu(x,P(G) - {x_p}) - localbdeu(x,P(G))
+        return scorePart1 - scorePart2;
     }
 
+
+    public double localBdeuScore(int nNode, int[] nParents, Set<Integer> setParents) {
+        Double oldScore = localScoreCache.get("" + nNode + Arrays.toString(nParents));
+        problem.counter.getAndIncrement();
+
+        if (oldScore != null) {
+            return oldScore;
+        }
+        
+        problem.counterSinDict.getAndIncrement();
+        
+        double fLogScore = metric.localScore(nNode, nParents);
+        localScoreCache.put("" + nNode + Arrays.toString(nParents), fLogScore);
+        
+        return fLogScore;
+    }
+    
 
     public double search(){
+        double c1 = problem.counter.get();
+        double c2 = problem.counterSinDict.get();
+        
         graph = new EdgeListGraph_n(problem.getVariables());
-        order.parallelStream().forEach(child -> {
-            int i = order.indexOf(child);
-            List<Node> parents = new ArrayList<>();
-            for(int j=i-1; j >= 0; j--){
-                Node parent = order.get(j);
-                parents.add(parent);
+        
+        Set<Integer> candidates = new HashSet<>();
+        for (int node : order) {
+            Set<Integer> parents = evaluate(node, candidates);
+            for (int parent : parents) {
+                Edge edge = Edges.directedEdge(problem.getNode(parent), problem.getNode(node));
+                graph.addEdge(edge);
             }
-            System.out.println("---------------------");
-            System.out.println("Subset " + i + ": Starting evaluation of child - " + child + " and parents: " + parents + " with graph " + graph);
-            evaluate(child, parents, graph);
-        });
-/*        for (int i = 0; i <order.size() ; i++) {
-            Node child = order.get(i);
-            List<Node> parents = new ArrayList<>();
-            for(int j=i-1; j >= 0; j--){
-                Node parent = order.get(j);
-                parents.add(parent);
-            }
-            System.out.println("---------------------");
-            System.out.println("Subset " + i + ": Starting evaluation of child - " + child + " and parents: " + parents + " with graph " + graph);
-            evaluate(child, parents, graph);
+            
+            Integer[] arr = parents.toArray(new Integer[0]);
+            finalScore += localBdeuScore(node, ArrayUtils.toPrimitive(arr), parents);
+            
+            candidates.add(node);
         }
-*/
-        //Score the resulting graph
-        score = GESThread.scoreGraph(graph,problem);
-        return score;
 
-        /* //PREVIOUS VERSION: WRONG
-        int iterations = 0;
-        while (iterations < MAX_ITERATIONS) {
-            EdgeSearch bestEdge = edges.parallelStream()
-                    .map(edge -> {
-                    // checking if the edge passes all the tests
-                    if (passedTests(edge)){
-                        SubSet subset = new SubSet();
-                        Node parent = Edges.getDirectedEdgeTail(edge);
-                        Node child = Edges.getDirectedEdgeHead(edge);
-                        double insertEval = GESThread.insertEval(parent, child, subset, graph, problem);
-                        return new EdgeSearch(insertEval, new SubSet(), edge);
-                    }
-                    return null;
-                     } )
-                    .filter(Objects::nonNull)
-                    .max(EdgeSearch::compareTo).orElse(null);
-
-            // Checking if there has been a convergence
-            if(bestEdge == null )
-                break;
-            if(score + bestEdge.getScore() < score)
-                break;
-            // Adding best edge
-            graph.addEdge(bestEdge.getEdge());
-            score += bestEdge.getScore();
-            edges.remove(bestEdge.getEdge());
-            iterations++;
-        }
-        */
+        System.out.println("\n TOTAL CALCULATIONS:  " + (problem.counter.get() - c1));
+        System.out.println(" TOTAL CALCULATIONS no dictionary:  " + (problem.counterSinDict.get() - c2));
+        System.out.println(" SIZE OF CONCURRENT: " + localScoreCache.size());
+        
+        return finalScore;
     }
-
+    
 
     public double getScore() {
-        return score;
+        return finalScore;
     }
 
     public Graph getGraph() {

@@ -10,6 +10,7 @@ import edu.cmu.tetrad.search.BDeuScore;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Problem {
 
@@ -62,10 +63,15 @@ public class Problem {
      * BDeu Score.
      */
     protected BDeuScore bdeu;
+    
+    public AtomicInteger counter;
+    public AtomicInteger counterSinDict;
 
 
     public Problem(DataSet dataSet){
-
+        this.counter = new AtomicInteger();
+        this.counterSinDict = new AtomicInteger();
+        
         //Setting dataset
         List<String> _varNames = dataSet.getVariableNames();
 
@@ -186,6 +192,14 @@ public class Problem {
     public Node getNode(String name){
         for (Node node: variables) {
             if(node.getName().equals(name))
+                return node;
+        }
+        return null;
+    }
+    
+    public Node getNode(int id){
+        for (Node node: variables) {
+            if(hashIndices.get(node) == id)
                 return node;
         }
         return null;

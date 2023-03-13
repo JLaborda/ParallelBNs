@@ -2,6 +2,7 @@ package org.albacete.simd.mctsbn;
 
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Graph;
+import edu.cmu.tetrad.graph.GraphNode;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.utils.Problem;
 
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class MCTSBN {
@@ -41,13 +42,17 @@ public class MCTSBN {
     private List<Node> bestOrder = null;
     private Graph bestDag = null;
 
-
+    private ConcurrentHashMap<String,Double> cache = new ConcurrentHashMap();
 
     public MCTSBN(Problem problem, int nThreads){
         this.problem = problem;
         this.nThreads = nThreads;
     }
 
+    public Dag search() {
+        State initialState = new State(new GraphNode("root"), new ArrayList<>(), problem);
+        return this.search(initialState);
+    }
 
     public Dag search(State initialState){
         //1. Set Root
@@ -132,7 +137,7 @@ public class MCTSBN {
         List<Node> finalOrder = new ArrayList<>(order);
         finalOrder.addAll(candidates);
 
-        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, finalOrder);
+        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, finalOrder, cache);
         double score = hc.search();
 
         // Setting best score, order and graph
@@ -193,7 +198,7 @@ public class MCTSBN {
     }
 
     public Dag generateDag(List<Node> order){
-        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, order);
+        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, order, cache);
         hc.search();
         Graph result = hc.getGraph();
         return new Dag(result);
