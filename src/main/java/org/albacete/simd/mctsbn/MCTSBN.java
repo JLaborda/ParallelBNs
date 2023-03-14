@@ -11,48 +11,48 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MCTSBN {
 
     /**
      * Time limit in miliseconds
-      */
+     */
     private int timeLimit;
     /**
      * Iteration limit of the search
      */
-    private final int ITERATION_LIMIT = 10;
+    private final int ITERATION_LIMIT;
 
     /**
      * Exploration constant c for the UCT equation: UCT_j = X_j + c * sqrt(ln(N) / n_j)
      */
-    private double explorationConstant = 1.0 / Math.sqrt(2);
+    private final double explorationConstant = 1.0 / Math.sqrt(2);
 
     /**
      * Problem of the search
      */
-    private Problem problem;
+    private final Problem problem;
 
     private int nThreads = 1;
 
     private TreeNode root;
 
     private double bestScore = Double.NEGATIVE_INFINITY;
-    private List<Node> bestOrder = null;
+    private List<Node> bestOrder = new ArrayList<>();
     private Graph bestDag = null;
 
-    private ConcurrentHashMap<String,Double> cache = new ConcurrentHashMap();
+    private boolean convergence = false;
+
+    private ConcurrentHashMap<String,Double> cache = new ConcurrentHashMap<>();
 
     public MCTSBN(Problem problem, int nThreads){
         this.problem = problem;
         this.nThreads = nThreads;
+        this.ITERATION_LIMIT = 10000;
     }
 
-    public Dag search() {
-        State initialState = new State(new GraphNode("root"), new ArrayList<>(), problem);
-        return this.search(initialState);
-    }
 
     public Dag search(State initialState){
         //1. Set Root
@@ -60,14 +60,22 @@ public class MCTSBN {
 
         //2. Search loop
         for (int i = 0; i < ITERATION_LIMIT; i++) {
+            System.out.println("Iteration " + i + "...");
             executeRound();
+            System.out.println("Tree Structure:");
+            System.out.println(this);
+            if(convergence){
+                System.out.println("Convergence has been found. Ending search");
+                break;
+            }
         }
+        // return Best Dag
+        return new Dag(bestDag);
+    }
 
-        //3. Get best order
-        List<Node> bestOrder = getBestOrder();
-
-        //4. Generate best Dag
-        return generateDag(bestOrder);
+    public Dag search(){
+        State initialState = new State(new GraphNode("root"), new ArrayList<>(), problem);
+        return this.search(initialState);
     }
 
     /**
@@ -76,12 +84,14 @@ public class MCTSBN {
     private void executeRound(){
         //1. Selection and Expansions
         TreeNode selectedNode = selectNode(this.root);
+        if(selectedNode == null) {
+            convergence = true;
+            return;
+        }
         //2. Rollout
         double reward = rollout(selectedNode.getState());
         //3. Backpropagation
         backPropagate(selectedNode, reward);
-
-        // Update best bn and order
     }
 
     /**
@@ -97,7 +107,7 @@ public class MCTSBN {
                 return expand(node);
             }
         }
-        throw new IllegalStateException("No state was selected while using " + node + " as a starting point");
+        return null;
     }
 
     public TreeNode expand(TreeNode node){
@@ -140,7 +150,7 @@ public class MCTSBN {
         HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, finalOrder, cache);
         double score = hc.search();
 
-        // Setting best score, order and graph
+        // Updating best score, order and graph
         if(score > bestScore){
             bestScore = score;
             bestOrder = finalOrder;
@@ -170,7 +180,7 @@ public class MCTSBN {
         List<TreeNode> bestNodes = new ArrayList<>();
 
         for (TreeNode child: node.getChildren()
-             ) {
+        ) {
             // Evaluating the child of the node
             double nodeValue = child.getTotalReward() / child.getNumVisits() +
                     explorationValue * Math.sqrt(Math.log(node.getNumVisits()) / child.getNumVisits());
@@ -190,17 +200,12 @@ public class MCTSBN {
     }
 
     public List<Node> getBestOrder(){
-        TreeNode currentNode = root;
-        while(!currentNode.isTerminal()){
-            currentNode = getBestChild(currentNode,0);
-        }
-        return currentNode.getState().getOrder();
+        return bestOrder;
     }
 
-    public Dag generateDag(List<Node> order){
-        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, order, cache);
-        hc.search();
-        Graph result = hc.getGraph();
-        return new Dag(result);
+
+    @Override
+    public String toString() {
+        return root.toString();
     }
 }

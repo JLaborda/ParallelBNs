@@ -183,10 +183,11 @@ public class HillClimbingEvaluator {
             candidates.add(node);
         }
 
+        /*
         System.out.println("\n TOTAL CALCULATIONS:  " + (problem.counter.get() - c1));
         System.out.println(" TOTAL CALCULATIONS no dictionary:  " + (problem.counterSinDict.get() - c2));
         System.out.println(" SIZE OF CONCURRENT: " + localScoreCache.size());
-        
+        */
         return finalScore;
     }
     
