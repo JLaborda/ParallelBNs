@@ -67,13 +67,13 @@ public class HillClimbingEvaluator {
                 // OPERATION ADD
                 if (!parents.contains(candidate)) {
                     //System.out.println("ADD: " + candidate + " -> " + child + ", " + parents);
-                    score = getAdditionScore(child, candidate, new HashSet(parents), parentsArr);
+                    score = getAdditionScore(child, candidate, new HashSet<>(parents), parentsArr);
                 }
                     
                 // OPERATION DELETE
                 else {
                     //System.out.println("DELETE: " + candidate + " -> " + child + ", " + parents);
-                    score = getDeleteScore(child, candidate, new HashSet(parents), parentsArr);
+                    score = getDeleteScore(child, candidate, new HashSet<>(parents), parentsArr);
                 }
                 if(score > bestScore.get()){
                     bestScore.set(score);
@@ -105,7 +105,7 @@ public class HillClimbingEvaluator {
     }
 
     
-    private double getAdditionScore(int indexChild, int indexParent, Set<Integer> parents, Integer[] indexParents) {
+    public double getAdditionScore(int indexChild, int indexParent, Set<Integer> parents, Integer[] indexParents) {
         // Creating an array adding the index of the parent
         int[] indexUnion = new int[indexParents.length + 1];
         for (int i = 0; i < indexParents.length; i++) {
@@ -116,18 +116,18 @@ public class HillClimbingEvaluator {
         if (indexUnion.length > 1)
             Arrays.sort(indexUnion);
         
-        double scorePart1 = localBdeuScore(indexChild, indexUnion, parents);
+        double scorePart1 = localBdeuScore(indexChild, indexUnion);
         
         // Removing again the parent to the set
         parents.remove(indexParent);
-        double scorePart2 = localBdeuScore(indexChild, ArrayUtils.toPrimitive(indexParents), parents);
+        double scorePart2 = localBdeuScore(indexChild, ArrayUtils.toPrimitive(indexParents));
         
         // Score = localbdeu(x,P(G) + {x_p}) - localbdeu(x,P(G))
         return scorePart1 - scorePart2;
     }
-    
-    
-    private double getDeleteScore(int indexChild, int indexParent, Set<Integer> parents, Integer[] indexParents) {
+
+
+    public double getDeleteScore(int indexChild, int indexParent, Set<Integer> parents, Integer[] indexParents) {
         // Calculating indexes for the difference set of parents
         parents.remove(indexParent);    
         Integer[] indexParentsAux = new Integer[parents.size()];
@@ -135,18 +135,18 @@ public class HillClimbingEvaluator {
         if (indexParentsAux.length > 1)
             Arrays.sort(indexParentsAux);
 
-        double scorePart1 = localBdeuScore(indexChild, ArrayUtils.toPrimitive(indexParentsAux), parents);
+        double scorePart1 = localBdeuScore(indexChild, ArrayUtils.toPrimitive(indexParentsAux));
         
         // Adding again the parent to the set
         parents.add(indexParent);
-        double scorePart2 = localBdeuScore(indexChild, ArrayUtils.toPrimitive(indexParents), parents);
+        double scorePart2 = localBdeuScore(indexChild, ArrayUtils.toPrimitive(indexParents));
         
         // Score = localbdeu(x,P(G) - {x_p}) - localbdeu(x,P(G))
         return scorePart1 - scorePart2;
     }
 
 
-    public double localBdeuScore(int nNode, int[] nParents, Set<Integer> setParents) {
+    public double localBdeuScore(int nNode, int[] nParents) {
         Double oldScore = localScoreCache.get("" + nNode + Arrays.toString(nParents));
         problem.counter.getAndIncrement();
 
@@ -178,7 +178,7 @@ public class HillClimbingEvaluator {
             }
             
             Integer[] arr = parents.toArray(new Integer[0]);
-            finalScore += localBdeuScore(node, ArrayUtils.toPrimitive(arr), parents);
+            finalScore += localBdeuScore(node, ArrayUtils.toPrimitive(arr));
             
             candidates.add(node);
         }

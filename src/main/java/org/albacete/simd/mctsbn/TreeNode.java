@@ -1,19 +1,19 @@
 package org.albacete.simd.mctsbn;
 
 import edu.cmu.tetrad.graph.Node;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class TreeNode {
+public class TreeNode implements Comparable<TreeNode>{
 
     private final State state;
     private final TreeNode parent;
     private int numVisits = 0;
     private double totalReward = 0;
     private Set<TreeNode> children = new HashSet<>();
-
     private boolean fullyExpanded;
 
     public TreeNode(State state, TreeNode parent){
@@ -108,4 +108,30 @@ public class TreeNode {
             }
         }
     }
+
+    @Override
+    public int compareTo(@NotNull TreeNode o) {
+        //child.getTotalReward() / child.getNumVisits() +
+        //                    explorationValue * Math.sqrt(Math.log(node.getNumVisits()) / child.getNumVisits());
+        double thisScore = this.getTotalReward() / this.getNumVisits() +
+                MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.getNumVisits()) / this.getNumVisits());
+        double thatScore = o.getTotalReward() / o.getNumVisits() +
+                MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(o.getNumVisits()) / o.getNumVisits());
+
+        return Double.compare(thisScore, thatScore);
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj)
+            return true;
+        if(!(obj instanceof TreeNode))
+            return false;
+        TreeNode other = (TreeNode) obj;
+
+        return this.state.equals(other.state);
+    }
+
+
 }
