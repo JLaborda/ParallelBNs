@@ -29,13 +29,13 @@ public class MCTSBN {
     /**
      * Exploration constant c for the UCT equation: UCT_j = X_j + c * sqrt(ln(N) / n_j)
      */
-    public static final double EXPLORATION_CONSTANT = Math.sqrt(2); //1.0 / Math.sqrt(2);
+    public static final double EXPLORATION_CONSTANT = 4 * Math.sqrt(2); //1.0 / Math.sqrt(2);
 
-    private static final int NUM_ROLLOUTS = 20;
+    private static final int NUM_ROLLOUTS = 1;
 
     private static final int NUM_SELECTION = 1;
 
-    private static final int NUM_EXPAND = 50;
+    private static final int NUM_EXPAND = 1;
 
     /**
      * Problem of the search
@@ -162,8 +162,8 @@ public class MCTSBN {
     }
 
     /**
-     * Selects the best node. The best node is the best node according to the UCT equation.
-     * @return
+     * Selects the best nodes to expand. The nodes are selected with the UCT equation.
+     * @return List of selected nodes to be expanded
      */
     private List<TreeNode> selectNode(){//(TreeNode node){
         /*
@@ -177,6 +177,7 @@ public class MCTSBN {
 
         return null;
 */
+        // Creating the arraylist of the selected nodes.
         List<TreeNode> selection = new ArrayList<>();
         for (int i = 0; i < NUM_SELECTION; i++) {
 
@@ -185,8 +186,8 @@ public class MCTSBN {
             if(selectNode == null)
                 break;
 
-            // Checking if the parent of the best node has been fully expanded
-            if (selectNode.getParent() == null || selectNode.getParent().isFullyExpanded())
+            // Checking if the parent of the best node has already been expanded at least once
+            if (selectNode.getParent() == null || selectNode.getParent().isExpanded())
                 selection.add(selectionQueue.poll());
             else {
                 // Parent has not been fully expanded, adding it for expansion
@@ -198,6 +199,11 @@ public class MCTSBN {
         return  selection;
     }
 
+    /**
+     * Expands the nodes in the list of selected nodes. The nodes are expanded by creating n child for each selected node.
+     * @param selection List of selected nodes
+     * @return List of expanded nodes.
+     */
     public List<TreeNode> expand(List<TreeNode> selection){
 
         List<TreeNode> expansion = new ArrayList<>();
@@ -221,13 +227,14 @@ public class MCTSBN {
                     // 4. Expand the tree by creating a new node and connecting it to the tree.
                     TreeNode newNode = new TreeNode(node.getState().takeAction(action), node);
                     node.addChild(newNode);
+                    node.setExpanded(true);
                     // 5. Check if there are more actions to be expanded in this node, and if not, change the isFullyExpanded value
                     if(node.getChildrenAction().size() == actions.size())
                         node.setFullyExpanded(true);
 
                     // 7. Adding the expanded node to the list and queue
                     expansion.add(newNode);
-                    selectionQueue.add(newNode);
+                    //selectionQueue.add(newNode);
                     nExpansion++;
 
                     //return newNode;
@@ -246,10 +253,9 @@ public class MCTSBN {
         // Generating candidates and shuffling
         double scoreSum = 0;
 
-        // Cambiar límite si queremos más rollouts
         for (int i = 0; i < NUM_ROLLOUTS; i++) {
+            // Creating a total order with the partial order of the state.
             List<Node> order = state.getOrder();
-            //System.out.println("Doing rollout for partial order: " + order);
             List<Node> candidates = problem.getVariables();
             candidates = candidates.stream().filter(node -> !order.contains(node)).collect(Collectors.toList());
             Collections.shuffle(candidates);
@@ -257,8 +263,6 @@ public class MCTSBN {
             // Creating order for HC
             List<Node> finalOrder = new ArrayList<>(order);
             finalOrder.addAll(candidates);
-
-            //System.out.println("Final order is: " + finalOrder);
 
             HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, finalOrder, cache);
             double score = hc.search();
@@ -277,15 +281,23 @@ public class MCTSBN {
         return scoreSum;
     }
 
+    /**
+     * Backpropagates the reward and visits of the nodes where a rollout has been done.
+     * @param node Node that
+     * @param reward
+     */
     public void backPropagate(TreeNode node, double reward){
+        // REVISAR!!!!
         TreeNode currentNode = node;
         while (currentNode != null){
+            // Add one visit and total reward to the currentNode
             currentNode.incrementOneVisit();
             currentNode.addReward(reward);
+            selectionQueue.remove(currentNode);
             if((!currentNode.isFullyExpanded()) && !(currentNode.isTerminal())) {
-                selectionQueue.remove(currentNode);
                 selectionQueue.add(currentNode);
             }
+            // Update currentNode to its parent.
             currentNode = currentNode.getParent();
         }
     }

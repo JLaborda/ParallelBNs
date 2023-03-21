@@ -6,14 +6,12 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Dag_n;
-import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
-import java.util.List;
 
 public class MainMCTSBN {
 
@@ -26,7 +24,7 @@ public class MainMCTSBN {
 
         Problem problem = new Problem(bbdd_path);
 
-        MCTSBN mctsbn = new MCTSBN(problem, 1, 10000);
+        MCTSBN mctsbn = new MCTSBN(problem, 1, 1000);
         long startTime = System.currentTimeMillis();
         addEndHook(mctsbn,startTime, netPath);
 
@@ -63,8 +61,8 @@ public class MainMCTSBN {
                 System.out.println(MCTSBN.toStringOrder(mctsbn.getBestOrder()));
                 System.out.println("Best Dag: ");
                 System.out.println(new Dag(mctsbn.getBestDag()));
-                //System.out.println("Tree Structure: ");
-                //System.out.println(mctsbn);
+                System.out.println("Tree Structure: ");
+                System.out.println(mctsbn);
 
                 MlBayesIm controlBayesianNetwork;
                 try {
