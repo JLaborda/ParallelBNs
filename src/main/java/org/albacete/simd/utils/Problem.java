@@ -6,6 +6,7 @@ import edu.cmu.tetrad.graph.EdgeListGraph_n;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
 import edu.cmu.tetrad.search.BDeuScore;
+import org.albacete.simd.threads.GESThread;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -63,6 +64,10 @@ public class Problem {
      * BDeu Score.
      */
     protected BDeuScore bdeu;
+
+    public static double emptyGraphScore;
+
+    public static int nInstances;
     
     public AtomicInteger counter;
     public AtomicInteger counterSinDict;
@@ -99,6 +104,8 @@ public class Problem {
         buildIndexing(graph);
         
         bdeu = new BDeuScore(data);
+        emptyGraphScore = GESThread.scoreGraph(graph, this);
+        nInstances = dataSet.getNumRows();
     }
 
 
@@ -204,5 +211,6 @@ public class Problem {
         }
         return null;
     }
+
 
 }
