@@ -9,11 +9,11 @@ import java.util.Objects;
 
 public class State {
 
-    private Node node;
+    private final Node node;
 
-    private List<Node> order;
+    private final List<Node> order;
 
-    private Problem problem;
+    private final Problem problem;
 
     public State(Node node, List<Node> order, Problem problem){
         this.node = node;
@@ -34,7 +34,7 @@ public class State {
 
     public State takeAction(Node action){
         List<Node> newOrder = new ArrayList<>(order);
-        newOrder.add(action);
+        newOrder.add(0, action);
         return new State(action, newOrder, problem);
     }
 

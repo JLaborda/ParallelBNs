@@ -6,6 +6,7 @@ import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class HillClimbingEvaluator {
 
@@ -20,7 +22,7 @@ public class HillClimbingEvaluator {
     
     private final ConcurrentHashMap<String,Double> localScoreCache;
 
-    private final List<Integer> order;
+    private List<Integer> order;
 
     private Graph graph;
 
@@ -31,25 +33,22 @@ public class HillClimbingEvaluator {
     private final BDeuScore metric;
 
 
-    public HillClimbingEvaluator(Problem problem, List<Node> order, ConcurrentHashMap<String,Double> localScoreCache){
+    public HillClimbingEvaluator(Problem problem, ConcurrentHashMap<String,Double> localScoreCache){
         this.problem = problem;
         this.localScoreCache = localScoreCache;
-        this.order = new ArrayList(order.size());
-        for (Node node : order) {
-            this.order.add(problem.getHashIndices().get(node));
-        }
         this.graph = new EdgeListGraph_n();
         metric = new BDeuScore(problem.getData());
     }
 
 
 
-    private Set<Integer> evaluate(int child, Set<Integer> candidates){
+    public Pair evaluate(int child, Set<Integer> candidates){
         int iteration = 0;
 
         //System.out.println("\n-------------- " + child + " --------------");
         
         Set<Integer> parents = new HashSet<>();
+        double bdeuFinal = 0;
 
         while(iteration < MAX_ITERATIONS) {
             //System.out.println("\nITERATION " + iteration);
@@ -94,6 +93,7 @@ public class HillClimbingEvaluator {
                     //System.out.println("   BEST PARENT ADD: " + bp + ", SCORE: " + bestScore.get());
                 }
                 iteration++;
+                bdeuFinal += bestScore.get();
             } 
             else {
                 //System.out.println("     FIN DE LA ITERACIÓN: " + bestParent.get() + ", SCORE: " + bestScore.get());
@@ -101,7 +101,7 @@ public class HillClimbingEvaluator {
             }
         }
         
-        return parents;
+        return new Pair(child,parents,bdeuFinal);
     }
 
     
@@ -171,7 +171,7 @@ public class HillClimbingEvaluator {
         
         Set<Integer> candidates = new HashSet<>();
         for (int node : order) {
-            Set<Integer> parents = evaluate(node, candidates);
+            Set<Integer> parents = evaluate(node, candidates).set;
             for (int parent : parents) {
                 Edge edge = Edges.directedEdge(problem.getNode(parent), problem.getNode(node));
                 graph.addEdge(edge);
@@ -182,12 +182,14 @@ public class HillClimbingEvaluator {
             
             candidates.add(node);
         }
+        
+        System.out.println("Obtained result: " + finalScore + "\t-> " + order);
 
-        /*
+        
         System.out.println("\n TOTAL CALCULATIONS:  " + (problem.counter.get() - c1));
         System.out.println(" TOTAL CALCULATIONS no dictionary:  " + (problem.counterSinDict.get() - c2));
         System.out.println(" SIZE OF CONCURRENT: " + localScoreCache.size());
-        */
+        
         return finalScore;
     }
     
@@ -199,4 +201,32 @@ public class HillClimbingEvaluator {
     public Graph getGraph() {
         return graph;
     }
+    
+    public void setOrder(Collection<Node> order) {
+        this.order = new ArrayList(order.size());
+        for (Node node : order) {
+            this.order.add(problem.getHashIndices().get(node));
+        }
+    }
+    
+    
+    public class Pair implements Comparable<Pair> {
+        public final int node;
+        public final Set set;
+        public final double bdeu;
+
+        public Pair(int node, Set a, double b) {
+            this.node = node;
+            this.set = a;
+            this.bdeu = b;
+        }
+        
+        @Override
+        public int compareTo(Pair o) {
+            if (this.bdeu > o.bdeu) return 1;
+            else if (this.bdeu < o.bdeu) return -1;
+            else return 0;
+        }
+    };
+    
 }

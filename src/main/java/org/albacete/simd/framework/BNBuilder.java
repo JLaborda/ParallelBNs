@@ -104,6 +104,13 @@ public abstract class BNBuilder {
         this.nItInterleaving = nItInterleaving;
         initialize(nThreads);
     }
+    
+    public BNBuilder(Problem problem, DataSet data, int nThreads, int maxIterations, int nItInterleaving){
+        this.problem = problem;
+        this.maxIterations = maxIterations;
+        this.nItInterleaving = nItInterleaving;
+        initialize(nThreads);
+    }
 
     public BNBuilder(String path, int nThreads, int maxIterations, int nItInterleaving) {
         this(Utils.readData(path), nThreads, maxIterations, nItInterleaving);

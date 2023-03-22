@@ -271,7 +271,7 @@ public class FESThread extends GESThread {
             Node y = edge.getNode2();
             return !process.contains(x) && !process.contains(y);
         });
-        System.out.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
+        //System.out.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
     }
 
     private Set<Node> revertToCPDAG(Graph graph) {

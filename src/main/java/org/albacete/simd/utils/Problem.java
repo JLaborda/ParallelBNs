@@ -11,6 +11,7 @@ import org.albacete.simd.threads.GESThread;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Problem {
@@ -58,7 +59,9 @@ public class Problem {
     /**
      * Caches scores for discrete search.
      */
-    protected LocalScoreCacheConcurrent localScoreCache = new LocalScoreCacheConcurrent();
+    //protected LocalScoreCacheConcurrent localScoreCache = new LocalScoreCacheConcurrent();
+    
+    private final ConcurrentHashMap<String,Double> localScoreCache = new ConcurrentHashMap<>();
 
     /**
      * BDeu Score.
@@ -188,7 +191,11 @@ public class Problem {
         return hashIndices;
     }
 
-    public LocalScoreCacheConcurrent getLocalScoreCache() {
+    /*public LocalScoreCacheConcurrent getLocalScoreCache() {
+        return localScoreCache;
+    }*/
+    
+    public ConcurrentHashMap getLocalScoreCache() {
         return localScoreCache;
     }
     

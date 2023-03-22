@@ -6,15 +6,19 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 public class TreeNode implements Comparable<TreeNode>{
 
     private final State state;
     private final TreeNode parent;
+    private Set<TreeNode> children = new HashSet<>();
+    
     private int numVisits = 0;
     private double totalReward = 0;
-    private Set<TreeNode> children = new HashSet<>();
+    private double UCTSCore = 0;
+    
     private boolean fullyExpanded;
     private boolean isExpanded = false;
 
@@ -44,6 +48,10 @@ public class TreeNode implements Comparable<TreeNode>{
 
     public double getTotalReward() {
         return totalReward;
+    }
+    
+    public double getUCTSCore() {
+        return UCTSCore;
     }
 
     public Set<TreeNode> getChildren() {
@@ -98,6 +106,7 @@ public class TreeNode implements Comparable<TreeNode>{
         isExpanded = expanded;
     }
 
+    @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder(50);
         print(buffer, "", "");
@@ -107,6 +116,18 @@ public class TreeNode implements Comparable<TreeNode>{
     private void print(StringBuilder buffer, String prefix, String childrenPrefix) {
         buffer.append(prefix);
         buffer.append(state.getNode().getName());
+        
+        String results;
+        if(this.parent == null){
+            double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
+            results = "  \t" + this.getNumVisits() + "   " + Double.MAX_VALUE + ", " + exploitationScore;
+        } else {
+            double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
+            double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
+            results = "  \t" + this.getNumVisits() + "   " + (exploitationScore - explorationScore) + ", " + exploitationScore + ", " + explorationScore;
+        }
+        buffer.append(results);
+        
         buffer.append('\n');
         for (Iterator<TreeNode> it = children.iterator(); it.hasNext();) {
             TreeNode next = it.next();
@@ -117,68 +138,22 @@ public class TreeNode implements Comparable<TreeNode>{
             }
         }
     }
-
-    @Override
-    public int compareTo(@NotNull TreeNode o) {
-        // child.getTotalReward() / child.getNumVisits() +
-        //                    explorationValue * Math.sqrt(Math.log(node.getNumVisits()) / child.getNumVisits());
-
-        // ESTO ESTÁ MAL!
-        // El reward debe ser positivo y acotado, porque sino es una búsqueda aleatorio
-        // Restarle por el score de la red vacía (un delta) y dividirlo por el número de instancias para acotar el score.
-        // Hay que pensar en la ecuación UCT para evitar una búsqueda de anchura.+
-
-        double thisScore, thatScore;
-
-        if(this.parent == null && o.parent == null){
-            // Ambos son la raíz, esto no debería pasar...
-            throw new IllegalStateException("Root is in the selection queue twice");
-        }
-
-
-        // Checking if this TreeNode is the root
+    
+    public void updateUCT() {
         if(this.parent == null){
-            thisScore = Double.MAX_VALUE;
+            UCTSCore = Double.MAX_VALUE;
         }
         else{
             double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
-            //System.out.println("Exploitation Score for node  [" + this.state.getOrder() + "] is: " + exploitationScore);
-            //System.out.println("******");
-
             double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
-            //System.out.println("Exploration Score for node  [" + this.state.getOrder() + "] is: " + explorationScore);
-            //System.out.println("******");
 
-            thisScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances +
-                    MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
-
-            //System.out.println("This Score: " + thisScore);
+            UCTSCore = exploitationScore - explorationScore;
         }
+    }
 
-        // Checking if o is the root
-        if(o.parent == null){
-            thatScore = Double.MAX_VALUE;
-        }
-        else{
-            double exploitationScore = ((o.getTotalReward() / o.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
-            //System.out.println("Exploitation Score for node  [" + o.state.getOrder() + "] is: " + exploitationScore);
-            //System.out.println("******");
-
-            double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(o.parent.getNumVisits()) / o.getNumVisits());
-            //System.out.println("Exploration Score for node  [" + o.state.getOrder() + "] is: " + explorationScore);
-            //System.out.println("******");
-
-            thatScore = ((o.getTotalReward() / o.getNumVisits()) - Problem.emptyGraphScore ) / Problem.nInstances +
-                    MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(o.parent.getNumVisits()) / o.getNumVisits());
-
-            //System.out.println("That Score: " + thatScore);
-        }
-
-        // El valor de las visitas del padre de la raiz cuál es?
-
-
-        return Double.compare(thisScore, thatScore);
-
+    @Override
+    public int compareTo(@NotNull TreeNode o) {
+        return Double.compare(this.UCTSCore, o.UCTSCore);
     }
 
     @Override
@@ -190,6 +165,13 @@ public class TreeNode implements Comparable<TreeNode>{
         TreeNode other = (TreeNode) obj;
 
         return this.state.equals(other.state);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 29 * hash + Objects.hashCode(this.state);
+        return hash;
     }
 
 }

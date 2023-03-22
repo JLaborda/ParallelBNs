@@ -128,6 +128,36 @@ public final class Dag_n implements Graph {
     }
 
     //===============================PUBLIC METHODS======================//
+    
+    public ArrayList<Node> getTopologicalOrder(){
+        ArrayList<Node> L = new ArrayList(nodesHash.size());
+        ArrayList<Node> S = new ArrayList();
+        
+        Dag_n graphCopy = new Dag_n(this);
+        
+        // S -> Nodos raíz, sin padres
+        for (Node node : graphCopy.getNodes()) {
+            if (graphCopy.getParents(node).isEmpty()) {
+                S.add(node);
+            }
+        }
+        
+        while (!S.isEmpty()) {
+            Node node = S.remove(0);
+            L.add(node);
+            
+            // Borramos el nodo, y los enlaces a los hijos. 
+            // Si ahora los hijos no tienen padres, los añadimos a S
+            for (Node children : graphCopy.getAdjacentNodes(node)) {
+                graphCopy.removeEdge(node, children);
+                if (graphCopy.getParents(children).isEmpty()) {
+                    S.add(children);
+                }
+            }
+        }
+        
+        return L;
+    }
 
     public boolean addBidirectedEdge(Node node1, Node node2) {
         throw new UnsupportedOperationException();

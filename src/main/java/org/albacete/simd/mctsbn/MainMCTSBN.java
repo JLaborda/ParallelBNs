@@ -17,14 +17,14 @@ public class MainMCTSBN {
 
     public static void main(String[] args) {
         String networkFolder = "./res/networks/";
-        String net_name = "alarm";
+        String net_name = "water";
         String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif50003_.csv";
         String netPath = networkFolder + net_name + ".xbif";
 
 
         Problem problem = new Problem(bbdd_path);
 
-        MCTSBN mctsbn = new MCTSBN(problem, 1, 1000);
+        MCTSBN mctsbn = new MCTSBN(problem, 10000);
         long startTime = System.currentTimeMillis();
         addEndHook(mctsbn,startTime, netPath);
 
@@ -61,8 +61,8 @@ public class MainMCTSBN {
                 System.out.println(MCTSBN.toStringOrder(mctsbn.getBestOrder()));
                 System.out.println("Best Dag: ");
                 System.out.println(new Dag(mctsbn.getBestDag()));
-                System.out.println("Tree Structure: ");
-                System.out.println(mctsbn);
+                //System.out.println("Tree Structure: ");
+                //System.out.println(mctsbn);
 
                 MlBayesIm controlBayesianNetwork;
                 try {
