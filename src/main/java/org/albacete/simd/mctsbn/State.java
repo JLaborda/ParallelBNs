@@ -5,6 +5,7 @@ import org.albacete.simd.utils.Problem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class State {
 
@@ -52,5 +53,18 @@ public class State {
     @Override
     public String toString() {
      return "State with node: " + node + "----- and order: " + order;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        State state = (State) o;
+        return Objects.equals(node, state.node) && Objects.equals(order, state.order);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(node, order);
     }
 }

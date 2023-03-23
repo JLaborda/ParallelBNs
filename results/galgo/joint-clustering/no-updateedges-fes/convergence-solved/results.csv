@@ -1,4 +1,4 @@
-algorithm, network, bbdd, threads, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, dfMM minus, Total iterations, Total time(s)
+algorithm,network,bbdd,threads,pges_threads,interleaving,seed,SHD,loglike,bdeu,deltaMM,deltaMM+,deltaMM-,iterations,time(s)
 pges-jc,alarm,alarm.xbif50001246_,16,16,10,-1,10,-0.39766096935597867,-54344.17500505482,20.0,4.0,16.0,5,1.252
 pges-jc,alarm,alarm.xbif50001246_,16,16,15,-1,7,-0.43662206785406654,-54034.68310137827,14.0,0.0,14.0,5,1.317
 pges-jc,alarm,alarm.xbif50001246_,16,16,5,-1,13,-0.426333825846433,-54321.203757010735,26.0,6.0,20.0,6,1.274

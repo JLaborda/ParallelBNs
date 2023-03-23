@@ -6,10 +6,12 @@ import edu.cmu.tetrad.graph.EdgeListGraph_n;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
 import edu.cmu.tetrad.search.BDeuScore;
+import org.albacete.simd.threads.GESThread;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Problem {
 
@@ -63,9 +65,18 @@ public class Problem {
      */
     protected BDeuScore bdeu;
 
+    public static double emptyGraphScore;
+
+    public static int nInstances;
+    
+    public AtomicInteger counter;
+    public AtomicInteger counterSinDict;
+
 
     public Problem(DataSet dataSet){
-
+        this.counter = new AtomicInteger();
+        this.counterSinDict = new AtomicInteger();
+        
         //Setting dataset
         List<String> _varNames = dataSet.getVariableNames();
 
@@ -93,6 +104,8 @@ public class Problem {
         buildIndexing(graph);
         
         bdeu = new BDeuScore(data);
+        emptyGraphScore = GESThread.scoreGraph(graph, this);
+        nInstances = dataSet.getNumRows();
     }
 
 
@@ -190,5 +203,14 @@ public class Problem {
         }
         return null;
     }
+    
+    public Node getNode(int id){
+        for (Node node: variables) {
+            if(hashIndices.get(node) == id)
+                return node;
+        }
+        return null;
+    }
+
 
 }
