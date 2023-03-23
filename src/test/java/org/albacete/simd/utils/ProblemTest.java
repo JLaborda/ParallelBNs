@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.*;
 
@@ -38,7 +39,7 @@ public class ProblemTest {
         String [] varNames = problem.getVarNames();
         List<Node> variables = problem.getVariables();
         DataSet data = problem.getData();
-        LocalScoreCacheConcurrent cache = problem.getLocalScoreCache();
+        ConcurrentHashMap<String,Double> cache = problem.getLocalScoreCache();
         problem.setSamplePrior(20);
         problem.setStructurePrior(0.002);
         double samplePrior = problem.getSamplePrior();

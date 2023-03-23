@@ -40,6 +40,11 @@ public class HillClimbingEvaluator {
         metric = new BDeuScore(problem.getData());
     }
 
+    public HillClimbingEvaluator(Problem problem, List<Node> order, ConcurrentHashMap<String,Double> localScoreCache){
+        this(problem, localScoreCache);
+        setOrder(order);
+    }
+
 
 
     public Pair evaluate(int child, Set<Integer> candidates){

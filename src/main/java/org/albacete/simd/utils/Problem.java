@@ -195,7 +195,7 @@ public class Problem {
         return localScoreCache;
     }*/
     
-    public ConcurrentHashMap getLocalScoreCache() {
+    public ConcurrentHashMap<String,Double> getLocalScoreCache() {
         return localScoreCache;
     }
     

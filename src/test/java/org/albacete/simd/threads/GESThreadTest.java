@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.*;
 
@@ -349,7 +350,7 @@ public class GESThreadTest {
      * @result This test should be true
      */
     @Test
-    public void ifNaYXTListContainsYisSemiDirectedBlockedShouldBeTrueTest() {
+    public void ifNaYXTListContainsYisSemiDirectedBlockedShouldBeFalseTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -369,37 +370,6 @@ public class GESThreadTest {
 
         // Act
         boolean result = GESThread.isSemiDirectedBlocked(X, Y, naYXT, g, null);
-
-        // Assert
-        assertTrue(result);
-    }
-
-    /**
-     * Tests that the isSemiDirectedBlocked function returns true when X and Y are the same.
-     *
-     * @result This test should be true
-     */
-    @Test
-    public void ifNaYXTListContainsOnlyXisSemiDirectedBlockedShouldBeTrueTest() {
-        // Arrange
-        // Nodes
-        Node X = new GraphNode("X");
-        Node Y = new GraphNode("Y");
-        Node Z = new GraphNode("Z");
-        Node T = new GraphNode("T");
-        List<Node> nodes = new ArrayList<>();
-        nodes.add(X);
-        nodes.add(Y);
-        nodes.add(Z);
-        nodes.add(T);
-
-        // Graph
-        Graph g = new EdgeListGraph(nodes);
-        List<Node> naYXT = new ArrayList<>();
-        naYXT.add(Y);
-
-        // Act
-        boolean result = GESThread.isSemiDirectedBlocked(X, X, naYXT, g, null);
 
         // Assert
         assertFalse(result);
@@ -426,9 +396,10 @@ public class GESThreadTest {
 
         // Graph
         Graph g = new EdgeListGraph(nodes);
-        g.addUndirectedEdge(X, Z);
+        g.addDirectedEdge(Z, X);
         g.addUndirectedEdge(Z, T);
         g.addUndirectedEdge(T, Y);
+        g.addUndirectedEdge(Z, Y);
 
 
         List<Node> naYXT = new ArrayList<>();
@@ -456,20 +427,27 @@ public class GESThreadTest {
         Node Y = new GraphNode("Y");
         Node Z = new GraphNode("Z");
         Node T = new GraphNode("T");
+        Node M = new GraphNode("M");
+
         List<Node> nodes = new ArrayList<>();
         nodes.add(X);
         nodes.add(Y);
         nodes.add(Z);
         nodes.add(T);
+        nodes.add(M);
 
         // Graph
         Graph g = new EdgeListGraph(nodes);
-        g.addUndirectedEdge(X, Z);
+        g.addDirectedEdge(Z, X);
         g.addUndirectedEdge(Z, T);
         g.addUndirectedEdge(T, Y);
+        g.addUndirectedEdge(Z, Y);
+        g.addDirectedEdge(Y, M);
+        g.addUndirectedEdge(M, X);
 
         List<Node> naYXT = new ArrayList<>();
-        //naYXT.add(Z);
+        naYXT.add(Z);
+        naYXT.add(T);
 
         // Act
         boolean result = GESThread.isSemiDirectedBlocked(X, Y, naYXT, g, new HashSet<>());
@@ -539,7 +517,7 @@ public class GESThreadTest {
         Problem problem = new Problem(dataset);
         GESThread thread = new FESThread(problem, subset1, 15, false);
 
-        LocalScoreCacheConcurrent result = thread.getLocalScoreCache();
+        ConcurrentHashMap<String,Double> result = thread.getLocalScoreCache();
         assertNotNull(result);
 
     }

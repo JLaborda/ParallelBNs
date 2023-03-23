@@ -798,7 +798,7 @@ public abstract class GESThread implements Runnable{
         return this.id;
     }
 
-    public ConcurrentHashMap<String,Integer> getLocalScoreCache() {
+    public ConcurrentHashMap<String,Double> getLocalScoreCache() {
         return problem.getLocalScoreCache();
     }
 
