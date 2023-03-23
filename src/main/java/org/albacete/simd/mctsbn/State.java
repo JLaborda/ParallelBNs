@@ -9,22 +9,24 @@ import java.util.Objects;
 
 public class State {
 
-    private final Node node;
+    private final Integer node;
 
-    private final List<Node> order;
+    private final List<Integer> order;
+    
+    private final List<Integer> allVars;
 
     private final Problem problem;
 
-    public State(Node node, List<Node> order, Problem problem){
+    public State(Integer node, List<Integer> order, List<Integer> allVars, Problem problem){
         this.node = node;
         this.order = order;
+        this.allVars = allVars;
         this.problem = problem;
     }
 
-    public List<Node> getPossibleActions(){
-        List<Node> allVars = problem.getVariables();
-        List<Node> possibleActions = new ArrayList<>();
-        for(Node var : allVars){
+    public List<Integer> getPossibleActions(){
+        List<Integer> possibleActions = new ArrayList<>();
+        for(Integer var : allVars){
             if(!order.contains(var)){
                 possibleActions.add(var);
             }
@@ -32,21 +34,21 @@ public class State {
         return possibleActions;
     }
 
-    public State takeAction(Node action){
-        List<Node> newOrder = new ArrayList<>(order);
+    public State takeAction(Integer action){
+        List<Integer> newOrder = new ArrayList<>(order);
         newOrder.add(0, action);
-        return new State(action, newOrder, problem);
+        return new State(action, newOrder, allVars, problem);
     }
 
     public boolean isTerminal(){
         return order.size() == problem.getVariables().size();
     }
 
-    public Node getNode(){
+    public Integer getNode(){
         return this.node;
     }
 
-    public List<Node> getOrder() {
+    public List<Integer> getOrder() {
         return order;
     }
 

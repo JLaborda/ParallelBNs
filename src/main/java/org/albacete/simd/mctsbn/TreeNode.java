@@ -17,7 +17,10 @@ public class TreeNode implements Comparable<TreeNode>{
     
     private int numVisits = 0;
     private double totalReward = 0;
+    
     private double UCTSCore = 0;
+    
+    
     
     private boolean fullyExpanded;
     private boolean isExpanded = false;
@@ -58,8 +61,8 @@ public class TreeNode implements Comparable<TreeNode>{
         return children;
     }
 
-    public Set<Node> getChildrenAction(){
-        Set<Node> actions = new HashSet<>();
+    public Set<Integer> getChildrenAction(){
+        Set<Integer> actions = new HashSet<>();
         for (TreeNode child: children) {
             actions.add(child.state.getNode());
         }
@@ -115,7 +118,7 @@ public class TreeNode implements Comparable<TreeNode>{
 
     private void print(StringBuilder buffer, String prefix, String childrenPrefix) {
         buffer.append(prefix);
-        buffer.append(state.getNode().getName());
+        buffer.append("N" + state.getNode());
         
         String results;
         if(this.parent == null){
@@ -124,7 +127,7 @@ public class TreeNode implements Comparable<TreeNode>{
         } else {
             double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
             double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
-            results = "  \t" + this.getNumVisits() + "   " + (exploitationScore - explorationScore) + ", " + exploitationScore + ", " + explorationScore;
+            results = "  \t" + this.getNumVisits() + "   " + (exploitationScore + explorationScore) + ", " + exploitationScore + ", " + explorationScore;
         }
         buffer.append(results);
         
@@ -139,15 +142,16 @@ public class TreeNode implements Comparable<TreeNode>{
         }
     }
     
-    public void updateUCT() {
+    public void updateUCT(double[] bestBDeuForNode) {
         if(this.parent == null){
             UCTSCore = Double.MAX_VALUE;
         }
         else{
             double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
             double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
+            double aStarScore = 0;
 
-            UCTSCore = exploitationScore - explorationScore;
+            UCTSCore = exploitationScore + explorationScore + aStarScore;
         }
     }
 

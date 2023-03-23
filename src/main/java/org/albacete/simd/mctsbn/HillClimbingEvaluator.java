@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.NotNull;
 
 public class HillClimbingEvaluator {
 
@@ -40,14 +39,14 @@ public class HillClimbingEvaluator {
         metric = new BDeuScore(problem.getData());
     }
 
-    public HillClimbingEvaluator(Problem problem, List<Node> order, ConcurrentHashMap<String,Double> localScoreCache){
+    public HillClimbingEvaluator(Problem problem, List<Integer> order, ConcurrentHashMap<String,Double> localScoreCache){
         this(problem, localScoreCache);
         setOrder(order);
     }
 
 
 
-    public Pair evaluate(int child, Set<Integer> candidates){
+    public Pair evaluate(int child, Collection<Integer> candidates){
         int iteration = 0;
 
         //System.out.println("\n-------------- " + child + " --------------");
@@ -173,6 +172,7 @@ public class HillClimbingEvaluator {
         double c2 = problem.counterSinDict.get();
         
         graph = new EdgeListGraph_n(problem.getVariables());
+        finalScore = 0;
         
         Set<Integer> candidates = new HashSet<>();
         for (int node : order) {
@@ -207,13 +207,21 @@ public class HillClimbingEvaluator {
         return graph;
     }
     
-    public void setOrder(Collection<Node> order) {
-        this.order = new ArrayList(order.size());
-        for (Node node : order) {
-            this.order.add(problem.getHashIndices().get(node));
+    public final void setOrder(List<Integer> order) {
+        this.order = order;
+    }
+     
+    public ArrayList<Integer> nodeToIntegerList(List<Node> nodes){
+        ArrayList<Integer> integers = new ArrayList(nodes.size());
+        for (Node node : nodes) {
+            integers.add(nodeToInteger(node));
         }
+        return integers;
     }
     
+    public Integer nodeToInteger(Node node){
+        return problem.getHashIndices().get(node);
+    }
     
     public class Pair implements Comparable<Pair> {
         public final int node;

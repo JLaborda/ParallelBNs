@@ -46,13 +46,17 @@ public class MainHCEvaluator {
         ConcurrentHashMap<String,Double> cache = new ConcurrentHashMap();
         long startTime1 = System.currentTimeMillis();
         for (int i = 0; i < 60; i++) {
-            List<Node> order = randomOrder(problem, i);
 
+            HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, cache);
+            
+            List<Integer> order = new ArrayList<>(hc.nodeToIntegerList(problem.getVariables()));
+            Random random = new Random(i);
+            Collections.shuffle(order, random);
+        
             System.out.println("\n\nThe order is: ");
-            System.out.println(toStringOrder(order));
+            System.out.println(order);
             System.out.println();
-
-            HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, order, cache);
+            
             long startTime = System.currentTimeMillis();
             double score = hc.search();
             long endTime = System.currentTimeMillis();
@@ -60,7 +64,7 @@ public class MainHCEvaluator {
 
             System.out.println("----------------------------------");
             System.out.println("FINISHED!");
-            System.out.println("For the order: " + toStringOrder(order));
+            System.out.println("For the order: " + order);
             System.out.println("The score is: " + score);
             System.out.println("Number of edges: " + resultingDag.getEdges().size());
             //System.out.println("The resulting Dag is: \n" + resultingDag);
@@ -69,13 +73,6 @@ public class MainHCEvaluator {
         }
         
         System.out.println("Total time: " + (System.currentTimeMillis() - startTime1) / (double)1000 + " seconds");
-    }
-
-    public static List<Node> randomOrder(Problem problem, int seed){
-        List<Node> randomOrder = new ArrayList<>(problem.getVariables());
-        Random random = new Random(seed);
-        Collections.shuffle(randomOrder, random);
-        return randomOrder;
     }
 
     public static String toStringOrder(List<Node> order){

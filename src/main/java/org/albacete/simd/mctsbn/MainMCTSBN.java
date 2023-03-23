@@ -17,14 +17,14 @@ public class MainMCTSBN {
 
     public static void main(String[] args) {
         String networkFolder = "./res/networks/";
-        String net_name = "water";
+        String net_name = "alarm";
         String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif50003_.csv";
         String netPath = networkFolder + net_name + ".xbif";
 
 
         Problem problem = new Problem(bbdd_path);
 
-        MCTSBN mctsbn = new MCTSBN(problem, 10000);
+        MCTSBN mctsbn = new MCTSBN(problem, 1000);
         long startTime = System.currentTimeMillis();
         addEndHook(mctsbn,startTime, netPath);
 
@@ -58,7 +58,7 @@ public class MainMCTSBN {
                 System.out.println("Total time: " + (endTime - startTime)*1.0 / 1000);
                 System.out.println("Score: " + mctsbn.getBestScore());
                 System.out.println("Best Order");
-                System.out.println(MCTSBN.toStringOrder(mctsbn.getBestOrder()));
+                System.out.println(mctsbn.getBestOrder());
                 System.out.println("Best Dag: ");
                 System.out.println(new Dag(mctsbn.getBestDag()));
                 //System.out.println("Tree Structure: ");

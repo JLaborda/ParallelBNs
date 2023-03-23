@@ -42,12 +42,16 @@ public class MCTSBN {
      * Problem of the search
      */
     private final Problem problem;
+    
+    private final ArrayList<Integer> allVars;
+    
+    private final HillClimbingEvaluator hc;
 
     private TreeNode root;
 
     private double bestScore = Double.NEGATIVE_INFINITY;
-    private List<Node> bestOrder = new ArrayList<>();
-    private List<Node> bestPartialOrder = new ArrayList<>();
+    private List<Integer> bestOrder = new ArrayList<>();
+    private List<Integer> bestPartialOrder = new ArrayList<>();
     private Graph bestDag = null;
 
     private boolean convergence = false;
@@ -56,7 +60,7 @@ public class MCTSBN {
     
     private final double[] bestBDeuForNode;
 
-    private HashSet<TreeNode> selectionSet = new HashSet<>();
+    private final HashSet<TreeNode> selectionSet = new HashSet<>();
 
     private final String saveFilePath = "prueba-mctsbn.csv";
 
@@ -64,7 +68,9 @@ public class MCTSBN {
         this.problem = problem;
         this.cache = problem.getLocalScoreCache();
         this.ITERATION_LIMIT = iterationLimit;
-        bestBDeuForNode = new double [problem.getVariables().size()];
+        this.bestBDeuForNode = new double [problem.getVariables().size()];
+        this.hc = new HillClimbingEvaluator(problem, cache);
+        this.allVars = hc.nodeToIntegerList(problem.getVariables());
     }
 
 
@@ -72,42 +78,12 @@ public class MCTSBN {
         //1. Set Root
         this.root = new TreeNode(initialState, null);
         selectionSet.add(root);
+        
+        System.out.println("\n\nSTARTING warmup\n------------------------------------------------------");
 
-
+        // 1.5 Calculate the best parents of each node
         warmup();
-
-        /*
-                List<Node> order = state.getOrder();
-        List<Node> finalOrder = new ArrayList<>(problem.getVariables().size());
-        finalOrder.addAll(order);
-
-        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, cache);
-
-        // Creating the candidates set
-        HashSet<Integer> candidates = new HashSet<>(problem.getVariables().size());
-        for (Node node : problem.getVariables()) {
-            if (!order.contains(node)) {
-                candidates.add(problem.getHashIndices().get(node));
-            }
-        }
-
-                // We calculate the best parents for each node, and append the best to the order
-        while (!candidates.isEmpty()){
-            ArrayList<Pair> evaluations = new ArrayList<>();
-            for (Integer node : candidates) {
-                evaluations.add(hc.evaluate(node, candidates));
-            }
-
-            // Add the best node to the head of the order
-            Pair best = Collections.max(evaluations);
-            finalOrder.add(0, problem.getNode(best.node));
-            candidates.remove(best.node);
-
-        }
-
-        hc.setOrder(finalOrder);
-
-         */
+        System.out.println(Arrays.toString(bestBDeuForNode));
         
         //1.5 Add PGES order
         /*for (int i = 4; i < 4; i++) {
@@ -147,19 +123,13 @@ public class MCTSBN {
     }
 
     private void warmup() {
-        HashSet<Integer> candidates = new HashSet<>(problem.getVariables().size());
-        for (Node node : problem.getVariables()) {
-            candidates.add(problem.getHashIndices().get(node));
-        }
-
-        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, cache);
-        for (Integer node : candidates) {
-           bestBDeuForNode[node] = hc.evaluate(node, candidates).bdeu;
+        for (Integer node : allVars) {
+           bestBDeuForNode[node] = hc.evaluate(node, allVars).bdeu;
         }
     }
 
     public Dag search(){
-        State initialState = new State(new GraphNode("root"), new ArrayList<>(), problem);
+        State initialState = new State(-1, new ArrayList<>(), allVars, problem);
         return this.search(initialState);
     }
     
@@ -169,7 +139,8 @@ public class MCTSBN {
         Clustering hierarchicalClustering = new HierarchicalClustering();
         BNBuilder algorithm = new PGESwithStages(problem, hierarchicalClustering, nThreads, Integer.MAX_VALUE, Integer.MAX_VALUE, true);
         algorithm.search();
-        List<Node> orderPGES = algorithm.getCurrentDag().getCausalOrdering();
+        List<Integer> orderPGES = hc.nodeToIntegerList(algorithm.getCurrentDag().getCausalOrdering());
+        
         
         System.out.println("\n\nFINISHED PGES (" + ((System.currentTimeMillis() - init)/1000.0) + " s). BDeu: " + GESThread.scoreGraph(algorithm.getCurrentDag(), problem));
         
@@ -177,7 +148,6 @@ public class MCTSBN {
         
         // Evaluate the order with HC
         init = System.currentTimeMillis();
-        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, cache);
         hc.setOrder(orderPGES);
         hc.search();
         
@@ -194,7 +164,7 @@ public class MCTSBN {
         // Expand the tree to the generated node
         root.incrementOneVisit();
         root.addReward(bestScore);
-        for (Node node : orderPGES) {
+        for (Integer node : orderPGES) {
             TreeNode newNode = new TreeNode(root.getState().takeAction(node), root);
             root.addChild(newNode);
             newNode.incrementOneVisit();
@@ -212,14 +182,12 @@ public class MCTSBN {
      */
     private void executeRound(){
         //1. Selection and Expansions
-        //TreeNode selectedNode = selectNode(root);
         List<TreeNode> selectedNodes = selectNode();
         if(selectedNodes.isEmpty()) {
             convergence = true;
             return;
         }
         // 2. Expand selected node
-        //TreeNode expandedNode = expand(selectedNode);
         List<TreeNode> expandedNodes = expand(selectedNodes);
 
         //3. Rollout and Backpropagation
@@ -227,49 +195,8 @@ public class MCTSBN {
             double reward = inverseRollout(expandedNode.getState());
             backPropagate(expandedNode, reward);
         });
-        /*for (TreeNode expandedNode: expandedNodes) {
-            double reward = rollout(expandedNode.getState());
-            //4. Backpropagation
-            backPropagate(expandedNode, reward);
-        }*/
-        
-        updateUCTList();
-    }
 
-    private void saveRound(int iteration, double totalTimeRound) {
-
-        /*File file = new File(saveFilePath);
-        BufferedWriter csvWriter = null;
-        try {
-            csvWriter = new BufferedWriter(new FileWriter(saveFilePath, true));
-
-            //FileWriter csvWriter = new FileWriter(savePath, true);
-            if (file.length() == 0) {
-                String header = "iterations,time(s),score\n";
-                csvWriter.append(header);
-            }
-            String result = "" + iteration + "," + totalTimeRound + "," + bestScore + "\n";*/
-            //System.out.println("Results iteration:" + iteration);
-            System.out.println("Total time iteration: " + totalTimeRound);
-            System.out.println("Best Score: " + bestScore);
-            System.out.println("Best order: " + toStringOrder(bestOrder));
-            List<Integer> order = new ArrayList<>();
-            for (Node node : bestOrder) {
-                order.add(problem.getHashIndices().get(node));
-            }
-            System.out.println("  " + bestScore + "\t-> " + order);
-            System.out.println("Best partial order: " + toStringOrder(bestPartialOrder));
-            System.out.println("------------------------------------------------------");
-            /*csvWriter.append(result);
-
-            csvWriter.flush();
-            csvWriter.close();
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }*/
-        //System.out.println("Results of iteration saved at: " + saveFilePath);
-
+        updateUCTList(bestBDeuForNode);
     }
 
     /**
@@ -307,7 +234,7 @@ public class MCTSBN {
                 selection.add(selectNode.getParent());
             }
             
-            System.out.println("SELECTED: " + printUCB(selectNode) + "   " + selectNode.getState().getNode() + " -> " + problem.getHashIndices().get(selectNode.getState().getNode()));
+            System.out.println("SELECTED: " + printUCB(selectNode) + "   " + selectNode.getState().getNode());
         }
         
         /*for (TreeNode tn : selectionQueue) {
@@ -320,14 +247,7 @@ public class MCTSBN {
         return  selection;
     }
     
-    private double printUCB(TreeNode o) {
-        if(o.getParent() == null){
-            return Double.MAX_VALUE;
-        }
-        return  ((o.getTotalReward() / o.getNumVisits()) - Problem.emptyGraphScore ) / Problem.nInstances +
-                    MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(o.getParent().getNumVisits()) / o.getNumVisits());
-    }
-
+    
     /**
      * Expands the nodes in the list of selected nodes. The nodes are expanded by creating n child for each selected node.
      * @param selection List of selected nodes
@@ -342,10 +262,10 @@ public class MCTSBN {
             int nExpansion = 0;
 
             //1. Get all possible actions
-            List<Node> actions = node.getState().getPossibleActions();
+            List<Integer> actions = node.getState().getPossibleActions();
             //2. Get actions already taken for this node
-            Set<Node> childrenActions = node.getChildrenAction();
-            for (Node action: actions) {
+            Set<Integer> childrenActions = node.getChildrenAction();
+            for (Integer action: actions) {
 
                 // Checking if the number of expansion for this node is greater than the limit
                 if(nExpansion >= NUM_EXPAND)
@@ -365,8 +285,6 @@ public class MCTSBN {
                     expansion.add(newNode);
                     selectionSet.add(newNode);
                     nExpansion++;
-
-                    //return newNode;
                 }
             }
         }
@@ -381,43 +299,44 @@ public class MCTSBN {
         double score;
 
         // Creating a total order with the partial order of the state.
-        List<Node> order = state.getOrder();
-        List<Node> finalOrder = new ArrayList<>(problem.getVariables().size());
+        List<Integer> order = state.getOrder();
+        List<Integer> finalOrder = new ArrayList<>(problem.getVariables().size());
         finalOrder.addAll(order);
 
-        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, cache);
-        
         // Creating the candidates set
         HashSet<Integer> candidates = new HashSet<>(problem.getVariables().size());
-        for (Node node : problem.getVariables()) {
+        for (Integer node : allVars) {
             if (!order.contains(node)) {
-                candidates.add(problem.getHashIndices().get(node));
+                candidates.add(node);
             }
         }
         
         // We calculate the best parents for each node, and append the best to the order
         while (!candidates.isEmpty()){
             ArrayList<Pair> evaluations = new ArrayList<>();
+            HashSet<Integer> copyCandidates = new HashSet<>(candidates);
+            
             for (Integer node : candidates) {
-                evaluations.add(hc.evaluate(node, candidates));
+                copyCandidates.remove(node);
+                evaluations.add(hc.evaluate(node, copyCandidates));
+                copyCandidates.add(node);
             }
 
             // Add the best node to the head of the order
             Pair best = Collections.max(evaluations);
-            finalOrder.add(0, problem.getNode(best.node));
+            finalOrder.add(0, best.node);
             candidates.remove(best.node);
-
         }
         
         hc.setOrder(finalOrder);
         score = hc.search();
 
-        checkBestScore(score, finalOrder, order, hc);
+        checkBestScore(score, finalOrder, order);
 
         return score;
     }
 
-    synchronized private void checkBestScore(double score, List<Node> finalOrder, List<Node> order, HillClimbingEvaluator hc) {
+    synchronized private void checkBestScore(double score, List<Integer> finalOrder, List<Integer> order) {
         if(score > bestScore){
             bestScore = score;
             bestOrder = finalOrder;
@@ -439,23 +358,22 @@ public class MCTSBN {
 
         for (int i = 0; i < NUM_ROLLOUTS; i++) {
             // Creating a total order with the partial order of the state.
-            List<Node> order = state.getOrder();
-            List<Node> candidates = problem.getVariables();
+            List<Integer> order = state.getOrder();
+            List<Integer> candidates = new ArrayList(allVars);
             candidates = candidates.stream().filter(node -> !order.contains(node)).collect(Collectors.toList());
             Collections.shuffle(candidates);
 
             // Creating order for HC
-            List<Node> finalOrder = new ArrayList<>(order);
+            List<Integer> finalOrder = new ArrayList<>(order);
             finalOrder.addAll(candidates);
 
-            HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, cache);
             hc.setOrder(finalOrder);
             
             double score = hc.search();
             scoreSum+= score;
             
             // Updating best score, order and graph
-            checkBestScore(score, finalOrder, order, hc);
+            checkBestScore(score, finalOrder, order);
         }
         scoreSum = scoreSum / NUM_ROLLOUTS;
 
@@ -486,10 +404,51 @@ public class MCTSBN {
         }
     }
     
-    public void updateUCTList() {
-        for (TreeNode tn : selectionSet){
-            tn.updateUCT();
+    private double printUCB(TreeNode o) {
+        if(o.getParent() == null){
+            return Double.MAX_VALUE;
         }
+        return  ((o.getTotalReward() / o.getNumVisits()) - Problem.emptyGraphScore ) / Problem.nInstances +
+                    MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(o.getParent().getNumVisits()) / o.getNumVisits());
+    }
+    
+    public void updateUCTList(double[] bestBDeuForNode) {
+        for (TreeNode tn : selectionSet){
+            tn.updateUCT(bestBDeuForNode);
+        }
+    }
+    
+    
+    private void saveRound(int iteration, double totalTimeRound) {
+
+        /*File file = new File(saveFilePath);
+        BufferedWriter csvWriter = null;
+        try {
+            csvWriter = new BufferedWriter(new FileWriter(saveFilePath, true));
+
+            //FileWriter csvWriter = new FileWriter(savePath, true);
+            if (file.length() == 0) {
+                String header = "iterations,time(s),score\n";
+                csvWriter.append(header);
+            }
+            String result = "" + iteration + "," + totalTimeRound + "," + bestScore + "\n";*/
+            //System.out.println("Results iteration:" + iteration);
+            System.out.println("Total time iteration: " + totalTimeRound);
+            System.out.println("Best Score: " + bestScore);
+            System.out.println("Best order: " + toStringOrder(bestOrder));
+            System.out.println("  " + bestScore + "\t-> " + bestOrder);
+            System.out.println("Best partial order: " + toStringOrder(bestPartialOrder));
+            System.out.println("------------------------------------------------------");
+            /*csvWriter.append(result);
+
+            csvWriter.flush();
+            csvWriter.close();
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }*/
+        //System.out.println("Results of iteration saved at: " + saveFilePath);
+
     }
 
     /**
@@ -523,7 +482,7 @@ public class MCTSBN {
         return bestNodes.get(index);
     }
 
-    public List<Node> getBestOrder(){
+    public List<Integer> getBestOrder(){
         return bestOrder;
     }
 
@@ -540,10 +499,10 @@ public class MCTSBN {
         return root.toString();
     }
 
-    public static String toStringOrder(List<Node> order){
+    public String toStringOrder(List<Integer> order){
         StringBuilder result = new StringBuilder();
-        for (Node o: order) {
-            result.append(o).append(" < ");
+        for (Integer o: order) {
+            result.append(problem.getVarNames()[o]).append(" < ");
         }
         return result.toString();
     }
@@ -556,7 +515,7 @@ public class MCTSBN {
             double explorationScore = 0;
             if (tn.getParent() != null)
                 explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(tn.getParent().getNumVisits()) / tn.getNumVisits());
-            res += (tn.getState().getNode().getName() + "\t\t" + tn.getNumVisits() + "   " + tn.getUCTSCore() + "   " + explotationScore + "   " + explorationScore + "\n");
+            res += ("N"+tn.getState().getNode() + "\t\t" + tn.getNumVisits() + "   " + tn.getUCTSCore() + "   " + explotationScore + "   " + explorationScore + "\n");
         }
 
         return res;
