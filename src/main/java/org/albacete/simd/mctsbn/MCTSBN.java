@@ -54,7 +54,7 @@ public class MCTSBN {
 
     private final ConcurrentHashMap<String,Double> cache;
     
-    private final Pair[] bestBDeuForNode;
+    private final double[] bestBDeuForNode;
 
     private HashSet<TreeNode> selectionSet = new HashSet<>();
 
@@ -64,7 +64,7 @@ public class MCTSBN {
         this.problem = problem;
         this.cache = problem.getLocalScoreCache();
         this.ITERATION_LIMIT = iterationLimit;
-        bestBDeuForNode = new Pair[problem.getVariables().size()];
+        bestBDeuForNode = new double [problem.getVariables().size()];
     }
 
 
@@ -72,11 +72,47 @@ public class MCTSBN {
         //1. Set Root
         this.root = new TreeNode(initialState, null);
         selectionSet.add(root);
+
+
+        warmup();
+
+        /*
+                List<Node> order = state.getOrder();
+        List<Node> finalOrder = new ArrayList<>(problem.getVariables().size());
+        finalOrder.addAll(order);
+
+        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, cache);
+
+        // Creating the candidates set
+        HashSet<Integer> candidates = new HashSet<>(problem.getVariables().size());
+        for (Node node : problem.getVariables()) {
+            if (!order.contains(node)) {
+                candidates.add(problem.getHashIndices().get(node));
+            }
+        }
+
+                // We calculate the best parents for each node, and append the best to the order
+        while (!candidates.isEmpty()){
+            ArrayList<Pair> evaluations = new ArrayList<>();
+            for (Integer node : candidates) {
+                evaluations.add(hc.evaluate(node, candidates));
+            }
+
+            // Add the best node to the head of the order
+            Pair best = Collections.max(evaluations);
+            finalOrder.add(0, problem.getNode(best.node));
+            candidates.remove(best.node);
+
+        }
+
+        hc.setOrder(finalOrder);
+
+         */
         
         //1.5 Add PGES order
-        for (int i = 4; i < 4; i++) {
+        /*for (int i = 4; i < 4; i++) {
             initializeWithPGES(root,i);
-        }
+        }*/
 
         System.out.println("\n\nSTARTING MCTSBN\n------------------------------------------------------");
         
@@ -108,6 +144,18 @@ public class MCTSBN {
         //System.out.println(this);
         // return Best Dag
         return new Dag(bestDag);
+    }
+
+    private void warmup() {
+        HashSet<Integer> candidates = new HashSet<>(problem.getVariables().size());
+        for (Node node : problem.getVariables()) {
+            candidates.add(problem.getHashIndices().get(node));
+        }
+
+        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, cache);
+        for (Integer node : candidates) {
+           bestBDeuForNode[node] = hc.evaluate(node, candidates).bdeu;
+        }
     }
 
     public Dag search(){
@@ -358,12 +406,7 @@ public class MCTSBN {
             Pair best = Collections.max(evaluations);
             finalOrder.add(0, problem.getNode(best.node));
             candidates.remove(best.node);
-            
-            // Save the Pair
-            if (bestBDeuForNode[best.node] == null || 
-                    bestBDeuForNode[best.node].bdeu < best.bdeu) {
-                bestBDeuForNode[best.node] = best;
-            }
+
         }
         
         hc.setOrder(finalOrder);
