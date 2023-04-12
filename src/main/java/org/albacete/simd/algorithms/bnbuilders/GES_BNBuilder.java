@@ -23,37 +23,38 @@ public class GES_BNBuilder extends BNBuilder {
     private boolean fesFlag = false;
     private boolean besFlag = false;
     
-    private boolean speedUp;
+    private final boolean parallel;
 
-    public GES_BNBuilder(DataSet data, boolean speedUp) {
+
+    public GES_BNBuilder(DataSet data, boolean parallel) {
         super(data, 1, -1, -1);
         initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
-        this.speedUp = speedUp;
+        this.parallel = parallel;
     }
 
-    public GES_BNBuilder(String path, boolean speedUp) {
+    public GES_BNBuilder(String path, boolean parallel) {
         super(path, 1, -1, -1);
         initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
-        this.speedUp = speedUp;
+        this.parallel = parallel;
     }
 
-    public GES_BNBuilder(Graph initialDag, DataSet data, boolean speedUp) {
-        this(data, speedUp);
+    public GES_BNBuilder(Graph initialDag, DataSet data, boolean parallel) {
+        this(data, parallel);
         this.initialDag = new EdgeListGraph(initialDag);
         this.currentGraph = new EdgeListGraph(initialDag);
     }
 
-    public GES_BNBuilder(Graph initialDag, String path, boolean speedUp) {
-        this(path, speedUp);
+    public GES_BNBuilder(Graph initialDag, String path, boolean parallel) {
+        this(path, parallel);
         this.initialDag = new EdgeListGraph(initialDag);
         this.currentGraph = new EdgeListGraph(initialDag);
     }
 
-    public GES_BNBuilder(Graph initialDag, Problem problem, Set<Edge> subsetEdges, boolean speedUp) {
+    public GES_BNBuilder(Graph initialDag, Problem problem, Set<Edge> subsetEdges, boolean parallel) {
         super(initialDag, problem, 1, -1,-1);
         super.setOfArcs = subsetEdges;
         this.initialDag = new EdgeListGraph(initialDag);
-        this.speedUp = speedUp;
+        this.parallel = parallel;
     }
 
     @Override
@@ -74,7 +75,7 @@ public class GES_BNBuilder extends BNBuilder {
     @Override
     protected void forwardStage() throws InterruptedException {
         ForwardStage.meanTimeTotal = 0;
-        FESThread fes = new FESThread(problem, initialDag, setOfArcs, Integer.MAX_VALUE, speedUp);
+        FESThread fes = new FESThread(problem, initialDag, setOfArcs, Integer.MAX_VALUE, false, false, parallel);
         fes.run();
         currentGraph = fes.getCurrentGraph();
         fesFlag = fes.getFlag();

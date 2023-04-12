@@ -23,6 +23,8 @@ public class FESThread extends GESThread {
     private static int threadCounter = 1;
     
     private final boolean speedUp;
+    private final boolean update;
+    private final boolean parallel;
 
     /**
      * Constructor of FESThread with an initial DAG
@@ -35,8 +37,8 @@ public class FESThread extends GESThread {
      * @param maxIt maximum number of iterations allowed in the fes stage
      * @param speedUp
      */
-    public FESThread(Problem problem, Graph initialDag, Set<Edge> subset, int maxIt, boolean speedUp) {
-        this(problem, subset, maxIt, speedUp);
+    public FESThread(Problem problem, Graph initialDag, Set<Edge> subset, int maxIt, boolean speedUp, boolean update, boolean parallel) {
+        this(problem, subset, maxIt, speedUp, update, parallel);
         this.initialDag = initialDag;
     }
 
@@ -50,7 +52,7 @@ public class FESThread extends GESThread {
      * @param maxIt maximum number of iterations allowed in the fes stage
      * @param speedUp
      */
-    public FESThread(Problem problem, Set<Edge> subset, int maxIt, boolean speedUp) {
+    public FESThread(Problem problem, Set<Edge> subset, int maxIt, boolean speedUp, boolean update, boolean parallel) {
         this.problem = problem;
         this.initialDag = new EdgeListGraph_n(new LinkedList<>(getVariables()));
         setSubSetSearch(subset);
@@ -59,6 +61,8 @@ public class FESThread extends GESThread {
         threadCounter++;
         this.isForwards = true;
         this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
     //==========================PUBLIC METHODS==========================//
@@ -153,8 +157,10 @@ public class FESThread extends GESThread {
             //boolean cycles = graph.existsDirectedCycle();
 
             //PDAGtoCPDAG
-            //rebuildPattern(graph);
-            updateEdges(graph);
+            if (update)
+                updateEdges(graph);
+            else
+                rebuildPattern(graph);
             
             // Printing score
             /*if (!t_0.isEmpty()) {
@@ -216,7 +222,13 @@ public class FESThread extends GESThread {
         }
         */
         
-        Set<EdgeSearch> newScores = enlaces.parallelStream()
+        Set<EdgeSearch> newScores;
+        if (parallel)
+            newScores = enlaces.parallelStream()
+                .map(e -> scoreEdge(graph, e))
+                .collect(Collectors.toSet());
+        else
+            newScores = enlaces.stream()
                 .map(e -> scoreEdge(graph, e))
                 .collect(Collectors.toSet());
         
@@ -271,7 +283,7 @@ public class FESThread extends GESThread {
             Node y = edge.getNode2();
             return !process.contains(x) && !process.contains(y);
         });
-        System.out.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
+        //System.out.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
     }
 
     private Set<Node> revertToCPDAG(Graph graph) {

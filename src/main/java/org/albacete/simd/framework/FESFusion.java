@@ -23,11 +23,13 @@ public class FESFusion extends FusionStage{
 
 
 
-    public FESFusion(Problem problem, Graph currentGraph, ArrayList<Dag_n> graphs) {
+    public FESFusion(Problem problem, Graph currentGraph, ArrayList<Dag_n> graphs, boolean update) {
         super(problem, currentGraph, graphs);
+        this.update = update;
     }
     
     public boolean flag = false;
+    private final boolean update;
 
     @Override
     public Dag_n fusion() {
@@ -54,7 +56,7 @@ public class FESFusion extends FusionStage{
         }
         
 
-        FESThread fuse = new FESThread(this.problem,this.currentGraph,candidates,candidates.size(),false);
+        FESThread fuse = new FESThread(this.problem,this.currentGraph,candidates,candidates.size(),false, update,true);
 
         fuse.run();
         

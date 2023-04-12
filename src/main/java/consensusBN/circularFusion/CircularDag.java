@@ -80,7 +80,7 @@ public class CircularDag {
     }
     
     private void applyFESFusion(ArrayList<Dag_n> dags)  throws InterruptedException {
-        FESFusion fusion = new FESFusion(problem, dag, dags);
+        FESFusion fusion = new FESFusion(problem, dag, dags, false);
         dag = fusion.fusion();
         printResults(id, "Fusion", GESThread.scoreGraph(dag, problem));
         
@@ -106,7 +106,7 @@ public class CircularDag {
 
     private Graph applyGES() throws InterruptedException {
         // Do the FESThread
-        FESThread fes = new FESThread(problem, dag, subsetEdges, this.nItInterleaving, false);
+        FESThread fes = new FESThread(problem, dag, subsetEdges, this.nItInterleaving, false, false, false);
         fes.run();
         Graph fesGraph = fes.getCurrentGraph();
         fesGraph = transformPDAGtoDAG(fesGraph);

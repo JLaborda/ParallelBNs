@@ -6,6 +6,8 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag_n;
+import edu.cmu.tetrad.graph.GraphUtils;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.clustering.Clustering;
@@ -15,8 +17,6 @@ import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
 import org.apache.commons.lang3.time.StopWatch;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
@@ -79,7 +79,6 @@ public class ExperimentBNBuilder {
         extractParametersForClusterExperiment(parameters);
         this.numberOfThreads = threads;
         createBNBuilder();
-        setSignalHandler();
     }
 
     private void extractParametersForClusterExperiment(String[] parameters){
@@ -97,17 +96,10 @@ public class ExperimentBNBuilder {
         databaseName = getDatabaseNameFromPattern();
         testDatabasePath = parameters[4];
         testDataset = Utils.readData(testDatabasePath);
-        if(algName.equals("pges") || algName.equals("pges_random") || algName.equals("circular_ges")) {
-            numberOfPGESThreads = Integer.parseInt(parameters[5]);
-            interleaving = Integer.parseInt(parameters[6]);
-            seed = Integer.parseInt(parameters[7]);
-        }
 
-        if(algName.equals("pges-jc")){
-            numberOfPGESThreads = Integer.parseInt(parameters[5]);
-            interleaving = Integer.parseInt(parameters[6]);
-            seed = -1;
-        }
+        numberOfPGESThreads = Integer.parseInt(parameters[5]);
+        interleaving = Integer.parseInt(parameters[6]);
+        seed = Integer.parseInt(parameters[7]);
     }
     
     public boolean checkExistentFile(String savePath) throws IOException{
@@ -129,18 +121,27 @@ public class ExperimentBNBuilder {
     }
 
     private void createBNBuilder() throws Exception {
-        boolean speedUp = true;
+        boolean speedUp = false;
+        boolean update = true;
+        boolean parallel = true;
         switch(algName) {
             case "pges_random":
                 Clustering randomClustering = new RandomClustering(seed);
-                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp);
+                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, parallel);
                 break;
             case "pges":
                 Clustering hierarchicalClusteringPGES = new HierarchicalClustering();
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, true);
+                break;
+            case "pges-noParallel":
+                Clustering hierarchicalClusteringPGES2 = new HierarchicalClustering();
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES2, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, false);
                 break;
             case "ges":
-                algorithm = new GES_BNBuilder(databasePath, speedUp);
+                algorithm = new GES_BNBuilder(databasePath, true);
+                break;
+            case "ges-noParallel":
+                algorithm = new GES_BNBuilder(databasePath, false);
                 break;
             case "circular_ges":
                 Clustering hierarchicalClusteringGES = new HierarchicalClustering();
@@ -157,33 +158,15 @@ public class ExperimentBNBuilder {
                 break;
             case "pges-jc":
                 Clustering hierarchicalClusteringJC = new HierarchicalClustering(true, true);
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, true);
+                break;
+            case "pges-jc-noParallel":
+                Clustering hierarchicalClusteringJC2 = new HierarchicalClustering(true, true);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC2, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, false);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);
         }
-    }
-
-    public void setSignalHandler(){
-        // Setting Signal Handler
-        Signal.handle(new Signal("STOP"), new SignalHandler() {
-                    public void handle(Signal sig) {
-                        System.out.println("Signal handler called for signal " + sig);
-                        // Stop the timer when the stop signal or the interrupt signal is received
-                        if (sig.getName().equals("STOP") || sig.getName().equals("INT")) {
-                            if (stopWatch.isStarted()) {
-                                stopWatch.stop();
-                            }
-                        }
-                        // Resume the timer when the continue signal is received
-                        if(sig.getName().equals("CONT")) {
-                            if (!stopWatch.isStarted()) {
-                                stopWatch.start();
-                            }
-                        }
-                    }
-                }
-        );
     }
 
     public ExperimentBNBuilder(BNBuilder algorithm, String netName, String netPath, String bbddPath, String testDatabasePath) {
@@ -269,7 +252,14 @@ public class ExperimentBNBuilder {
     private void calcuateMeasurements(MlBayesIm controlBayesianNetwork) {
         // Getting time
         this.elapsedTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
+        
+        // SHD Tetrad
+        //GraphUtils.GraphComparison comparison = SearchGraphUtils.getGraphComparison(controlBayesianNetwork.getDag(), algorithm.getCurrentDag());
+        //this.structuralHamiltonDistanceValue = comparison.getShd();
+        
+        // "SDM": 
         this.structuralHamiltonDistanceValue = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
+        
         this.differencesOfMalkovsBlanket = Utils.avgMarkovBlanquetdif(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
         this.numberOfIterations = algorithm.getIterations();
         this.bdeuScore = GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem());

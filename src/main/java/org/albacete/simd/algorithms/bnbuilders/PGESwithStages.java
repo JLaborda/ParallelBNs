@@ -14,37 +14,47 @@ public class PGESwithStages extends BNBuilder {
     private FESStage fesStage;
     private BESStage besStage;
     
-    private boolean speedUp;
+    private final boolean speedUp;
+    private final boolean update;
+    private final boolean parallel;
 
     private final Clustering clustering;
 
-    public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp) {
+    public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp, boolean update, boolean parallel) {
 
         super(data, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
         this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
-    public PGESwithStages(String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp) {
+    public PGESwithStages(String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp, boolean update, boolean parallel) {
         super(path, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
         this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
-    public PGESwithStages(Graph initialGraph, String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp) {
+    public PGESwithStages(Graph initialGraph, String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp, boolean update, boolean parallel) {
         super(initialGraph, path, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
         this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
-    public PGESwithStages(Graph initialGraph, DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp) {
+    public PGESwithStages(Graph initialGraph, DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp, boolean update, boolean parallel) {
         super(initialGraph, data, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
         this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
     @Override
@@ -85,14 +95,14 @@ public class PGESwithStages extends BNBuilder {
 
     @Override
     protected void forwardStage(){
-        fesStage = new FESStage(problem, currentGraph,nThreads,nItInterleaving, subSets, speedUp);
+        fesStage = new FESStage(problem, currentGraph,nThreads,nItInterleaving, subSets, speedUp, update, parallel);
         fesFlag = fesStage.run();
         graphs = fesStage.getGraphs();
     }
 
     @Override
     protected void forwardFusion() throws InterruptedException {
-        FESFusion fesFusion = new FESFusion(problem, currentGraph, graphs);
+        FESFusion fesFusion = new FESFusion(problem, currentGraph, graphs, update);
         fesFusion.run();
         fesFlag = fesFusion.flag;
         currentGraph = fesFusion.getCurrentGraph();

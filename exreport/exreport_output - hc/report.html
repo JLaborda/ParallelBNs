@@ -1,0 +1,1928 @@
+<!--
+Parameters:
+
+title, date
+
+-->
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <link href="assets/bootstrap.min.css" rel="stylesheet" />
+
+    <title>Your mAnDE report</title>
+</head>
+
+<body data-spy="scroll" data-target="#side-nav" data-offset="350">
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="http://exreport.jarias.es">Generated with exreport - beta 0.4</a>
+    </div>
+  </div>
+</nav>
+
+    <div class="container">
+
+
+        <div class="row">
+
+             <div class="col-xs-1 visible-lg visible-md"></div>
+
+             <div class="col-md-10 document">
+              <div class="document-content">
+
+               <br>
+               <br>
+               <div class="text-center">
+                 <h1>Your mAnDE report</h1>
+                 <h3>2023-02-06</h3>
+               </div>
+               <br>
+               <hr>
+               <br>
+               <br>
+
+<!--
+Parameters:
+
+title, methods, problems, parameters, outputs, history
+
+-->
+
+<section id="elem_1_hook">
+<a id="pGES"></a>
+    <div class="text-center">
+      <h2>Experiment: pGES</h2>
+    </div>
+    <ul>
+    </br>
+        <li><strong>Methods:</strong> Fges,1, Fges-faithfulness,1, Fges-ges,1, GES,1, pGES,2, pGES,4, pGES,8, pGES,16</li>
+        <li><strong>Problems:</strong> andes, hailfinder, link, munin, pigs</li>
+        <li><strong>Parameters:</strong>
+        <ul>
+<li>pges_threads [1,2,4,8,16] (instantiated)</li>
+
+</ul>
+        </li>
+        <li><strong>Outputs:</strong> SHD, loglike, bdeu, deltaMM, deltaMM., deltaMM..1, time.s., deltaBDeu, deltas, deltaSHD, deltaSHDemptySHD</li>
+    </ul>
+    <h5>History:</h5>
+        <ol>
+<li>Experiment pGES loaded from a data set.</li>
+<li>Methods has been instanciated with the parameters: pges_threads</li>
+
+</ol>
+    </br>
+    </br>
+</section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_2_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "bdeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output bdeu </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: maximize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 14.5</li>
+        <li>Computed p-value: 0.0429703080155061</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_3_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "bdeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">-</td><td style="text-align:right">3.10</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.10</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.40</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.50</td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.90</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right"><strong>5.3292e-01</strong></td><td style="text-align:right">5.60</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right"><strong>1.4321e-01</strong></td><td style="text-align:right">6.60</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right"><strong>1.1847e-01</strong></td><td style="text-align:right">6.80</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_3_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_3_hidden">
+      <pre id="elem_3_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES,4 & - & 3.10 & - & - & -\\
+pGES,8 & \bf 1.0000e+00 & 3.10 & 3 & 1 & 1\\
+GES,1 & \bf 1.0000e+00 & 3.40 & 2 & 0 & 3\\
+pGES,16 & \bf 1.0000e+00 & 3.50 & 2 & 1 & 2\\
+pGES,2 & \bf 1.0000e+00 & 3.90 & 3 & 1 & 1\\
+Fges-faithfulness,1 & \bf 5.3292e-01 & 5.60 & 4 & 0 & 1\\
+Fges-ges,1 & \bf 1.4321e-01 & 6.60 & 5 & 0 & 0\\
+Fges,1 & \bf 1.1847e-01 & 6.80 & 4 & 0 & 1\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_3_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_4_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "bdeu"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_4', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_4', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_4', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_4', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_4.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_5_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "bdeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">andes</th><th style="text-align:right">hailfinder</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">-473700.5718273271</td><td style="text-align:right">-252281.5493274437</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">-472615.1604891632</td><td style="text-align:right">-252091.6760570734</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">-472601.8327950239</td><td style="text-align:right">-252150.3281126900</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">-471581.3941527303</td><td style="text-align:right"><strong>-252067.1538740745</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">-471585.7249164879</td><td style="text-align:right">-252073.2418579998</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">-471583.3883498240</td><td style="text-align:right">-252077.2577834334</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right"><strong>-471573.8073858133</strong></td><td style="text-align:right">-252080.3129831337</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right">-471576.8720492080</td><td style="text-align:right">-252081.0192250438</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">link</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">-1430938.5540858174</td><td style="text-align:right">-933486.6914035190</td><td style="text-align:right">-1725913.1018322634</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">-1198200.4522007839</td><td style="text-align:right"><strong>-932960.1772118104</strong></td><td style="text-align:right">-1725909.0654285431</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">-1196131.4765387757</td><td style="text-align:right">-</td><td style="text-align:right">-1725904.6823034019</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">-1141528.2310095066</td><td style="text-align:right">-935367.8454346504</td><td style="text-align:right"><strong>-1674994.7424588739</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">-1138432.6985761302</td><td style="text-align:right">-933962.4792970963</td><td style="text-align:right">-1674994.7424588741</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">-1137072.6548004688</td><td style="text-align:right">-933490.1446104064</td><td style="text-align:right">-1674994.7424588741</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">-1137707.0294119471</td><td style="text-align:right">-933710.7504170515</td><td style="text-align:right">-1674994.7424588741</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right"><strong>-1137044.8962586985</strong></td><td style="text-align:right">-934053.1252679981</td><td style="text-align:right">-1674994.7424588741</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_5_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_5_hidden">
+      <pre id="elem_5_code">
+
+\begin{tabular}{lrr}
+\hline
+algorithm & andes & hailfinder\\
+\hline
+Fges,1 & -473700.5718273271 & -252281.5493274437\\
+Fges-faithfulness,1 & -472615.1604891632 & -252091.6760570734\\
+Fges-ges,1 & -472601.8327950239 & -252150.3281126900\\
+GES,1 & -471581.3941527303 & \bf -252067.1538740745\\
+pGES,2 & -471585.7249164879 & -252073.2418579998\\
+pGES,4 & -471583.3883498240 & -252077.2577834334\\
+pGES,8 & \bf -471573.8073858133 & -252080.3129831337\\
+pGES,16 & -471576.8720492080 & -252081.0192250438\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrr}
+\hline
+algorithm & link & munin & pigs\\
+\hline
+Fges,1 & -1430938.5540858174 & -933486.6914035190 & -1725913.1018322634\\
+Fges-faithfulness,1 & -1198200.4522007839 & \bf -932960.1772118104 & -1725909.0654285431\\
+Fges-ges,1 & -1196131.4765387757 & - & -1725904.6823034019\\
+GES,1 & -1141528.2310095066 & -935367.8454346504 & \bf -1674994.7424588739\\
+pGES,2 & -1138432.6985761302 & -933962.4792970963 & -1674994.7424588741\\
+pGES,4 & -1137072.6548004688 & -933490.1446104064 & -1674994.7424588741\\
+pGES,8 & -1137707.0294119471 & -933710.7504170515 & -1674994.7424588741\\
+pGES,16 & \bf -1137044.8962586985 & -934053.1252679981 & -1674994.7424588741\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_5_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_6_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "SHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output SHD </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: minimize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 20.15</li>
+        <li>Computed p-value: 0.00525463780608681</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_7_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "SHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">-</td><td style="text-align:right">2.40</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">2.60</td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.60</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.80</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.80</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right"><strong>1.4093e-01</strong></td><td style="text-align:right">5.80</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">3.3056e-02</td><td style="text-align:right">6.70</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">1.0933e-02</td><td style="text-align:right">7.30</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_7_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_7_hidden">
+      <pre id="elem_7_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES,8 & - & 2.40 & - & - & -\\
+GES,1 & \bf 1.0000e+00 & 2.60 & 2 & 1 & 2\\
+pGES,16 & \bf 1.0000e+00 & 3.60 & 3 & 1 & 1\\
+pGES,2 & \bf 1.0000e+00 & 3.80 & 3 & 1 & 1\\
+pGES,4 & \bf 1.0000e+00 & 3.80 & 3 & 1 & 1\\
+Fges-faithfulness,1 & \bf 1.4093e-01 & 5.80 & 5 & 0 & 0\\
+Fges,1 & 3.3056e-02 & 6.70 & 5 & 0 & 0\\
+Fges-ges,1 & 1.0933e-02 & 7.30 & 5 & 0 & 0\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_7_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_8_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "SHD"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_8', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_8', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_8', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_8', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_8.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_9_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "SHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">andes</th><th style="text-align:right">hailfinder</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">232.45455</td><td style="text-align:right">45.90909</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">179.27273</td><td style="text-align:right">43.90909</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">180.00000</td><td style="text-align:right">43.90909</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">151.54545</td><td style="text-align:right">32.90909</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">152.81818</td><td style="text-align:right"><strong>32.81818</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">153.36364</td><td style="text-align:right">33.81818</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right"><strong>151.00000</strong></td><td style="text-align:right">33.36364</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right">151.72727</td><td style="text-align:right">33.00000</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">link</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">1370.45455</td><td style="text-align:right">1489.63636</td><td style="text-align:right">309.00000</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">1083.72727</td><td style="text-align:right">1489.63636</td><td style="text-align:right">309.18182</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">1094.27273</td><td style="text-align:right">-</td><td style="text-align:right">309.27273</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">1032.36364</td><td style="text-align:right"><strong>1468.45455</strong></td><td style="text-align:right"><strong>0.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">952.81818</td><td style="text-align:right">1505.45455</td><td style="text-align:right"><strong>0.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right"><strong>948.63636</strong></td><td style="text-align:right">1490.18182</td><td style="text-align:right"><strong>0.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">950.27273</td><td style="text-align:right">1471.70000</td><td style="text-align:right"><strong>0.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right">951.18182</td><td style="text-align:right">1494.63636</td><td style="text-align:right"><strong>0.00000</strong></td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_9_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_9_hidden">
+      <pre id="elem_9_code">
+
+\begin{tabular}{lrr}
+\hline
+algorithm & andes & hailfinder\\
+\hline
+Fges,1 & 232.45455 & 45.90909\\
+Fges-faithfulness,1 & 179.27273 & 43.90909\\
+Fges-ges,1 & 180.00000 & 43.90909\\
+GES,1 & 151.54545 & 32.90909\\
+pGES,2 & 152.81818 & \bf 32.81818\\
+pGES,4 & 153.36364 & 33.81818\\
+pGES,8 & \bf 151.00000 & 33.36364\\
+pGES,16 & 151.72727 & 33.00000\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrr}
+\hline
+algorithm & link & munin & pigs\\
+\hline
+Fges,1 & 1370.45455 & 1489.63636 & 309.00000\\
+Fges-faithfulness,1 & 1083.72727 & 1489.63636 & 309.18182\\
+Fges-ges,1 & 1094.27273 & - & 309.27273\\
+GES,1 & 1032.36364 & \bf 1468.45455 & \bf 0.00000\\
+pGES,2 & 952.81818 & 1505.45455 & \bf 0.00000\\
+pGES,4 & \bf 948.63636 & 1490.18182 & \bf 0.00000\\
+pGES,8 & 950.27273 & 1471.70000 & \bf 0.00000\\
+pGES,16 & 951.18182 & 1494.63636 & \bf 0.00000\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_9_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_10_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "deltaSHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output deltaSHD </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: maximize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 20.15</li>
+        <li>Computed p-value: 0.00525463780608681</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_11_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "deltaSHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">-</td><td style="text-align:right">2.40</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">2.60</td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.60</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.80</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.80</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right"><strong>1.4093e-01</strong></td><td style="text-align:right">5.80</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">3.3056e-02</td><td style="text-align:right">6.70</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">1.0933e-02</td><td style="text-align:right">7.30</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_11_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_11_hidden">
+      <pre id="elem_11_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES,8 & - & 2.40 & - & - & -\\
+GES,1 & \bf 1.0000e+00 & 2.60 & 2 & 1 & 2\\
+pGES,16 & \bf 1.0000e+00 & 3.60 & 3 & 1 & 1\\
+pGES,2 & \bf 1.0000e+00 & 3.80 & 3 & 1 & 1\\
+pGES,4 & \bf 1.0000e+00 & 3.80 & 3 & 1 & 1\\
+Fges-faithfulness,1 & \bf 1.4093e-01 & 5.80 & 5 & 0 & 0\\
+Fges,1 & 3.3056e-02 & 6.70 & 5 & 0 & 0\\
+Fges-ges,1 & 1.0933e-02 & 7.30 & 5 & 0 & 0\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_11_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_12_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "deltaSHD"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_12', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_12', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_12', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_12', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_12.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_13_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "deltaSHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">andes</th><th style="text-align:right">hailfinder</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">393.54545</td><td style="text-align:right">53.09091</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">446.72727</td><td style="text-align:right">55.09091</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">446.00000</td><td style="text-align:right">55.09091</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">474.45455</td><td style="text-align:right">66.09091</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">473.18182</td><td style="text-align:right"><strong>66.18182</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">472.63636</td><td style="text-align:right">65.18182</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right"><strong>475.00000</strong></td><td style="text-align:right">65.63636</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right">474.27273</td><td style="text-align:right">66.00000</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">link</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">367.54545</td><td style="text-align:right">353.36364</td><td style="text-align:right">497.00000</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">654.27273</td><td style="text-align:right">353.36364</td><td style="text-align:right">496.81818</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">643.72727</td><td style="text-align:right">-</td><td style="text-align:right">496.72727</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">705.63636</td><td style="text-align:right"><strong>374.54545</strong></td><td style="text-align:right"><strong>806.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">785.18182</td><td style="text-align:right">337.54545</td><td style="text-align:right"><strong>806.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right"><strong>789.36364</strong></td><td style="text-align:right">352.81818</td><td style="text-align:right"><strong>806.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">787.72727</td><td style="text-align:right">371.30000</td><td style="text-align:right"><strong>806.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right">786.81818</td><td style="text-align:right">348.36364</td><td style="text-align:right"><strong>806.00000</strong></td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_13_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_13_hidden">
+      <pre id="elem_13_code">
+
+\begin{tabular}{lrr}
+\hline
+algorithm & andes & hailfinder\\
+\hline
+Fges,1 & 393.54545 & 53.09091\\
+Fges-faithfulness,1 & 446.72727 & 55.09091\\
+Fges-ges,1 & 446.00000 & 55.09091\\
+GES,1 & 474.45455 & 66.09091\\
+pGES,2 & 473.18182 & \bf 66.18182\\
+pGES,4 & 472.63636 & 65.18182\\
+pGES,8 & \bf 475.00000 & 65.63636\\
+pGES,16 & 474.27273 & 66.00000\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrr}
+\hline
+algorithm & link & munin & pigs\\
+\hline
+Fges,1 & 367.54545 & 353.36364 & 497.00000\\
+Fges-faithfulness,1 & 654.27273 & 353.36364 & 496.81818\\
+Fges-ges,1 & 643.72727 & - & 496.72727\\
+GES,1 & 705.63636 & \bf 374.54545 & \bf 806.00000\\
+pGES,2 & 785.18182 & 337.54545 & \bf 806.00000\\
+pGES,4 & \bf 789.36364 & 352.81818 & \bf 806.00000\\
+pGES,8 & 787.72727 & 371.30000 & \bf 806.00000\\
+pGES,16 & 786.81818 & 348.36364 & \bf 806.00000\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_13_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_14_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "deltaSHDemptySHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output deltaSHDemptySHD </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: maximize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 20.15</li>
+        <li>Computed p-value: 0.00525463780608681</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_15_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "deltaSHDemptySHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">-</td><td style="text-align:right">2.40</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">2.60</td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.60</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.80</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.80</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right"><strong>1.4093e-01</strong></td><td style="text-align:right">5.80</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">3.3056e-02</td><td style="text-align:right">6.70</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">1.0933e-02</td><td style="text-align:right">7.30</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_15_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_15_hidden">
+      <pre id="elem_15_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES,8 & - & 2.40 & - & - & -\\
+GES,1 & \bf 1.0000e+00 & 2.60 & 2 & 1 & 2\\
+pGES,16 & \bf 1.0000e+00 & 3.60 & 3 & 1 & 1\\
+pGES,2 & \bf 1.0000e+00 & 3.80 & 3 & 1 & 1\\
+pGES,4 & \bf 1.0000e+00 & 3.80 & 3 & 1 & 1\\
+Fges-faithfulness,1 & \bf 1.4093e-01 & 5.80 & 5 & 0 & 0\\
+Fges,1 & 3.3056e-02 & 6.70 & 5 & 0 & 0\\
+Fges-ges,1 & 1.0933e-02 & 7.30 & 5 & 0 & 0\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_15_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_16_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "deltaSHDemptySHD"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_16', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_16', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_16', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_16', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_16.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_17_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "deltaSHDemptySHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">andes</th><th style="text-align:right">hailfinder</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">62.86669</td><td style="text-align:right">53.62718</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">71.36218</td><td style="text-align:right">55.64738</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">71.24601</td><td style="text-align:right">55.64738</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">75.79146</td><td style="text-align:right">66.75849</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">75.58815</td><td style="text-align:right"><strong>66.85032</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">75.50102</td><td style="text-align:right">65.84022</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right"><strong>75.87859</strong></td><td style="text-align:right">66.29936</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right">75.76242</td><td style="text-align:right">66.66667</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">link</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">21.14761</td><td style="text-align:right">19.17328</td><td style="text-align:right">61.66253</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">37.64515</td><td style="text-align:right">19.17328</td><td style="text-align:right">61.63997</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">37.03839</td><td style="text-align:right">-</td><td style="text-align:right">61.62869</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">40.60048</td><td style="text-align:right"><strong>20.32260</strong></td><td style="text-align:right"><strong>100.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">45.17732</td><td style="text-align:right">18.31500</td><td style="text-align:right"><strong>100.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right"><strong>45.41793</strong></td><td style="text-align:right">19.14369</td><td style="text-align:right"><strong>100.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">45.32378</td><td style="text-align:right">20.14650</td><td style="text-align:right"><strong>100.00000</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right">45.27147</td><td style="text-align:right">18.90199</td><td style="text-align:right"><strong>100.00000</strong></td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_17_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_17_hidden">
+      <pre id="elem_17_code">
+
+\begin{tabular}{lrr}
+\hline
+algorithm & andes & hailfinder\\
+\hline
+Fges,1 & 62.86669 & 53.62718\\
+Fges-faithfulness,1 & 71.36218 & 55.64738\\
+Fges-ges,1 & 71.24601 & 55.64738\\
+GES,1 & 75.79146 & 66.75849\\
+pGES,2 & 75.58815 & \bf 66.85032\\
+pGES,4 & 75.50102 & 65.84022\\
+pGES,8 & \bf 75.87859 & 66.29936\\
+pGES,16 & 75.76242 & 66.66667\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrr}
+\hline
+algorithm & link & munin & pigs\\
+\hline
+Fges,1 & 21.14761 & 19.17328 & 61.66253\\
+Fges-faithfulness,1 & 37.64515 & 19.17328 & 61.63997\\
+Fges-ges,1 & 37.03839 & - & 61.62869\\
+GES,1 & 40.60048 & \bf 20.32260 & \bf 100.00000\\
+pGES,2 & 45.17732 & 18.31500 & \bf 100.00000\\
+pGES,4 & \bf 45.41793 & 19.14369 & \bf 100.00000\\
+pGES,8 & 45.32378 & 20.14650 & \bf 100.00000\\
+pGES,16 & 45.27147 & 18.90199 & \bf 100.00000\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_17_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_18_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "deltaBDeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output deltaBDeu </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: maximize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 14.5</li>
+        <li>Computed p-value: 0.0429703080155061</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_19_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "deltaBDeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">-</td><td style="text-align:right">3.10</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.10</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.40</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.50</td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.90</td><td style="text-align:right">3</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right"><strong>5.3292e-01</strong></td><td style="text-align:right">5.60</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right"><strong>1.4321e-01</strong></td><td style="text-align:right">6.60</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right"><strong>1.1847e-01</strong></td><td style="text-align:right">6.80</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_19_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_19_hidden">
+      <pre id="elem_19_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES,4 & - & 3.10 & - & - & -\\
+pGES,8 & \bf 1.0000e+00 & 3.10 & 3 & 1 & 1\\
+GES,1 & \bf 1.0000e+00 & 3.40 & 2 & 0 & 3\\
+pGES,16 & \bf 1.0000e+00 & 3.50 & 2 & 1 & 2\\
+pGES,2 & \bf 1.0000e+00 & 3.90 & 3 & 1 & 1\\
+Fges-faithfulness,1 & \bf 5.3292e-01 & 5.60 & 4 & 0 & 1\\
+Fges-ges,1 & \bf 1.4321e-01 & 6.60 & 5 & 0 & 0\\
+Fges,1 & \bf 1.1847e-01 & 6.80 & 4 & 0 & 1\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_19_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_20_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "deltaBDeu"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_20', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_20', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_20', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_20', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_20.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_21_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "deltaBDeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">andes</th><th style="text-align:right">hailfinder</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">140090.35345</td><td style="text-align:right">96870.06658</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">141175.76478</td><td style="text-align:right">97059.93985</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">141189.09248</td><td style="text-align:right">97001.28780</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">142209.53112</td><td style="text-align:right"><strong>97084.46203</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">142205.20036</td><td style="text-align:right">97078.37405</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">142207.53692</td><td style="text-align:right">97074.35813</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right"><strong>142217.11789</strong></td><td style="text-align:right">97071.30293</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right">142214.05322</td><td style="text-align:right">97070.59668</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">link</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">621355.84958</td><td style="text-align:right">793158.86059</td><td style="text-align:right">572872.50319</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">854093.95147</td><td style="text-align:right"><strong>793685.37478</strong></td><td style="text-align:right">572876.53959</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">856162.92713</td><td style="text-align:right">-</td><td style="text-align:right">572880.92272</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">910766.17266</td><td style="text-align:right">791277.70655</td><td style="text-align:right"><strong>623790.86256</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">913861.70509</td><td style="text-align:right">792683.07269</td><td style="text-align:right">623790.86256</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">915221.74887</td><td style="text-align:right">793155.40738</td><td style="text-align:right">623790.86256</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">914587.37426</td><td style="text-align:right">792934.80157</td><td style="text-align:right">623790.86256</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right"><strong>915249.50741</strong></td><td style="text-align:right">792592.42672</td><td style="text-align:right">623790.86256</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_21_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_21_hidden">
+      <pre id="elem_21_code">
+
+\begin{tabular}{lrr}
+\hline
+algorithm & andes & hailfinder\\
+\hline
+Fges,1 & 140090.35345 & 96870.06658\\
+Fges-faithfulness,1 & 141175.76478 & 97059.93985\\
+Fges-ges,1 & 141189.09248 & 97001.28780\\
+GES,1 & 142209.53112 & \bf 97084.46203\\
+pGES,2 & 142205.20036 & 97078.37405\\
+pGES,4 & 142207.53692 & 97074.35813\\
+pGES,8 & \bf 142217.11789 & 97071.30293\\
+pGES,16 & 142214.05322 & 97070.59668\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrr}
+\hline
+algorithm & link & munin & pigs\\
+\hline
+Fges,1 & 621355.84958 & 793158.86059 & 572872.50319\\
+Fges-faithfulness,1 & 854093.95147 & \bf 793685.37478 & 572876.53959\\
+Fges-ges,1 & 856162.92713 & - & 572880.92272\\
+GES,1 & 910766.17266 & 791277.70655 & \bf 623790.86256\\
+pGES,2 & 913861.70509 & 792683.07269 & 623790.86256\\
+pGES,4 & 915221.74887 & 793155.40738 & 623790.86256\\
+pGES,8 & 914587.37426 & 792934.80157 & 623790.86256\\
+pGES,16 & \bf 915249.50741 & 792592.42672 & 623790.86256\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_21_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_22_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "deltas"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output deltas </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: maximize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 19.2</li>
+        <li>Computed p-value: 0.00758337347060458</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_23_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "deltas"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">-</td><td style="text-align:right">2.60</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">2.80</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.20</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.80</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">4.00</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right"><strong>1.6911e-01</strong></td><td style="text-align:right">6.00</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>1.6911e-01</strong></td><td style="text-align:right">6.00</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">8.7418e-03</td><td style="text-align:right">7.60</td><td style="text-align:right">5</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_23_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_23_hidden">
+      <pre id="elem_23_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES,8 & - & 2.60 & - & - & -\\
+pGES,4 & \bf 1.0000e+00 & 2.80 & 2 & 0 & 3\\
+Fges,1 & \bf 1.0000e+00 & 3.20 & 2 & 0 & 3\\
+pGES,16 & \bf 1.0000e+00 & 3.80 & 5 & 0 & 0\\
+pGES,2 & \bf 1.0000e+00 & 4.00 & 4 & 0 & 1\\
+Fges-faithfulness,1 & \bf 1.6911e-01 & 6.00 & 5 & 0 & 0\\
+GES,1 & \bf 1.6911e-01 & 6.00 & 4 & 0 & 1\\
+Fges-ges,1 & 8.7418e-03 & 7.60 & 5 & 0 & 0\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_23_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_24_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "deltas"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_24', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_24', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_24', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_24', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_24.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_25_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "deltas"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">andes</th><th style="text-align:right">hailfinder</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right"><strong>46087.47020</strong></td><td style="text-align:right">59.00314</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">13255.87989</td><td style="text-align:right">59.56958</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">6330.06480</td><td style="text-align:right">13.85143</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">7426.99859</td><td style="text-align:right">83027.49662</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">19605.38861</td><td style="text-align:right"><strong>84680.58129</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">24262.86517</td><td style="text-align:right">79264.38688</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">23257.19544</td><td style="text-align:right">77232.13468</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right">18569.50520</td><td style="text-align:right">70158.96970</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">link</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right"><strong>15381.25764</strong></td><td style="text-align:right">71.07506</td><td style="text-align:right"><strong>28808.44763</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">4389.59867</td><td style="text-align:right">68.71776</td><td style="text-align:right">12006.34699</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">2409.58108</td><td style="text-align:right">-</td><td style="text-align:right">4595.45430</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">1429.95218</td><td style="text-align:right">470.77632</td><td style="text-align:right">4394.20470</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,2</td><td style="text-align:right">3358.38096</td><td style="text-align:right">803.40531</td><td style="text-align:right">13682.64716</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,4</td><td style="text-align:right">5624.11330</td><td style="text-align:right"><strong>1229.25280</strong></td><td style="text-align:right">20726.91063</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,8</td><td style="text-align:right">8148.83511</td><td style="text-align:right">1163.03745</td><td style="text-align:right">24938.85748</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES,16</td><td style="text-align:right">7979.31526</td><td style="text-align:right">996.62211</td><td style="text-align:right">24226.58000</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_25_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_25_hidden">
+      <pre id="elem_25_code">
+
+\begin{tabular}{lrr}
+\hline
+algorithm & andes & hailfinder\\
+\hline
+Fges,1 & \bf 46087.47020 & 59.00314\\
+Fges-faithfulness,1 & 13255.87989 & 59.56958\\
+Fges-ges,1 & 6330.06480 & 13.85143\\
+GES,1 & 7426.99859 & 83027.49662\\
+pGES,2 & 19605.38861 & \bf 84680.58129\\
+pGES,4 & 24262.86517 & 79264.38688\\
+pGES,8 & 23257.19544 & 77232.13468\\
+pGES,16 & 18569.50520 & 70158.96970\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrr}
+\hline
+algorithm & link & munin & pigs\\
+\hline
+Fges,1 & \bf 15381.25764 & 71.07506 & \bf 28808.44763\\
+Fges-faithfulness,1 & 4389.59867 & 68.71776 & 12006.34699\\
+Fges-ges,1 & 2409.58108 & - & 4595.45430\\
+GES,1 & 1429.95218 & 470.77632 & 4394.20470\\
+pGES,2 & 3358.38096 & 803.40531 & 13682.64716\\
+pGES,4 & 5624.11330 & \bf 1229.25280 & 20726.91063\\
+pGES,8 & 8148.83511 & 1163.03745 & 24938.85748\\
+pGES,16 & 7979.31526 & 996.62211 & 24226.58000\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_25_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+<!--
+Parameters:
+
+r_version, index
+
+-->
+          </div>
+        </div> <!-- End Col -->
+
+        <div class="col-md-1 visible-lg" id="side-nav">
+            <ul class="nav nav-pills nav-stacked" data-spy="affix" data-offset-top="50">
+              
+<li><a href="#elem_1_hook"><strong>experiment:</strong>pGES</a></li>
+<li><a href="#elem_2_hook"><strong>TestMultipleControl:</strong>bdeu</a></li>
+<li><a href="#elem_3_hook"><strong>TestSummaryTable:</strong>bdeu</a></li>
+<li><a href="#elem_4_hook"><strong>RankDistributionPlot:</strong>bdeu</a></li>
+<li><a href="#elem_5_hook"><strong>ExpSummaryTable:</strong>bdeu</a></li>
+<li><a href="#elem_6_hook"><strong>TestMultipleControl:</strong>SHD</a></li>
+<li><a href="#elem_7_hook"><strong>TestSummaryTable:</strong>SHD</a></li>
+<li><a href="#elem_8_hook"><strong>RankDistributionPlot:</strong>SHD</a></li>
+<li><a href="#elem_9_hook"><strong>ExpSummaryTable:</strong>SHD</a></li>
+<li><a href="#elem_10_hook"><strong>TestMultipleControl:</strong>deltaSHD</a></li>
+<li><a href="#elem_11_hook"><strong>TestSummaryTable:</strong>deltaSHD</a></li>
+<li><a href="#elem_12_hook"><strong>RankDistributionPlot:</strong>deltaSHD</a></li>
+<li><a href="#elem_13_hook"><strong>ExpSummaryTable:</strong>deltaSHD</a></li>
+<li><a href="#elem_14_hook"><strong>TestMultipleControl:</strong>deltaSHDemptySHD</a></li>
+<li><a href="#elem_15_hook"><strong>TestSummaryTable:</strong>deltaSHDemptySHD</a></li>
+<li><a href="#elem_16_hook"><strong>RankDistributionPlot:</strong>deltaSHDemptySHD</a></li>
+<li><a href="#elem_17_hook"><strong>ExpSummaryTable:</strong>deltaSHDemptySHD</a></li>
+<li><a href="#elem_18_hook"><strong>TestMultipleControl:</strong>deltaBDeu</a></li>
+<li><a href="#elem_19_hook"><strong>TestSummaryTable:</strong>deltaBDeu</a></li>
+<li><a href="#elem_20_hook"><strong>RankDistributionPlot:</strong>deltaBDeu</a></li>
+<li><a href="#elem_21_hook"><strong>ExpSummaryTable:</strong>deltaBDeu</a></li>
+<li><a href="#elem_22_hook"><strong>TestMultipleControl:</strong>deltas</a></li>
+<li><a href="#elem_23_hook"><strong>TestSummaryTable:</strong>deltas</a></li>
+<li><a href="#elem_24_hook"><strong>RankDistributionPlot:</strong>deltas</a></li>
+<li><a href="#elem_25_hook"><strong>ExpSummaryTable:</strong>deltas</a></li>
+            </ul>
+        </div>
+
+
+      </div> <!-- End Row -->
+    </div> <!-- End Container -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <br>
+          <br>
+        </div>
+      </div>
+
+      <div class="row">
+          <div class="col-md-12 text-center" style="background-color:black;">
+          <span class="text-center" style="color: #999;">
+            <br>
+            <h5>exreport, Copyright 2015 by Jacinto Arias and Javier Cozar</h5>
+            Generated using R version 4.2.0 (2022-04-22)
+            <br>
+            <br>
+          </span>
+          </div>
+      </div>
+    </div>
+
+    <script src="./assets/jquery.js"></script>
+    <script src="./assets/scripts.js"></script>
+    <script src="./assets/bootstrap.min.js"></script>
+
+</body>
+</html>

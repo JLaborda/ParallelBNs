@@ -15,11 +15,13 @@ public class Fges_BNBuilder extends BNBuilder {
     public Fges_BNBuilder(DataSet data, boolean setFaithfulnessAssumed, boolean ges) {
         super(data, 1, -1, -1);
         this.setFaithfulnessAssumed = setFaithfulnessAssumed;
+        this.ges = ges;
     }
 
     public Fges_BNBuilder(String path, boolean setFaithfulnessAssumed, boolean ges) {
         super(path, 1, -1, -1);
         this.setFaithfulnessAssumed = setFaithfulnessAssumed;
+        this.ges = ges;
     }
 
     @Override
