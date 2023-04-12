@@ -1,6 +1,6 @@
 package org.albacete.simd.mctsbn;
 
-import edu.cmu.tetrad.graph.Node;
+import java.util.Arrays;
 import org.albacete.simd.utils.Problem;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,20 +17,26 @@ public class TreeNode implements Comparable<TreeNode>{
     
     private int numVisits = 0;
     private double totalReward = 0;
-    
+
     private double UCTSCore = 0;
     
-    
+    private final HillClimbingEvaluator hc;
     
     private boolean fullyExpanded;
     private boolean isExpanded = false;
 
     public TreeNode(State state, TreeNode parent){
         this.state = state;
+        this.hc = state.getHC();
         this.parent = parent;
         this.numVisits = 0;
         this.totalReward = 0;
         this.fullyExpanded = state.isTerminal();
+        
+        if (this.parent != null) {
+            this.parent.addChild(this);
+            this.numVisits = 1;
+        }
     }
 
     public boolean isTerminal() {
@@ -53,7 +59,7 @@ public class TreeNode implements Comparable<TreeNode>{
         return totalReward;
     }
     
-    public double getUCTSCore() {
+    public double getUCTScore() {
         return UCTSCore;
     }
 
@@ -75,6 +81,7 @@ public class TreeNode implements Comparable<TreeNode>{
 
     public void addChild(TreeNode child){
         this.children.add(child);
+        this.isExpanded = true;
     }
 
     public boolean isFullyExpanded() {
@@ -100,6 +107,10 @@ public class TreeNode implements Comparable<TreeNode>{
     public void incrementOneVisit(){
         this.numVisits++;
     }
+    
+    public void decrementOneVisit(){
+        this.numVisits--;
+    }
 
     public boolean isExpanded() {
         return isExpanded;
@@ -121,13 +132,20 @@ public class TreeNode implements Comparable<TreeNode>{
         buffer.append("N" + state.getNode());
         
         String results;
+        
+        double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
+        double aStar = state.getLocalScore();
+        for (Integer node : state.getPossibleActions()) {
+            aStar += hc.bestBDeuForNode[node];
+        }
+        aStar -= Arrays.stream(hc.bestBDeuForNode).sum();
+        aStar /= Problem.nInstances;
+        aStar *= MCTSBN.A_STAR_CONSTANT;
         if(this.parent == null){
-            double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
-            results = "  \t" + this.getNumVisits() + "   " + Double.MAX_VALUE + ", " + exploitationScore;
+            results = "  \t" + this.getNumVisits() + "   BDeu " + exploitationScore + ",   A* " + aStar;
         } else {
-            double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
             double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
-            results = "  \t" + this.getNumVisits() + "   " + (exploitationScore + explorationScore) + ", " + exploitationScore + ", " + explorationScore;
+            results = "  \t" + this.getNumVisits() + "   UCT " + UCTSCore + ",   BDeu " + exploitationScore + ",   EXP " + explorationScore + ",   A* " + aStar;
         }
         buffer.append(results);
         
@@ -142,16 +160,23 @@ public class TreeNode implements Comparable<TreeNode>{
         }
     }
     
-    public void updateUCT(double[] bestBDeuForNode) {
-        if(this.parent == null){
-            UCTSCore = Double.MAX_VALUE;
-        }
-        else{
+    public void updateUCT(double bestAStar) {
+        if(this.parent == null && this.fullyExpanded){
+            UCTSCore = Double.NEGATIVE_INFINITY;
+        } else {
             double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
             double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
-            double aStarScore = 0;
-
-            UCTSCore = exploitationScore + explorationScore + aStarScore;
+            double aStar = state.getLocalScore();
+            for (Integer node : state.getPossibleActions()) {
+                aStar += hc.bestBDeuForNode[node];
+            }
+            //System.out.println("localScore: " + state.getLocalScore() + ", aStar: " + aStar + ", bestAStar: " + bestAStar);
+            aStar -= bestAStar;
+            aStar /= Problem.nInstances;
+            aStar *= MCTSBN.A_STAR_CONSTANT;
+            
+            UCTSCore = exploitationScore + explorationScore + aStar;
+            //System.out.println("UCT: " + UCTSCore + ".   \t" + exploitationScore + ".   \t" + explorationScore + ".   \t" + aStar);
         }
     }
 

@@ -30,12 +30,15 @@ public class HillClimbingEvaluator {
     private final static int MAX_ITERATIONS = 1000;
 
     private final BDeuScore metric;
+    
+    protected final double[] bestBDeuForNode;
 
 
     public HillClimbingEvaluator(Problem problem, ConcurrentHashMap<String,Double> localScoreCache){
         this.problem = problem;
         this.localScoreCache = localScoreCache;
         this.graph = new EdgeListGraph_n();
+        this.bestBDeuForNode = new double [problem.getVariables().size()];
         metric = new BDeuScore(problem.getData());
     }
 
@@ -105,6 +108,11 @@ public class HillClimbingEvaluator {
             }
         }
         
+        // Updating best BDeu for Node
+        if (bdeuFinal > bestBDeuForNode[child]) {
+            bestBDeuForNode[child] = bdeuFinal;
+        }
+        
         return new Pair(child,parents,bdeuFinal);
     }
 
@@ -152,13 +160,13 @@ public class HillClimbingEvaluator {
 
     public double localBdeuScore(int nNode, int[] nParents) {
         Double oldScore = localScoreCache.get("" + nNode + Arrays.toString(nParents));
-        problem.counter.getAndIncrement();
+        //problem.counter.getAndIncrement();
 
         if (oldScore != null) {
             return oldScore;
         }
         
-        problem.counterSinDict.getAndIncrement();
+        //problem.counterSinDict.getAndIncrement();
         
         double fLogScore = metric.localScore(nNode, nParents);
         localScoreCache.put("" + nNode + Arrays.toString(nParents), fLogScore);
@@ -168,8 +176,8 @@ public class HillClimbingEvaluator {
     
 
     public double search(){
-        double c1 = problem.counter.get();
-        double c2 = problem.counterSinDict.get();
+        //double c1 = problem.counter.get();
+        //double c2 = problem.counterSinDict.get();
         
         graph = new EdgeListGraph_n(problem.getVariables());
         finalScore = 0;
@@ -191,9 +199,9 @@ public class HillClimbingEvaluator {
         System.out.println("Obtained result: " + finalScore + "\t-> " + order);
 
         
-        System.out.println("\n TOTAL CALCULATIONS:  " + (problem.counter.get() - c1));
-        System.out.println(" TOTAL CALCULATIONS no dictionary:  " + (problem.counterSinDict.get() - c2));
-        System.out.println(" SIZE OF CONCURRENT: " + localScoreCache.size());
+        //System.out.println("\n TOTAL CALCULATIONS:  " + (problem.counter.get() - c1));
+        //System.out.println(" TOTAL CALCULATIONS no dictionary:  " + (problem.counterSinDict.get() - c2));
+        //System.out.println(" SIZE OF CONCURRENT: " + localScoreCache.size());
         
         return finalScore;
     }

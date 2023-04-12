@@ -72,13 +72,13 @@ public class Problem {
 
     public static int nInstances;
     
-    public AtomicInteger counter;
-    public AtomicInteger counterSinDict;
+    //public AtomicInteger counter;
+    //public AtomicInteger counterSinDict;
 
 
     public Problem(DataSet dataSet){
-        this.counter = new AtomicInteger();
-        this.counterSinDict = new AtomicInteger();
+        //this.counter = new AtomicInteger();
+        //this.counterSinDict = new AtomicInteger();
         
         //Setting dataset
         List<String> _varNames = dataSet.getVariableNames();
