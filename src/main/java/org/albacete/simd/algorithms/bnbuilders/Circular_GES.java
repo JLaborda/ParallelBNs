@@ -10,38 +10,47 @@ import org.albacete.simd.framework.BNBuilder;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.albacete.simd.threads.BESThread;
+import org.albacete.simd.threads.FESThread;
+import org.albacete.simd.utils.Utils;
 
 
 public class Circular_GES extends BNBuilder {
     
     public static final String EXPERIMENTS_FOLDER = "./experiments/";
-    private ConcurrentHashMap<Integer, Set<Edge>> subsetEdges;
+    private final String typeConvergence;
+    
+    private HashMap<Integer, Set<Edge>> subsetEdges;
     private final Clustering clustering;
-    private final ConcurrentHashMap<Integer, CircularDag> circularFusionThreadsResults;
+    private final HashMap<Integer, CircularDag> circularFusionThreadsResults;
     private CircularDag bestDag;
     private double lastBestBDeu;
     private boolean convergence;
-
-    public Circular_GES(String path, Clustering clustering, int nThreads, int nItInterleaving) {
+    
+    public Circular_GES(String path, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence) {
         super(path, nThreads, -1, nItInterleaving);
        
         this.clustering = clustering;
-        this.circularFusionThreadsResults = new ConcurrentHashMap<>(nThreads);
+        this.circularFusionThreadsResults = new HashMap<>(nThreads);
+        this.typeConvergence = typeConvergence;
     }
     
-    public Circular_GES(DataSet data, Clustering clustering, int nThreads, int nItInterleaving) {
+    public Circular_GES(DataSet data, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence) {
         super(data, nThreads, -1, nItInterleaving);
 
         this.clustering = clustering;
-        this.circularFusionThreadsResults = new ConcurrentHashMap<>(nThreads);
+        this.circularFusionThreadsResults = new HashMap<>(nThreads);
+        this.typeConvergence = typeConvergence;
     }
     
-   
+    
     @Override
     public Graph search(){
         //1. Setup
@@ -55,6 +64,11 @@ public class Circular_GES extends BNBuilder {
         printResults();
         calculateBestGraph();
         currentGraph = bestDag.dag;
+        
+        //4. Do a final GES with all the data
+        System.out.println("\n\n\n FINAL GES");
+        finalGES();
+        
         return currentGraph;
     }
     
@@ -71,7 +85,7 @@ public class Circular_GES extends BNBuilder {
         clustering.setProblem(this.problem);
         List<Set<Edge>> subsetEdgesList = clustering.generateEdgeDistribution(nThreads);
 
-        subsetEdges = new ConcurrentHashMap<>(nThreads);
+        subsetEdges = new HashMap<>(nThreads);
         for (int i = 0; i < subsetEdgesList.size(); i++) {
             subsetEdges.put(i, subsetEdgesList.get(i));
         }
@@ -85,15 +99,36 @@ public class Circular_GES extends BNBuilder {
     
     private void iteration() {
         it++;
-        circularFusionThreadsResults.values().parallelStream().forEach((dag) -> {
-            try {
-                dag.fusionGES(getInputDag(dag.id));
-            } catch (InterruptedException ex) {
-                System.out.println("Error with InterruptedException: " +
-                        "\n Dag_n Id: " + dag.id +
-                        "\n Dag_n graph: " + dag.dag);
-            }
+        putInputDags();
+        if (typeConvergence.equals("c1") || typeConvergence.equals("c2")) {
+            circularFusionThreadsResults.values().parallelStream().forEach((dag) -> {
+                try {
+                    dag.fusionGES();
+                } catch (InterruptedException ex) {
+                    System.out.println("Error with InterruptedException: " +
+                            "\n Dag_n Id: " + dag.id +
+                            "\n Dag_n graph: " + dag.dag);
+                }
+            });
+        } else {
+            circularFusionThreadsResults.values().stream().forEach((dag) -> {
+                try {
+                    dag.fusionGES();
+                } catch (InterruptedException ex) {
+                    System.out.println("Error with InterruptedException: " +
+                            "\n Dag_n Id: " + dag.id +
+                            "\n Dag_n graph: " + dag.dag);
+                }
+            });
+        }
+    }
+    
+    private void putInputDags() {
+        circularFusionThreadsResults.values().stream().forEach((dag) -> {
+            CircularDag cd = getInputDag(dag.id);
+            dag.setInputDag(cd);
         });
+        
     }
 
     private CircularDag getInputDag(int i) {
@@ -121,19 +156,46 @@ public class Circular_GES extends BNBuilder {
     
     @Override
     protected boolean convergence() {
-        convergence = true;
-        
-        circularFusionThreadsResults.values().forEach((dag) -> {
-            convergence = convergence && dag.convergence;
-        });
-        return convergence;
+        switch (typeConvergence) {
+            // When any DAG changues in the iteration
+            case "c1":
+            case "c3":
+                convergence = true;
+                
+                circularFusionThreadsResults.values().forEach((dag) -> {
+                    convergence = convergence && dag.convergence;
+                });
+                
+                return convergence;
+                
+            // When any DAG inproves the previous best DAG
+            case "c2":
+            case "c4":
+            default:
+                if (bestDag != null){
+                    lastBestBDeu = bestDag.getBDeu();
+                }
+                else lastBestBDeu = Double.NEGATIVE_INFINITY;
+                
+                circularFusionThreadsResults.values().forEach((dag) -> {
+                    calculateBestGraph(dag);
+                });
+                return lastBestBDeu >= bestDag.getBDeu();
+        }
     }
     
-    protected boolean convergence2() {
-        circularFusionThreadsResults.values().forEach((dag) -> {
-            calculateBestGraph(dag);
-        });
-        return lastBestBDeu <= bestDag.getBDeu();
+    private void finalGES() {
+        try {
+            FESThread fes = new FESThread(problem, this.currentGraph, setOfArcs, Integer.MAX_VALUE, false, true, true);
+            fes.run();
+            currentGraph = fes.getCurrentGraph();
+            
+            BESThread bes = new BESThread(problem, currentGraph, setOfArcs);
+            bes.run();
+            currentGraph = bes.getCurrentGraph();
+            score = bes.getScoreBDeu();
+            currentGraph = Utils.removeInconsistencies(currentGraph);
+        } catch (InterruptedException ex) {}
     }
     
     private void printResults() {

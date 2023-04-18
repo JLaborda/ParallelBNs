@@ -3,7 +3,6 @@ package consensusBN.circularFusion;
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
-import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.framework.FESFusion;
 import org.albacete.simd.threads.BESThread;
 import org.albacete.simd.threads.FESThread;
@@ -15,19 +14,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
-import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import static org.albacete.simd.utils.Utils.pdagToDag;
 
 public class CircularDag {
     public Dag_n dag;
-    public int id;
+    public final int id;
     public boolean convergence = false;
     
     private double bdeu = Double.NEGATIVE_INFINITY;
     private double lastBdeu;
-    private Problem problem;
-    private Set<Edge> subsetEdges;
-    private int nItInterleaving;
+    private final Problem problem;
+    private final Set<Edge> subsetEdges;
+    private final int nItInterleaving;
+    
+    private CircularDag inputDag;
     
     public static final String EXPERIMENTS_FOLDER = "./experiments/";
 
@@ -38,8 +38,19 @@ public class CircularDag {
         this.nItInterleaving = nItInterleaving;
         this.dag = new Dag_n(problem.getVariables());
     }
+    
+    public CircularDag(CircularDag cd) {
+        this.id = cd.id;
+        this.problem = cd.problem;
+        this.subsetEdges = cd.subsetEdges;
+        this.nItInterleaving = cd.nItInterleaving;
+        this.dag = new Dag_n(cd.dag);
+        
+        this.bdeu = cd.bdeu;
+        this.lastBdeu = cd.lastBdeu;
+    }
 
-    public void fusionGES(CircularDag inputDag) throws InterruptedException {
+    public void fusionGES() throws InterruptedException {
 
         // Setup
         // 1. Update bdeu and convergence variables
@@ -55,15 +66,12 @@ public class CircularDag {
         }
         
         // 5. GES Stage
-        Graph besGraph = applyGES();
+        applyGES();
 
-        // 6. Transforming pdag from GES to a dag
-        dag = transformPDAGtoDAG(besGraph);
-
-        // 7. Update bdeu value
+        // 6. Update bdeu value
         updateResults();
 
-        // 8. Convergence
+        // 7. Convergence
         checkConvergence();
     }
     
@@ -79,17 +87,16 @@ public class CircularDag {
         return dags;
     }
     
-    private void applyFESFusion(ArrayList<Dag_n> dags)  throws InterruptedException {
-        FESFusion fusion = new FESFusion(problem, dag, dags, false);
+    private void applyFESFusion(ArrayList<Dag_n> dags) throws InterruptedException {
+        FESFusion fusion = new FESFusion(problem, dag, dags, true);
         dag = fusion.fusion();
         printResults(id, "Fusion", GESThread.scoreGraph(dag, problem));
         
         // Do the BESThread to complete the GES of the fusion
         BESThread bes = new BESThread(problem, dag, dag.getEdges());
         bes.run();
-        Graph graph = bes.getCurrentGraph();
-        pdagToDag(graph);
-        dag = new Dag_n(graph);
+
+        dag = transformPDAGtoDAG(bes.getCurrentGraph());
     }
 
     private void printResults(int id, String stage, double BDeu) {
@@ -104,9 +111,9 @@ public class CircularDag {
         }
     }
 
-    private Graph applyGES() throws InterruptedException {
+    private void applyGES() throws InterruptedException {
         // Do the FESThread
-        FESThread fes = new FESThread(problem, dag, subsetEdges, this.nItInterleaving, false, false, false);
+        FESThread fes = new FESThread(problem, dag, subsetEdges, this.nItInterleaving, false, true, true);
         fes.run();
         Graph fesGraph = fes.getCurrentGraph();
         fesGraph = transformPDAGtoDAG(fesGraph);
@@ -115,9 +122,8 @@ public class CircularDag {
         // Do the BESThread to complete the GES of the fusion
         BESThread bes = new BESThread(problem, fesGraph, subsetEdges);
         bes.run();
-        Graph besGraph = bes.getCurrentGraph();
-        besGraph = transformPDAGtoDAG(besGraph);
-        return besGraph;
+
+        dag = transformPDAGtoDAG(bes.getCurrentGraph());
     }
 
     private Dag_n transformPDAGtoDAG(Graph besGraph) {
@@ -140,5 +146,13 @@ public class CircularDag {
 
     public void setBDeu(double bdeu) {
         this.bdeu = bdeu;
+    }
+    
+    public void setInputDagCopy(CircularDag inputDag) {
+        this.inputDag = new CircularDag(inputDag);
+    }
+    
+    public void setInputDag(CircularDag inputDag) {
+        this.inputDag = inputDag;
     }
 }
