@@ -31,7 +31,7 @@ public class Circular_GES extends BNBuilder {
     private final Clustering clustering;
     private final HashMap<Integer, CircularDag> circularFusionThreadsResults;
     private CircularDag bestDag;
-    private double lastBestBDeu;
+    private double lastBestBDeu = Double.NEGATIVE_INFINITY;
     private boolean convergence;
     
     public Circular_GES(String path, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence) {
@@ -100,33 +100,21 @@ public class Circular_GES extends BNBuilder {
     private void iteration() {
         it++;
         putInputDags();
-        if (typeConvergence.equals("c1") || typeConvergence.equals("c2")) {
-            circularFusionThreadsResults.values().parallelStream().forEach((dag) -> {
-                try {
-                    dag.fusionGES();
-                } catch (InterruptedException ex) {
-                    System.out.println("Error with InterruptedException: " +
-                            "\n Dag_n Id: " + dag.id +
-                            "\n Dag_n graph: " + dag.dag);
-                }
-            });
-        } else {
-            circularFusionThreadsResults.values().stream().forEach((dag) -> {
-                try {
-                    dag.fusionGES();
-                } catch (InterruptedException ex) {
-                    System.out.println("Error with InterruptedException: " +
-                            "\n Dag_n Id: " + dag.id +
-                            "\n Dag_n graph: " + dag.dag);
-                }
-            });
-        }
+        circularFusionThreadsResults.values().parallelStream().forEach((dag) -> {
+            try {
+                dag.fusionGES();
+            } catch (InterruptedException ex) {
+                System.out.println("Error with InterruptedException: " +
+                        "\n Dag_n Id: " + dag.id +
+                        "\n Dag_n graph: " + dag.dag);
+            }
+        });
     }
     
     private void putInputDags() {
         circularFusionThreadsResults.values().stream().forEach((dag) -> {
             CircularDag cd = getInputDag(dag.id);
-            dag.setInputDag(cd);
+            dag.setInputDag(cd.dag);
         });
         
     }
@@ -159,7 +147,7 @@ public class Circular_GES extends BNBuilder {
         switch (typeConvergence) {
             // When any DAG changues in the iteration
             case "c1":
-            case "c3":
+            default:
                 convergence = true;
                 
                 circularFusionThreadsResults.values().forEach((dag) -> {
@@ -168,19 +156,15 @@ public class Circular_GES extends BNBuilder {
                 
                 return convergence;
                 
-            // When any DAG inproves the previous best DAG
+            // When any DAG improves the previous best DAG
             case "c2":
-            case "c4":
-            default:
-                if (bestDag != null){
-                    lastBestBDeu = bestDag.getBDeu();
-                }
-                else lastBestBDeu = Double.NEGATIVE_INFINITY;
+                calculateBestGraph();
+
+                boolean max = lastBestBDeu >= bestDag.getBDeu();
                 
-                circularFusionThreadsResults.values().forEach((dag) -> {
-                    calculateBestGraph(dag);
-                });
-                return lastBestBDeu >= bestDag.getBDeu();
+                lastBestBDeu = bestDag.getBDeu();
+                        
+                return max;
         }
     }
     

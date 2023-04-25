@@ -24,8 +24,8 @@ public abstract class FusionStage extends Stage {
 
     protected Dag_n fusionIntersection(){
         ArrayList<Node> order = new ArrayList<>(this.currentGraph.getCausalOrdering()); // currentGraph.getCausalOrdering
-        for(Dag_n g: this.graphs) {
-            for(Edge e:g.getEdges()) {
+        for(int i = 0; i < this.graphs.size(); i++) {
+            for(Edge e:this.graphs.get(i).getEdges()) {
                 if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW))
                     continue;
 

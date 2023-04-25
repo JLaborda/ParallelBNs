@@ -27,7 +27,7 @@ public class CircularDag {
     private final Set<Edge> subsetEdges;
     private final int nItInterleaving;
     
-    private CircularDag inputDag;
+    private Dag_n inputDag;
     
     public static final String EXPERIMENTS_FOLDER = "./experiments/";
 
@@ -38,17 +38,6 @@ public class CircularDag {
         this.nItInterleaving = nItInterleaving;
         this.dag = new Dag_n(problem.getVariables());
     }
-    
-    public CircularDag(CircularDag cd) {
-        this.id = cd.id;
-        this.problem = cd.problem;
-        this.subsetEdges = cd.subsetEdges;
-        this.nItInterleaving = cd.nItInterleaving;
-        this.dag = new Dag_n(cd.dag);
-        
-        this.bdeu = cd.bdeu;
-        this.lastBdeu = cd.lastBdeu;
-    }
 
     public void fusionGES() throws InterruptedException {
 
@@ -57,7 +46,7 @@ public class CircularDag {
         setup();
         
         // 2. Check if the input dag is empty
-        if (!inputDag.dag.getEdges().isEmpty()) {
+        if (!inputDag.getEdges().isEmpty()) {
             // 3. Merge dags into an arraylist
             ArrayList<Dag_n> dags = mergeBothDags(inputDag);
 
@@ -80,10 +69,10 @@ public class CircularDag {
         convergence = false;
     }
     
-    private ArrayList<Dag_n> mergeBothDags(CircularDag dag2) {
+    private ArrayList<Dag_n> mergeBothDags(Dag_n dag2) {
         ArrayList<Dag_n> dags = new ArrayList<>();
         dags.add(dag);
-        dags.add(dag2.dag);
+        dags.add(dag2);
         return dags;
     }
     
@@ -147,12 +136,8 @@ public class CircularDag {
     public void setBDeu(double bdeu) {
         this.bdeu = bdeu;
     }
-    
-    public void setInputDagCopy(CircularDag inputDag) {
-        this.inputDag = new CircularDag(inputDag);
-    }
-    
-    public void setInputDag(CircularDag inputDag) {
+
+    public void setInputDag(Dag_n inputDag) {
         this.inputDag = inputDag;
     }
 }
