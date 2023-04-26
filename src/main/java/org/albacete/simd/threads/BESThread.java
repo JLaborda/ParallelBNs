@@ -171,22 +171,28 @@ public class BESThread extends GESThread {
         h_0 = null;
         
         Set<Edge> edgesInGraph = graph.getEdges();
-        EdgeSearch[] scores = new EdgeSearch[edgesInGraph.size()];
-        List<Edge> edges = new ArrayList<>(edgesInGraph);
         
-        Arrays.parallelSetAll(scores, e->{
-            return scoreEdge(graph, edges.get(e), initialScore);
-        });
-        
-        EdgeSearch max = Collections.max(Arrays.asList(scores));
+        if (!edgesInGraph.isEmpty()) {
+            EdgeSearch[] arrScores = new EdgeSearch[edgesInGraph.size()];
+            List<Edge> edges = new ArrayList<>(edgesInGraph);
 
-        if (max.score > initialScore) {
-            x_d = max.edge.getNode1();
-            y_d = max.edge.getNode2();
-            h_0 = max.hSubset;
+            Arrays.parallelSetAll(arrScores, e->{
+                return scoreEdge(graph, edges.get(e), initialScore);
+            });
+
+            List<EdgeSearch> list = Arrays.asList(arrScores);
+            EdgeSearch max = Collections.max(list);
+
+            if (max.score > initialScore) {
+                x_d = max.edge.getNode1();
+                y_d = max.edge.getNode2();
+                h_0 = max.hSubset;
+            }
+            
+            return max.score;
         }
         
-        return max.score;
+        return initialScore;
     }
     
     private EdgeSearch scoreEdge(Graph graph, Edge edge, double initialScore) {
