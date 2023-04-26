@@ -144,11 +144,11 @@ public class FESThreadTest {
     @Test
     public void constructorTest() throws InterruptedException{
         // Arrange
-        FESThread thread1 = new FESThread(problem, subset1, 15, false);
+        FESThread thread1 = new FESThread(problem, subset1, 15, false, true, true);
         thread1.run();
         Graph graph = thread1.getCurrentGraph();
         // Act
-        FESThread thread2 = new FESThread(problem, graph, subset1, 15,false);
+        FESThread thread2 = new FESThread(problem, graph, subset1, 15,false, true, true);
         // Arrange
         assertNotNull(thread1);
         assertNotNull(thread2);
@@ -165,8 +165,8 @@ public class FESThreadTest {
         BackwardStage.meanTimeTotal = 0;
         ForwardStage.meanTimeTotal = 0;
         // ThFES objects
-        FESThread thread1 = new FESThread(problem, subset1, 15, false);
-        FESThread thread2 = new FESThread(problem, subset2, 15, false);
+        FESThread thread1 = new FESThread(problem, subset1, 15, false, true, true);
+        FESThread thread2 = new FESThread(problem, subset2, 15, false, true, true);
 
 
         //Act
@@ -200,7 +200,7 @@ public class FESThreadTest {
     public void noMoreEdgesToAddInFESTest(){
 
         // ThFES objects
-        FESThread thread1 = new FESThread(problem, subset1, 1000, false);
+        FESThread thread1 = new FESThread(problem, subset1, 1000, false, true, true);
 
         //Act
         thread1.run();
@@ -217,7 +217,7 @@ public class FESThreadTest {
     @Test
     public void maximumNumberOfEdgesReachedTest() throws InterruptedException {
         // ThFES objects
-        FESThread thread1 = new FESThread(problem, subset1, 1000, false);
+        FESThread thread1 = new FESThread(problem, subset1, 1000, false, true, true);
         thread1.setMaxNumEdges(2);
 
         //Act
@@ -246,8 +246,8 @@ public class FESThreadTest {
         Set<Edge> subset2 = subsets.get(1);
 
         Problem pAlarm = new Problem(alarmDataset);
-        FESThread thread1 = new FESThread(pAlarm, subset1, 100, false);
-        FESThread thread2 = new FESThread(pAlarm, subset2, 100, false);
+        FESThread thread1 = new FESThread(pAlarm, subset1, 100, false, true, true);
+        FESThread thread2 = new FESThread(pAlarm, subset2, 100, false, true, true);
 
 
         //Act
@@ -275,7 +275,7 @@ public class FESThreadTest {
         S.add(edge1);
         S.add(edge2);
 
-        FESThread fes = new FESThread(problem, S, 100, false);
+        FESThread fes = new FESThread(problem, S, 100, false, true, true);
         Thread tFES = new Thread(fes);
 
         // Act
@@ -307,7 +307,7 @@ public class FESThreadTest {
      */
     @Test
     public void isAggressivelyPreventCyclesTest(){
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         assertFalse(thfes.isAggressivelyPreventCycles());
     }
     /**
@@ -317,7 +317,7 @@ public class FESThreadTest {
     @Test
     public void setAggresivelyPreventCyclesTest(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         // Act
         thfes.setAggressivelyPreventCycles(true);
         // Assert
@@ -331,7 +331,7 @@ public class FESThreadTest {
     @Test
     public void getCurrentGraphTest() throws InterruptedException {
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         // Act
         thfes.run();
         Graph result = thfes.getCurrentGraph();
@@ -345,7 +345,7 @@ public class FESThreadTest {
     @Test
     public void getFlagTest() throws InterruptedException {
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         // Act
         thfes.run();
         boolean result = thfes.getFlag();
@@ -359,7 +359,7 @@ public class FESThreadTest {
     @Test
     public void resetFlagTest() throws InterruptedException {
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         // Act
         thfes.run();
         thfes.resetFlag();
@@ -375,7 +375,7 @@ public class FESThreadTest {
     @Test
     public void getBDeuScoreTest(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         // Act
         thfes.run();
         thfes.resetFlag();
@@ -392,7 +392,7 @@ public class FESThreadTest {
     @Test
     public void setterAndGetterOfInitialGraphTest() throws InterruptedException {
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         // Act
         thfes.run();
         Graph expected = thfes.getCurrentGraph();
@@ -411,7 +411,7 @@ public class FESThreadTest {
     @Test
     public void setterAndGetterOfStructurePriorTest(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         // Act
         double expected = 2.3;
         thfes.setStructurePrior(expected);
@@ -427,7 +427,7 @@ public class FESThreadTest {
     @Test
     public void setterAndGetterOfSamplePriorTest(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         // Act
         double expected = 2.3;
         thfes.setSamplePrior(expected);
@@ -444,7 +444,7 @@ public class FESThreadTest {
     @Test
     public void setterAndGetterOfElapsedTimeTest(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         // Act
         long expected = 0;
         long actual = thfes.getElapsedTime();
@@ -459,7 +459,7 @@ public class FESThreadTest {
     @Test
     public void setterAndGetterOfMaxNumEdges(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false);
+        FESThread thfes = new FESThread(problem, subset1, 15, false, true, true);
         // Act
         int expected = 23;
         thfes.setMaxNumEdges(expected);

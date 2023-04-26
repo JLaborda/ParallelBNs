@@ -98,8 +98,8 @@ public class ForwardHillClimbingThread extends GESThread {
             for(Edge edge : edges) {
 
                 //Checking Time
-                if(isTimeout())
-                    break;
+                //if(isTimeout())
+                //    break;
 
                 //System.out.println("[FHC " + getId() + "]" + "Checking edge: " + edge);
 
