@@ -6,6 +6,9 @@ import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
+import edu.cmu.tetrad.graph.GraphUtils;
+import edu.cmu.tetrad.search.SearchGraphUtils;
 import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.clustering.Clustering;
@@ -14,6 +17,7 @@ import org.albacete.simd.clustering.RandomClustering;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Utils;
+import org.apache.commons.lang3.time.StopWatch;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
@@ -21,9 +25,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.albacete.simd.algorithms.bnbuilders.Circular_GES;
+import org.albacete.simd.algorithms.bnbuilders.Fges_BNBuilder;
 
 /*We are checking the following hyperparameters:
  * Threads: [1, 2, 4, 8, 16]
@@ -43,6 +49,7 @@ public class ExperimentBNBuilder {
     protected DataSet testDataset;
 
     protected int numberOfThreads;
+    protected int numberOfPGESThreads;
     protected int interleaving;
     protected int maxIterations;
     //protected static HashMap<String, HashMap<String,String>> map;
@@ -50,8 +57,13 @@ public class ExperimentBNBuilder {
     protected int structuralHamiltonDistanceValue = Integer.MAX_VALUE;
     protected double bdeuScore;
     protected double [] differencesOfMalkovsBlanket;
-    private long startTime;
-    private long endTime;
+    /**
+     * The stop watch that measures the time of the execution of the algorithm
+     */
+    private static StopWatch stopWatch;
+    /**
+     * Time elapsed in milliseconds
+     */
     protected long elapsedTime;
     protected int numberOfIterations;
     protected double LogLikelihoodScore;
@@ -61,28 +73,43 @@ public class ExperimentBNBuilder {
     protected String algName;
     protected long seed = -1;
     private MlBayesIm controlBayesianNetwork;
-    private Dag resultingBayesianNetwork;
+    public Dag_n resultingBayesianNetwork;
 
 
-    public ExperimentBNBuilder(String[] parameters) throws Exception {
+    public ExperimentBNBuilder(String[] parameters, int threads) throws Exception {
         extractParametersForClusterExperiment(parameters);
+        this.numberOfThreads = threads;
         createBNBuilder();
     }
 
     private void extractParametersForClusterExperiment(String[] parameters){
+        System.out.println("Extracting parameters...");
+        System.out.println("Number of hyperparams: " + parameters.length);
+        int i=0;
+        for (String string : parameters) {
+            System.out.println("Param[" + i + "]: " + string);
+            i++;
+        }
         algName = parameters[0];
         netName = parameters[1];
         netPath = parameters[2];
         databasePath = parameters[3];
         databaseName = getDatabaseNameFromPattern();
         testDatabasePath = parameters[4];
+        testDataset = Utils.readData(testDatabasePath);
 
-        if(!algName.equals("ges")) {
-            numberOfThreads = Runtime.getRuntime().availableProcessors();
-            interleaving = Integer.parseInt(parameters[5]);
-            seed = Integer.parseInt(parameters[6]);
-        }
+        numberOfPGESThreads = Integer.parseInt(parameters[5]);
+        interleaving = Integer.parseInt(parameters[6]);
+        seed = Integer.parseInt(parameters[7]);
     }
+    
+    public boolean checkExistentFile(String savePath) throws IOException{
+        File file = new File(savePath);
+
+        if(file.length() != 0) return true;
+        else return false;
+    }
+    
 
     private String getDatabaseNameFromPattern(){
         // Matching the end of the csv file to get the name of the database
@@ -95,21 +122,48 @@ public class ExperimentBNBuilder {
     }
 
     private void createBNBuilder() throws Exception {
+        boolean speedUp = false;
+        boolean update = true;
+        boolean parallel = true;
         switch(algName) {
-            case "pges":
+            case "pges_random":
                 Clustering randomClustering = new RandomClustering(seed);
-                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, parallel);
                 break;
-            case "pges_clustering":
+            case "pges":
                 Clustering hierarchicalClusteringPGES = new HierarchicalClustering();
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, true);
+                break;
+            case "pges-noParallel":
+                Clustering hierarchicalClusteringPGES2 = new HierarchicalClustering();
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES2, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, false);
                 break;
             case "ges":
-                algorithm = new GES_BNBuilder(databasePath);
+                algorithm = new GES_BNBuilder(databasePath, true);
+                break;
+            case "ges-noParallel":
+                algorithm = new GES_BNBuilder(databasePath, false);
                 break;
             case "circular_ges":
                 Clustering hierarchicalClusteringGES = new HierarchicalClustering();
-                algorithm = new Circular_GES(databasePath, hierarchicalClusteringGES, numberOfThreads, interleaving);
+                algorithm = new Circular_GES(databasePath, hierarchicalClusteringGES, numberOfPGESThreads, interleaving);
+                break;
+            case "fges":
+                algorithm = new Fges_BNBuilder(databasePath, true, false);
+                break;
+            case "fges-faithfulness":
+                algorithm = new Fges_BNBuilder(databasePath, false, false);
+                break;
+            case "ges-tetrad":
+                algorithm = new Fges_BNBuilder(databasePath, true, true);
+                break;
+            case "pges-jc":
+                Clustering hierarchicalClusteringJC = new HierarchicalClustering(true, true);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, true);
+                break;
+            case "pges-jc-noParallel":
+                Clustering hierarchicalClusteringJC2 = new HierarchicalClustering(true, true);
+                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC2, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, false);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);
@@ -130,7 +184,8 @@ public class ExperimentBNBuilder {
         if (matcher.find()) {
             databaseName = matcher.group(1);
         }
-        this.numberOfThreads = algorithm.getnThreads();
+        this.numberOfThreads = Runtime.getRuntime().availableProcessors();
+        this.numberOfPGESThreads = algorithm.getnThreads();
         this.maxIterations = algorithm.getMaxIterations();
         this.interleaving = algorithm.getItInterleaving();
     }
@@ -150,9 +205,11 @@ public class ExperimentBNBuilder {
             controlBayesianNetwork = readOriginalBayesianNetwork();
 
             // Search is executed
+            // Starting startWatch
+            stopWatch = StopWatch.createStarted();
             this.algorithm.search();
             resultingBayesianNetwork =  this.algorithm.getCurrentDag();
-
+            stopWatch.stop();
             // Metrics
             calcuateMeasurements(controlBayesianNetwork);
 
@@ -169,6 +226,7 @@ public class ExperimentBNBuilder {
         System.out.println("\tBBDD Name: " + databaseName);
         //System.out.println("\tFusion Consensus: " + fusion_consensus);
         System.out.println("\tnThreads: " + numberOfThreads);
+        System.out.println("\tnPGESThreads: " + numberOfPGESThreads);
         System.out.println("\tnItInterleaving: " + interleaving);
         System.out.println("-----------------------------------------");
 
@@ -177,9 +235,6 @@ public class ExperimentBNBuilder {
     }
 
     private MlBayesIm readOriginalBayesianNetwork() throws Exception {
-        // Starting timer
-        startTime = System.currentTimeMillis();
-
         BIFReader bayesianReader = new BIFReader();
         bayesianReader.processFile(this.netPath);
         BayesNet bayesianNet = bayesianReader;
@@ -196,10 +251,16 @@ public class ExperimentBNBuilder {
     }
 
     private void calcuateMeasurements(MlBayesIm controlBayesianNetwork) {
-        // Ending timer
-        endTime = System.currentTimeMillis();
-        this.elapsedTime = endTime - startTime;
+        // Getting time
+        this.elapsedTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
+        
+        // SHD Tetrad
+        //GraphUtils.GraphComparison comparison = SearchGraphUtils.getGraphComparison(controlBayesianNetwork.getDag(), algorithm.getCurrentDag());
+        //this.structuralHamiltonDistanceValue = comparison.getShd();
+        
+        // "SDM": 
         this.structuralHamiltonDistanceValue = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
+        
         this.differencesOfMalkovsBlanket = Utils.avgMarkovBlanquetdif(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
         this.numberOfIterations = algorithm.getIterations();
         this.bdeuScore = GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem());
@@ -228,7 +289,7 @@ public class ExperimentBNBuilder {
         BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
         //FileWriter csvWriter = new FileWriter(savePath, true);
         if(file.length() == 0) {
-            String header = "algorithm, network, bbdd, threads, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, dfMM minus, Total iterations, Total time(s)\n";
+            String header = "algorithm,network,bbdd,threads,pges_threads,interleaving,seed,SHD,loglike,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
             csvWriter.append(header);
         }
         csvWriter.append(this.getResults());
@@ -271,6 +332,7 @@ public class ExperimentBNBuilder {
                 + this.netName + ","
                 + this.databaseName + ","
                 + this.numberOfThreads + ","
+                + this.numberOfPGESThreads + ","
                 + this.interleaving + ","
                 + this.seed + ","
                 + this.structuralHamiltonDistanceValue + ","

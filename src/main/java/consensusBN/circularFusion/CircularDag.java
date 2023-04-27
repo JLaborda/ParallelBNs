@@ -1,6 +1,6 @@
 package consensusBN.circularFusion;
 
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.search.SearchGraphUtils;
@@ -19,7 +19,7 @@ import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import static org.albacete.simd.utils.Utils.pdagToDag;
 
 public class CircularDag {
-    public Dag dag;
+    public Dag_n dag;
     public int id;
     public boolean convergence = false;
     
@@ -36,7 +36,7 @@ public class CircularDag {
         this.problem = problem;
         this.subsetEdges = subsetEdges;
         this.nItInterleaving = nItInterleaving;
-        this.dag = new Dag(problem.getVariables());
+        this.dag = new Dag_n(problem.getVariables());
     }
 
     public void fusionGES(CircularDag inputDag) throws InterruptedException {
@@ -48,7 +48,7 @@ public class CircularDag {
         // 2. Check if the input dag is empty
         if (!inputDag.dag.getEdges().isEmpty()) {
             // 3. Merge dags into an arraylist
-            ArrayList<Dag> dags = mergeBothDags(inputDag);
+            ArrayList<Dag_n> dags = mergeBothDags(inputDag);
 
             // 4. FES Fusion (Consensus Fusion + FES)
             applyFESFusion(dags);
@@ -72,15 +72,15 @@ public class CircularDag {
         convergence = false;
     }
     
-    private ArrayList<Dag> mergeBothDags(CircularDag dag2) {
-        ArrayList<Dag> dags = new ArrayList<>();
+    private ArrayList<Dag_n> mergeBothDags(CircularDag dag2) {
+        ArrayList<Dag_n> dags = new ArrayList<>();
         dags.add(dag);
         dags.add(dag2.dag);
         return dags;
     }
     
-    private void applyFESFusion(ArrayList<Dag> dags)  throws InterruptedException {
-        FESFusion fusion = new FESFusion(problem, dag, dags);
+    private void applyFESFusion(ArrayList<Dag_n> dags)  throws InterruptedException {
+        FESFusion fusion = new FESFusion(problem, dag, dags, false);
         dag = fusion.fusion();
         printResults(id, "Fusion", GESThread.scoreGraph(dag, problem));
         
@@ -89,7 +89,7 @@ public class CircularDag {
         bes.run();
         Graph graph = bes.getCurrentGraph();
         pdagToDag(graph);
-        dag = new Dag(graph);
+        dag = new Dag_n(graph);
     }
 
     private void printResults(int id, String stage, double BDeu) {
@@ -106,7 +106,7 @@ public class CircularDag {
 
     private Graph applyGES() throws InterruptedException {
         // Do the FESThread
-        FESThread fes = new FESThread(problem, dag, subsetEdges, this.nItInterleaving);
+        FESThread fes = new FESThread(problem, dag, subsetEdges, this.nItInterleaving, false, false, false);
         fes.run();
         Graph fesGraph = fes.getCurrentGraph();
         fesGraph = transformPDAGtoDAG(fesGraph);
@@ -120,9 +120,9 @@ public class CircularDag {
         return besGraph;
     }
 
-    private Dag transformPDAGtoDAG(Graph besGraph) {
+    private Dag_n transformPDAGtoDAG(Graph besGraph) {
         pdagToDag(besGraph);
-        return new Dag(besGraph);
+        return new Dag_n(besGraph);
     }
     
     private void updateResults() {

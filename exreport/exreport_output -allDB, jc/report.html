@@ -1,0 +1,1928 @@
+<!--
+Parameters:
+
+title, date
+
+-->
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <link href="assets/bootstrap.min.css" rel="stylesheet" />
+
+    <title>Your mAnDE report</title>
+</head>
+
+<body data-spy="scroll" data-target="#side-nav" data-offset="350">
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="http://exreport.jarias.es">Generated with exreport - beta 0.4</a>
+    </div>
+  </div>
+</nav>
+
+    <div class="container">
+
+
+        <div class="row">
+
+             <div class="col-xs-1 visible-lg visible-md"></div>
+
+             <div class="col-md-10 document">
+              <div class="document-content">
+
+               <br>
+               <br>
+               <div class="text-center">
+                 <h1>Your mAnDE report</h1>
+                 <h3>2023-02-07</h3>
+               </div>
+               <br>
+               <hr>
+               <br>
+               <br>
+
+<!--
+Parameters:
+
+title, methods, problems, parameters, outputs, history
+
+-->
+
+<section id="elem_1_hook">
+<a id="pGES"></a>
+    <div class="text-center">
+      <h2>Experiment: pGES</h2>
+    </div>
+    <ul>
+    </br>
+        <li><strong>Methods:</strong> Fges,1, Fges-faithfulness,1, Fges-ges,1, GES,1, pGES-jc,2, pGES-jc,4, pGES-jc,8, pGES-jc,16</li>
+        <li><strong>Problems:</strong> alarm, andes, barley, child, hailfinder, hepar2, insurance, link, mildew, munin, pigs, water, win95pts</li>
+        <li><strong>Parameters:</strong>
+        <ul>
+<li>pges_threads [1,2,4,8,16] (instantiated)</li>
+
+</ul>
+        </li>
+        <li><strong>Outputs:</strong> SHD, loglike, bdeu, deltaMM, deltaMM., deltaMM..1, time.s., deltaBDeu, deltas, deltaSHD, deltaSHDemptySHD</li>
+    </ul>
+    <h5>History:</h5>
+        <ol>
+<li>Experiment pGES loaded from a data set.</li>
+<li>Methods has been instanciated with the parameters: pges_threads</li>
+
+</ol>
+    </br>
+    </br>
+</section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_2_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "bdeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output bdeu </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: maximize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 32.3653846153847</li>
+        <li>Computed p-value: 3.47455141387557e-05</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_3_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "bdeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">-</td><td style="text-align:right">2.77</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.15</td><td style="text-align:right">7</td><td style="text-align:right">2</td><td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.38</td><td style="text-align:right">6</td><td style="text-align:right">5</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.62</td><td style="text-align:right">8</td><td style="text-align:right">2</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">3.4447e-02</td><td style="text-align:right">5.38</td><td style="text-align:right">11</td><td style="text-align:right">0</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">3.4447e-02</td><td style="text-align:right">5.38</td><td style="text-align:right">10</td><td style="text-align:right">1</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">3.4447e-02</td><td style="text-align:right">5.42</td><td style="text-align:right">10</td><td style="text-align:right">0</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">1.2882e-04</td><td style="text-align:right">6.88</td><td style="text-align:right">11</td><td style="text-align:right">0</td><td style="text-align:right">2</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_3_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_3_hidden">
+      <pre id="elem_3_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES-jc,4 & - & 2.77 & - & - & -\\
+pGES-jc,16 & \bf 1.0000e+00 & 3.15 & 7 & 2 & 4\\
+pGES-jc,8 & \bf 1.0000e+00 & 3.38 & 6 & 5 & 2\\
+pGES-jc,2 & \bf 1.0000e+00 & 3.62 & 8 & 2 & 3\\
+Fges-ges,1 & 3.4447e-02 & 5.38 & 11 & 0 & 2\\
+GES,1 & 3.4447e-02 & 5.38 & 10 & 1 & 2\\
+Fges-faithfulness,1 & 3.4447e-02 & 5.42 & 10 & 0 & 3\\
+Fges,1 & 1.2882e-04 & 6.88 & 11 & 0 & 2\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_3_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_4_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "bdeu"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_4', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_4', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_4', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_4', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_4.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_5_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "bdeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">alarm</th><th style="text-align:right">andes</th><th style="text-align:right">barley</th><th style="text-align:right">child</th><th style="text-align:right">hailfinder</th><th style="text-align:right">hepar2</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">-10.7883828374</td><td style="text-align:right">-94.7401143655</td><td style="text-align:right">-53.3575465291</td><td style="text-align:right">-12.4587248338</td><td style="text-align:right">-50.4563098655</td><td style="text-align:right">-33.0004317560</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">-10.7883828374</td><td style="text-align:right">-94.5230320978</td><td style="text-align:right">-52.8385328335</td><td style="text-align:right">-12.4549618637</td><td style="text-align:right">-50.4183352114</td><td style="text-align:right">-32.9936938696</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">-10.7902184173</td><td style="text-align:right">-94.5203665590</td><td style="text-align:right">-52.8296818027</td><td style="text-align:right">-12.4549618637</td><td style="text-align:right">-50.4300656225</td><td style="text-align:right">-32.9936938696</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">-10.8732550627</td><td style="text-align:right">-94.3162788305</td><td style="text-align:right">-53.2231294452</td><td style="text-align:right">-12.4691960023</td><td style="text-align:right"><strong>-50.4134307748</strong></td><td style="text-align:right">-32.9625348531</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>-10.7882189593</strong></td><td style="text-align:right">-94.3160183769</td><td style="text-align:right">-52.8167240994</td><td style="text-align:right">-12.4508069466</td><td style="text-align:right"><strong>-50.4134307748</strong></td><td style="text-align:right">-32.9609807176</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">-10.7887218063</td><td style="text-align:right"><strong>-94.3148341925</strong></td><td style="text-align:right">-52.8039800662</td><td style="text-align:right">-12.4361691429</td><td style="text-align:right"><strong>-50.4134307748</strong></td><td style="text-align:right"><strong>-32.9606798416</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">-10.7887218063</td><td style="text-align:right">-94.3148401954</td><td style="text-align:right">-52.8201430832</td><td style="text-align:right"><strong>-12.4236653856</strong></td><td style="text-align:right"><strong>-50.4134307748</strong></td><td style="text-align:right"><strong>-32.9606798416</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">-10.7920134789</td><td style="text-align:right">-94.3158865672</td><td style="text-align:right"><strong>-52.7933881441</strong></td><td style="text-align:right">-12.4283072051</td><td style="text-align:right"><strong>-50.4134307748</strong></td><td style="text-align:right">-32.9608091366</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">insurance</th><th style="text-align:right">link</th><th style="text-align:right">mildew</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th><th style="text-align:right">water</th><th style="text-align:right">win95pts</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">-13.5582462522</td><td style="text-align:right">-286.1877108172</td><td style="text-align:right">-</td><td style="text-align:right">-186.6973382807</td><td style="text-align:right">-345.1826203665</td><td style="text-align:right">-13.1751040367</td><td style="text-align:right">-9.5879441398</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">-13.5523899500</td><td style="text-align:right">-239.6400904402</td><td style="text-align:right">-</td><td style="text-align:right">-186.5920354424</td><td style="text-align:right">-345.1818130857</td><td style="text-align:right">-13.1713966307</td><td style="text-align:right">-9.4400150273</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right"><strong>-13.5472092554</strong></td><td style="text-align:right">-239.2262953078</td><td style="text-align:right">-</td><td style="text-align:right"><strong>-186.5235851510</strong></td><td style="text-align:right">-345.1809364607</td><td style="text-align:right">-13.1724237254</td><td style="text-align:right">-9.4457290404</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">-13.5622992247</td><td style="text-align:right">-228.3056462019</td><td style="text-align:right"><strong>-47.0790051706</strong></td><td style="text-align:right">-187.0735690869</td><td style="text-align:right"><strong>-334.9989484918</strong></td><td style="text-align:right">-13.1773785142</td><td style="text-align:right">-9.4278837510</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right">-13.5666003841</td><td style="text-align:right"><strong>-227.6842784686</strong></td><td style="text-align:right">-47.0790051706</td><td style="text-align:right">-186.6266238705</td><td style="text-align:right">-334.9994208870</td><td style="text-align:right">-13.1668142118</td><td style="text-align:right">-9.4187452104</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">-13.5594007995</td><td style="text-align:right">-227.6843257870</td><td style="text-align:right">-47.0790051706</td><td style="text-align:right">-186.6116866139</td><td style="text-align:right">-334.9989484918</td><td style="text-align:right">-13.1668427898</td><td style="text-align:right"><strong>-9.4125551251</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">-13.5518646592</td><td style="text-align:right">-227.6861155705</td><td style="text-align:right">-47.0790051706</td><td style="text-align:right">-186.6230698593</td><td style="text-align:right">-334.9989484918</td><td style="text-align:right">-13.1872003814</td><td style="text-align:right">-9.4180491683</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">-13.5490674644</td><td style="text-align:right">-227.6847167012</td><td style="text-align:right">-47.0923910509</td><td style="text-align:right">-186.6394109721</td><td style="text-align:right">-334.9989484918</td><td style="text-align:right"><strong>-13.1663533982</strong></td><td style="text-align:right">-9.4146002454</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_5_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_5_hidden">
+      <pre id="elem_5_code">
+
+\begin{tabular}{lrrrrrr}
+\hline
+algorithm & alarm & andes & barley & child & hailfinder & hepar2\\
+\hline
+Fges,1 & -10.7883828374 & -94.7401143655 & -53.3575465291 & -12.4587248338 & -50.4563098655 & -33.0004317560\\
+Fges-faithfulness,1 & -10.7883828374 & -94.5230320978 & -52.8385328335 & -12.4549618637 & -50.4183352114 & -32.9936938696\\
+Fges-ges,1 & -10.7902184173 & -94.5203665590 & -52.8296818027 & -12.4549618637 & -50.4300656225 & -32.9936938696\\
+GES,1 & -10.8732550627 & -94.3162788305 & -53.2231294452 & -12.4691960023 & \bf -50.4134307748 & -32.9625348531\\
+pGES-jc,2 & \bf -10.7882189593 & -94.3160183769 & -52.8167240994 & -12.4508069466 & \bf -50.4134307748 & -32.9609807176\\
+pGES-jc,4 & -10.7887218063 & \bf -94.3148341925 & -52.8039800662 & -12.4361691429 & \bf -50.4134307748 & \bf -32.9606798416\\
+pGES-jc,8 & -10.7887218063 & -94.3148401954 & -52.8201430832 & \bf -12.4236653856 & \bf -50.4134307748 & \bf -32.9606798416\\
+pGES-jc,16 & -10.7920134789 & -94.3158865672 & \bf -52.7933881441 & -12.4283072051 & \bf -50.4134307748 & -32.9608091366\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrrrrrr}
+\hline
+algorithm & insurance & link & mildew & munin & pigs & water & win95pts\\
+\hline
+Fges,1 & -13.5582462522 & -286.1877108172 & - & -186.6973382807 & -345.1826203665 & -13.1751040367 & -9.5879441398\\
+Fges-faithfulness,1 & -13.5523899500 & -239.6400904402 & - & -186.5920354424 & -345.1818130857 & -13.1713966307 & -9.4400150273\\
+Fges-ges,1 & \bf -13.5472092554 & -239.2262953078 & - & \bf -186.5235851510 & -345.1809364607 & -13.1724237254 & -9.4457290404\\
+GES,1 & -13.5622992247 & -228.3056462019 & \bf -47.0790051706 & -187.0735690869 & \bf -334.9989484918 & -13.1773785142 & -9.4278837510\\
+pGES-jc,2 & -13.5666003841 & \bf -227.6842784686 & -47.0790051706 & -186.6266238705 & -334.9994208870 & -13.1668142118 & -9.4187452104\\
+pGES-jc,4 & -13.5594007995 & -227.6843257870 & -47.0790051706 & -186.6116866139 & -334.9989484918 & -13.1668427898 & \bf -9.4125551251\\
+pGES-jc,8 & -13.5518646592 & -227.6861155705 & -47.0790051706 & -186.6230698593 & -334.9989484918 & -13.1872003814 & -9.4180491683\\
+pGES-jc,16 & -13.5490674644 & -227.6847167012 & -47.0923910509 & -186.6394109721 & -334.9989484918 & \bf -13.1663533982 & -9.4146002454\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_5_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_6_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "SHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output SHD </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: minimize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 38.7692307692308</li>
+        <li>Computed p-value: 2.16289246417007e-06</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_7_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "SHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">-</td><td style="text-align:right">2.81</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.08</td><td style="text-align:right">6</td><td style="text-align:right">2</td><td style="text-align:right">5</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.12</td><td style="text-align:right">6</td><td style="text-align:right">2</td><td style="text-align:right">5</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.38</td><td style="text-align:right">7</td><td style="text-align:right">2</td><td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>6.5237e-02</strong></td><td style="text-align:right">5.12</td><td style="text-align:right">8</td><td style="text-align:right">2</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">2.2396e-02</td><td style="text-align:right">5.54</td><td style="text-align:right">11</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">6.1707e-03</td><td style="text-align:right">5.96</td><td style="text-align:right">12</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">8.9602e-05</td><td style="text-align:right">7.00</td><td style="text-align:right">13</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_7_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_7_hidden">
+      <pre id="elem_7_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES-jc,16 & - & 2.81 & - & - & -\\
+pGES-jc,8 & \bf 1.0000e+00 & 3.08 & 6 & 2 & 5\\
+pGES-jc,2 & \bf 1.0000e+00 & 3.12 & 6 & 2 & 5\\
+pGES-jc,4 & \bf 1.0000e+00 & 3.38 & 7 & 2 & 4\\
+GES,1 & \bf 6.5237e-02 & 5.12 & 8 & 2 & 3\\
+Fges-faithfulness,1 & 2.2396e-02 & 5.54 & 11 & 1 & 1\\
+Fges-ges,1 & 6.1707e-03 & 5.96 & 12 & 0 & 1\\
+Fges,1 & 8.9602e-05 & 7.00 & 13 & 0 & 0\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_7_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_8_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "SHD"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_8', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_8', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_8', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_8', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_8.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_9_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "SHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">alarm</th><th style="text-align:right">andes</th><th style="text-align:right">barley</th><th style="text-align:right">child</th><th style="text-align:right">hailfinder</th><th style="text-align:right">hepar2</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">7.90909</td><td style="text-align:right">232.45455</td><td style="text-align:right">59.54545</td><td style="text-align:right">5.36364</td><td style="text-align:right">45.90909</td><td style="text-align:right">92.18182</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">7.90909</td><td style="text-align:right">179.27273</td><td style="text-align:right"><strong>55.90909</strong></td><td style="text-align:right">4.45455</td><td style="text-align:right">43.90909</td><td style="text-align:right">87.00000</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">8.00000</td><td style="text-align:right">180.00000</td><td style="text-align:right">57.54545</td><td style="text-align:right">4.45455</td><td style="text-align:right">43.90909</td><td style="text-align:right">87.00000</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">9.27273</td><td style="text-align:right">151.54545</td><td style="text-align:right">61.18182</td><td style="text-align:right">8.27273</td><td style="text-align:right"><strong>32.90909</strong></td><td style="text-align:right">76.54545</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>7.27273</strong></td><td style="text-align:right">152.27273</td><td style="text-align:right">56.45455</td><td style="text-align:right">4.45455</td><td style="text-align:right"><strong>32.90909</strong></td><td style="text-align:right"><strong>75.72727</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">7.36364</td><td style="text-align:right"><strong>151.18182</strong></td><td style="text-align:right">56.45455</td><td style="text-align:right">2.36364</td><td style="text-align:right"><strong>32.90909</strong></td><td style="text-align:right">76.00000</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">7.36364</td><td style="text-align:right"><strong>151.18182</strong></td><td style="text-align:right">56.45455</td><td style="text-align:right"><strong>0.81818</strong></td><td style="text-align:right"><strong>32.90909</strong></td><td style="text-align:right">76.00000</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">7.54545</td><td style="text-align:right">151.90909</td><td style="text-align:right">56.09091</td><td style="text-align:right">1.54545</td><td style="text-align:right"><strong>32.90909</strong></td><td style="text-align:right">75.90909</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">insurance</th><th style="text-align:right">link</th><th style="text-align:right">mildew</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th><th style="text-align:right">water</th><th style="text-align:right">win95pts</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">23.81818</td><td style="text-align:right">1370.45455</td><td style="text-align:right">-</td><td style="text-align:right">1489.63636</td><td style="text-align:right">309.00000</td><td style="text-align:right">90.09091</td><td style="text-align:right">87.18182</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">22.81818</td><td style="text-align:right">1083.72727</td><td style="text-align:right">-</td><td style="text-align:right">1489.63636</td><td style="text-align:right">309.18182</td><td style="text-align:right">88.63636</td><td style="text-align:right">69.27273</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right"><strong>22.54545</strong></td><td style="text-align:right">1094.27273</td><td style="text-align:right">-</td><td style="text-align:right">1477.72727</td><td style="text-align:right">309.27273</td><td style="text-align:right">88.63636</td><td style="text-align:right">70.18182</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">24.90909</td><td style="text-align:right">1032.36364</td><td style="text-align:right"><strong>41.27273</strong></td><td style="text-align:right"><strong>1468.45455</strong></td><td style="text-align:right"><strong>0.00000</strong></td><td style="text-align:right">91.00000</td><td style="text-align:right">60.63636</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right">24.72727</td><td style="text-align:right"><strong>952.36364</strong></td><td style="text-align:right"><strong>41.27273</strong></td><td style="text-align:right">1478.45455</td><td style="text-align:right"><strong>0.00000</strong></td><td style="text-align:right"><strong>87.54545</strong></td><td style="text-align:right">60.27273</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">24.54545</td><td style="text-align:right">952.90909</td><td style="text-align:right"><strong>41.27273</strong></td><td style="text-align:right">1486.81818</td><td style="text-align:right"><strong>0.00000</strong></td><td style="text-align:right">88.09091</td><td style="text-align:right">57.81818</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">23.36364</td><td style="text-align:right">952.81818</td><td style="text-align:right"><strong>41.27273</strong></td><td style="text-align:right">1481.36364</td><td style="text-align:right"><strong>0.00000</strong></td><td style="text-align:right">87.81818</td><td style="text-align:right">61.27273</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">22.81818</td><td style="text-align:right">953.36364</td><td style="text-align:right">42.00000</td><td style="text-align:right">1476.63636</td><td style="text-align:right"><strong>0.00000</strong></td><td style="text-align:right">87.63636</td><td style="text-align:right"><strong>56.45455</strong></td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_9_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_9_hidden">
+      <pre id="elem_9_code">
+
+\begin{tabular}{lrrrrrr}
+\hline
+algorithm & alarm & andes & barley & child & hailfinder & hepar2\\
+\hline
+Fges,1 & 7.90909 & 232.45455 & 59.54545 & 5.36364 & 45.90909 & 92.18182\\
+Fges-faithfulness,1 & 7.90909 & 179.27273 & \bf 55.90909 & 4.45455 & 43.90909 & 87.00000\\
+Fges-ges,1 & 8.00000 & 180.00000 & 57.54545 & 4.45455 & 43.90909 & 87.00000\\
+GES,1 & 9.27273 & 151.54545 & 61.18182 & 8.27273 & \bf 32.90909 & 76.54545\\
+pGES-jc,2 & \bf 7.27273 & 152.27273 & 56.45455 & 4.45455 & \bf 32.90909 & \bf 75.72727\\
+pGES-jc,4 & 7.36364 & \bf 151.18182 & 56.45455 & 2.36364 & \bf 32.90909 & 76.00000\\
+pGES-jc,8 & 7.36364 & \bf 151.18182 & 56.45455 & \bf 0.81818 & \bf 32.90909 & 76.00000\\
+pGES-jc,16 & 7.54545 & 151.90909 & 56.09091 & 1.54545 & \bf 32.90909 & 75.90909\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrrrrrr}
+\hline
+algorithm & insurance & link & mildew & munin & pigs & water & win95pts\\
+\hline
+Fges,1 & 23.81818 & 1370.45455 & - & 1489.63636 & 309.00000 & 90.09091 & 87.18182\\
+Fges-faithfulness,1 & 22.81818 & 1083.72727 & - & 1489.63636 & 309.18182 & 88.63636 & 69.27273\\
+Fges-ges,1 & \bf 22.54545 & 1094.27273 & - & 1477.72727 & 309.27273 & 88.63636 & 70.18182\\
+GES,1 & 24.90909 & 1032.36364 & \bf 41.27273 & \bf 1468.45455 & \bf 0.00000 & 91.00000 & 60.63636\\
+pGES-jc,2 & 24.72727 & \bf 952.36364 & \bf 41.27273 & 1478.45455 & \bf 0.00000 & \bf 87.54545 & 60.27273\\
+pGES-jc,4 & 24.54545 & 952.90909 & \bf 41.27273 & 1486.81818 & \bf 0.00000 & 88.09091 & 57.81818\\
+pGES-jc,8 & 23.36364 & 952.81818 & \bf 41.27273 & 1481.36364 & \bf 0.00000 & 87.81818 & 61.27273\\
+pGES-jc,16 & 22.81818 & 953.36364 & 42.00000 & 1476.63636 & \bf 0.00000 & 87.63636 & \bf 56.45455\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_9_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_10_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "deltaSHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output deltaSHD </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: maximize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 38.7692307692308</li>
+        <li>Computed p-value: 2.16289246417007e-06</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_11_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "deltaSHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">-</td><td style="text-align:right">2.81</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.08</td><td style="text-align:right">6</td><td style="text-align:right">2</td><td style="text-align:right">5</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.12</td><td style="text-align:right">6</td><td style="text-align:right">2</td><td style="text-align:right">5</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.38</td><td style="text-align:right">7</td><td style="text-align:right">2</td><td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>6.5237e-02</strong></td><td style="text-align:right">5.12</td><td style="text-align:right">8</td><td style="text-align:right">2</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">2.2396e-02</td><td style="text-align:right">5.54</td><td style="text-align:right">11</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">6.1707e-03</td><td style="text-align:right">5.96</td><td style="text-align:right">12</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">8.9602e-05</td><td style="text-align:right">7.00</td><td style="text-align:right">13</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_11_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_11_hidden">
+      <pre id="elem_11_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES-jc,16 & - & 2.81 & - & - & -\\
+pGES-jc,8 & \bf 1.0000e+00 & 3.08 & 6 & 2 & 5\\
+pGES-jc,2 & \bf 1.0000e+00 & 3.12 & 6 & 2 & 5\\
+pGES-jc,4 & \bf 1.0000e+00 & 3.38 & 7 & 2 & 4\\
+GES,1 & \bf 6.5237e-02 & 5.12 & 8 & 2 & 3\\
+Fges-faithfulness,1 & 2.2396e-02 & 5.54 & 11 & 1 & 1\\
+Fges-ges,1 & 6.1707e-03 & 5.96 & 12 & 0 & 1\\
+Fges,1 & 8.9602e-05 & 7.00 & 13 & 0 & 0\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_11_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_12_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "deltaSHD"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_12', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_12', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_12', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_12', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_12.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_13_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "deltaSHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">alarm</th><th style="text-align:right">andes</th><th style="text-align:right">barley</th><th style="text-align:right">child</th><th style="text-align:right">hailfinder</th><th style="text-align:right">hepar2</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">57.09091</td><td style="text-align:right">393.54545</td><td style="text-align:right">66.45455</td><td style="text-align:right">24.63636</td><td style="text-align:right">53.09091</td><td style="text-align:right">65.81818</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">57.09091</td><td style="text-align:right">446.72727</td><td style="text-align:right"><strong>70.09091</strong></td><td style="text-align:right">25.54545</td><td style="text-align:right">55.09091</td><td style="text-align:right">71.00000</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">57.00000</td><td style="text-align:right">446.00000</td><td style="text-align:right">68.45455</td><td style="text-align:right">25.54545</td><td style="text-align:right">55.09091</td><td style="text-align:right">71.00000</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">55.72727</td><td style="text-align:right">474.45455</td><td style="text-align:right">64.81818</td><td style="text-align:right">21.72727</td><td style="text-align:right"><strong>66.09091</strong></td><td style="text-align:right">81.45455</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>57.72727</strong></td><td style="text-align:right">473.72727</td><td style="text-align:right">69.54545</td><td style="text-align:right">25.54545</td><td style="text-align:right"><strong>66.09091</strong></td><td style="text-align:right"><strong>82.27273</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">57.63636</td><td style="text-align:right"><strong>474.81818</strong></td><td style="text-align:right">69.54545</td><td style="text-align:right">27.63636</td><td style="text-align:right"><strong>66.09091</strong></td><td style="text-align:right">82.00000</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">57.63636</td><td style="text-align:right"><strong>474.81818</strong></td><td style="text-align:right">69.54545</td><td style="text-align:right"><strong>29.18182</strong></td><td style="text-align:right"><strong>66.09091</strong></td><td style="text-align:right">82.00000</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">57.45455</td><td style="text-align:right">474.09091</td><td style="text-align:right">69.90909</td><td style="text-align:right">28.45455</td><td style="text-align:right"><strong>66.09091</strong></td><td style="text-align:right">82.09091</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">insurance</th><th style="text-align:right">link</th><th style="text-align:right">mildew</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th><th style="text-align:right">water</th><th style="text-align:right">win95pts</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">46.18182</td><td style="text-align:right">367.54545</td><td style="text-align:right">-</td><td style="text-align:right">353.36364</td><td style="text-align:right">497.00000</td><td style="text-align:right">32.90909</td><td style="text-align:right">137.81818</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">47.18182</td><td style="text-align:right">654.27273</td><td style="text-align:right">-</td><td style="text-align:right">353.36364</td><td style="text-align:right">496.81818</td><td style="text-align:right">34.36364</td><td style="text-align:right">155.72727</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right"><strong>47.45455</strong></td><td style="text-align:right">643.72727</td><td style="text-align:right">-</td><td style="text-align:right">365.27273</td><td style="text-align:right">496.72727</td><td style="text-align:right">34.36364</td><td style="text-align:right">154.81818</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">45.09091</td><td style="text-align:right">705.63636</td><td style="text-align:right"><strong>38.72727</strong></td><td style="text-align:right"><strong>374.54545</strong></td><td style="text-align:right"><strong>806.00000</strong></td><td style="text-align:right">32.00000</td><td style="text-align:right">164.36364</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right">45.27273</td><td style="text-align:right"><strong>785.63636</strong></td><td style="text-align:right"><strong>38.72727</strong></td><td style="text-align:right">364.54545</td><td style="text-align:right"><strong>806.00000</strong></td><td style="text-align:right"><strong>35.45455</strong></td><td style="text-align:right">164.72727</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">45.45455</td><td style="text-align:right">785.09091</td><td style="text-align:right"><strong>38.72727</strong></td><td style="text-align:right">356.18182</td><td style="text-align:right"><strong>806.00000</strong></td><td style="text-align:right">34.90909</td><td style="text-align:right">167.18182</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">46.63636</td><td style="text-align:right">785.18182</td><td style="text-align:right"><strong>38.72727</strong></td><td style="text-align:right">361.63636</td><td style="text-align:right"><strong>806.00000</strong></td><td style="text-align:right">35.18182</td><td style="text-align:right">163.72727</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">47.18182</td><td style="text-align:right">784.63636</td><td style="text-align:right">38.00000</td><td style="text-align:right">366.36364</td><td style="text-align:right"><strong>806.00000</strong></td><td style="text-align:right">35.36364</td><td style="text-align:right"><strong>168.54545</strong></td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_13_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_13_hidden">
+      <pre id="elem_13_code">
+
+\begin{tabular}{lrrrrrr}
+\hline
+algorithm & alarm & andes & barley & child & hailfinder & hepar2\\
+\hline
+Fges,1 & 57.09091 & 393.54545 & 66.45455 & 24.63636 & 53.09091 & 65.81818\\
+Fges-faithfulness,1 & 57.09091 & 446.72727 & \bf 70.09091 & 25.54545 & 55.09091 & 71.00000\\
+Fges-ges,1 & 57.00000 & 446.00000 & 68.45455 & 25.54545 & 55.09091 & 71.00000\\
+GES,1 & 55.72727 & 474.45455 & 64.81818 & 21.72727 & \bf 66.09091 & 81.45455\\
+pGES-jc,2 & \bf 57.72727 & 473.72727 & 69.54545 & 25.54545 & \bf 66.09091 & \bf 82.27273\\
+pGES-jc,4 & 57.63636 & \bf 474.81818 & 69.54545 & 27.63636 & \bf 66.09091 & 82.00000\\
+pGES-jc,8 & 57.63636 & \bf 474.81818 & 69.54545 & \bf 29.18182 & \bf 66.09091 & 82.00000\\
+pGES-jc,16 & 57.45455 & 474.09091 & 69.90909 & 28.45455 & \bf 66.09091 & 82.09091\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrrrrrr}
+\hline
+algorithm & insurance & link & mildew & munin & pigs & water & win95pts\\
+\hline
+Fges,1 & 46.18182 & 367.54545 & - & 353.36364 & 497.00000 & 32.90909 & 137.81818\\
+Fges-faithfulness,1 & 47.18182 & 654.27273 & - & 353.36364 & 496.81818 & 34.36364 & 155.72727\\
+Fges-ges,1 & \bf 47.45455 & 643.72727 & - & 365.27273 & 496.72727 & 34.36364 & 154.81818\\
+GES,1 & 45.09091 & 705.63636 & \bf 38.72727 & \bf 374.54545 & \bf 806.00000 & 32.00000 & 164.36364\\
+pGES-jc,2 & 45.27273 & \bf 785.63636 & \bf 38.72727 & 364.54545 & \bf 806.00000 & \bf 35.45455 & 164.72727\\
+pGES-jc,4 & 45.45455 & 785.09091 & \bf 38.72727 & 356.18182 & \bf 806.00000 & 34.90909 & 167.18182\\
+pGES-jc,8 & 46.63636 & 785.18182 & \bf 38.72727 & 361.63636 & \bf 806.00000 & 35.18182 & 163.72727\\
+pGES-jc,16 & 47.18182 & 784.63636 & 38.00000 & 366.36364 & \bf 806.00000 & 35.36364 & \bf 168.54545\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_13_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_14_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "deltaSHDemptySHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output deltaSHDemptySHD </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: maximize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 37.4679487179487</li>
+        <li>Computed p-value: 3.82400727751499e-06</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_15_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "deltaSHDemptySHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">-</td><td style="text-align:right">2.85</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.08</td><td style="text-align:right">6</td><td style="text-align:right">2</td><td style="text-align:right">5</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.19</td><td style="text-align:right">6</td><td style="text-align:right">2</td><td style="text-align:right">5</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.38</td><td style="text-align:right">7</td><td style="text-align:right">2</td><td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>7.2728e-02</strong></td><td style="text-align:right">5.12</td><td style="text-align:right">8</td><td style="text-align:right">2</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">3.2427e-02</td><td style="text-align:right">5.46</td><td style="text-align:right">11</td><td style="text-align:right">0</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">8.1726e-03</td><td style="text-align:right">5.92</td><td style="text-align:right">12</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">1.0752e-04</td><td style="text-align:right">7.00</td><td style="text-align:right">13</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_15_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_15_hidden">
+      <pre id="elem_15_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES-jc,16 & - & 2.85 & - & - & -\\
+pGES-jc,8 & \bf 1.0000e+00 & 3.08 & 6 & 2 & 5\\
+pGES-jc,2 & \bf 1.0000e+00 & 3.19 & 6 & 2 & 5\\
+pGES-jc,4 & \bf 1.0000e+00 & 3.38 & 7 & 2 & 4\\
+GES,1 & \bf 7.2728e-02 & 5.12 & 8 & 2 & 3\\
+Fges-faithfulness,1 & 3.2427e-02 & 5.46 & 11 & 0 & 2\\
+Fges-ges,1 & 8.1726e-03 & 5.92 & 12 & 0 & 1\\
+Fges,1 & 1.0752e-04 & 7.00 & 13 & 0 & 0\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_15_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_16_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "deltaSHDemptySHD"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_16', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_16', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_16', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_16', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_16.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_17_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "deltaSHDemptySHD"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">alarm</th><th style="text-align:right">andes</th><th style="text-align:right">barley</th><th style="text-align:right">child</th><th style="text-align:right">hailfinder</th><th style="text-align:right">hepar2</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">87.83217</td><td style="text-align:right">62.86669</td><td style="text-align:right">52.74170</td><td style="text-align:right">82.12121</td><td style="text-align:right">53.62718</td><td style="text-align:right">41.65708</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">87.83217</td><td style="text-align:right">71.36218</td><td style="text-align:right"><strong>55.62771</strong></td><td style="text-align:right">85.15152</td><td style="text-align:right">55.64738</td><td style="text-align:right">44.93671</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">87.69231</td><td style="text-align:right">71.24601</td><td style="text-align:right">54.32900</td><td style="text-align:right">85.15152</td><td style="text-align:right">55.64738</td><td style="text-align:right">44.93671</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">85.73427</td><td style="text-align:right">75.79146</td><td style="text-align:right">51.44300</td><td style="text-align:right">72.42424</td><td style="text-align:right"><strong>66.75849</strong></td><td style="text-align:right">51.55351</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>88.81119</strong></td><td style="text-align:right">75.67528</td><td style="text-align:right">55.19481</td><td style="text-align:right">85.15152</td><td style="text-align:right"><strong>66.75849</strong></td><td style="text-align:right"><strong>52.07135</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">88.67133</td><td style="text-align:right"><strong>75.84955</strong></td><td style="text-align:right">55.19481</td><td style="text-align:right">92.12121</td><td style="text-align:right"><strong>66.75849</strong></td><td style="text-align:right">51.89873</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">88.67133</td><td style="text-align:right"><strong>75.84955</strong></td><td style="text-align:right">55.19481</td><td style="text-align:right"><strong>97.27273</strong></td><td style="text-align:right"><strong>66.75849</strong></td><td style="text-align:right">51.89873</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">88.39161</td><td style="text-align:right">75.73337</td><td style="text-align:right">55.48341</td><td style="text-align:right">94.84848</td><td style="text-align:right"><strong>66.75849</strong></td><td style="text-align:right">51.95627</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">insurance</th><th style="text-align:right">link</th><th style="text-align:right">mildew</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th><th style="text-align:right">water</th><th style="text-align:right">win95pts</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">65.97403</td><td style="text-align:right">21.14761</td><td style="text-align:right">-</td><td style="text-align:right">19.17328</td><td style="text-align:right">61.66253</td><td style="text-align:right">26.75536</td><td style="text-align:right">61.25253</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">67.40260</td><td style="text-align:right">37.64515</td><td style="text-align:right">-</td><td style="text-align:right">19.17328</td><td style="text-align:right">61.63997</td><td style="text-align:right">27.93792</td><td style="text-align:right">69.21212</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right"><strong>67.79221</strong></td><td style="text-align:right">37.03839</td><td style="text-align:right">-</td><td style="text-align:right">19.81946</td><td style="text-align:right">61.62869</td><td style="text-align:right">27.93792</td><td style="text-align:right">68.80808</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">64.41558</td><td style="text-align:right">40.60048</td><td style="text-align:right"><strong>48.40909</strong></td><td style="text-align:right"><strong>20.32260</strong></td><td style="text-align:right"><strong>100.00000</strong></td><td style="text-align:right">26.01626</td><td style="text-align:right">73.05051</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right">64.67532</td><td style="text-align:right"><strong>45.20347</strong></td><td style="text-align:right"><strong>48.40909</strong></td><td style="text-align:right">19.78000</td><td style="text-align:right"><strong>100.00000</strong></td><td style="text-align:right"><strong>28.82483</strong></td><td style="text-align:right">73.21212</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">64.93506</td><td style="text-align:right">45.17209</td><td style="text-align:right"><strong>48.40909</strong></td><td style="text-align:right">19.32620</td><td style="text-align:right"><strong>100.00000</strong></td><td style="text-align:right">28.38137</td><td style="text-align:right">74.30303</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">66.62338</td><td style="text-align:right">45.17732</td><td style="text-align:right"><strong>48.40909</strong></td><td style="text-align:right">19.62216</td><td style="text-align:right"><strong>100.00000</strong></td><td style="text-align:right">28.60310</td><td style="text-align:right">72.76768</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">67.40260</td><td style="text-align:right">45.14594</td><td style="text-align:right">47.50000</td><td style="text-align:right">19.87866</td><td style="text-align:right"><strong>100.00000</strong></td><td style="text-align:right">28.75092</td><td style="text-align:right"><strong>74.90909</strong></td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_17_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_17_hidden">
+      <pre id="elem_17_code">
+
+\begin{tabular}{lrrrrrr}
+\hline
+algorithm & alarm & andes & barley & child & hailfinder & hepar2\\
+\hline
+Fges,1 & 87.83217 & 62.86669 & 52.74170 & 82.12121 & 53.62718 & 41.65708\\
+Fges-faithfulness,1 & 87.83217 & 71.36218 & \bf 55.62771 & 85.15152 & 55.64738 & 44.93671\\
+Fges-ges,1 & 87.69231 & 71.24601 & 54.32900 & 85.15152 & 55.64738 & 44.93671\\
+GES,1 & 85.73427 & 75.79146 & 51.44300 & 72.42424 & \bf 66.75849 & 51.55351\\
+pGES-jc,2 & \bf 88.81119 & 75.67528 & 55.19481 & 85.15152 & \bf 66.75849 & \bf 52.07135\\
+pGES-jc,4 & 88.67133 & \bf 75.84955 & 55.19481 & 92.12121 & \bf 66.75849 & 51.89873\\
+pGES-jc,8 & 88.67133 & \bf 75.84955 & 55.19481 & \bf 97.27273 & \bf 66.75849 & 51.89873\\
+pGES-jc,16 & 88.39161 & 75.73337 & 55.48341 & 94.84848 & \bf 66.75849 & 51.95627\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrrrrrr}
+\hline
+algorithm & insurance & link & mildew & munin & pigs & water & win95pts\\
+\hline
+Fges,1 & 65.97403 & 21.14761 & - & 19.17328 & 61.66253 & 26.75536 & 61.25253\\
+Fges-faithfulness,1 & 67.40260 & 37.64515 & - & 19.17328 & 61.63997 & 27.93792 & 69.21212\\
+Fges-ges,1 & \bf 67.79221 & 37.03839 & - & 19.81946 & 61.62869 & 27.93792 & 68.80808\\
+GES,1 & 64.41558 & 40.60048 & \bf 48.40909 & \bf 20.32260 & \bf 100.00000 & 26.01626 & 73.05051\\
+pGES-jc,2 & 64.67532 & \bf 45.20347 & \bf 48.40909 & 19.78000 & \bf 100.00000 & \bf 28.82483 & 73.21212\\
+pGES-jc,4 & 64.93506 & 45.17209 & \bf 48.40909 & 19.32620 & \bf 100.00000 & 28.38137 & 74.30303\\
+pGES-jc,8 & 66.62338 & 45.17732 & \bf 48.40909 & 19.62216 & \bf 100.00000 & 28.60310 & 72.76768\\
+pGES-jc,16 & 67.40260 & 45.14594 & 47.50000 & 19.87866 & \bf 100.00000 & 28.75092 & \bf 74.90909\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_17_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_18_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "deltaBDeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output deltaBDeu </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: maximize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 32.3653846153847</li>
+        <li>Computed p-value: 3.47455141387557e-05</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_19_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "deltaBDeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">-</td><td style="text-align:right">2.77</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.15</td><td style="text-align:right">7</td><td style="text-align:right">2</td><td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.38</td><td style="text-align:right">6</td><td style="text-align:right">5</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.62</td><td style="text-align:right">8</td><td style="text-align:right">2</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">3.4447e-02</td><td style="text-align:right">5.38</td><td style="text-align:right">11</td><td style="text-align:right">0</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">3.4447e-02</td><td style="text-align:right">5.38</td><td style="text-align:right">10</td><td style="text-align:right">1</td><td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">3.4447e-02</td><td style="text-align:right">5.42</td><td style="text-align:right">10</td><td style="text-align:right">0</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">1.2882e-04</td><td style="text-align:right">6.88</td><td style="text-align:right">11</td><td style="text-align:right">0</td><td style="text-align:right">2</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_19_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_19_hidden">
+      <pre id="elem_19_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+pGES-jc,4 & - & 2.77 & - & - & -\\
+pGES-jc,16 & \bf 1.0000e+00 & 3.15 & 7 & 2 & 4\\
+pGES-jc,8 & \bf 1.0000e+00 & 3.38 & 6 & 5 & 2\\
+pGES-jc,2 & \bf 1.0000e+00 & 3.62 & 8 & 2 & 3\\
+Fges-ges,1 & 3.4447e-02 & 5.38 & 11 & 0 & 2\\
+GES,1 & 3.4447e-02 & 5.38 & 10 & 1 & 2\\
+Fges-faithfulness,1 & 3.4447e-02 & 5.42 & 10 & 0 & 3\\
+Fges,1 & 1.2882e-04 & 6.88 & 11 & 0 & 2\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_19_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_20_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "deltaBDeu"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_20', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_20', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_20', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_20', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_20.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_21_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "deltaBDeu"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">alarm</th><th style="text-align:right">andes</th><th style="text-align:right">barley</th><th style="text-align:right">child</th><th style="text-align:right">hailfinder</th><th style="text-align:right">hepar2</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">9.78673</td><td style="text-align:right">28.01807</td><td style="text-align:right">27.68338</td><td style="text-align:right">4.75658</td><td style="text-align:right">19.37401</td><td style="text-align:right">2.21390</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">9.78673</td><td style="text-align:right">28.23515</td><td style="text-align:right">28.20239</td><td style="text-align:right">4.76034</td><td style="text-align:right">19.41199</td><td style="text-align:right">2.22064</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">9.78489</td><td style="text-align:right">28.23782</td><td style="text-align:right">28.21124</td><td style="text-align:right">4.76034</td><td style="text-align:right">19.40026</td><td style="text-align:right">2.22064</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">9.70186</td><td style="text-align:right">28.44191</td><td style="text-align:right">27.81780</td><td style="text-align:right">4.74610</td><td style="text-align:right"><strong>19.41689</strong></td><td style="text-align:right">2.25180</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>9.78689</strong></td><td style="text-align:right">28.44217</td><td style="text-align:right">28.22420</td><td style="text-align:right">4.76449</td><td style="text-align:right"><strong>19.41689</strong></td><td style="text-align:right">2.25335</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">9.78639</td><td style="text-align:right"><strong>28.44335</strong></td><td style="text-align:right">28.23695</td><td style="text-align:right">4.77913</td><td style="text-align:right"><strong>19.41689</strong></td><td style="text-align:right"><strong>2.25365</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">9.78639</td><td style="text-align:right">28.44334</td><td style="text-align:right">28.22078</td><td style="text-align:right"><strong>4.79164</strong></td><td style="text-align:right"><strong>19.41689</strong></td><td style="text-align:right"><strong>2.25365</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">9.78310</td><td style="text-align:right">28.44230</td><td style="text-align:right"><strong>28.24754</strong></td><td style="text-align:right">4.78699</td><td style="text-align:right"><strong>19.41689</strong></td><td style="text-align:right">2.25352</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">insurance</th><th style="text-align:right">link</th><th style="text-align:right">mildew</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th><th style="text-align:right">water</th><th style="text-align:right">win95pts</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">7.99152</td><td style="text-align:right">124.27117</td><td style="text-align:right">-</td><td style="text-align:right">158.63177</td><td style="text-align:right">114.57450</td><td style="text-align:right">3.81775</td><td style="text-align:right">9.50893</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">7.99738</td><td style="text-align:right">170.81879</td><td style="text-align:right">-</td><td style="text-align:right">158.73707</td><td style="text-align:right">114.57531</td><td style="text-align:right">3.82146</td><td style="text-align:right">9.65686</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right"><strong>8.00256</strong></td><td style="text-align:right">171.23259</td><td style="text-align:right">-</td><td style="text-align:right"><strong>158.80553</strong></td><td style="text-align:right">114.57618</td><td style="text-align:right">3.82043</td><td style="text-align:right">9.65114</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">7.98747</td><td style="text-align:right">182.15323</td><td style="text-align:right"><strong>15.34693</strong></td><td style="text-align:right">158.25554</td><td style="text-align:right"><strong>124.75817</strong></td><td style="text-align:right">3.81548</td><td style="text-align:right">9.66899</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right">7.98317</td><td style="text-align:right"><strong>182.77460</strong></td><td style="text-align:right">15.34693</td><td style="text-align:right">158.70249</td><td style="text-align:right">124.75770</td><td style="text-align:right">3.82604</td><td style="text-align:right">9.67813</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">7.99037</td><td style="text-align:right">182.77455</td><td style="text-align:right">15.34693</td><td style="text-align:right">158.71742</td><td style="text-align:right">124.75817</td><td style="text-align:right">3.82601</td><td style="text-align:right"><strong>9.68432</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">7.99790</td><td style="text-align:right">182.77277</td><td style="text-align:right">15.34693</td><td style="text-align:right">158.70604</td><td style="text-align:right">124.75817</td><td style="text-align:right">3.80565</td><td style="text-align:right">9.67882</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">8.00070</td><td style="text-align:right">182.77416</td><td style="text-align:right">15.33354</td><td style="text-align:right">158.68970</td><td style="text-align:right">124.75817</td><td style="text-align:right"><strong>3.82650</strong></td><td style="text-align:right">9.68227</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_21_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_21_hidden">
+      <pre id="elem_21_code">
+
+\begin{tabular}{lrrrrrr}
+\hline
+algorithm & alarm & andes & barley & child & hailfinder & hepar2\\
+\hline
+Fges,1 & 9.78673 & 28.01807 & 27.68338 & 4.75658 & 19.37401 & 2.21390\\
+Fges-faithfulness,1 & 9.78673 & 28.23515 & 28.20239 & 4.76034 & 19.41199 & 2.22064\\
+Fges-ges,1 & 9.78489 & 28.23782 & 28.21124 & 4.76034 & 19.40026 & 2.22064\\
+GES,1 & 9.70186 & 28.44191 & 27.81780 & 4.74610 & \bf 19.41689 & 2.25180\\
+pGES-jc,2 & \bf 9.78689 & 28.44217 & 28.22420 & 4.76449 & \bf 19.41689 & 2.25335\\
+pGES-jc,4 & 9.78639 & \bf 28.44335 & 28.23695 & 4.77913 & \bf 19.41689 & \bf 2.25365\\
+pGES-jc,8 & 9.78639 & 28.44334 & 28.22078 & \bf 4.79164 & \bf 19.41689 & \bf 2.25365\\
+pGES-jc,16 & 9.78310 & 28.44230 & \bf 28.24754 & 4.78699 & \bf 19.41689 & 2.25352\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrrrrrr}
+\hline
+algorithm & insurance & link & mildew & munin & pigs & water & win95pts\\
+\hline
+Fges,1 & 7.99152 & 124.27117 & - & 158.63177 & 114.57450 & 3.81775 & 9.50893\\
+Fges-faithfulness,1 & 7.99738 & 170.81879 & - & 158.73707 & 114.57531 & 3.82146 & 9.65686\\
+Fges-ges,1 & \bf 8.00256 & 171.23259 & - & \bf 158.80553 & 114.57618 & 3.82043 & 9.65114\\
+GES,1 & 7.98747 & 182.15323 & \bf 15.34693 & 158.25554 & \bf 124.75817 & 3.81548 & 9.66899\\
+pGES-jc,2 & 7.98317 & \bf 182.77460 & 15.34693 & 158.70249 & 124.75770 & 3.82604 & 9.67813\\
+pGES-jc,4 & 7.99037 & 182.77455 & 15.34693 & 158.71742 & 124.75817 & 3.82601 & \bf 9.68432\\
+pGES-jc,8 & 7.99790 & 182.77277 & 15.34693 & 158.70604 & 124.75817 & 3.80565 & 9.67882\\
+pGES-jc,16 & 8.00070 & 182.77416 & 15.33354 & 158.68970 & 124.75817 & \bf 3.82650 & 9.68227\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_21_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, target, objetive, distribution, statistic, pvalue, alpha, outcome
+
+-->
+
+   <section id="elem_22_hook">
+    <div class="text-center">
+      <h2>Friedman Test for output "deltas"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+
+    </br>
+    Friedman test for output deltas </br>
+    <ul>
+        <li>H<sub>0</sub>: all methods being equivalent.</li>
+        <li>H<sub>1</sub>: at least one method is not equivalent.</li>
+    </ul>
+
+    <ul>
+        <li>Strategy for ranks: maximize</li>
+        <li>Computed Chi squared statistic with 7 degrees of freedom: 34.1282051282052</li>
+        <li>Computed p-value: 1.62986628215279e-05</li>
+        <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
+    </ul>
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, scope, method, alpha, htmlTable, id, latexTable
+
+-->
+    <section id="elem_23_hook">
+    <div class="text-center">
+      <h2>Summary of Control post-hoc test for output "deltas"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    <ul>
+        <li>Test: Control post-hoc test</li>
+        <li>Adjust Method: Holm</li>
+        <li>&alpha; = 0.05</li>
+        <li>Boldfaced results represent non-rejected hipotheses</li>
+    </ul>
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right">-</td><td style="text-align:right">3.08</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.15</td><td style="text-align:right">7</td><td style="text-align:right">0</td><td style="text-align:right">6</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.85</td><td style="text-align:right">9</td><td style="text-align:right">0</td><td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">4.08</td><td style="text-align:right">9</td><td style="text-align:right">0</td><td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">4.15</td><td style="text-align:right">9</td><td style="text-align:right">0</td><td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right"><strong>3.9085e-01</strong></td><td style="text-align:right">4.77</td><td style="text-align:right">9</td><td style="text-align:right">0</td><td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right"><strong>1.8383e-01</strong></td><td style="text-align:right">5.15</td><td style="text-align:right">10</td><td style="text-align:right">0</td><td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">7.2802e-06</td><td style="text-align:right">7.77</td><td style="text-align:right">11</td><td style="text-align:right">0</td><td style="text-align:right">2</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_23_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_23_hidden">
+      <pre id="elem_23_code">
+
+\begin{tabular}{lrrrrr}
+\hline
+algorithm & pvalue & rank & win & tie & loss\\
+\hline
+GES,1 & - & 3.08 & - & - & -\\
+Fges,1 & \bf 1.0000e+00 & 3.15 & 7 & 0 & 6\\
+pGES-jc,2 & \bf 1.0000e+00 & 3.85 & 9 & 0 & 4\\
+pGES-jc,4 & \bf 1.0000e+00 & 4.08 & 9 & 0 & 4\\
+pGES-jc,8 & \bf 1.0000e+00 & 4.15 & 9 & 0 & 4\\
+pGES-jc,16 & \bf 3.9085e-01 & 4.77 & 9 & 0 & 4\\
+Fges-faithfulness,1 & \bf 1.8383e-01 & 5.15 & 10 & 0 & 3\\
+Fges-ges,1 & 7.2802e-06 & 7.77 & 11 & 0 & 2\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_23_code')">
+        Select Code
+      </button>
+    </div>
+    <br>
+    <br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, htmlTable, id, latexTable
+
+-->
+    <section id="elem_24_hook">
+    <div class="text-center">
+    <h2>Distribution of ranks for output "deltas"</h2>
+    From experiment: <a href="#pGES">pGES</a>
+    </div>
+    </br>
+    </br>
+
+    <!-- Single button -->
+    <div class="text-center">
+      <div class="btn-group ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Download <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" onclick="downloadFig('elem_24', '.eps')">EPS format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_24', '.pdf')">PDF format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_24', '.png')">PNG format</a></li>
+            <li><a href="#" onclick="downloadFig('elem_24', '.svg')">SVG format</a></li>
+        </ul>
+      </div>
+      <br>
+      <br>
+      <img  src="./img/elem_24.svg" width="80%"/>
+    </div>
+
+    </br>
+    </br>
+    </section>
+    <hr>
+
+<!--
+Parameters:
+
+title, context, htmlTable, id, latexTable
+
+-->
+    <section id="elem_25_hook">
+    <div class="text-center">
+      <h2>Detailed results for output(s) "deltas"</h2>
+      From experiment: <a href="#pGES">pGES</a>
+    </div>
+
+    </br>
+    </br>
+
+    <div>
+      <div class="table-responsive">
+        
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">alarm</th><th style="text-align:right">andes</th><th style="text-align:right">barley</th><th style="text-align:right">child</th><th style="text-align:right">hailfinder</th><th style="text-align:right">hepar2</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">10.68491</td><td style="text-align:right"><strong>9.21749</strong></td><td style="text-align:right">6.18599</td><td style="text-align:right">1.06568</td><td style="text-align:right">0.01180</td><td style="text-align:right"><strong>2.78751</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">9.20376</td><td style="text-align:right">2.65118</td><td style="text-align:right">2.51088</td><td style="text-align:right">0.92576</td><td style="text-align:right">0.01191</td><td style="text-align:right">1.35905</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">5.54711</td><td style="text-align:right">1.26601</td><td style="text-align:right">1.36805</td><td style="text-align:right">0.87404</td><td style="text-align:right">0.00277</td><td style="text-align:right">0.62388</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>12.49053</strong></td><td style="text-align:right">1.48540</td><td style="text-align:right"><strong>17.17596</strong></td><td style="text-align:right"><strong>12.76343</strong></td><td style="text-align:right"><strong>16.60550</strong></td><td style="text-align:right">1.68245</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right">9.10484</td><td style="text-align:right">3.27886</td><td style="text-align:right">13.31888</td><td style="text-align:right">5.39241</td><td style="text-align:right">14.66902</td><td style="text-align:right">1.46024</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">8.84136</td><td style="text-align:right">4.32383</td><td style="text-align:right">14.59829</td><td style="text-align:right">5.03001</td><td style="text-align:right">12.94805</td><td style="text-align:right">1.40273</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">7.61311</td><td style="text-align:right">4.41499</td><td style="text-align:right">11.26708</td><td style="text-align:right">5.25339</td><td style="text-align:right">13.10969</td><td style="text-align:right">1.26922</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">6.90565</td><td style="text-align:right">3.59527</td><td style="text-align:right">14.83698</td><td style="text-align:right">5.10959</td><td style="text-align:right">11.76171</td><td style="text-align:right">1.11830</td>
+</tr>
+</table>
+<br/><br/>
+<table class="table table-hover">
+<tr>
+<tr>
+<th style="text-align:left">algorithm</th><th style="text-align:right">insurance</th><th style="text-align:right">link</th><th style="text-align:right">mildew</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th><th style="text-align:right">water</th><th style="text-align:right">win95pts</th></tr>
+<tr>
+<td style="text-align:left">Fges,1</td><td style="text-align:right">11.41258</td><td style="text-align:right"><strong>3.07625</strong></td><td style="text-align:right">-</td><td style="text-align:right">0.01422</td><td style="text-align:right"><strong>5.76169</strong></td><td style="text-align:right"><strong>9.57168</strong></td><td style="text-align:right"><strong>6.85485</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-faithfulness,1</td><td style="text-align:right">9.86315</td><td style="text-align:right">0.87792</td><td style="text-align:right">-</td><td style="text-align:right">0.01374</td><td style="text-align:right">2.40127</td><td style="text-align:right">5.85941</td><td style="text-align:right">4.08525</td>
+</tr>
+<tr>
+<td style="text-align:left">Fges-ges,1</td><td style="text-align:right">6.57971</td><td style="text-align:right">0.48192</td><td style="text-align:right">-</td><td style="text-align:right">0.00772</td><td style="text-align:right">0.91909</td><td style="text-align:right">3.68318</td><td style="text-align:right">2.17122</td>
+</tr>
+<tr>
+<td style="text-align:left">GES,1</td><td style="text-align:right"><strong>14.33487</strong></td><td style="text-align:right">0.28599</td><td style="text-align:right"><strong>12.51257</strong></td><td style="text-align:right">0.09416</td><td style="text-align:right">0.87884</td><td style="text-align:right">7.70895</td><td style="text-align:right">5.24396</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,2</td><td style="text-align:right">7.75464</td><td style="text-align:right">0.58055</td><td style="text-align:right">10.77291</td><td style="text-align:right">0.09636</td><td style="text-align:right">2.06531</td><td style="text-align:right">4.38339</td><td style="text-align:right">4.54133</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,4</td><td style="text-align:right">8.23998</td><td style="text-align:right">0.76385</td><td style="text-align:right">10.08486</td><td style="text-align:right">0.09921</td><td style="text-align:right">2.92555</td><td style="text-align:right">4.17467</td><td style="text-align:right">4.04735</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,8</td><td style="text-align:right">7.03870</td><td style="text-align:right">1.13541</td><td style="text-align:right">9.66684</td><td style="text-align:right"><strong>0.13239</strong></td><td style="text-align:right">4.06948</td><td style="text-align:right">3.77085</td><td style="text-align:right">3.79951</td>
+</tr>
+<tr>
+<td style="text-align:left">pGES-jc,16</td><td style="text-align:right">6.71507</td><td style="text-align:right">1.20664</td><td style="text-align:right">9.36919</td><td style="text-align:right">0.12006</td><td style="text-align:right">4.72881</td><td style="text-align:right">3.50358</td><td style="text-align:right">3.37884</td>
+</tr>
+</table>
+      </div>
+    </div>
+
+    </br>
+
+    <button class="btn btn-primary" type="button" data-toggle="collapse"
+     data-target="#elem_25_hidden" aria-expanded="false" aria-controls="collapseExample">
+      Show/Hide LaTeX Code
+    </button>
+    </br>
+    </br>
+    <div class="collapse" id="elem_25_hidden">
+      <pre id="elem_25_code">
+
+\begin{tabular}{lrrrrrr}
+\hline
+algorithm & alarm & andes & barley & child & hailfinder & hepar2\\
+\hline
+Fges,1 & 10.68491 & \bf 9.21749 & 6.18599 & 1.06568 & 0.01180 & \bf 2.78751\\
+Fges-faithfulness,1 & 9.20376 & 2.65118 & 2.51088 & 0.92576 & 0.01191 & 1.35905\\
+Fges-ges,1 & 5.54711 & 1.26601 & 1.36805 & 0.87404 & 0.00277 & 0.62388\\
+GES,1 & \bf 12.49053 & 1.48540 & \bf 17.17596 & \bf 12.76343 & \bf 16.60550 & 1.68245\\
+pGES-jc,2 & 9.10484 & 3.27886 & 13.31888 & 5.39241 & 14.66902 & 1.46024\\
+pGES-jc,4 & 8.84136 & 4.32383 & 14.59829 & 5.03001 & 12.94805 & 1.40273\\
+pGES-jc,8 & 7.61311 & 4.41499 & 11.26708 & 5.25339 & 13.10969 & 1.26922\\
+pGES-jc,16 & 6.90565 & 3.59527 & 14.83698 & 5.10959 & 11.76171 & 1.11830\\
+\hline
+\end{tabular}
+
+
+\begin{tabular}{lrrrrrrr}
+\hline
+algorithm & insurance & link & mildew & munin & pigs & water & win95pts\\
+\hline
+Fges,1 & 11.41258 & \bf 3.07625 & - & 0.01422 & \bf 5.76169 & \bf 9.57168 & \bf 6.85485\\
+Fges-faithfulness,1 & 9.86315 & 0.87792 & - & 0.01374 & 2.40127 & 5.85941 & 4.08525\\
+Fges-ges,1 & 6.57971 & 0.48192 & - & 0.00772 & 0.91909 & 3.68318 & 2.17122\\
+GES,1 & \bf 14.33487 & 0.28599 & \bf 12.51257 & 0.09416 & 0.87884 & 7.70895 & 5.24396\\
+pGES-jc,2 & 7.75464 & 0.58055 & 10.77291 & 0.09636 & 2.06531 & 4.38339 & 4.54133\\
+pGES-jc,4 & 8.23998 & 0.76385 & 10.08486 & 0.09921 & 2.92555 & 4.17467 & 4.04735\\
+pGES-jc,8 & 7.03870 & 1.13541 & 9.66684 & \bf 0.13239 & 4.06948 & 3.77085 & 3.79951\\
+pGES-jc,16 & 6.71507 & 1.20664 & 9.36919 & 0.12006 & 4.72881 & 3.50358 & 3.37884\\
+\hline
+\end{tabular}
+</pre>
+    </br>
+      <button class="btn btn-success btn-sm" onclick="selectText('elem_25_code')">
+        Select Code
+      </button>
+    </div>
+
+    <br>
+    <br>
+    </section>
+    <hr>
+<!--
+Parameters:
+
+r_version, index
+
+-->
+          </div>
+        </div> <!-- End Col -->
+
+        <div class="col-md-1 visible-lg" id="side-nav">
+            <ul class="nav nav-pills nav-stacked" data-spy="affix" data-offset-top="50">
+              
+<li><a href="#elem_1_hook"><strong>experiment:</strong>pGES</a></li>
+<li><a href="#elem_2_hook"><strong>TestMultipleControl:</strong>bdeu</a></li>
+<li><a href="#elem_3_hook"><strong>TestSummaryTable:</strong>bdeu</a></li>
+<li><a href="#elem_4_hook"><strong>RankDistributionPlot:</strong>bdeu</a></li>
+<li><a href="#elem_5_hook"><strong>ExpSummaryTable:</strong>bdeu</a></li>
+<li><a href="#elem_6_hook"><strong>TestMultipleControl:</strong>SHD</a></li>
+<li><a href="#elem_7_hook"><strong>TestSummaryTable:</strong>SHD</a></li>
+<li><a href="#elem_8_hook"><strong>RankDistributionPlot:</strong>SHD</a></li>
+<li><a href="#elem_9_hook"><strong>ExpSummaryTable:</strong>SHD</a></li>
+<li><a href="#elem_10_hook"><strong>TestMultipleControl:</strong>deltaSHD</a></li>
+<li><a href="#elem_11_hook"><strong>TestSummaryTable:</strong>deltaSHD</a></li>
+<li><a href="#elem_12_hook"><strong>RankDistributionPlot:</strong>deltaSHD</a></li>
+<li><a href="#elem_13_hook"><strong>ExpSummaryTable:</strong>deltaSHD</a></li>
+<li><a href="#elem_14_hook"><strong>TestMultipleControl:</strong>deltaSHDemptySHD</a></li>
+<li><a href="#elem_15_hook"><strong>TestSummaryTable:</strong>deltaSHDemptySHD</a></li>
+<li><a href="#elem_16_hook"><strong>RankDistributionPlot:</strong>deltaSHDemptySHD</a></li>
+<li><a href="#elem_17_hook"><strong>ExpSummaryTable:</strong>deltaSHDemptySHD</a></li>
+<li><a href="#elem_18_hook"><strong>TestMultipleControl:</strong>deltaBDeu</a></li>
+<li><a href="#elem_19_hook"><strong>TestSummaryTable:</strong>deltaBDeu</a></li>
+<li><a href="#elem_20_hook"><strong>RankDistributionPlot:</strong>deltaBDeu</a></li>
+<li><a href="#elem_21_hook"><strong>ExpSummaryTable:</strong>deltaBDeu</a></li>
+<li><a href="#elem_22_hook"><strong>TestMultipleControl:</strong>deltas</a></li>
+<li><a href="#elem_23_hook"><strong>TestSummaryTable:</strong>deltas</a></li>
+<li><a href="#elem_24_hook"><strong>RankDistributionPlot:</strong>deltas</a></li>
+<li><a href="#elem_25_hook"><strong>ExpSummaryTable:</strong>deltas</a></li>
+            </ul>
+        </div>
+
+
+      </div> <!-- End Row -->
+    </div> <!-- End Container -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <br>
+          <br>
+        </div>
+      </div>
+
+      <div class="row">
+          <div class="col-md-12 text-center" style="background-color:black;">
+          <span class="text-center" style="color: #999;">
+            <br>
+            <h5>exreport, Copyright 2015 by Jacinto Arias and Javier Cozar</h5>
+            Generated using R version 4.2.0 (2022-04-22)
+            <br>
+            <br>
+          </span>
+          </div>
+      </div>
+    </div>
+
+    <script src="./assets/jquery.js"></script>
+    <script src="./assets/scripts.js"></script>
+    <script src="./assets/bootstrap.min.js"></script>
+
+</body>
+</html>

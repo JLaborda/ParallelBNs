@@ -10,13 +10,23 @@ import java.util.List;
 import java.util.Set;
 
 public class FESStage extends ForwardStage{
+    
+    private boolean speedUp;
+    private boolean update;
+    private boolean parallel;
 
-    public FESStage(Problem problem, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
+    public FESStage(Problem problem, int nThreads, int itInterleaving, List<Set<Edge>> subsets, boolean speedUp, boolean update, boolean parallel) {
         super(problem, nThreads, itInterleaving, subsets);
+        this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
-    public FESStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
+    public FESStage(Problem problem, Graph currentGraph, int nThreads, int itInterleaving, List<Set<Edge>> subsets, boolean speedUp, boolean update, boolean parallel) {
         super(problem, currentGraph, nThreads, itInterleaving, subsets);
+        this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
     @Override
@@ -42,12 +52,12 @@ public class FESStage extends ForwardStage{
         // Creating each ThFES runnable
         if (this.currentGraph == null) {
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new FESThread(this.problem, this.subsets.get(i), this.itInterleaving);
+                this.gesThreads[i] = new FESThread(this.problem, this.subsets.get(i), this.itInterleaving, speedUp, update, parallel);
             }
         }
         else{
             for (int i = 0; i < this.nThreads; i++) {
-                this.gesThreads[i] = new FESThread(this.problem, this.currentGraph, this.subsets.get(i), this.itInterleaving);
+                this.gesThreads[i] = new FESThread(this.problem, this.currentGraph, this.subsets.get(i), this.itInterleaving, speedUp,  update, parallel);
             }
         }
 

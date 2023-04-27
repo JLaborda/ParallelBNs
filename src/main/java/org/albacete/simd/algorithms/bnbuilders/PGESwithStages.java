@@ -1,12 +1,10 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
 import edu.cmu.tetrad.data.DataSet;
-import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
-import java.util.Set;
 import org.albacete.simd.clustering.Clustering;
 import org.albacete.simd.framework.*;
-import org.albacete.simd.utils.Utils;
+import org.albacete.simd.threads.GESThread;
 
 public class PGESwithStages extends BNBuilder {
 
@@ -15,33 +13,48 @@ public class PGESwithStages extends BNBuilder {
     
     private FESStage fesStage;
     private BESStage besStage;
+    
+    private final boolean speedUp;
+    private final boolean update;
+    private final boolean parallel;
 
-    private Clustering clustering;
+    private final Clustering clustering;
 
+    public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp, boolean update, boolean parallel) {
 
-
-    public PGESwithStages(DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
         super(data, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
+        this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
-    public PGESwithStages(String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp, boolean update, boolean parallel) {
         super(path, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
+        this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
-    public PGESwithStages(Graph initialGraph, String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(Graph initialGraph, String path, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp, boolean update, boolean parallel) {
         super(initialGraph, path, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
+        this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
-    public PGESwithStages(Graph initialGraph, DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving) {
+    public PGESwithStages(Graph initialGraph, DataSet data, Clustering clustering, int nThreads, int maxIterations, int nItInterleaving, boolean speedUp, boolean update, boolean parallel) {
         super(initialGraph, data, nThreads, maxIterations, nItInterleaving);
         this.clustering = clustering;
         this.clustering.setProblem(super.getProblem());
+        this.speedUp = speedUp;
+        this.update = update;
+        this.parallel = parallel;
     }
 
     @Override
@@ -50,14 +63,24 @@ public class PGESwithStages extends BNBuilder {
         if (it >= this.maxIterations)
             return true;
 
-        System.out.println("      Comprobando convergencia. FES: " + fesFlag + ", BES: " + besFlag);
-        // Checking working status
-        if(!fesFlag && !besFlag){
-            return true;
-        }
         it++;
         System.out.println("\n\nIterations: " + it);
-        return false;
+
+        // Checking working status
+        /*if(!fesFlag && !besFlag){
+            return true;
+        }*/
+        double currentScore = GESThread.scoreGraph(this.currentGraph, this.problem);
+
+        System.out.println("Current: " + currentScore + ", prev: "+ prevScore);
+        if(currentScore > prevScore){
+
+            prevScore = currentScore;
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
     @Override
@@ -67,31 +90,26 @@ public class PGESwithStages extends BNBuilder {
 
     @Override
     protected void repartition() {
-        this.subSets = clustering.generateEdgeDistribution(nThreads, false);
-        System.out.println("\n\n\n");
-        for (Set<Edge> subSet : subSets) {
-            System.out.println(subSet);
-        }
-        System.out.println("\n\n\n");
+        this.subSets = clustering.generateEdgeDistribution(nThreads);
     }
 
     @Override
-    protected void forwardStage() throws InterruptedException {
-        fesStage = new FESStage(problem, currentGraph,nThreads,nItInterleaving, subSets);
+    protected void forwardStage(){
+        fesStage = new FESStage(problem, currentGraph,nThreads,nItInterleaving, subSets, speedUp, update, parallel);
         fesFlag = fesStage.run();
         graphs = fesStage.getGraphs();
     }
 
     @Override
     protected void forwardFusion() throws InterruptedException {
-        FESFusion fesFusion = new FESFusion(problem, currentGraph, graphs, fesStage);
+        FESFusion fesFusion = new FESFusion(problem, currentGraph, graphs, update);
         fesFusion.run();
         fesFlag = fesFusion.flag;
         currentGraph = fesFusion.getCurrentGraph();
     }
 
     @Override
-    protected void backwardStage() throws InterruptedException {
+    protected void backwardStage(){
         besStage = new BESStage(problem, currentGraph, nThreads, nItInterleaving, subSets);
         besFlag = besStage.run();
         graphs = besStage.getGraphs();

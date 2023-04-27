@@ -179,7 +179,7 @@ public class BackwardsHillClimbingThreadTest {
         System.out.println(g1);
 
         // Getting dags
-        Dag gdag1 = new Dag(removeInconsistencies(g1));
+        Dag_n gdag1 = new Dag_n(removeInconsistencies(g1));
 
 
         for(Edge edge : expected){

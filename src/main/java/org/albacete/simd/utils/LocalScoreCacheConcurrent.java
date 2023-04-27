@@ -1,42 +1,25 @@
 package org.albacete.simd.utils;
 
-import java.util.HashSet;
+import edu.cmu.tetrad.graph.Node;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Objects;
 
 
 public class LocalScoreCacheConcurrent {
-    private ConcurrentHashMap<DualKey<Integer, Set<Integer>>, Double> map = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<DualKey<Integer, Set<Node>>, Double> map = new ConcurrentHashMap<>();
 
     public LocalScoreCacheConcurrent() {
     }
 
-    public void add(int variable, int[] parents, double score) {
-        Set<Integer> _parents = new HashSet<>(parents.length);
-        //int[] parents_aux = parents;
-
-        for(int i = 0; i < parents.length; ++i) {
-            int parent = parents[i];
-            _parents.add(parent);
-        }
-
-        DualKey<Integer, Set<Integer>> key = new DualKey<>(variable, _parents);
+    public void add(int variable, Set<Node> parents, double score) {
+        DualKey<Integer, Set<Node>> key = new DualKey<>(variable, parents);
 
         this.map.put(key, score);
     }
 
-    public double get(int variable, int[] parents) {
-        Set<Integer> _parents = new HashSet<Integer>(parents.length);
-        int[] var7 = parents;
-        int var6 = parents.length;
-
-        for(int i = 0; i < parents.length; ++i) {
-            int parent = parents[i];
-            _parents.add(parent);
-        }
-        DualKey<Integer, Set<Integer>> key = new DualKey<>(variable, _parents);
-
+    public double get(int variable, Set<Node> parents) {
+        DualKey<Integer, Set<Node>> key = new DualKey<>(variable, parents);
 
         Double _score = this.map.get(key);
         return _score == null ? Double.NaN : _score;
@@ -56,6 +39,8 @@ public class LocalScoreCacheConcurrent {
     private class DualKey<K1,K2> {
         private final K1 key1;
         private final K2 key2;
+        
+        private int hash;
     
         public DualKey(K1 key1, K2 key2){
             this.key1 = key1;
@@ -88,8 +73,11 @@ public class LocalScoreCacheConcurrent {
     
         @Override
         public int hashCode() {
+            if (hash == 0){
+                hash = Objects.hash(key1, key2);
+            }
             //return super.hashCode();
-            return Objects.hash(key1, key2);
+            return hash;
         }
     }
 }

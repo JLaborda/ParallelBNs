@@ -23,7 +23,7 @@ public class ExperimentBNBuilderTest {
     int seed = 42;
     int maxIterations = 15;
     Clustering clustering = new RandomClustering();
-    BNBuilder algorithm = new PGESwithStages(Resources.CANCER_BBDD_PATH, clustering, nThreads, maxIterations, nItInterleaving);
+    BNBuilder algorithm = new PGESwithStages(Resources.CANCER_BBDD_PATH, clustering, nThreads, maxIterations, nItInterleaving, false, true, true);
     ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "cancer", Resources.CANCER_NET_PATH, Resources.CANCER_BBDD_PATH, Resources.CANCER_TEST_PATH, seed);
 
 

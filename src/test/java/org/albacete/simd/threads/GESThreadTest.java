@@ -65,7 +65,7 @@ public class GESThreadTest {
     final Set<Edge> subset2 = new HashSet<>();
 
     @Before
-    public void restartMeans(){
+    public void restartMeans() {
         BackwardStage.meanTimeTotal = 0;
         ForwardStage.meanTimeTotal = 0;
     }
@@ -80,7 +80,7 @@ public class GESThreadTest {
     /**
      * This method initializes the subsets, splitting the nodes in what is expected to happen when the seed is 42
      */
-    private void initializeSubsets(){
+    private void initializeSubsets() {
         // Seed used for arc split is 42
 
         // Subset 1:
@@ -90,7 +90,7 @@ public class GESThreadTest {
         subset1.add(Edges.directedEdge(smoker, dyspnoea));
         subset1.add(Edges.directedEdge(xray, pollution));
         subset1.add(Edges.directedEdge(pollution, xray));
-        subset1.add(Edges.directedEdge(xray , cancer));
+        subset1.add(Edges.directedEdge(xray, cancer));
         subset1.add(Edges.directedEdge(cancer, xray));
         subset1.add(Edges.directedEdge(cancer, pollution));
         subset1.add(Edges.directedEdge(pollution, cancer));
@@ -111,10 +111,11 @@ public class GESThreadTest {
 
     /**
      * Testing the insert method.
-     * @result insert(X,Y,S,G) adds {X-Y, A-Y, B-Y} to the graph (in this case S is composed by two nodes A and B)
+     *
+     * @result insert(X, Y, S, G) adds {X-Y, A-Y, B-Y} to the graph (in this case S is composed by two nodes A and B)
      */
     @Test
-    public void insertTest(){
+    public void insertTest() {
         // Arrange
         List<Node> nodes = new ArrayList<>();
         nodes.add(dyspnoea);
@@ -123,19 +124,19 @@ public class GESThreadTest {
         nodes.add(cancer);
         nodes.add(pollution);
 
-        Graph g = new Dag(nodes);
+        Graph g = new Dag_n(nodes);
         Set<Node> setNode = new HashSet<>();
         setNode.add(dyspnoea);
         setNode.add(smoker);
 
         //Expectations
-        Edge edge1 = new Edge(cancer,xray, Endpoint.TAIL, Endpoint.ARROW);
-        Edge edge2 = new Edge(dyspnoea,xray, Endpoint.TAIL, Endpoint.ARROW);
-        Edge edge3 = new Edge(smoker,xray, Endpoint.TAIL, Endpoint.ARROW);
+        Edge edge1 = new Edge(cancer, xray, Endpoint.TAIL, Endpoint.ARROW);
+        Edge edge2 = new Edge(dyspnoea, xray, Endpoint.TAIL, Endpoint.ARROW);
+        Edge edge3 = new Edge(smoker, xray, Endpoint.TAIL, Endpoint.ARROW);
 
 
         // Act
-        GESThread.insert(cancer,xray,setNode,g);
+        GESThread.insert(cancer, xray, setNode, g);
 
         // Assert
         assertTrue(g.getEdges().contains(edge1));
@@ -145,10 +146,11 @@ public class GESThreadTest {
 
     /**
      * Testing that we get the correct neighbors of nodes for Y that are not adjacent to X. Directed nodes should not be added
+     *
      * @result Y should only have as neighbors nodes Z and T
      */
     @Test
-    public void getSubsetOfUndirectedNeighborsTest(){
+    public void getSubsetOfUndirectedNeighborsTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -168,22 +170,22 @@ public class GESThreadTest {
         Graph g = new EdgeListGraph(nodes);
 
         // Edges
-        g.addUndirectedEdge(P,X);
-        g.addUndirectedEdge(X,Y);
-        g.addUndirectedEdge(Y,Z);
-        g.addDirectedEdge(Y,M);
-        g.addUndirectedEdge(Y,T);
-        g.addUndirectedEdge(Y,P);
+        g.addUndirectedEdge(P, X);
+        g.addUndirectedEdge(X, Y);
+        g.addUndirectedEdge(Y, Z);
+        g.addDirectedEdge(Y, M);
+        g.addUndirectedEdge(Y, T);
+        g.addUndirectedEdge(Y, P);
 
         List<Node> expected = new ArrayList<>();
         expected.add(Z);
         expected.add(T);
 
         // Act
-        List<Node> result = GESThread.getSubsetOfNeighbors(X,Y,g);
+        List<Node> result = GESThread.getSubsetOfNeighbors(X, Y, g);
 
         // Assert
-        for(Node n : expected) {
+        for (Node n : expected) {
             assertTrue(result.contains(n));
         }
         assertFalse(result.contains(P));
@@ -191,10 +193,11 @@ public class GESThreadTest {
 
     /**
      * Testing that we get no neighbors for only one node
+     *
      * @result An empty set of neighbors.
      */
     @Test
-    public void getEmptySubsetOfNeighborsTest(){
+    public void getEmptySubsetOfNeighborsTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -205,7 +208,7 @@ public class GESThreadTest {
         // Graph
         Graph g = new EdgeListGraph(nodes);
         // Act
-        List<Node> result = GESThread.getSubsetOfNeighbors(X,Y,g);
+        List<Node> result = GESThread.getSubsetOfNeighbors(X, Y, g);
         assertEquals(0, result.size());
     }
 
@@ -213,10 +216,11 @@ public class GESThreadTest {
     /**
      * Testing that in the graph X-Y-Z, when delete(X,Y,{Z}) is executed, the resulting edges are two directed edges X-Z
      * and Y-Z.
+     *
      * @result A graph with X-Y deleted and two directed edges added: X-Z and Y-Z
      */
     @Test
-    public void deleteTest(){
+    public void deleteTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -230,22 +234,22 @@ public class GESThreadTest {
         Graph g = new EdgeListGraph(nodes);
 
         // Edges
-        g.addUndirectedEdge(X,Y);
-        g.addUndirectedEdge(Y,Z);
+        g.addUndirectedEdge(X, Y);
+        g.addUndirectedEdge(Y, Z);
 
         Set<Node> subset = new HashSet<>();
         subset.add(Z);
 
         Graph expected = new EdgeListGraph(nodes);
-        expected.addDirectedEdge(X,Z);
-        expected.addDirectedEdge(Y,Z);
+        expected.addDirectedEdge(X, Z);
+        expected.addDirectedEdge(Y, Z);
 
 
         // Act
-        GESThread.delete(X,Y,subset,g);
+        GESThread.delete(X, Y, subset, g);
 
         // Assert
-        for(Edge edge : expected.getEdges()){
+        for (Edge edge : expected.getEdges()) {
             assertTrue(g.getEdges().contains(edge));
             Edge res_edge = g.getEdge(edge.getNode1(), edge.getNode2());
             assertEquals(res_edge, edge);
@@ -255,10 +259,11 @@ public class GESThreadTest {
     /**
      * Tests that for the graph {X-Z, X-T, Z-Y, T-Y (directed)} the nodes connected to Y by an undirected edge adjacent
      * to X is only Z.
+     *
      * @result A list with only the Node Z
      */
     @Test
-    public void findNaYXTest(){
+    public void findNaYXTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -275,19 +280,19 @@ public class GESThreadTest {
         Graph g = new EdgeListGraph(nodes);
 
         // Edges
-        g.addUndirectedEdge(X,Z);
-        g.addUndirectedEdge(X,T);
-        g.addUndirectedEdge(Z,Y);
-        g.addDirectedEdge(T,Y);
+        g.addUndirectedEdge(X, Z);
+        g.addUndirectedEdge(X, T);
+        g.addUndirectedEdge(Z, Y);
+        g.addDirectedEdge(T, Y);
 
         List<Node> expected = new ArrayList<>();
         expected.add(Z);
 
         // Act
-        List<Node> result = GESThread.findNaYX(X,Y,g);
+        List<Node> result = GESThread.findNaYX(X, Y, g);
 
         // Assert
-        for(Node n : expected){
+        for (Node n : expected) {
             assertTrue(result.contains(n));
         }
 
@@ -295,10 +300,11 @@ public class GESThreadTest {
 
     /**
      * Tests that the isClique detects cliques correctly both true cliques and false cliques
+     *
      * @result true for the graph that has a clique, false for the graph that doesn't have one.
      */
     @Test
-    public void isCliqueTest(){
+    public void isCliqueTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -316,18 +322,18 @@ public class GESThreadTest {
         Graph g2 = new EdgeListGraph(nodes);
 
         // Edges
-        g1.addUndirectedEdge(X,Y);
-        g1.addUndirectedEdge(X,T);
-        g1.addUndirectedEdge(X,Z);
-        g1.addUndirectedEdge(Y,Z);
-        g1.addUndirectedEdge(Y,T);
-        g1.addUndirectedEdge(Z,T);
+        g1.addUndirectedEdge(X, Y);
+        g1.addUndirectedEdge(X, T);
+        g1.addUndirectedEdge(X, Z);
+        g1.addUndirectedEdge(Y, Z);
+        g1.addUndirectedEdge(Y, T);
+        g1.addUndirectedEdge(Z, T);
 
-        g2.addUndirectedEdge(X,Y);
-        g2.addUndirectedEdge(X,T);
-        g2.addUndirectedEdge(X,Z);
-        g2.addUndirectedEdge(Y,Z);
-        g2.addUndirectedEdge(Y,T);
+        g2.addUndirectedEdge(X, Y);
+        g2.addUndirectedEdge(X, T);
+        g2.addUndirectedEdge(X, Z);
+        g2.addUndirectedEdge(Y, Z);
+        g2.addUndirectedEdge(Y, T);
 
         // Act
         boolean result1 = GESThread.isClique(nodes, g1);
@@ -339,10 +345,11 @@ public class GESThreadTest {
 
     /**
      * Tests that the isSemiDirectedBlocked function returns true when the list has the Y Node
+     *
      * @result This test should be true
      */
     @Test
-    public void ifNaYXTListContainsYisSemiDirectedBlockedShouldBeTrueTest(){
+    public void ifNaYXTListContainsYisSemiDirectedBlockedShouldBeTrueTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -369,10 +376,11 @@ public class GESThreadTest {
 
     /**
      * Tests that the isSemiDirectedBlocked function returns true when X and Y are the same.
+     *
      * @result This test should be true
      */
     @Test
-    public void ifNaYXTListContainsOnlyXisSemiDirectedBlockedShouldBeTrueTest(){
+    public void ifNaYXTListContainsOnlyXisSemiDirectedBlockedShouldBeTrueTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -399,10 +407,11 @@ public class GESThreadTest {
 
     /**
      * Tests that for all the paths from X and Y contain a node from the list naYXT.
+     *
      * @result Test should be true
      */
     @Test
-    public void isSemiDirectedBlockedShouldBeTrueForTest(){
+    public void isSemiDirectedBlockedShouldBeTrueForTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -417,9 +426,9 @@ public class GESThreadTest {
 
         // Graph
         Graph g = new EdgeListGraph(nodes);
-        g.addUndirectedEdge(X,Z);
-        g.addUndirectedEdge(Z,T);
-        g.addUndirectedEdge(T,Y);
+        g.addUndirectedEdge(X, Z);
+        g.addUndirectedEdge(Z, T);
+        g.addUndirectedEdge(T, Y);
 
 
         List<Node> naYXT = new ArrayList<>();
@@ -435,11 +444,12 @@ public class GESThreadTest {
 
     /**
      * Tests that there is a path from X and Y that doesn't contain a node from the list naYXT.
+     *
      * @result Test should be false
      */
 
     @Test
-    public void isSemiDirectedBlockedShouldBeFalseTest(){
+    public void isSemiDirectedBlockedShouldBeFalseTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -454,9 +464,9 @@ public class GESThreadTest {
 
         // Graph
         Graph g = new EdgeListGraph(nodes);
-        g.addUndirectedEdge(X,Z);
-        g.addUndirectedEdge(Z,T);
-        g.addUndirectedEdge(T,Y);
+        g.addUndirectedEdge(X, Z);
+        g.addUndirectedEdge(Z, T);
+        g.addUndirectedEdge(T, Y);
 
         List<Node> naYXT = new ArrayList<>();
         //naYXT.add(Z);
@@ -489,13 +499,14 @@ public class GESThreadTest {
 
     /**
      * Tests that the maximum number of edges is modified.
+     *
      * @result The max number of edges is changed to 5
      */
     @Test
-    public void setMaxNumEdgesNormalTest(){
+    public void setMaxNumEdgesNormalTest() {
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new FESThread(problem, subset1, 15);
+        GESThread thread = new FESThread(problem, subset1, 15, false, true, true);
 
         // Act
         thread.setMaxNumEdges(5);
@@ -506,13 +517,14 @@ public class GESThreadTest {
 
     /**
      * Tests that if a negative number is set as the maximum number of edges, an IllegalArgumentException is thrown
+     *
      * @result An IllegalArgumenException is thrown
      */
     @Test(expected = IllegalArgumentException.class)
-    public void setMaxNumEdgesErrorTest(){
+    public void setMaxNumEdgesErrorTest() {
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new FESThread(problem, subset1, 15);
+        GESThread thread = new FESThread(problem, subset1, 15, false, true, true);
 
         // Act
         thread.setMaxNumEdges(-2);
@@ -522,103 +534,15 @@ public class GESThreadTest {
     }
 
     @Test
-    public void getLogTest(){
+    public void getCacheTest() {
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new FESThread(problem, subset1, 15);
-
-        String result = thread.getLog();
-
-        assertEquals("", result);
-
-    }
-
-    @Test
-    public void getCacheTest(){
-        // Arrange
-        Problem problem = new Problem(dataset);
-        GESThread thread = new FESThread(problem, subset1, 15);
+        GESThread thread = new FESThread(problem, subset1, 15, false, true, true);
 
         LocalScoreCacheConcurrent result = thread.getLocalScoreCache();
         assertNotNull(result);
 
     }
-
-
-   /*
-    @Test
-    public void setCasesTest(){
-        // Arrange
-        String path = "src/test/resources/casesTest.csv";
-        DataSet data = Utils.readData(path);
-        int[] expNValues = {2,2,2,2,2};
-        int[][] expCases = {{0,0,0,1,0},
-                {0,0,0,1,0},
-                {1,0,1,1,0},
-                {0,1,0,0,1}};
-
-        // Act
-        //GESThread.setProblem(data);
-        //int[][] resultCases = GESThread.cases;
-        //int[] resultNValues = GESThread.nValues;
-
-        // Assert
-        assertEquals(expNValues.length, resultNValues.length);
-        assertEquals(expCases.length, resultCases.length);
-        for (int i = 0; i < expCases.length; i++) {
-            assertEquals(expNValues[i], resultNValues[i]);
-            assertEquals(expCases[i].length, resultCases[i].length);
-            for (int j = 0; j < expCases[i].length; j++) {
-                //System.out.println("(" + i + ", " + j + ")");
-                assertEquals(expCases[i][j], resultCases[i][j]);
-            }
-        }
-
-    }
-*/
 }
-
-    // Not working. Make Issue for this test
-    /*
-    @Test
-    public void getFlagTest() throws InterruptedException {
-
-        // Arrange
-        GESThread gesThread = new ThFES(dataset, subset1,15);
-        ThreadTest threadTest = new ThreadTest(gesThread);
-        Thread thread = new Thread(threadTest);
-        // Act
-        thread.run();
-        Graph g = new Dag();
-        gesThread.currentGraph = g;
-        boolean flag = threadTest.getFlag();
-
-        // Assert
-        assertFalse(flag);
-    }
-
-    private class ThreadTest implements Runnable{
-
-        GESThread gesThread;
-        boolean flag = false;
-        ThreadTest(GESThread gesThread){
-            this.gesThread = gesThread;
-        }
-
-        @Override
-        public void run() {
-            try {
-                flag = this.gesThread.getFlag();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public boolean getFlag() throws InterruptedException {
-            this.flag = this.gesThread.getFlag();
-            return this.flag;
-        }
-    }
-    */
 
 

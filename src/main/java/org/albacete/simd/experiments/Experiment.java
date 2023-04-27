@@ -142,8 +142,8 @@ public abstract class Experiment {
 //
 //
 //
-//            this.shd = Utils.compare(bn2.getDag(),(Dag) alg.getCurrentGraph());
-//            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag) alg.getCurrentGraph());
+//            this.shd = Utils.compare(bn2.getDag(),(Dag_n) alg.getCurrentGraph());
+//            this.dfmm = Utils.avgMarkovBlanquetdif(bn2.getDag(), (Dag_n) alg.getCurrentGraph());
 //            this.nIterations = alg.getIterations();
 //            this.score = GESThread.scoreGraph(alg.getCurrentGraph(), alg.getProblem());
 //
@@ -163,7 +163,7 @@ public abstract class Experiment {
             BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
             //FileWriter csvWriter = new FileWriter(savePath, true);
             if(file.length() == 0) {
-                String header = "algorithm, network, bbdd, threads, interleaving, seed, SHD, LL Score, BDeu Score, dfMM, dfMM plus, dfMM minus, Total iterations, Total time(s)\n";
+                String header = "algorithm,network,bbdd,threadsCPU,threadsPGES,interleaving,seed,SHD,LL Score,BDeu Score,dfMM,dfMM plus,dfMM minus,Total iterations,Total time(s)\n";
                 csvWriter.append(header);
             }
             csvWriter.append(results);

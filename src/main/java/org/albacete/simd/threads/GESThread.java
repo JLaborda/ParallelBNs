@@ -5,7 +5,6 @@ import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.MeekRules;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.NumberFormatUtil;
-import edu.cmu.tetrad.util.ProbUtils;
 import org.albacete.simd.framework.BackwardStage;
 import org.albacete.simd.framework.ForwardStage;
 import org.albacete.simd.utils.LocalScoreCacheConcurrent;
@@ -25,6 +24,13 @@ public abstract class GESThread implements Runnable{
      * Set of edges that will be checked over the GESThread
      */
     protected Set<Edge> S;
+    
+    protected Set<Edge> enlaces;
+    
+    /**
+     * Set of edges that will be checked over the GESThread
+     */
+    protected Set<EdgeSearch> scores = new HashSet<>();
 
     /**
      * Problem the thread is solving
@@ -131,25 +137,10 @@ public abstract class GESThread implements Runnable{
      */
     protected int id = -1;
 
-    private String log = "";
-
     /**
      * Boolean value that says if the thread is from a forward stage (true) or from a backwards stage (false)
      */
     protected boolean isForwards;
-
-    /**
-     * Timeout provided by the time it takes the first thread of the stage to finish
-     */
-    //public static long forwardTimeout = -1;
-
-    /**
-     * Timeout provided by the time it takes the first thread of the stage to finish
-     */
-    //public static long backwardTimeout = -1;
-
-
-
 
     /**
      * Evaluate the Insert(X, Y, T) operator (@see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf"> Definition 12 from Chickering 2002</a>,
@@ -187,13 +178,13 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage where the edge will be inserted into.
      */
     public static void insert(Node x, Node y, Set<Node> subset, Graph graph) {
-        System.out.println("Insert: " + x + " -> " + y);
+        //System.out.println("Insert: " + x + " -> " + y);
         graph.addDirectedEdge(x, y);
 
         for (Node node : subset) {
-            System.out.println("Delete: " + node + " -- " + y);
+            //System.out.println("Delete: " + node + " -- " + y);
             graph.removeEdge(node, y);
-            System.out.println("Insert: " + node + " -> " + y);
+            //System.out.println("Insert: " + node + " -> " + y);
             graph.addDirectedEdge(node, y);
         }
     }
@@ -206,20 +197,20 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage where the edge will be deleted from.
      */
     public static void delete(Node x, Node y, Set<Node> subset, Graph graph) {
-        System.out.println("Delete: " + x + " -- " + y);
+        //System.out.println("Delete: " + x + " -- " + y);
         graph.removeEdges(x, y);
 
         for (Node aSubset : subset) {
-            System.out.println("Deleting Edges in subset");
+            //System.out.println("Deleting Edges in subset");
             if (!graph.isParentOf(aSubset, x) && !graph.isParentOf(x, aSubset)) {
-                System.out.println("Delete: " + x + " -- " + aSubset);
+                //System.out.println("Delete: " + x + " -- " + aSubset);
                 graph.removeEdge(x, aSubset);
-                System.out.println("Insert: " + x + " -> " + aSubset);
+                //System.out.println("Insert: " + x + " -> " + aSubset);
                 graph.addDirectedEdge(x, aSubset);
             }
-            System.out.println("Delete: " + y + " -- " + aSubset);
+            //System.out.println("Delete: " + y + " -- " + aSubset);
             graph.removeEdge(y, aSubset);
-            System.out.println("Insert: " + y + " -> " + aSubset);
+            //System.out.println("Insert: " + y + " -> " + aSubset);
             graph.addDirectedEdge(y, aSubset);
         }
     }
@@ -256,7 +247,7 @@ public abstract class GESThread implements Runnable{
         List<Node> adjY = graph.getAdjacentNodes(y);
         List<Node> naYX = new LinkedList<>(adjY);
         naYX.retainAll(graph.getAdjacentNodes(x));
-
+        
         for (int i = naYX.size() - 1; i >= 0; i--) {
             Node z = naYX.get(i);
             Edge edge = graph.getEdge(y, z);
@@ -307,48 +298,47 @@ public abstract class GESThread implements Runnable{
             return false;
         }
         
-//        // nueva forma de calcular los caminos semidirigidos.
-//        
-        Graph aux = new EdgeListGraph(graph);
-        aux.removeNodes(naYXT);
-        
-        LinkedList<Node> open = new LinkedList<Node>();
-        HashMap<String,Node> close = new HashMap<String,Node>();
+        // nueva forma de calcular los caminos semidirigidos
+
+        LinkedHashSet<Node> open = new LinkedHashSet<>();
         open.add(y);
+        HashSet<Node> close = new HashSet<>(naYXT);
         
         while(!open.isEmpty()) {
-        	Node a = open.getFirst();
-        	if(a.equals(x)) return false;
-        	open.remove(a);
-        	close.put(a.toString(), a);
-        	List<Node> nb = aux.getAdjacentNodes(a);
-        	for(Node n: nb) {
-        		Edge e = aux.getEdge(a,n);
-        		if (close.get(n.toString()) == null && !e.pointsTowards(a) && !open.contains(n)) 
-        			open.addLast(n);
-        	}
+            Node a = open.iterator().next();
+            if(a.equals(x)) return false;
+            open.remove(a);
+            close.add(a);
+            
+            for(Edge e: graph.getEdges(a)) {
+                Node n = e.getNode1();
+                Node n2 = e.getNode2();
+                if (n.equals(a)) n = n2;
+                if (!close.contains(n) && !open.contains(n) && !e.pointsTowards(a)) 
+                    open.add(n);
+            }
         }
         return true;
 
-//        for (Node node1 : graph.getNodes()) {
-//            if (node1 == y || marked.contains(node1)) {
-//                continue;
-//            }
-//
-//            if (graph.isAdjacentTo(y, node1) && !graph.isParentOf(node1, y)) {
-//                marked.add(node1);
-//
-//                if (!isSemiDirectedBlocked(x, node1, naYXT, graph, marked)) {
-//                    return false;
-//                }
-//
-//                marked.remove(node1);
-//            }
-//        }
-//
-//        return true;
-    }
+        /*for (Node node1 : graph.getNodes()) {
+            if (node1 == y || marked.contains(node1)) {
+                continue;
+            }
+            
+            if (graph.isAdjacentTo(y, node1) && !graph.isParentOf(node1, y)) {
+                marked.add(node1);
 
+                if (!isSemiDirectedBlocked(x, node1, naYXT, graph, marked)) {
+                    return false;
+                }
+
+                marked.remove(node1);
+            }
+        }
+
+        return true;*/
+    }
+    
     /**
      * Completes a pattern that was modified by an insertion/deletion operator
      * Based on the algorithm described on @see <a href="http://www.jmlr.org/papers/volume3/chickering02b/chickering02b.pdf">Appendix C of (Chickering, 2002)</a>.
@@ -394,12 +384,12 @@ public abstract class GESThread implements Runnable{
         }
 
 //        Graph dag = SearchGraphUtils.dagFromPattern(graph);
-        Graph dag = new EdgeListGraph(graph);
+        Graph dag = new EdgeListGraph_n(graph);
         pdagToDag(dag);
         double score = 0.;
 
         for (Node next : dag.getNodes()) {
-            Collection<Node> parents = dag.getParents(next);
+            Set<Node> parents = new HashSet<>(dag.getParents(next));
             int nextIndex = -1;
             for (int i = 0; i < problem.getVariables().size(); i++) {
                 String[] varNames = problem.getVarNames();
@@ -421,9 +411,38 @@ public abstract class GESThread implements Runnable{
                     }
                 }
             }
-            score += localBdeuScore(nextIndex, parentIndices, problem);
-        }
+                score += localBdeuScore(nextIndex, parentIndices, parents, problem);
+            }
         return score;
+    }
+    
+    public double scoreDag(Graph graph) {
+        
+        if (graph == null){
+            return Double.NEGATIVE_INFINITY;
+        }
+        
+        Graph dag = new EdgeListGraph_n(graph);
+        pdagToDag(dag);
+        HashMap<Node,Integer> hashIndices = problem.getHashIndices();
+
+        double _score = 0;
+
+        for (Node node : getVariables()) {
+            List<Node> x = dag.getParents(node);
+
+            int[] parentIndices = new int[x.size()];
+
+            int count = 0;
+            for (Node parent : x) {
+                parentIndices[count++] = hashIndices.get(parent);
+            }
+
+            final double nodeScore = problem.getBDeu().localScore(hashIndices.get(node), parentIndices);
+
+            _score += nodeScore;
+        }
+        return _score;
     }
 
     /**
@@ -485,8 +504,8 @@ public abstract class GESThread implements Runnable{
         }
 
         // Calculating the scores of both possibilities and returning the difference
-        double score1 = localBdeuScore(yIndex, parentIndices1, problem);
-        double score2 = localBdeuScore(yIndex, parentIndices2, problem);
+        double score1 = localBdeuScore(yIndex, parentIndices1, parents1, problem);
+        double score2 = localBdeuScore(yIndex, parentIndices2, parents2, problem);
         return score1 - score2;
     }
 
@@ -497,79 +516,85 @@ public abstract class GESThread implements Runnable{
      *
      * @param nNode    index of the child node
      * @param nParents index of the parents of the node being considered as child.
+     * @param setParents set with the parent of the node being considered as child.
      * @return The Bdeu score of the combination.
      */
 
-    public static double localBdeuScore(int nNode, int[] nParents, Problem problem) {
+    public static double localBdeuScore(int nNode, int[] nParents, Set<Node> setParents, Problem problem) {
         numTotalCalls++;
 
         LocalScoreCacheConcurrent localScoreCache = problem.getLocalScoreCache();
 
-        double oldScore = localScoreCache.get(nNode, nParents);
+        double oldScore = localScoreCache.get(nNode, setParents);
         if (!Double.isNaN(oldScore)) {
             return oldScore;
         }
         numNonCachedCalls++;
-        int[] nValues = problem.getnValues();
-        int[][] cases = problem.getCases();
 
-        int numValues=nValues[nNode];
-        int numParents=nParents.length;
+        double fLogScore = problem.getBDeu().localScore(nNode, nParents);
+        
+        /*  int[] nValues = problem.getnValues();
+            int[][] cases = problem.getCases();
 
-        double ess= problem.getSamplePrior();
-        double kappa= problem.getStructurePrior();
 
-        int[] numValuesParents=new int[nParents.length];
-        int cardinality=1;
-        for(int i=0;i<numValuesParents.length;i++) {
+            int numValues=nValues[nNode];
+            int numParents=nParents.length;
 
-            numValuesParents[i]=nValues[nParents[i]];
-            cardinality*=numValuesParents[i];
-        }
+            double ess= problem.getSamplePrior();
+            double essPenalty = 1.0;
+            double kappa= problem.getStructurePrior();
 
-        int[][] Ni_jk = new int[cardinality][numValues];
-        double Np_ijk = (1.0*ess) / (numValues*cardinality);
-        double Np_ij = (1.0*ess) / cardinality;
+            int[] numValuesParents=new int[nParents.length];
+            int cardinality=1;
+            for(int i=0;i<numValuesParents.length;i++) {
 
-        // initialize
-        for (int j = 0; j < cardinality;j++)
-            for(int k= 0; k<numValues; k++)
-                Ni_jk[j][k] = 0;
-
-        for (int[] aCase : cases) {
-            int iCPT = 0;
-            for (int iParent = 0; iParent < numParents; iParent++) {
-                iCPT = iCPT * numValuesParents[iParent] + aCase[nParents[iParent]];
+                numValuesParents[i]=nValues[nParents[i]];
+                cardinality*=numValuesParents[i];
             }
-            Ni_jk[iCPT][aCase[nNode]]++;
-        }
 
-        double fLogScore = 0.0;
+            int[][] Ni_jk = new int[cardinality][numValues];
+    
+            double Np_ijk = (essPenalty * ess) / (numValues*cardinality);
+            double Np_ij = (essPenalty *ess) / cardinality;
 
-        for (int iParent = 0; iParent < cardinality; iParent++) {
-            double N_ij = 0;
-            double N_ijk;
+            // initialize
+            for (int j = 0; j < cardinality;j++)
+                for(int k= 0; k<numValues; k++)
+                    Ni_jk[j][k] = 0;
 
-            for (int iSymbol = 0; iSymbol < numValues; iSymbol++) {
-                if (Ni_jk[iParent][iSymbol] != 0) {
-                    N_ijk = Ni_jk[iParent][iSymbol];
-                    fLogScore += ProbUtils.lngamma(N_ijk + Np_ijk);
-                    fLogScore -= ProbUtils.lngamma(Np_ijk);
-                    N_ij += N_ijk;
+            for (int[] aCase : cases) {
+                int iCPT = 0;
+                for (int iParent = 0; iParent < numParents; iParent++) {
+                    iCPT = iCPT * numValuesParents[iParent] + aCase[nParents[iParent]];
                 }
+                Ni_jk[iCPT][aCase[nNode]]++;
             }
-            if (Np_ij != 0)
-                fLogScore += ProbUtils.lngamma(Np_ij);
-            if (Np_ij + N_ij != 0)
-                fLogScore -= ProbUtils.lngamma(Np_ij + N_ij);
-        }
-        fLogScore += Math.log(kappa) * cardinality * (numValues - 1);
 
-        localScoreCache.add(nNode, nParents, fLogScore);
+            for (int iParent = 0; iParent < cardinality; iParent++) {
+                double N_ij = 0;
+                double N_ijk;
+
+                for (int iSymbol = 0; iSymbol < numValues; iSymbol++) {
+                    if (Ni_jk[iParent][iSymbol] != 0) {
+                        N_ijk = Ni_jk[iParent][iSymbol];
+                        fLogScore += ProbUtils.lngamma(N_ijk + Np_ijk);
+                        fLogScore -= ProbUtils.lngamma(Np_ijk);
+                        N_ij += N_ijk;
+                    }
+                }
+                if (Np_ij != 0)
+                    fLogScore += ProbUtils.lngamma(Np_ij);
+                if (Np_ij + N_ij != 0)
+                    fLogScore -= ProbUtils.lngamma(Np_ij + N_ij);
+            }
+            fLogScore += Math.log(kappa) * cardinality * (numValues - 1);
+        */
+
+        localScoreCache.add(nNode, setParents, fLogScore);
         return fLogScore;
     }
-
-
+    
+    
 
     //==========================SETTERS AND GETTERS=========================//
 
@@ -582,8 +607,8 @@ public abstract class GESThread implements Runnable{
     }
 
     /**
-     * Gets the initial Dag of the Thread
-     * @return the initial Dag
+     * Gets the initial Dag_n of the Thread
+     * @return the initial Dag_n
      */
     public Graph getInitialGraph(){
         return this.initialDag;
@@ -753,8 +778,8 @@ public abstract class GESThread implements Runnable{
         for (int i = tNeighbors.size() - 1; i >= 0; i--) {
             Node z = tNeighbors.get(i);
             Edge edge = graph.getEdge(y, z);
-
-            if (!Edges.isUndirectedEdge(edge)) {
+            
+            if (edge != null && !Edges.isUndirectedEdge(edge)) {
                 tNeighbors.remove(z);
             }
         }
@@ -769,10 +794,6 @@ public abstract class GESThread implements Runnable{
 
     public int getId(){
         return this.id;
-    }
-
-    public String getLog(){
-        return this.log;
     }
 
     public LocalScoreCacheConcurrent getLocalScoreCache() {
@@ -801,5 +822,4 @@ public abstract class GESThread implements Runnable{
         return zScore > 3;
 
     }
-
 }

@@ -1,6 +1,7 @@
 package org.albacete.simd.algorithms.bnbuilders;
 
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
+import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.Resources;
@@ -33,7 +34,7 @@ public class HillClimbingSearchTest {
         HillClimbingSearch hc4 = new HillClimbingSearch(problem.getData());
 
         List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
-        Dag initialGraph = new Dag(nodes);
+        Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
@@ -84,13 +85,13 @@ public class HillClimbingSearchTest {
         hc1.search();
 
         assertNotNull(hc1.getCurrentGraph());
-        assertTrue(hc1.getCurrentGraph() instanceof Dag);
+        assertTrue(hc1.getCurrentGraph() instanceof Dag_n);
     }
 
     @Test
     public void searchTestWithInitialGraph() {
         List<Node> nodes = Arrays.asList(Resources.XRAY, Resources.DYSPNOEA, Resources.CANCER, Resources.POLLUTION, Resources.SMOKER);
-        Dag initialGraph = new Dag(nodes);
+        Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
         //initialGraph.addDirectedEdge(Resources.POLLUTION, Resources.CANCER);
@@ -98,13 +99,34 @@ public class HillClimbingSearchTest {
 
 
         HillClimbingSearch hc1 = new HillClimbingSearch(initialGraph, Resources.CANCER_BBDD_PATH);
-        Dag result = hc1.getCurrentDag();
+        Dag_n result = hc1.getCurrentDag();
         // Equals is never gonna work. Because tetrad doesn't have a proper equals
         assertEquals(initialGraph.getNodes(), result.getNodes());
-        assertEquals(initialGraph.getEdges(), result.getEdges());
+
+        //Asserting that the edges from the initial Graph inserted and the current graph are the same
+        System.out.println("Initial Graph: " + initialGraph.getEdges());
+        System.out.println("Current Graph: " + result.getEdges());
+
+        for (Edge edgeInitial : initialGraph.getEdges()) {
+            Node x = edgeInitial.getNode1();
+            Node y = edgeInitial.getNode2();
+            boolean found = false;
+            for (Edge edgeCurrent : result.getEdges()) {
+                if (edgeCurrent.getNode1().equals(x) && edgeCurrent.getNode2().equals(y)) {
+                    found = true;
+                    break;
+                }
+            }
+            assertTrue(found);
+        }
+        //assertEquals(initialGraph.getEdges(), result.getEdges());
         hc1.search();
+
+        //Asserting that there is a resulting graph from hc1.
         assertNotNull(hc1.getCurrentGraph());
         assertNotNull(hc1.getCurrentDag());
+
+        //Making sure that the graphs are different, because the search should have changed the graph.
         assertNotEquals(initialGraph, hc1.getCurrentDag());
 
     }

@@ -46,7 +46,7 @@ target/
 *50k.csv
 
 # Individual results
-experiment_results*
+*experiment_results*
 
 # Outputs and errors
 run_experiments_cluster*
@@ -66,3 +66,12 @@ scripts/git-keys-update.bash
 
 # ignore notebook checkpoints
 .ipynb_checkpoints/
+
+# ignore replicates folder
+replicates/
+
+# ignore vscode settings
+.vscode/
+
+# ignore logs folders
+logs/
