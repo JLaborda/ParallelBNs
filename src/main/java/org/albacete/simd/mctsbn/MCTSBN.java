@@ -1,5 +1,6 @@
 package org.albacete.simd.mctsbn;
 
+import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.utils.Problem;
@@ -13,6 +14,7 @@ import org.albacete.simd.clustering.HierarchicalClustering;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.mctsbn.HillClimbingEvaluator.Pair;
 import org.albacete.simd.threads.GESThread;
+import org.albacete.simd.utils.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class MCTSBN {
@@ -31,7 +33,7 @@ public class MCTSBN {
      */
     public static final double EXPLORATION_CONSTANT = 2 * Math.sqrt(2); //1.0 / Math.sqrt(2);
     
-    public static final double EXPLOITATION_CONSTANT = 2000;
+    public static final double EXPLOITATION_CONSTANT = 50;
     
     public static final double A_STAR_CONSTANT = 0;
     
@@ -252,7 +254,7 @@ public class MCTSBN {
             int nExpansion = 0;
 
             //1. Get all possible actions
-            List<Integer> actions = node.getState().getPossibleActionsbyOrder(orderSet.get(random.nextInt(orderSet.size())));
+            List<Integer> actions = node.getState().getPossibleActionsbyOrder(getRandomOrder());
             //2. Get actions already taken for this node
             Set<Integer> childrenActions = node.getChildrenAction();
             for (Integer action: actions) {
@@ -367,7 +369,7 @@ public class MCTSBN {
             Collections.shuffle(candidates);*/
             
             // Pseudorandom order by PGES
-            List<Integer> candidates = new ArrayList(orderSet.get(random.nextInt(orderSet.size())));
+            List<Integer> candidates = getRandomOrder();
             candidates = candidates.stream().filter(node -> !order.contains(node)).collect(Collectors.toList());
             
             // Creating order for HC
@@ -410,6 +412,9 @@ public class MCTSBN {
         }
     }
     
+    private ArrayList<Integer> getRandomOrder() {
+        return new ArrayList(orderSet.get(random.nextInt(orderSet.size())));
+    }
     
     private void initializeWithPGES(int nThreads) {        
         // Execute PGES to obtain a good order
