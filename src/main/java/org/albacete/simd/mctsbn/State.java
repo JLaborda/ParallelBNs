@@ -50,10 +50,20 @@ public class State {
         }
         return possibleActions;
     }
+    
+    public List<Integer> getPossibleActionsbyOrder(ArrayList<Integer> orderPGES){
+        List<Integer> possibleActions = new ArrayList<>();
+        for(Integer var : orderPGES){
+            if(!order.contains(var)){
+                possibleActions.add(var);
+            }
+        }
+        return possibleActions;
+    }
 
     public State takeAction(Integer action){
         List<Integer> newOrder = new ArrayList<>(order);
-        newOrder.add(0, action);
+        newOrder.add(action);
 
         return new State(action, newOrder, allVars, problem, localScore, hc);
     }

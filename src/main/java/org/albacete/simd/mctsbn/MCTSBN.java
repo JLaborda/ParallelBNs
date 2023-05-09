@@ -1,6 +1,6 @@
 package org.albacete.simd.mctsbn;
 
-import edu.cmu.tetrad.graph.Dag;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.utils.Problem;
 
@@ -13,6 +13,7 @@ import org.albacete.simd.clustering.HierarchicalClustering;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.mctsbn.HillClimbingEvaluator.Pair;
 import org.albacete.simd.threads.GESThread;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class MCTSBN {
 
@@ -29,6 +30,8 @@ public class MCTSBN {
      * Exploration constant c for the UCT equation: UCT_j = X_j + c * sqrt(ln(N) / n_j)
      */
     public static final double EXPLORATION_CONSTANT = 2 * Math.sqrt(2); //1.0 / Math.sqrt(2);
+    
+    public static final double EXPLOITATION_CONSTANT = 2000;
     
     public static final double A_STAR_CONSTANT = 0;
     
@@ -65,6 +68,11 @@ public class MCTSBN {
     private final String saveFilePath = "prueba-mctsbn.csv";
     
     private final Random random = new Random();
+    
+    private double mean;
+    private double standardDeviation;
+    
+    private final ArrayList<ArrayList> orderSet = new ArrayList<>();
 
     public MCTSBN(Problem problem, int iterationLimit){
         this.problem = problem;
@@ -75,30 +83,42 @@ public class MCTSBN {
     }
 
 
-    public Dag search(State initialState){
+    public Dag_n search(State initialState){
         //1. Set Root
         this.root = new TreeNode(initialState, null);
 
         System.out.println("\n\nSTARTING warmup\n------------------------------------------------------");
 
         //1.5 Add PGES order
-        for (int i = 4; i <= 4; i++) {
-            initializeWithPGES(i);
-        }
+        initializeWithPGES(4);
 
         //1.5. Create a node for each variable (totally expand root). Implicit warmup
         // allVars.size()-1 if we do initializeWithPGES
         ArrayList<TreeNode> selection = new ArrayList<>();
         selection.add(this.root);
+        
+        double[] rewards = new double[allVars.size()];
         for (int i = 0; i < allVars.size()-1; i++) {
             // 2. Expand selected node
             TreeNode expandedNode = expand(selection).get(0);
 
             //3. Rollout and Backpropagation
-            double reward = inverseRollout(expandedNode.getState());
+            double reward = rollout(expandedNode.getState());
+            rewards[i] = reward;
             backPropagate(expandedNode, reward);
         }
         this.root.setFullyExpanded(true);
+        
+        // Train the normalizer with the mean and sd of the scores of all vars
+        normalize_fit(rewards);
+        
+        // Convert the bdeus obtained
+        root.setTotalReward(normalize_predict(root.getTotalReward()));
+        for (TreeNode tn : root.getChildren()) {
+            double reward = normalize_predict(tn.getTotalReward());
+            tn.setTotalReward(reward);
+        }
+        
         
         // Update the UCT's
         updateUCTList();
@@ -139,11 +159,11 @@ public class MCTSBN {
         //System.out.println("Tree Structure: ");
         System.out.println(this);
         // return Best Dag
-        return new Dag(bestDag);
+        return new Dag_n(bestDag);
     }
 
 
-    public Dag search(){
+    public Dag_n search(){
         State initialState = new State(-1, new ArrayList<>(), allVars, problem, 0, hc);
         return this.search(initialState);
     }
@@ -163,8 +183,8 @@ public class MCTSBN {
 
         //3. Rollout and Backpropagation
         expandedNodes.parallelStream().forEach(expandedNode -> {
-            double reward = inverseRollout(expandedNode.getState());
-            backPropagate(expandedNode, reward);
+            double reward = rollout(expandedNode.getState());
+            backPropagate(expandedNode, normalize_predict(reward));
         });
 
         updateUCTList();
@@ -232,7 +252,7 @@ public class MCTSBN {
             int nExpansion = 0;
 
             //1. Get all possible actions
-            List<Integer> actions = node.getState().getPossibleActions();
+            List<Integer> actions = node.getState().getPossibleActionsbyOrder(orderSet.get(random.nextInt(orderSet.size())));
             //2. Get actions already taken for this node
             Set<Integer> childrenActions = node.getChildrenAction();
             for (Integer action: actions) {
@@ -340,10 +360,16 @@ public class MCTSBN {
         for (int i = 0; i < NUM_ROLLOUTS; i++) {
             // Creating a total order with the partial order of the state.
             List<Integer> order = state.getOrder();
-            List<Integer> candidates = new ArrayList(allVars);
+            
+            // Random order
+            /*List<Integer> candidates = new ArrayList(allVars);
             candidates = candidates.stream().filter(node -> !order.contains(node)).collect(Collectors.toList());
-            Collections.shuffle(candidates);
-
+            Collections.shuffle(candidates);*/
+            
+            // Pseudorandom order by PGES
+            List<Integer> candidates = new ArrayList(orderSet.get(random.nextInt(orderSet.size())));
+            candidates = candidates.stream().filter(node -> !order.contains(node)).collect(Collectors.toList());
+            
             // Creating order for HC
             List<Integer> finalOrder = new ArrayList<>(order);
             finalOrder.addAll(candidates);
@@ -383,6 +409,48 @@ public class MCTSBN {
             currentNode = currentNode.getParent();
         }
     }
+    
+    
+    private void initializeWithPGES(int nThreads) {        
+        // Execute PGES to obtain a good order
+        double init = System.currentTimeMillis();
+        Clustering hierarchicalClustering = new HierarchicalClustering();
+        BNBuilder algorithm = new PGESwithStages(problem, hierarchicalClustering, nThreads, Integer.MAX_VALUE, Integer.MAX_VALUE, true);
+        algorithm.search();
+
+        // Create the set with some orders to use in rollout
+        Dag_n currentDag = algorithm.getCurrentDag();
+        for (int i = 0; i < 10000; i++) {
+            orderSet.add(hc.nodeToIntegerList(currentDag.getTopologicalOrder()));
+        }
+
+        System.out.println("\n\nFINISHED PGES (" + ((System.currentTimeMillis() - init)/1000.0) + " s). BDeu: " + GESThread.scoreGraph(algorithm.getCurrentDag(), problem));
+    }
+    
+    /**
+     * Normalize (standardize) the sample, so it is has a mean of 0 and a standard deviation of 1.
+     *
+     * @param sample Sample to normalize.
+     * @return normalized (standardized) sample.
+     * @since 2.2
+     */
+    private void normalize_fit(double[] sample) {
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+
+        // Add the data from the series to stats
+        for (int i = 0; i < sample.length; i++) {
+            stats.addValue(sample[i]);
+        }
+
+        // Compute mean and standard deviation
+        mean = stats.getMean();
+        standardDeviation = stats.getStandardDeviation();
+    }
+    
+    private double normalize_predict(double sample) {
+        return (sample - mean) / standardDeviation;
+    }
+
     
     private double printUCB(TreeNode o) {
         if(o.getParent() == null){
@@ -500,51 +568,6 @@ public class MCTSBN {
         }
 
         return res;
-    }
-    
-    private void initializeWithPGES(int nThreads) {        
-        // Execute PGES to obtain a good order
-        double init = System.currentTimeMillis();
-        Clustering hierarchicalClustering = new HierarchicalClustering();
-        BNBuilder algorithm = new PGESwithStages(problem, hierarchicalClustering, nThreads, Integer.MAX_VALUE, Integer.MAX_VALUE, true);
-        algorithm.search();
-        List<Integer> orderPGES = hc.nodeToIntegerList(algorithm.getCurrentDag().getCausalOrdering());
-        
-        
-        System.out.println("\n\nFINISHED PGES (" + ((System.currentTimeMillis() - init)/1000.0) + " s). BDeu: " + GESThread.scoreGraph(algorithm.getCurrentDag(), problem));
-        
-        // Evaluate the order with HC
-        init = System.currentTimeMillis();
-        hc.setOrder(orderPGES);
-        hc.search();
-        
-        if (hc.getScore() > this.bestScore) {
-            this.bestDag = hc.getGraph();
-            this.bestScore = hc.getScore();
-            this.bestOrder = orderPGES;
-        }
-
-        System.out.println("\n\nFINISHED HC (" + ((System.currentTimeMillis() - init)/1000.0) + " s). BDeu: " + hc.getScore());
-        
-        // Inverse the PGES order
-        Collections.reverse(orderPGES);
-
-        // Expand the tree to the generated node
-        TreeNode actualNode = root;
-
-        for (Integer node : orderPGES) {
-            TreeNode newNode = new TreeNode(actualNode.getState().takeAction(node), actualNode);
-
-            this.selectionSet.add(newNode);
-            
-            backPropagate(newNode, hc.getScore());
-
-            actualNode = newNode;
-        }
-        
-        // After the for, root is the last element of the order
-        actualNode.setFullyExpanded(true);
-        this.selectionSet.remove(actualNode);
     }
 
 }

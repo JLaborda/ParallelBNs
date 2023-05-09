@@ -130,6 +130,8 @@ public final class Dag_n implements Graph {
     //===============================PUBLIC METHODS======================//
     
     public ArrayList<Node> getTopologicalOrder(){
+        Random random = new Random();
+        
         ArrayList<Node> L = new ArrayList(nodesHash.size());
         ArrayList<Node> S = new ArrayList();
         
@@ -141,15 +143,15 @@ public final class Dag_n implements Graph {
                 S.add(node);
             }
         }
-        
+
         while (!S.isEmpty()) {
-            Node node = S.remove(0);
+            Node node = S.remove(random.nextInt(S.size()));
             L.add(node);
             
             // Borramos el nodo, y los enlaces a los hijos. 
             // Si ahora los hijos no tienen padres, los añadimos a S
             for (Node children : graphCopy.getAdjacentNodes(node)) {
-                graphCopy.removeEdge(node, children);
+                graphCopy.removeEdgesNRRDPath(node, children);
                 if (graphCopy.getParents(children).isEmpty()) {
                     S.add(children);
                 }
@@ -493,6 +495,11 @@ public final class Dag_n implements Graph {
 
         return removed;
     }
+        
+    public boolean removeEdgesNRRDPath(Node node1, Node node2) {
+        boolean removed = getGraph().removeEdges(node1, node2);
+        return removed;
+    }
 
     public boolean setEndpoint(Node node1, Node node2, Endpoint endpoint) {
         boolean ret = getGraph().setEndpoint(node1, node2, endpoint);
@@ -514,6 +521,7 @@ public final class Dag_n implements Graph {
         return removed;
     }
 
+            
     public boolean removeEdges(Collection<Edge> edges) {
         boolean change = false;
 
@@ -537,7 +545,7 @@ public final class Dag_n implements Graph {
 
         return removed;
     }
-
+    
     public boolean removeNodes(List<Node> nodes) {
         return getGraph().removeNodes(nodes);
     }

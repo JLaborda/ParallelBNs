@@ -133,7 +133,7 @@ public class TreeNode implements Comparable<TreeNode>{
         
         String results;
         
-        double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
+        double exploitationScore = MCTSBN.EXPLOITATION_CONSTANT * (this.getTotalReward() / this.getNumVisits());
         double aStar = state.getLocalScore();
         for (Integer node : state.getPossibleActions()) {
             aStar += hc.bestBDeuForNode[node];
@@ -164,7 +164,7 @@ public class TreeNode implements Comparable<TreeNode>{
         if(this.parent == null && this.fullyExpanded){
             UCTSCore = Double.NEGATIVE_INFINITY;
         } else {
-            double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
+            double exploitationScore = MCTSBN.EXPLOITATION_CONSTANT * (this.getTotalReward() / this.getNumVisits());
             double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
             double aStar = state.getLocalScore();
             for (Integer node : state.getPossibleActions()) {

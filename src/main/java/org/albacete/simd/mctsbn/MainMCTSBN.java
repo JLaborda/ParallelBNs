@@ -4,7 +4,6 @@ import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DelimiterType;
-import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Dag_n;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
@@ -17,7 +16,7 @@ public class MainMCTSBN {
 
     public static void main(String[] args) {
         String networkFolder = "./res/networks/";
-        String net_name = "alarm";
+        String net_name = "andes";
         String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif50003_.csv";
         String netPath = networkFolder + net_name + ".xbif";
 
@@ -28,7 +27,7 @@ public class MainMCTSBN {
         long startTime = System.currentTimeMillis();
         addEndHook(mctsbn,startTime, netPath);
 
-        Dag result = mctsbn.search();
+        Dag_n result = mctsbn.search();
         long endTime = System.currentTimeMillis();
         double score = GESThread.scoreGraph(result, problem);
 
@@ -60,7 +59,7 @@ public class MainMCTSBN {
                 System.out.println("Best Order");
                 System.out.println(mctsbn.getBestOrder());
                 System.out.println("Best Dag: ");
-                System.out.println(new Dag(mctsbn.getBestDag()));
+                System.out.println(new Dag_n(mctsbn.getBestDag()));
                 //System.out.println("Tree Structure: ");
                 //System.out.println(mctsbn);
 
