@@ -218,7 +218,7 @@ public class ForwardHillClimbingThreadTest {
     @Test
     public void maximumNumberOfEdgesReachedTest() throws InterruptedException {
         // ThFES objects
-        FESThread thread1 = new FESThread(problem, subset1, 1000, false);
+        FESThread thread1 = new FESThread(problem, subset1, 1000, false, true, true);
         thread1.setMaxNumEdges(2);
 
         //Act

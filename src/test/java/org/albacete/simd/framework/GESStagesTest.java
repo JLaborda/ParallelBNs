@@ -31,7 +31,7 @@ public class GESStagesTest {
         int nThreads = 2;
         int itInterleaving = 5;
         List<Set<Edge>> subsets = Utils.split(Utils.calculateArcs(problem.getData()), nThreads);
-        FESStage fesStage = new FESStage(problem, nThreads, itInterleaving, subsets, false);
+        FESStage fesStage = new FESStage(problem, nThreads, itInterleaving, subsets, false, true, true);
 
         // TESTING FESStage
         // Act
@@ -44,7 +44,7 @@ public class GESStagesTest {
         assertNotNull(fesStage.getGraphs().get(1));
 
         //TESTING FESFusion
-        Stage fesFusion = new FESFusion(problem, fesStage.getCurrentGraph(), fesStage.getGraphs());
+        Stage fesFusion = new FESFusion(problem, fesStage.getCurrentGraph(), fesStage.getGraphs(), true);
         fesFusion.run();
         Graph g = fesFusion.getCurrentGraph();
         double fesFusionScore = GESThread.scoreGraph(g, problem);
@@ -85,11 +85,7 @@ public class GESStagesTest {
         assertTrue(besFusionScore >= besStageScore);
 
         //SECOND ITERATION
-        Stage fesStage2 = new FESStage(problem,
-                g2,
-                nThreads,
-                itInterleaving,
-                subsets, false);
+        Stage fesStage2 = new FESStage(problem, g2, nThreads, itInterleaving, subsets, false, true, true);
         fesStage2.run();
         double fesStageScore2 = (GESThread.scoreGraph(fesStage2.getGraphs().get(0), problem) + GESThread.scoreGraph(fesStage2.getGraphs().get(1), problem)) / 2;
         //Assert

@@ -506,7 +506,7 @@ public class GESThreadTest {
     public void setMaxNumEdgesNormalTest() {
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new FESThread(problem, subset1, 15, false);
+        GESThread thread = new FESThread(problem, subset1, 15, false, true, true);
 
         // Act
         thread.setMaxNumEdges(5);
@@ -524,7 +524,7 @@ public class GESThreadTest {
     public void setMaxNumEdgesErrorTest() {
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new FESThread(problem, subset1, 15, false);
+        GESThread thread = new FESThread(problem, subset1, 15, false, true, true);
 
         // Act
         thread.setMaxNumEdges(-2);
@@ -537,7 +537,7 @@ public class GESThreadTest {
     public void getCacheTest() {
         // Arrange
         Problem problem = new Problem(dataset);
-        GESThread thread = new FESThread(problem, subset1, 15, false);
+        GESThread thread = new FESThread(problem, subset1, 15, false, true, true);
 
         LocalScoreCacheConcurrent result = thread.getLocalScoreCache();
         assertNotNull(result);
