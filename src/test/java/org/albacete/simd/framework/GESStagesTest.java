@@ -26,7 +26,7 @@ public class GESStagesTest {
     @Test
     public void runTest() throws InterruptedException{
         //Arrange
-        String path = Resources.CANCER_BBDD_PATH;
+        String path = Resources.ALARM_BBDD_PATH;
         Problem problem = new Problem(path);
         int nThreads = 2;
         int itInterleaving = 5;

@@ -140,9 +140,18 @@
           <version>0.8.6</version>
           <configuration>
             <excludes>
-              <exclude>src/main/java/org/albacete/simd/simulacionRedes/**</exclude>
-              <exclude>src/main/java/org/albacete/simd/experiments/**</exclude>
-              <exclude>src/main/java/consensusBN/**</exclude>
+              <!--External packages -->
+              <exclude>**/simulacionRedes/**</exclude>
+              <exclude>**/experiments/**</exclude>
+              <exclude>**/consensusBN/**</exclude>
+              <exclude>**/tetrad/**</exclude>
+              <!-- Unnecessary classes -->
+              <exclude>**/Circular_GES*</exclude>
+              <exclude>**/Empty*</exclude>
+              <exclude>**/Fges_BNBuilder*</exclude>
+              <exclude>**/PHC_BNBuilder*</exclude>
+              <exclude>**/framework/BHC*</exclude>
+              <exclude>**/framework/FHC*</exclude>
             </excludes>
           </configuration>
           <executions>
