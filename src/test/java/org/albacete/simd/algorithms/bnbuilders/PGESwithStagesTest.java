@@ -46,7 +46,6 @@ public class PGESwithStagesTest {
         PGESwithStages alg3 = new PGESwithStages(initialGraph, Resources.CANCER_BBDD_PATH, clustering, 2, 100, 5, false, true, true);
         PGESwithStages alg4 = new PGESwithStages(initialGraph, Resources.CANCER_DATASET, clustering, 2, 100, 5, false, true, true);
 
-
         assertNotNull(alg1);
         assertNotNull(alg2);
         assertNotNull(alg3);
@@ -75,6 +74,7 @@ public class PGESwithStagesTest {
     public void searchTest(){
         System.out.println("PGESwithStagesTest: searchTest");
         PGESwithStages alg1 = new PGESwithStages(Resources.CANCER_DATASET, clustering, 2, 100, 5, false, true, true);
+        
         Utils.setSeed(42);
         List<Node> nodes = new ArrayList<>();
         nodes.add(Resources.CANCER);
@@ -100,15 +100,7 @@ public class PGESwithStagesTest {
 
     @Test
     public void convergenceTest(){
-        PGESwithStages alg = new PGESwithStages(Utils.readData(Resources.CANCER_BBDD_PATH),
-                clustering,
-                2,
-                1,
-                5,
-                false,
-                true,
-                true
-        );
+        PGESwithStages alg = new PGESwithStages(Utils.readData(Resources.CANCER_BBDD_PATH), clustering, 2, 1, 5, false, true, true);
         alg.search();
 
         assertNotNull(alg.getCurrentGraph());

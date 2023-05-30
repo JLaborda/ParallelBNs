@@ -122,21 +122,23 @@ public class ExperimentBNBuilder {
     }
 
     private void createBNBuilder() throws Exception {
+        Clustering clustering;
+        
         boolean speedUp = false;
         boolean update = true;
         boolean parallel = true;
         switch(algName) {
             case "pges_random":
-                Clustering randomClustering = new RandomClustering(seed);
-                algorithm = new PGESwithStages(databasePath, randomClustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, parallel);
+                clustering = new RandomClustering(seed);
+                algorithm = new PGESwithStages(databasePath, clustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, parallel);
                 break;
             case "pges":
-                Clustering hierarchicalClusteringPGES = new HierarchicalClustering();
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, true);
+                clustering = new HierarchicalClustering();
+                algorithm = new PGESwithStages(databasePath, clustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, true);
                 break;
             case "pges-noParallel":
-                Clustering hierarchicalClusteringPGES2 = new HierarchicalClustering();
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringPGES2, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, false);
+                clustering = new HierarchicalClustering();
+                algorithm = new PGESwithStages(databasePath, clustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, false);
                 break;
             case "ges":
                 algorithm = new GES_BNBuilder(databasePath, true);
@@ -144,9 +146,21 @@ public class ExperimentBNBuilder {
             case "ges-noParallel":
                 algorithm = new GES_BNBuilder(databasePath, false);
                 break;
-            case "circular_ges":
-                Clustering hierarchicalClusteringGES = new HierarchicalClustering();
-                algorithm = new Circular_GES(databasePath, hierarchicalClusteringGES, numberOfPGESThreads, interleaving);
+            case "circular_ges_c1":
+                clustering = new HierarchicalClustering();
+                algorithm = new Circular_GES(databasePath, clustering, numberOfPGESThreads, interleaving, "c1");
+                break;
+            case "circular_ges_c2":
+                clustering = new HierarchicalClustering();
+                algorithm = new Circular_GES(databasePath, clustering, numberOfPGESThreads, interleaving, "c2");
+                break;
+            case "circular_ges_c3":
+                clustering = new HierarchicalClustering();
+                algorithm = new Circular_GES(databasePath, clustering, numberOfPGESThreads, interleaving, "c3");
+                break;
+            case "circular_ges_c4":
+                clustering = new HierarchicalClustering();
+                algorithm = new Circular_GES(databasePath, clustering, numberOfPGESThreads, interleaving, "c4");
                 break;
             case "fges":
                 algorithm = new Fges_BNBuilder(databasePath, true, false);
@@ -158,12 +172,12 @@ public class ExperimentBNBuilder {
                 algorithm = new Fges_BNBuilder(databasePath, true, true);
                 break;
             case "pges-jc":
-                Clustering hierarchicalClusteringJC = new HierarchicalClustering(true, true);
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, true);
+                clustering = new HierarchicalClustering(true, true);
+                algorithm = new PGESwithStages(databasePath, clustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, true);
                 break;
             case "pges-jc-noParallel":
-                Clustering hierarchicalClusteringJC2 = new HierarchicalClustering(true, true);
-                algorithm = new PGESwithStages(databasePath, hierarchicalClusteringJC2, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, false);
+                clustering = new HierarchicalClustering(true, true);
+                algorithm = new PGESwithStages(databasePath, clustering, numberOfPGESThreads, ExperimentBNLauncher.MAXITERATIONS, interleaving, speedUp, update, false);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);

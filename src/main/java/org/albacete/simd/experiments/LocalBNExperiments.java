@@ -1,6 +1,8 @@
 package org.albacete.simd.experiments;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.clustering.Clustering;
@@ -23,35 +25,37 @@ public class LocalBNExperiments {
 
         // 2. Algorithm
         //String[] algorithmsPGES = new String[]{"pges", "pges update", "pges update speed", "pges-jc", "pges-jc update", "pges-jc update speed"};  // "pges update noParallel", 
-        String[] algorithmsPGES = new String[]{"empty"};
-        String[] bbdds = new String[]{"alarm", "barley", "child", "earthquake", "hepar2", "insurance", "mildew", "water", "win95pts", "andes", "pigs", "link", "diabetes","pathfinder", "munin", "hailfinder"};
-        Integer[] nThreads = new Integer[]{8};
+        String[] algorithmsPGES = new String[]{"circular_ges_c1", "circular_ges_c2", "circular_ges_c3", "circular_ges_c4"};
+        String[] bbdds = new String[]{"alarm", "barley", "child", "hepar2", "insurance", "mildew", "water", "win95pts", "andes", "pigs", "link", "diabetes", "pathfinder", "hailfinder", "munin"};
+
+        Integer[] nThreads = new Integer[]{8,4};
         String[] bbdd_patchs = new String[]{"50003_", "50002_", "50001_", "50004_","50005_", "50006_", "50007_",
                                             "50008_", "50009_", "50001246_", "_"};
 
-        for (String net_name : bbdds){
-            for (String bb : bbdd_patchs) {
-                String net_path = networkFolder + net_name + ".xbif";
-                String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif" + bb + ".csv";
-                String test_path = networkFolder + "BBDD/tests/" + net_name + "_test.csv";
-                
-                launchExperiment("empty", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
-                
-                /*launchExperiment("ges", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
-                System.gc();
-                launchExperiment("ges parallel", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
-                System.gc();
-                for (String alg : algorithmsPGES) {
-                    for (int threads : nThreads)
-                    {
-                        launchExperiment(alg, net_name, net_path, bbdd_path, test_path, threads, Integer.MAX_VALUE, bb);
+        for (int threads : nThreads) {
+            for (String net_name : bbdds) {
+                for (String bb : bbdd_patchs) {
+                    String net_path = networkFolder + net_name + ".xbif";
+                    String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif" + bb + ".csv";
+                    String test_path = networkFolder + "BBDD/tests/" + net_name + "_test.csv";
+
+                    //launchExperiment("empty", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
+
+                    /*launchExperiment("ges", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
+                    System.gc();
+                    launchExperiment("ges parallel", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
+                    System.gc();*/
+                    for (String alg : algorithmsPGES) {
+                        try {
+                            launchExperiment(alg, net_name, net_path, bbdd_path, test_path, threads, Integer.MAX_VALUE, bb);
+                        } catch(Exception ex) {System.out.println(ex);}
                         System.gc();
                     }
+                    /*launchExperiment("fges", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
+                    System.gc();
+                    launchExperiment("fges-faithfulness", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
+                    System.gc();*/
                 }
-                launchExperiment("fges", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
-                System.gc();
-                launchExperiment("fges-faithfulness", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
-                System.gc();*/
             }
         }
     }
@@ -112,10 +116,22 @@ public class LocalBNExperiments {
                     algorithm = new GES_BNBuilder(bbdd_path, true);
                     break;
 
-
-                case "circular_ges":
+                    
+                case "circular_ges_c1":
                     clustering = new HierarchicalClustering();
-                    algorithm = new Circular_GES(bbdd_path, clustering, numberOfPGESThreads, interleaving);
+                    algorithm = new Circular_GES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c1");
+                    break;
+                case "circular_ges_c2":
+                    clustering = new HierarchicalClustering();
+                    algorithm = new Circular_GES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c2");
+                    break;
+                case "circular_ges_c3":
+                    clustering = new HierarchicalClustering();
+                    algorithm = new Circular_GES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c3");
+                    break;
+                case "circular_ges_c4":
+                    clustering = new HierarchicalClustering();
+                    algorithm = new Circular_GES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c4");
                     break;
 
 
@@ -155,8 +171,15 @@ public class LocalBNExperiments {
     
     public static boolean checkExistentFile(String savePath) throws IOException {
         File file = new File(savePath);
+        
+        boolean check = file.length() != 0;
+        
+        BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
+        csvWriter.append(" ");
+        csvWriter.flush();
+        csvWriter.close();
 
-        return file.length() != 0;
+        return check;
     }
 
 }

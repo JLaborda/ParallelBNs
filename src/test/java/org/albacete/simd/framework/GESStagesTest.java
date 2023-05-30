@@ -85,14 +85,7 @@ public class GESStagesTest {
         assertTrue(besFusionScore >= besStageScore);
 
         //SECOND ITERATION
-        Stage fesStage2 = new FESStage(problem,
-                g2,
-                nThreads,
-                itInterleaving,
-                subsets,
-                false,
-                true,
-                true);
+        Stage fesStage2 = new FESStage(problem, g2, nThreads, itInterleaving, subsets, false, true, true);
         fesStage2.run();
         double fesStageScore2 = (GESThread.scoreGraph(fesStage2.getGraphs().get(0), problem) + GESThread.scoreGraph(fesStage2.getGraphs().get(1), problem)) / 2;
         //Assert
