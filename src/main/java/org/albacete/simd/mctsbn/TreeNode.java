@@ -134,18 +134,12 @@ public class TreeNode implements Comparable<TreeNode>{
         String results;
         
         double exploitationScore = MCTSBN.EXPLOITATION_CONSTANT * (this.getTotalReward() / this.getNumVisits());
-        double aStar = state.getLocalScore();
-        for (Integer node : state.getPossibleActions()) {
-            aStar += hc.bestBDeuForNode[node];
-        }
-        aStar -= Arrays.stream(hc.bestBDeuForNode).sum();
-        aStar /= Problem.nInstances;
-        aStar *= MCTSBN.A_STAR_CONSTANT;
+
         if(this.parent == null){
-            results = "  \t" + this.getNumVisits() + "   BDeu " + exploitationScore + ",   A* " + aStar;
+            results = "  \t" + this.getNumVisits() + "   BDeu " + exploitationScore;
         } else {
             double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
-            results = "  \t" + this.getNumVisits() + "   UCT " + UCTSCore + ",   BDeu " + exploitationScore + ",   EXP " + explorationScore + ",   A* " + aStar;
+            results = "  \t" + this.getNumVisits() + "   UCT " + UCTSCore + ",   BDeu " + exploitationScore + ",   EXP " + explorationScore;
         }
         buffer.append(results);
         
@@ -166,16 +160,16 @@ public class TreeNode implements Comparable<TreeNode>{
         } else {
             double exploitationScore = MCTSBN.EXPLOITATION_CONSTANT * (this.getTotalReward() / this.getNumVisits());
             double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
-            double aStar = state.getLocalScore();
+            /*double aStar = state.getLocalScore();
             for (Integer node : state.getPossibleActions()) {
                 aStar += hc.bestBDeuForNode[node];
             }
             //System.out.println("localScore: " + state.getLocalScore() + ", aStar: " + aStar + ", bestAStar: " + bestAStar);
             aStar -= bestAStar;
             aStar /= Problem.nInstances;
-            aStar *= MCTSBN.A_STAR_CONSTANT;
-            
-            UCTSCore = exploitationScore + explorationScore + aStar;
+            aStar *= MCTSBN.A_STAR_CONSTANT;*/
+
+            UCTSCore = exploitationScore + explorationScore;
             //System.out.println("UCT: " + UCTSCore + ".   \t" + exploitationScore + ".   \t" + explorationScore + ".   \t" + aStar);
         }
     }

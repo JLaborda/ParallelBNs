@@ -5,6 +5,10 @@ import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.utils.Problem;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -31,11 +35,13 @@ public class MCTSBN {
     /**
      * Exploration constant c for the UCT equation: UCT_j = X_j + c * sqrt(ln(N) / n_j)
      */
-    public static final double EXPLORATION_CONSTANT = 2 * Math.sqrt(2); //1.0 / Math.sqrt(2);
+    public static double EXPLORATION_CONSTANT = 1 * Math.sqrt(2); //1.0 / Math.sqrt(2);
     
-    public static final double EXPLOITATION_CONSTANT = 50;
+    public static double EXPLOITATION_CONSTANT = 50;
     
-    public static final double A_STAR_CONSTANT = 0;
+    public static double PROBABILITY_SWAP = 0.5;
+
+    public static double NUMBER_SWAPS = 0.5;
     
     private static final int NUM_ROLLOUTS = 1;
 
@@ -52,7 +58,7 @@ public class MCTSBN {
     
     private final ArrayList<Integer> allVars;
     
-    private final HillClimbingEvaluator hc;
+    public final HillClimbingEvaluator hc;
 
     private TreeNode root;
 
@@ -67,14 +73,21 @@ public class MCTSBN {
 
     private final HashSet<TreeNode> selectionSet = new HashSet<>();
 
-    private final String saveFilePath = "prueba-mctsbn.csv";
-    
     private final Random random = new Random();
     
     private double mean;
     private double standardDeviation;
+
+    private Dag_n PGESdag;
     
     private final ArrayList<ArrayList> orderSet = new ArrayList<>();
+
+    public double PGESTime;
+
+    // Write results in each round
+    File file;
+    BufferedWriter csvWriter;
+    String firstPart;
 
     public MCTSBN(Problem problem, int iterationLimit){
         this.problem = problem;
@@ -84,6 +97,30 @@ public class MCTSBN {
         this.allVars = hc.nodeToIntegerList(problem.getVariables());
     }
 
+    public MCTSBN(Problem problem, int iterationLimit, String netName, String databaseName, int threads, double exploitConstant, double numberSwaps, double probabilitySwap){
+        this.problem = problem;
+        this.cache = problem.getLocalScoreCache();
+        this.ITERATION_LIMIT = iterationLimit;
+        this.hc = new HillClimbingEvaluator(problem, cache);
+        this.allVars = hc.nodeToIntegerList(problem.getVariables());
+
+        String savePath = "results-it/experiment_" + netName + "_mcts_" +
+                databaseName + "_t" + threads + "_it" + iterationLimit + "_ex" + exploitConstant
+                + "_ps" + numberSwaps + "_ns" + probabilitySwap + ".csv";
+        file = new File(savePath);
+        try {
+            csvWriter = new BufferedWriter(new FileWriter(savePath, true));
+            if (file.length() == 0) {
+                String header = "algorithm,network,bbdd,threads,itLimit,exploitConst,numSwaps,probSwap,bdeuMCTS,iteration,time\n";
+                csvWriter.append(header);
+            }
+            csvWriter.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        this.firstPart = "mcts," + netName + "," + databaseName + "," + threads + "," + iterationLimit + "," + exploitConstant + "," + numberSwaps + "," + probabilitySwap + ",";
+    }
 
     public Dag_n search(State initialState){
         //1. Set Root
@@ -98,6 +135,9 @@ public class MCTSBN {
         // allVars.size()-1 if we do initializeWithPGES
         ArrayList<TreeNode> selection = new ArrayList<>();
         selection.add(this.root);
+
+        double random_const = PROBABILITY_SWAP;
+        PROBABILITY_SWAP = 0;
         
         double[] rewards = new double[allVars.size()];
         for (int i = 0; i < allVars.size()-1; i++) {
@@ -110,6 +150,8 @@ public class MCTSBN {
             backPropagate(expandedNode, reward);
         }
         this.root.setFullyExpanded(true);
+
+        PROBABILITY_SWAP = random_const;
         
         // Train the normalizer with the mean and sd of the scores of all vars
         normalize_fit(rewards);
@@ -136,7 +178,7 @@ public class MCTSBN {
         
         //2. Search loop
         for (int i = 0; i < ITERATION_LIMIT; i++) {
-            System.out.println("Iteration " + i + "...");
+            //System.out.println("Iteration " + i + "...");
 
             // Executing round
             long startTime = System.currentTimeMillis();
@@ -155,11 +197,18 @@ public class MCTSBN {
                 break;
             }
         }
+
+        try {
+            csvWriter.flush();
+            csvWriter.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         
         //System.out.println(queueToString());
         //System.out.println("Finished...");
         //System.out.println("Tree Structure: ");
-        System.out.println(this);
+        //System.out.println(this);
         // return Best Dag
         return new Dag_n(bestDag);
     }
@@ -227,7 +276,7 @@ public class MCTSBN {
                 selection.add(selectNode.getParent());
             }
             
-            System.out.println("SELECTED: " + printUCB(selectNode) + "   " + selectNode.getState().getNode());
+            //System.out.println("SELECTED: " + printUCB(selectNode) + "   " + selectNode.getState().getNode());
         }
         
         /*for (TreeNode tn : selectionQueue) {
@@ -376,6 +425,16 @@ public class MCTSBN {
             List<Integer> finalOrder = new ArrayList<>(order);
             finalOrder.addAll(candidates);
 
+            for (int j = 0; j < NUMBER_SWAPS * Math.sqrt(finalOrder.size()); j++) {
+                if (PROBABILITY_SWAP > 0 && random.nextDouble() <= PROBABILITY_SWAP) {
+                    // Randomly swap two elements in the order
+                    int index1 = random.nextInt(finalOrder.size());
+                    int index2 = random.nextInt(finalOrder.size());
+                    Collections.swap(finalOrder, index1, index2);
+                    //System.out.println("Swapping " + index1 + " and " + index2);
+                }
+            }
+
             hc.setOrder(finalOrder);
             
             double score = hc.search();
@@ -420,7 +479,7 @@ public class MCTSBN {
         // Execute PGES to obtain a good order
         double init = System.currentTimeMillis();
         Clustering hierarchicalClustering = new HierarchicalClustering();
-        BNBuilder algorithm = new PGESwithStages(problem, hierarchicalClustering, nThreads, Integer.MAX_VALUE, Integer.MAX_VALUE, true);
+        BNBuilder algorithm = new PGESwithStages(problem, hierarchicalClustering, nThreads, Integer.MAX_VALUE, Integer.MAX_VALUE, false);
         algorithm.search();
 
         // Create the set with some orders to use in rollout
@@ -430,6 +489,9 @@ public class MCTSBN {
         }
 
         System.out.println("\n\nFINISHED PGES (" + ((System.currentTimeMillis() - init)/1000.0) + " s). BDeu: " + GESThread.scoreGraph(algorithm.getCurrentDag(), problem));
+
+        this.PGESTime = (System.currentTimeMillis() - init)/1000.0;
+        this.PGESdag = currentDag;
     }
     
     /**
@@ -443,8 +505,8 @@ public class MCTSBN {
         DescriptiveStatistics stats = new DescriptiveStatistics();
 
         // Add the data from the series to stats
-        for (int i = 0; i < sample.length; i++) {
-            stats.addValue(sample[i]);
+        for (double v : sample) {
+            stats.addValue(v);
         }
 
         // Compute mean and standard deviation
@@ -474,35 +536,21 @@ public class MCTSBN {
     
     
     private void saveRound(int iteration, double totalTimeRound) {
-
-        /*File file = new File(saveFilePath);
-        BufferedWriter csvWriter = null;
         try {
-            csvWriter = new BufferedWriter(new FileWriter(saveFilePath, true));
+            //System.out.println("Best order:      " + bestScore + "\t-> " + bestOrder);
+            //System.out.println("Best order: " + toStringOrder(bestOrder));
+            //System.out.println("------------------------------------------------------");
 
-            //FileWriter csvWriter = new FileWriter(savePath, true);
-            if (file.length() == 0) {
-                String header = "iterations,time(s),score\n";
-                csvWriter.append(header);
-            }
-            String result = "" + iteration + "," + totalTimeRound + "," + bestScore + "\n";*/
-            //System.out.println("Results iteration:" + iteration);
-            //System.out.println("Total time iteration: " + totalTimeRound);
-            //System.out.println("Best Score: " + bestScore);
-            System.out.println("Best order:      " + bestScore + "\t-> " + bestOrder);
-            System.out.println("Best order: " + toStringOrder(bestOrder));
-            //System.out.println("Best partial order: " + toStringOrder(bestPartialOrder));
-            System.out.println("------------------------------------------------------");
-            /*csvWriter.append(result);
-
+            String result = (firstPart
+                    + bestScore + ","
+                    + iteration + ","
+                    + totalTimeRound + "\n");
+            csvWriter.append(result);
             csvWriter.flush();
-            csvWriter.close();
         }
         catch (IOException e) {
             throw new RuntimeException(e);
-        }*/
-        //System.out.println("Results of iteration saved at: " + saveFilePath);
-
+        }
     }
 
     /**
@@ -546,6 +594,10 @@ public class MCTSBN {
 
     public Graph getBestDag() {
         return bestDag;
+    }
+
+    public Dag_n getPGESDag() {
+        return PGESdag;
     }
 
     @Override

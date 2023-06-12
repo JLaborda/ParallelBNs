@@ -170,10 +170,9 @@ public class HillClimbingEvaluator {
         
         double fLogScore = metric.localScore(nNode, nParents);
         localScoreCache.put("" + nNode + Arrays.toString(nParents), fLogScore);
-        
+
         return fLogScore;
     }
-    
 
     public double search(){
         //double c1 = problem.counter.get();
@@ -196,7 +195,7 @@ public class HillClimbingEvaluator {
             candidates.add(node);
         }
         
-        System.out.println("Obtained result: " + finalScore + "\t-> " + order);
+        //System.out.println("Obtained result: " + finalScore + "\t-> " + order);
 
         
         //System.out.println("\n TOTAL CALCULATIONS:  " + (problem.counter.get() - c1));
@@ -227,8 +226,16 @@ public class HillClimbingEvaluator {
         return integers;
     }
     
-    public Integer nodeToInteger(Node node){
+    public int nodeToInteger(Node node){
         return problem.getHashIndices().get(node);
+    }
+
+    public int[] nodesToInteger(List<Node> nodes){
+        int[] integers = new int[nodes.size()];
+        for (int i = 0; i < nodes.size(); i++) {
+            integers[i] = nodeToInteger(nodes.get(i));
+        }
+        return integers;
     }
     
     public class Pair implements Comparable<Pair> {
