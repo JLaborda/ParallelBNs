@@ -5,3 +5,6 @@
 # ParallelBNs
 
 Parallel computing of Bayesian Networks using Java Threads.
+
+Projects in ParallelBNs:
+  1. Circular Greedy Equivalence Search (cGES). An independent repository is in https://github.com/JLaborda/cges
