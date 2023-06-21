@@ -1,29 +1,45 @@
 package org.albacete.simd.mctsbn;
 
-import edu.cmu.tetrad.graph.Node;
+import java.util.Arrays;
 import org.albacete.simd.utils.Problem;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 public class TreeNode implements Comparable<TreeNode>{
 
     private final State state;
     private final TreeNode parent;
+    private Set<TreeNode> children = new HashSet<>();
+    
     private int numVisits = 0;
     private double totalReward = 0;
-    private Set<TreeNode> children = new HashSet<>();
+
+    private double UCTSCore = 0;
+    
+    private final HillClimbingEvaluator hc;
+    
     private boolean fullyExpanded;
     private boolean isExpanded = false;
 
-    public TreeNode(State state, TreeNode parent){
+    MCTSBN mctsbn;
+
+    public TreeNode(State state, TreeNode parent, MCTSBN mctsbn) {
         this.state = state;
+        this.hc = state.getHC();
         this.parent = parent;
         this.numVisits = 0;
         this.totalReward = 0;
         this.fullyExpanded = state.isTerminal();
+        this.mctsbn = mctsbn;
+        
+        if (this.parent != null) {
+            this.parent.addChild(this);
+            this.numVisits = 1;
+        }
     }
 
     public boolean isTerminal() {
@@ -45,13 +61,17 @@ public class TreeNode implements Comparable<TreeNode>{
     public double getTotalReward() {
         return totalReward;
     }
+    
+    public double getUCTScore() {
+        return UCTSCore;
+    }
 
     public Set<TreeNode> getChildren() {
         return children;
     }
 
-    public Set<Node> getChildrenAction(){
-        Set<Node> actions = new HashSet<>();
+    public Set<Integer> getChildrenAction(){
+        Set<Integer> actions = new HashSet<>();
         for (TreeNode child: children) {
             actions.add(child.state.getNode());
         }
@@ -64,6 +84,7 @@ public class TreeNode implements Comparable<TreeNode>{
 
     public void addChild(TreeNode child){
         this.children.add(child);
+        this.isExpanded = true;
     }
 
     public boolean isFullyExpanded() {
@@ -89,6 +110,10 @@ public class TreeNode implements Comparable<TreeNode>{
     public void incrementOneVisit(){
         this.numVisits++;
     }
+    
+    public void decrementOneVisit(){
+        this.numVisits--;
+    }
 
     public boolean isExpanded() {
         return isExpanded;
@@ -98,6 +123,7 @@ public class TreeNode implements Comparable<TreeNode>{
         isExpanded = expanded;
     }
 
+    @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder(50);
         print(buffer, "", "");
@@ -106,7 +132,20 @@ public class TreeNode implements Comparable<TreeNode>{
 
     private void print(StringBuilder buffer, String prefix, String childrenPrefix) {
         buffer.append(prefix);
-        buffer.append(state.getNode().getName());
+        buffer.append("N" + state.getNode());
+        
+        String results;
+        
+        double exploitationScore = mctsbn.EXPLOITATION_CONSTANT * (this.getTotalReward() / this.getNumVisits());
+
+        if(this.parent == null){
+            results = "  \t" + this.getNumVisits() + "   BDeu " + exploitationScore;
+        } else {
+            double explorationScore = mctsbn.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
+            results = "  \t" + this.getNumVisits() + "   UCT " + UCTSCore + ",   BDeu " + exploitationScore + ",   EXP " + explorationScore;
+        }
+        buffer.append(results);
+        
         buffer.append('\n');
         for (Iterator<TreeNode> it = children.iterator(); it.hasNext();) {
             TreeNode next = it.next();
@@ -117,68 +156,30 @@ public class TreeNode implements Comparable<TreeNode>{
             }
         }
     }
+    
+    public void updateUCT(double bestAStar) {
+        if(this.parent == null && this.fullyExpanded){
+            UCTSCore = Double.NEGATIVE_INFINITY;
+        } else {
+            double exploitationScore = mctsbn.EXPLOITATION_CONSTANT * (this.getTotalReward() / this.getNumVisits());
+            double explorationScore = mctsbn.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
+            /*double aStar = state.getLocalScore();
+            for (Integer node : state.getPossibleActions()) {
+                aStar += hc.bestBDeuForNode[node];
+            }
+            //System.out.println("localScore: " + state.getLocalScore() + ", aStar: " + aStar + ", bestAStar: " + bestAStar);
+            aStar -= bestAStar;
+            aStar /= Problem.nInstances;
+            aStar *= MCTSBN.A_STAR_CONSTANT;*/
+
+            UCTSCore = exploitationScore + explorationScore;
+            //System.out.println("UCT: " + UCTSCore + ".   \t" + exploitationScore + ".   \t" + explorationScore + ".   \t" + aStar);
+        }
+    }
 
     @Override
     public int compareTo(@NotNull TreeNode o) {
-        // child.getTotalReward() / child.getNumVisits() +
-        //                    explorationValue * Math.sqrt(Math.log(node.getNumVisits()) / child.getNumVisits());
-
-        // ESTO ESTÁ MAL!
-        // El reward debe ser positivo y acotado, porque sino es una búsqueda aleatorio
-        // Restarle por el score de la red vacía (un delta) y dividirlo por el número de instancias para acotar el score.
-        // Hay que pensar en la ecuación UCT para evitar una búsqueda de anchura.+
-
-        double thisScore, thatScore;
-
-        if(this.parent == null && o.parent == null){
-            // Ambos son la raíz, esto no debería pasar...
-            throw new IllegalStateException("Root is in the selection queue twice");
-        }
-
-
-        // Checking if this TreeNode is the root
-        if(this.parent == null){
-            thisScore = Double.MAX_VALUE;
-        }
-        else{
-            double exploitationScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
-            //System.out.println("Exploitation Score for node  [" + this.state.getOrder() + "] is: " + exploitationScore);
-            //System.out.println("******");
-
-            double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
-            //System.out.println("Exploration Score for node  [" + this.state.getOrder() + "] is: " + explorationScore);
-            //System.out.println("******");
-
-            thisScore = ((this.getTotalReward() / this.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances +
-                    MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
-
-            //System.out.println("This Score: " + thisScore);
-        }
-
-        // Checking if o is the root
-        if(o.parent == null){
-            thatScore = Double.MAX_VALUE;
-        }
-        else{
-            double exploitationScore = ((o.getTotalReward() / o.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
-            //System.out.println("Exploitation Score for node  [" + o.state.getOrder() + "] is: " + exploitationScore);
-            //System.out.println("******");
-
-            double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(o.parent.getNumVisits()) / o.getNumVisits());
-            //System.out.println("Exploration Score for node  [" + o.state.getOrder() + "] is: " + explorationScore);
-            //System.out.println("******");
-
-            thatScore = ((o.getTotalReward() / o.getNumVisits()) - Problem.emptyGraphScore ) / Problem.nInstances +
-                    MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(o.parent.getNumVisits()) / o.getNumVisits());
-
-            //System.out.println("That Score: " + thatScore);
-        }
-
-        // El valor de las visitas del padre de la raiz cuál es?
-
-
-        return Double.compare(thisScore, thatScore);
-
+        return Double.compare(this.UCTSCore, o.UCTSCore);
     }
 
     @Override
@@ -190,6 +191,13 @@ public class TreeNode implements Comparable<TreeNode>{
         TreeNode other = (TreeNode) obj;
 
         return this.state.equals(other.state);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 29 * hash + Objects.hashCode(this.state);
+        return hash;
     }
 
 }

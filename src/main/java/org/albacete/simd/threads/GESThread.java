@@ -12,6 +12,7 @@ import org.albacete.simd.utils.Problem;
 
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import static org.albacete.simd.utils.Utils.pdagToDag;
 
 /*
@@ -523,10 +524,11 @@ public abstract class GESThread implements Runnable{
     public static double localBdeuScore(int nNode, int[] nParents, Set<Node> setParents, Problem problem) {
         numTotalCalls++;
 
-        LocalScoreCacheConcurrent localScoreCache = problem.getLocalScoreCache();
+        ConcurrentHashMap<String,Double> localScoreCache = problem.getLocalScoreCache();
 
-        double oldScore = localScoreCache.get(nNode, setParents);
-        if (!Double.isNaN(oldScore)) {
+        Arrays.sort(nParents);
+        Double oldScore = localScoreCache.get("" + nNode + Arrays.toString(nParents));
+        if (oldScore != null) {
             return oldScore;
         }
         numNonCachedCalls++;
@@ -589,8 +591,8 @@ public abstract class GESThread implements Runnable{
             }
             fLogScore += Math.log(kappa) * cardinality * (numValues - 1);
         */
-
-        localScoreCache.add(nNode, setParents, fLogScore);
+        
+        localScoreCache.put("" + nNode + Arrays.toString(nParents), fLogScore);
         return fLogScore;
     }
     
@@ -796,7 +798,7 @@ public abstract class GESThread implements Runnable{
         return this.id;
     }
 
-    public LocalScoreCacheConcurrent getLocalScoreCache() {
+    public ConcurrentHashMap<String,Double> getLocalScoreCache() {
         return problem.getLocalScoreCache();
     }
 
