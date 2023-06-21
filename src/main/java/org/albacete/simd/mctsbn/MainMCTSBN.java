@@ -20,17 +20,18 @@ public class MainMCTSBN {
 
     public static void main(String[] args) {
         String networkFolder = "./res/networks/";
-        String net_name = "link";
+        String net_name = "alarm";
         String bbdd_path = networkFolder + "BBDD/" + net_name + ".ALL.csv";
         String netPath = networkFolder + net_name + ".xbif";
 
 
         Problem problem = new Problem(bbdd_path);
 
-        MCTSBN mctsbn = new MCTSBN(problem, 300);
+        MCTSBN mctsbn = new MCTSBN(problem, 3000);
 
-        MCTSBN.NUMBER_SWAPS = 0.2;
-        MCTSBN.PROBABILITY_SWAP = 0.2;
+        mctsbn.NUMBER_SWAPS = 0.2;
+        mctsbn.PROBABILITY_SWAP = 0.2;
+        mctsbn.initializeAlgorithm = "fGES";
 
         long startTime = System.currentTimeMillis();
         addEndHook(mctsbn,startTime, netPath, problem);

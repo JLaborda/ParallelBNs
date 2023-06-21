@@ -45,10 +45,31 @@ public class ExperimentMCTSLauncher {
         // Si no existe el fichero
         if(file.length() == 0) {
             Problem problem = new Problem(databasePath);
-            MCTSBN mctsbn = new MCTSBN(problem, iterationLimit, netName, databaseName, threads, exploitConstant, numberSwaps, probabilitySwap);
-            MCTSBN.EXPLOITATION_CONSTANT = exploitConstant;
-            MCTSBN.NUMBER_SWAPS = numberSwaps;
-            MCTSBN.PROBABILITY_SWAP = probabilitySwap;
+
+            String alg;
+            switch (algName) {
+                default:
+                case "mcts":
+                case "mcts-pGES":
+                    alg = "pGES";
+                    break;
+                case "mcts-fGES":
+                    alg = "fGES";
+                    break;
+                case "mcts-PC":
+                    alg = "PC";
+                    break;
+                case "mcts-CPC":
+                    alg = "CPC";
+                    break;
+                case "mcts-PC-Max":
+                    alg = "PC-Max";
+                    break;
+            }
+            MCTSBN mctsbn = new MCTSBN(problem, iterationLimit, netName, databaseName, threads, exploitConstant, numberSwaps, probabilitySwap, alg);
+            mctsbn.EXPLOITATION_CONSTANT = exploitConstant;
+            mctsbn.NUMBER_SWAPS = numberSwaps;
+            mctsbn.PROBABILITY_SWAP = probabilitySwap;
 
             double init = System.currentTimeMillis();
             Dag_n result = mctsbn.search();

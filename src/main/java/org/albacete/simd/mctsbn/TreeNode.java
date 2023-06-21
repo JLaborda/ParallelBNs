@@ -25,13 +25,16 @@ public class TreeNode implements Comparable<TreeNode>{
     private boolean fullyExpanded;
     private boolean isExpanded = false;
 
-    public TreeNode(State state, TreeNode parent){
+    MCTSBN mctsbn;
+
+    public TreeNode(State state, TreeNode parent, MCTSBN mctsbn) {
         this.state = state;
         this.hc = state.getHC();
         this.parent = parent;
         this.numVisits = 0;
         this.totalReward = 0;
         this.fullyExpanded = state.isTerminal();
+        this.mctsbn = mctsbn;
         
         if (this.parent != null) {
             this.parent.addChild(this);
@@ -133,12 +136,12 @@ public class TreeNode implements Comparable<TreeNode>{
         
         String results;
         
-        double exploitationScore = MCTSBN.EXPLOITATION_CONSTANT * (this.getTotalReward() / this.getNumVisits());
+        double exploitationScore = mctsbn.EXPLOITATION_CONSTANT * (this.getTotalReward() / this.getNumVisits());
 
         if(this.parent == null){
             results = "  \t" + this.getNumVisits() + "   BDeu " + exploitationScore;
         } else {
-            double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
+            double explorationScore = mctsbn.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
             results = "  \t" + this.getNumVisits() + "   UCT " + UCTSCore + ",   BDeu " + exploitationScore + ",   EXP " + explorationScore;
         }
         buffer.append(results);
@@ -158,8 +161,8 @@ public class TreeNode implements Comparable<TreeNode>{
         if(this.parent == null && this.fullyExpanded){
             UCTSCore = Double.NEGATIVE_INFINITY;
         } else {
-            double exploitationScore = MCTSBN.EXPLOITATION_CONSTANT * (this.getTotalReward() / this.getNumVisits());
-            double explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
+            double exploitationScore = mctsbn.EXPLOITATION_CONSTANT * (this.getTotalReward() / this.getNumVisits());
+            double explorationScore = mctsbn.EXPLORATION_CONSTANT * Math.sqrt(Math.log(this.parent.getNumVisits()) / this.getNumVisits());
             /*double aStar = state.getLocalScore();
             for (Integer node : state.getPossibleActions()) {
                 aStar += hc.bestBDeuForNode[node];

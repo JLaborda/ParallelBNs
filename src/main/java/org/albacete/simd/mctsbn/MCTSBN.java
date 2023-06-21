@@ -3,6 +3,7 @@ package org.albacete.simd.mctsbn;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Graph;
+import edu.cmu.tetrad.search.*;
 import org.albacete.simd.utils.Problem;
 
 import java.io.BufferedWriter;
@@ -35,21 +36,21 @@ public class MCTSBN {
     /**
      * Exploration constant c for the UCT equation: UCT_j = X_j + c * sqrt(ln(N) / n_j)
      */
-    public static double EXPLORATION_CONSTANT = 1 * Math.sqrt(2); //1.0 / Math.sqrt(2);
+    public double EXPLORATION_CONSTANT = 1 * Math.sqrt(2); //1.0 / Math.sqrt(2);
     
-    public static double EXPLOITATION_CONSTANT = 50;
+    public double EXPLOITATION_CONSTANT = 50;
     
-    public static double PROBABILITY_SWAP = 0.5;
+    public double PROBABILITY_SWAP = 0.5;
 
-    public static double NUMBER_SWAPS = 0.5;
+    public double NUMBER_SWAPS = 0.5;
     
-    private static final int NUM_ROLLOUTS = 1;
+    private final int NUM_ROLLOUTS = 1;
 
-    private static final int NUM_SELECTION = 1;
+    private final int NUM_SELECTION = 1;
 
-    private static final int NUM_EXPAND = 1;
+    private final int NUM_EXPAND = 1;
     
-    private static final int RANDOM_SELECTIONS = 3;
+    private final int RANDOM_SELECTIONS = 3;
 
     /**
      * Problem of the search
@@ -84,6 +85,8 @@ public class MCTSBN {
 
     public double PGESTime;
 
+    public String initializeAlgorithm;
+
     // Write results in each round
     File file;
     BufferedWriter csvWriter;
@@ -97,14 +100,15 @@ public class MCTSBN {
         this.allVars = hc.nodeToIntegerList(problem.getVariables());
     }
 
-    public MCTSBN(Problem problem, int iterationLimit, String netName, String databaseName, int threads, double exploitConstant, double numberSwaps, double probabilitySwap){
+    public MCTSBN(Problem problem, int iterationLimit, String netName, String databaseName, int threads, double exploitConstant, double numberSwaps, double probabilitySwap, String initializeAlgorithm){
         this.problem = problem;
         this.cache = problem.getLocalScoreCache();
         this.ITERATION_LIMIT = iterationLimit;
         this.hc = new HillClimbingEvaluator(problem, cache);
         this.allVars = hc.nodeToIntegerList(problem.getVariables());
+        this.initializeAlgorithm = initializeAlgorithm;
 
-        String savePath = "results-it/experiment_" + netName + "_mcts_" +
+        String savePath = "results-it/experiment_" + netName + "_mcts_" + initializeAlgorithm + "_" +
                 databaseName + "_t" + threads + "_it" + iterationLimit + "_ex" + exploitConstant
                 + "_ps" + numberSwaps + "_ns" + probabilitySwap + ".csv";
         file = new File(savePath);
@@ -119,17 +123,35 @@ public class MCTSBN {
             ex.printStackTrace();
         }
 
-        this.firstPart = "mcts," + netName + "," + databaseName + "," + threads + "," + iterationLimit + "," + exploitConstant + "," + numberSwaps + "," + probabilitySwap + ",";
+        this.firstPart = "mcts-" + initializeAlgorithm + "," + netName + "," + databaseName + "," + threads + "," + iterationLimit + "," + exploitConstant + "," + numberSwaps + "," + probabilitySwap + ",";
     }
 
     public Dag_n search(State initialState){
         //1. Set Root
-        this.root = new TreeNode(initialState, null);
+        this.root = new TreeNode(initialState, null, this);
 
         System.out.println("\n\nSTARTING warmup\n------------------------------------------------------");
 
         //1.5 Add PGES order
-        initializeWithPGES(4);
+        switch (this.initializeAlgorithm) {
+            default:
+            case "pGES":
+                initializeWithPGES(4);
+                break;
+            case "fGES":
+                initializeWithfGES();
+                break;
+            case "PC":
+                initializeWithPC();
+                break;
+            case "CPC":
+                initializeWithCPC();
+                break;
+            case "PC-Max":
+                initializeWithPCMax();
+                break;
+        }
+
 
         //1.5. Create a node for each variable (totally expand root). Implicit warmup
         // allVars.size()-1 if we do initializeWithPGES
@@ -315,7 +337,7 @@ public class MCTSBN {
                 //3. Check if the actions has already been taken
                 if (!childrenActions.contains(action)){
                     // 4. Expand the tree by creating a new node and connecting it to the tree.
-                    TreeNode newNode = new TreeNode(node.getState().takeAction(action), node);
+                    TreeNode newNode = new TreeNode(node.getState().takeAction(action), node, this);
 
                     // 5. Check if there are more actions to be expanded in this node, and if not, change the isFullyExpanded value
                     if(node.getChildrenAction().size() == actions.size())
@@ -484,11 +506,47 @@ public class MCTSBN {
 
         // Create the set with some orders to use in rollout
         Dag_n currentDag = algorithm.getCurrentDag();
+
+        initialize(currentDag, init);
+    }
+
+    private void initializeWithfGES() {
+        double init = System.currentTimeMillis();
+        Fges alg = new Fges(problem.getBDeu());
+        Dag_n dag = new Dag_n(Utils.removeInconsistencies(alg.search()));
+        initialize(dag, init);
+    }
+
+    private void initializeWithPC() {
+        double init = System.currentTimeMillis();
+        IndependenceTest bdeu_test = new IndTestScore(problem.getBDeu());
+        Pc alg = new Pc(bdeu_test);
+        Dag_n dag = new Dag_n(Utils.removeInconsistencies(alg.search()));
+        initialize(dag, init);
+    }
+
+    private void initializeWithCPC() {
+        double init = System.currentTimeMillis();
+        IndependenceTest bdeu_test = new IndTestScore(problem.getBDeu());
+        Cpc alg = new Cpc(bdeu_test);
+        Dag_n dag = new Dag_n(Utils.removeInconsistencies(alg.search()));
+        initialize(dag, init);
+    }
+
+    private void initializeWithPCMax() {
+        double init = System.currentTimeMillis();
+        IndependenceTest bdeu_test = new IndTestScore(problem.getBDeu());
+        PcStableMax alg = new PcStableMax(bdeu_test);
+        Dag_n dag = new Dag_n(Utils.removeInconsistencies(alg.search()));
+        initialize(dag, init);
+    }
+
+    private void initialize(Dag_n currentDag, double init) {
         for (int i = 0; i < 10000; i++) {
             orderSet.add(hc.nodeToIntegerList(currentDag.getTopologicalOrder()));
         }
 
-        System.out.println("\n\nFINISHED PGES (" + ((System.currentTimeMillis() - init)/1000.0) + " s). BDeu: " + GESThread.scoreGraph(algorithm.getCurrentDag(), problem));
+        System.out.println("\n\nFINISHED PGES (" + ((System.currentTimeMillis() - init)/1000.0) + " s). BDeu: " + GESThread.scoreGraph(currentDag, problem));
 
         this.PGESTime = (System.currentTimeMillis() - init)/1000.0;
         this.PGESdag = currentDag;
@@ -524,7 +582,7 @@ public class MCTSBN {
             return Double.MAX_VALUE;
         }
         return  ((o.getTotalReward() / o.getNumVisits()) - Problem.emptyGraphScore ) / Problem.nInstances +
-                    MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(o.getParent().getNumVisits()) / o.getNumVisits());
+                    this.EXPLORATION_CONSTANT * Math.sqrt(Math.log(o.getParent().getNumVisits()) / o.getNumVisits());
     }
     
     public void updateUCTList() {
@@ -620,7 +678,7 @@ public class MCTSBN {
             double explotationScore = ((tn.getTotalReward() / tn.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
             double explorationScore = 0;
             if (tn.getParent() != null)
-                explorationScore = MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(tn.getParent().getNumVisits()) / tn.getNumVisits());
+                explorationScore = this.EXPLORATION_CONSTANT * Math.sqrt(Math.log(tn.getParent().getNumVisits()) / tn.getNumVisits());
             res += ("N"+tn.getState().getNode() + "\t\t" + tn.getNumVisits() + "   " + tn.getUCTScore() + "   " + explotationScore + "   " + explorationScore + "\n");
         }
 
