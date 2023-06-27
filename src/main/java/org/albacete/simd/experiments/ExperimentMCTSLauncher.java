@@ -63,7 +63,7 @@ public class ExperimentMCTSLauncher {
                 throw new RuntimeException(e);
             }
 
-            HillClimbingEvaluator hc = mctsbn.hc;
+            HillClimbingEvaluator hc = mctsbn.getHc();
 
             Dag_n dagOriginal = new Dag_n(controlBayesianNetwork.getDag());
             ArrayList<Node> ordenOriginal = dagOriginal.getTopologicalOrder();
@@ -117,7 +117,7 @@ public class ExperimentMCTSLauncher {
                         + shdOriginal + ","
                         + bdeuHCPerfect + ","
                         + shdHCPerfect + ","
-                        + (double) mctsbn.PGESTime + ","
+                        + (double) mctsbn.pgesTime + ","
                         + (double) time + "\n");
                 csvWriter.append(results);
                 csvWriter.flush();

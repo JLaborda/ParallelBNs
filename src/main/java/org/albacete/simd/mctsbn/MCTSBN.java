@@ -1,6 +1,5 @@
 package org.albacete.simd.mctsbn;
 
-import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.utils.Problem;
@@ -10,7 +9,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.clustering.Clustering;
@@ -18,8 +16,8 @@ import org.albacete.simd.clustering.HierarchicalClustering;
 import org.albacete.simd.framework.BNBuilder;
 import org.albacete.simd.mctsbn.HillClimbingEvaluator.Pair;
 import org.albacete.simd.threads.GESThread;
-import org.albacete.simd.utils.Utils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.jetbrains.annotations.NotNull;
 
 public class MCTSBN {
 
@@ -43,11 +41,11 @@ public class MCTSBN {
 
     public static double NUMBER_SWAPS = 0.5;
     
-    private static final int NUM_ROLLOUTS = 1;
+    public static int NUM_ROLLOUTS = 1;
 
-    private static final int NUM_SELECTION = 1;
+    public static int NUM_SELECTION = 1;
 
-    private static final int NUM_EXPAND = 1;
+    public static int NUM_EXPAND = 1;
     
     private static final int RANDOM_SELECTIONS = 3;
 
@@ -57,57 +55,56 @@ public class MCTSBN {
     private final Problem problem;
     
     private final ArrayList<Integer> allVars;
-    
-    public final HillClimbingEvaluator hc;
+
+    private final HillClimbingEvaluator hc;
+
+    //private final List<HillClimbingEvaluator> evaluators;
 
     private TreeNode root;
 
     private double bestScore = Double.NEGATIVE_INFINITY;
     private List<Integer> bestOrder = new ArrayList<>();
-    private List<Integer> bestPartialOrder = new ArrayList<>();
     private Graph bestDag = null;
 
     private boolean convergence = false;
 
-    private final ConcurrentHashMap<String,Double> cache;
+    //private final SortedSet<TreeNode> selectionSet = Collections.synchronizedSortedSet(new TreeSet<>());
+    private final MCTSQueue<TreeNode> candidates;
+    private final Random random = new Random(42);
 
-    private final HashSet<TreeNode> selectionSet = new HashSet<>();
-
-    private final Random random = new Random();
-    
     private double mean;
     private double standardDeviation;
 
-    private Dag_n PGESdag;
-    
-    private final ArrayList<ArrayList> orderSet = new ArrayList<>();
+    private Dag_n pgesDag;
 
-    public double PGESTime;
+    private final ArrayList<ArrayList<Integer>> orderSet = new ArrayList<>();
 
-    // Write results in each round
-    File file;
-    BufferedWriter csvWriter;
-    String firstPart;
+    public double pgesTime;
+
+    private BufferedWriter csvWriter;
+    private String header;
+    private boolean isDistributed = true;
 
     public MCTSBN(Problem problem, int iterationLimit){
         this.problem = problem;
-        this.cache = problem.getLocalScoreCache();
         this.ITERATION_LIMIT = iterationLimit;
-        this.hc = new HillClimbingEvaluator(problem, cache);
-        this.allVars = hc.nodeToIntegerList(problem.getVariables());
+        //this.evaluators = HillClimbingEvaluator.createEvaluators(Runtime.getRuntime().availableProcessors(), problem);
+        this.hc = new HillClimbingEvaluator(problem);
+        this.allVars = problem.nodeToIntegerList(problem.getVariables());
+        this.candidates = new MCTSQueue<>(problem.getVariables().size(), TreeNode::compareTo);
     }
 
     public MCTSBN(Problem problem, int iterationLimit, String netName, String databaseName, int threads, double exploitConstant, double numberSwaps, double probabilitySwap){
-        this.problem = problem;
-        this.cache = problem.getLocalScoreCache();
-        this.ITERATION_LIMIT = iterationLimit;
-        this.hc = new HillClimbingEvaluator(problem, cache);
-        this.allVars = hc.nodeToIntegerList(problem.getVariables());
+        this(problem, iterationLimit);
+        configSaveFile(iterationLimit, netName, databaseName, threads, exploitConstant, numberSwaps, probabilitySwap);
+    }
 
+    private void configSaveFile(int iterationLimit, String netName, String databaseName, int threads, double exploitConstant, double numberSwaps, double probabilitySwap) {
         String savePath = "results-it/experiment_" + netName + "_mcts_" +
                 databaseName + "_t" + threads + "_it" + iterationLimit + "_ex" + exploitConstant
                 + "_ps" + numberSwaps + "_ns" + probabilitySwap + ".csv";
-        file = new File(savePath);
+        // Write results in each round
+        File file = new File(savePath);
         try {
             csvWriter = new BufferedWriter(new FileWriter(savePath, true));
             if (file.length() == 0) {
@@ -119,63 +116,13 @@ public class MCTSBN {
             ex.printStackTrace();
         }
 
-        this.firstPart = "mcts," + netName + "," + databaseName + "," + threads + "," + iterationLimit + "," + exploitConstant + "," + numberSwaps + "," + probabilitySwap + ",";
+        this.header = "mcts," + netName + "," + databaseName + "," + threads + "," + iterationLimit + "," + exploitConstant + "," + numberSwaps + "," + probabilitySwap + ",";
     }
 
     public Dag_n search(State initialState){
-        //1. Set Root
-        this.root = new TreeNode(initialState, null);
+        //1. Get initial order
+        initialConfiguration(initialState);
 
-        System.out.println("\n\nSTARTING warmup\n------------------------------------------------------");
-
-        //1.5 Add PGES order
-        initializeWithPGES(4);
-
-        //1.5. Create a node for each variable (totally expand root). Implicit warmup
-        // allVars.size()-1 if we do initializeWithPGES
-        ArrayList<TreeNode> selection = new ArrayList<>();
-        selection.add(this.root);
-
-        double random_const = PROBABILITY_SWAP;
-        PROBABILITY_SWAP = 0;
-        
-        double[] rewards = new double[allVars.size()];
-        for (int i = 0; i < allVars.size()-1; i++) {
-            // 2. Expand selected node
-            TreeNode expandedNode = expand(selection).get(0);
-
-            //3. Rollout and Backpropagation
-            double reward = rollout(expandedNode.getState());
-            rewards[i] = reward;
-            backPropagate(expandedNode, reward);
-        }
-        this.root.setFullyExpanded(true);
-
-        PROBABILITY_SWAP = random_const;
-        
-        // Train the normalizer with the mean and sd of the scores of all vars
-        normalize_fit(rewards);
-        
-        // Convert the bdeus obtained
-        root.setTotalReward(normalize_predict(root.getTotalReward()));
-        for (TreeNode tn : root.getChildren()) {
-            double reward = normalize_predict(tn.getTotalReward());
-            tn.setTotalReward(reward);
-        }
-        
-        
-        // Update the UCT's
-        updateUCTList();
-
-        
-        
-        System.out.println(Arrays.toString(hc.bestBDeuForNode));
-        System.out.println(this);
-        
-
-        
-        System.out.println("\n\nSTARTING MCTSBN\n------------------------------------------------------");
-        
         //2. Search loop
         for (int i = 0; i < ITERATION_LIMIT; i++) {
             //System.out.println("Iteration " + i + "...");
@@ -197,12 +144,13 @@ public class MCTSBN {
                 break;
             }
         }
-
-        try {
-            csvWriter.flush();
-            csvWriter.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        if(csvWriter != null) {
+            try {
+                csvWriter.flush();
+                csvWriter.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
         
         //System.out.println(queueToString());
@@ -213,6 +161,184 @@ public class MCTSBN {
         return new Dag_n(bestDag);
     }
 
+    private void initialConfiguration(State initialState) {
+        System.out.println("\n\nSTARTING warmup\n------------------------------------------------------");
+
+        //1. Set Root
+        setRoot(initialState);
+
+        //1.5 Add PGES order
+        initializeWithPGES();
+
+        //1.5. Create a node for each variable (totally expand root). Implicit warmup
+        // allVars.size()-1 if we do initializeWithPGES
+        ArrayList<TreeNode> selection = initializeSelection();
+
+        double[] rewards = gerInitialRewards(selection);
+        // Train the normalizer with the mean and sd of the scores of all vars
+        normalizeFit(rewards);
+
+        // Normalize the scores of the initial tree
+        normalizeTreeScore();
+
+        // Update the UCT's
+        updateUCTList();
+
+
+        //System.out.println(Arrays.toString(hc.bestBDeuForNode));
+        System.out.println(this);
+
+
+        System.out.println("\n\nSTARTING MCTSBN\n------------------------------------------------------");
+    }
+
+    private double[] gerInitialRewards(ArrayList<TreeNode> selection) {
+        double[] rewards;
+        if(!isDistributed) {
+            rewards = getInitialRewardsSequential(selection);
+        }
+        else {
+            rewards = getInitialRewardsDistributed(selection);
+        }
+        return rewards;
+    }
+
+    /**
+     * Initializes the selection arraylist with only the root node
+     * @return selection arraylist with root node
+     */
+    @NotNull
+    private ArrayList<TreeNode> initializeSelection() {
+        ArrayList<TreeNode> selection = new ArrayList<>();
+        selection.add(this.root);
+        return selection;
+    }
+
+    /**
+     *Breath First Search to apply a normalization of the score to each treenode
+     */
+    private void normalizeTreeScore() {
+        // Breath First Search to apply a normalization to each treenode
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while(!queue.isEmpty()){
+            TreeNode node = queue.poll();
+            node.setTotalReward(normalize_predict(node.getTotalReward()));
+            queue.addAll(node.getChildren());
+        }
+    }
+
+    /*private double[] getInitialRewardsDistributed(ArrayList<TreeNode> selection) {
+        double[] rewards;
+        double random_const = PROBABILITY_SWAP;
+        PROBABILITY_SWAP = 0;
+        rewards = allVars.parallelStream().mapToDouble(selectedNode -> {
+            //2. Expand selected node
+            TreeNode expandedNode = expand(selection).get(0);
+            //3. Rollout and Backpropagation
+            double reward = rollout(expandedNode.getState());
+            backPropagate(expandedNode, reward);
+            return reward;
+        }).toArray();
+        this.root.setFullyExpanded(true);
+        PROBABILITY_SWAP = random_const;
+        return rewards;
+    }*/
+    private double[] getInitialRewardsDistributed(ArrayList<TreeNode> selection) {
+        double[] rewards;
+        double random_const = PROBABILITY_SWAP;
+        PROBABILITY_SWAP = 0;
+        rewards = allVars.parallelStream().mapToDouble(selectedNode -> {
+            //2. Expand selected node
+            TreeNode expandedNode = expand(selection).get(0);
+            //3. Rollout and Backpropagation
+            double reward = rollout(expandedNode.getState(), new HillClimbingEvaluator(problem));
+            backPropagate(expandedNode, reward);
+            return reward;
+        }).toArray();
+        this.root.setFullyExpanded(true);
+        PROBABILITY_SWAP = random_const;
+        System.out.println("Distributed Rewards: ");
+        System.out.println(Arrays.toString(rewards));
+        return rewards;
+    }
+
+
+    @NotNull
+    private double[] getInitialRewardsSequential(ArrayList<TreeNode> selection) {
+        double[] rewards;
+        double random_const = PROBABILITY_SWAP;
+        PROBABILITY_SWAP = 0;
+        rewards = new double[allVars.size()];
+        for (int i = 0; i < allVars.size(); i++) {
+            // 2. Expand selected node
+            TreeNode expandedNode = expand(selection).get(0);
+
+            //3. Rollout and Backpropagation
+            double reward = rollout(expandedNode.getState(), hc);
+            rewards[i] = reward;
+            backPropagate(expandedNode, reward);
+        }
+        this.root.setFullyExpanded(true);
+        PROBABILITY_SWAP = random_const;
+        System.out.println("Sequential Rewards: ");
+        System.out.println(Arrays.toString(rewards));
+        return rewards;
+    }
+
+    private void setRoot(State initialState) {
+        this.root = new TreeNode(initialState, null);
+    }
+
+    private void initializeWithPGES() {
+        // Execute PGES to obtain a good order
+        double init = System.currentTimeMillis();
+        Clustering hierarchicalClustering = new HierarchicalClustering();
+        BNBuilder algorithm = new PGESwithStages(problem, hierarchicalClustering, 4, Integer.MAX_VALUE, Integer.MAX_VALUE, false);
+        algorithm.search();
+
+        // Create the set with some orders to use in rollout
+        Dag_n currentDag = algorithm.getCurrentDag();
+        for (int i = 0; i < 10000; i++) {
+            orderSet.add(problem.nodeToIntegerList(currentDag.getTopologicalOrder()));
+        }
+
+        System.out.println("\n\nFINISHED PGES (" + ((System.currentTimeMillis() - init)/1000.0) + " s). BDeu: " + GESThread.scoreGraph(algorithm.getCurrentDag(), problem));
+
+        this.pgesTime = (System.currentTimeMillis() - init)/1000.0;
+        this.pgesDag = currentDag;
+    }
+
+    /**
+     * Normalize (standardize) the sample, so it is has a mean of 0 and a standard deviation of 1.
+     *
+     * @param sample Sample to normalize.
+     * @return normalized (standardized) sample.
+     * @since 2.2
+     */
+    private void normalizeFit(double[] sample) {
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+
+        // Add the data from the series to stats
+        for (double v : sample) {
+            stats.addValue(v);
+        }
+
+        // Compute mean and standard deviation
+        mean = stats.getMean();
+        standardDeviation = stats.getStandardDeviation();
+    }
+
+    private double normalize_predict(double sample) {
+        return (sample - mean) / standardDeviation;
+    }
+    public void updateUCTList() {
+        //double best = Arrays.stream(hc.bestBDeuForNode).sum(); //best is never used as the bestAStar argument
+        for (TreeNode tn : candidates){
+            //tn.updateUCT(best);
+            tn.updateUCT(0);
+        }
+    }
 
     public Dag_n search(){
         State initialState = new State(-1, new ArrayList<>(), allVars, problem, 0, hc);
@@ -234,7 +360,7 @@ public class MCTSBN {
 
         //3. Rollout and Backpropagation
         expandedNodes.parallelStream().forEach(expandedNode -> {
-            double reward = rollout(expandedNode.getState());
+            double reward = rollout(expandedNode.getState(), new HillClimbingEvaluator(problem));
             backPropagate(expandedNode, normalize_predict(reward));
         });
 
@@ -261,32 +387,27 @@ public class MCTSBN {
         List<TreeNode> selection = new ArrayList<>();
         for (int i = 0; i < NUM_SELECTION; i++) {
 
-            // Getting the best node
-            if (this.selectionSet.size() <= 0) break;
-            TreeNode selectNode = Collections.max(this.selectionSet);
-
-            // Checking if the parent of the best node has already been expanded at least once
-            if (selectNode.getParent() == null || selectNode.getParent().isExpanded()) {
-                this.selectionSet.remove(selectNode);
-                selection.add(selectNode);
-            }
-            else {
-                // Parent has not been fully expanded, adding it for expansion
-                this.selectionSet.remove(selectNode.getParent());
-                selection.add(selectNode.getParent());
-            }
-            
+            TreeNode selectNode = selectCandidate();
+            if(selectNode == null)
+                break;
+            selection.add(selectNode);
             //System.out.println("SELECTED: " + printUCB(selectNode) + "   " + selectNode.getState().getNode());
         }
-        
-        /*for (TreeNode tn : selectionQueue) {
-            System.out.println(printUCB(tn));
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {}
-        }*/
-
         return selection;
+    }
+
+    private TreeNode selectCandidate() {
+        if(candidates.isEmpty())
+            return null;
+        // Getting the best node from the candidates queue.
+        TreeNode selectNode = candidates.poll();
+        // Checking if the parent of the best node has already been expanded at least once
+        if ((selectNode.getParent() != null) && (!selectNode.getParent().isExpanded())) {
+            // Updating selectNode to parent node and removing it from the candidates if it is already present.
+            candidates.remove(selectNode.getParent());
+            selectNode = selectNode.getParent();
+        }
+        return selectNode;
     }
     
     
@@ -303,7 +424,7 @@ public class MCTSBN {
             int nExpansion = 0;
 
             //1. Get all possible actions
-            List<Integer> actions = node.getState().getPossibleActionsbyOrder(getRandomOrder());
+            List<Integer> actions = node.getState().getPossibleActions(getRandomOrder());
             //2. Get actions already taken for this node
             Set<Integer> childrenActions = node.getChildrenAction();
             for (Integer action: actions) {
@@ -323,18 +444,51 @@ public class MCTSBN {
 
                     // 7. Adding the expanded node to the list and queue
                     expansion.add(newNode);
-                    selectionSet.add(newNode);
+                    candidates.add(newNode);
                     nExpansion++;
                 }
             }
         }
         return expansion;
     }
-    
+
+
+
+    /**
+     * Expands only one node and generates one node after applying an action generated from the pGES order
+     * @param selectedNode Node from the selection phase
+     * @return returns a child node after expanding the node.
+     */
+    public TreeNode expand(TreeNode selectedNode){
+        //1. Get all possible actions using as hint a pges order
+        List<Integer> actions = selectedNode.getState().getPossibleActions(getRandomOrder());
+        //Collections.shuffle(actions);
+        //2. Get actions already taken for this node
+        Set<Integer> childrenActions = selectedNode.getChildrenAction();
+        for (Integer action: actions) {
+            //3. Check if the actions has already been taken
+            if (!childrenActions.contains(action)){
+                // 4. Expand the tree by creating a new node and connecting it to the tree.
+                TreeNode newNode = new TreeNode(selectedNode.getState().takeAction(action), selectedNode);
+
+                // 5. Check if there are more actions to be expanded in this node, and if not, change the isFullyExpanded value
+                if(selectedNode.getChildrenAction().size() == actions.size())
+                    selectedNode.setFullyExpanded(true);
+
+                // 7. Adding the expanded node to the list and queue
+                candidates.add(newNode);
+                return newNode;
+            }
+        }
+        return null;
+    }
+
+
     /**
      * @param state State that provides the partial order for a final randomly generated order.
      * @return
      */
+    /*
     public double inverseRollout(State state){
         // Creating a total order with the partial order of the state.
         List<Integer> order = state.getOrder();
@@ -387,24 +541,14 @@ public class MCTSBN {
 
         return score;
     }
-
-    synchronized private void checkBestScore(double score, List<Integer> finalOrder, List<Integer> order) {
-        if(score > bestScore){
-            bestScore = score;
-            bestOrder = finalOrder;
-            bestPartialOrder = order;
-            bestDag = hc.getGraph();
-        }
-        //System.out.println("    Score: " + score);
-    }
-
+    */
 
     /**
      * Random policy rollout. Given a state with a partial order, we generate a random order that starts off with the initial order
      * @param state State that provides the partial order for a final randomly generated order.
      * @return
      */
-    public double rollout(State state){
+    public double rollout(State state, HillClimbingEvaluator evaluator){
         // Generating candidates and shuffling
         double scoreSum = 0;
 
@@ -428,24 +572,37 @@ public class MCTSBN {
             for (int j = 0; j < NUMBER_SWAPS * Math.sqrt(finalOrder.size()); j++) {
                 if (PROBABILITY_SWAP > 0 && random.nextDouble() <= PROBABILITY_SWAP) {
                     // Randomly swap two elements in the order
-                    int index1 = random.nextInt(finalOrder.size());
-                    int index2 = random.nextInt(finalOrder.size());
+                    int index1, index2;
+                    do {
+                        index1 = random.nextInt(finalOrder.size());
+                        index2 = random.nextInt(finalOrder.size());
+                    } while(index1 == index2);
                     Collections.swap(finalOrder, index1, index2);
                     //System.out.println("Swapping " + index1 + " and " + index2);
                 }
             }
 
-            hc.setOrder(finalOrder);
+            // BOOKMARK! EL PROBLEMA ES QUE SE COMPARTE EL HC ENTRE TODOS LOS HILOS.
+            evaluator.setOrder(finalOrder);
             
-            double score = hc.search();
+            double score = evaluator.search();
             scoreSum+= score;
             
             // Updating best score, order and graph
-            checkBestScore(score, finalOrder, order);
+            checkBestScore(score, finalOrder, evaluator.getGraph());
         }
         scoreSum = scoreSum / NUM_ROLLOUTS;
 
         return scoreSum;
+    }
+
+    synchronized private void checkBestScore(double score, List<Integer> finalOrder, Graph graph) {
+        if(score > bestScore){
+            bestScore = score;
+            bestOrder = finalOrder;
+            bestDag = graph;
+        }
+        //System.out.println("    Score: " + score);
     }
 
     /**
@@ -463,7 +620,8 @@ public class MCTSBN {
             currentNode.addReward(reward);
             
             if(!currentNode.isFullyExpanded()) {
-                selectionSet.add(currentNode);
+                candidates.add(currentNode);
+                //addCandidate(currentNode);
             }
 
             // Update currentNode to its parent.
@@ -472,50 +630,7 @@ public class MCTSBN {
     }
     
     private ArrayList<Integer> getRandomOrder() {
-        return new ArrayList(orderSet.get(random.nextInt(orderSet.size())));
-    }
-    
-    private void initializeWithPGES(int nThreads) {        
-        // Execute PGES to obtain a good order
-        double init = System.currentTimeMillis();
-        Clustering hierarchicalClustering = new HierarchicalClustering();
-        BNBuilder algorithm = new PGESwithStages(problem, hierarchicalClustering, nThreads, Integer.MAX_VALUE, Integer.MAX_VALUE, false);
-        algorithm.search();
-
-        // Create the set with some orders to use in rollout
-        Dag_n currentDag = algorithm.getCurrentDag();
-        for (int i = 0; i < 10000; i++) {
-            orderSet.add(hc.nodeToIntegerList(currentDag.getTopologicalOrder()));
-        }
-
-        System.out.println("\n\nFINISHED PGES (" + ((System.currentTimeMillis() - init)/1000.0) + " s). BDeu: " + GESThread.scoreGraph(algorithm.getCurrentDag(), problem));
-
-        this.PGESTime = (System.currentTimeMillis() - init)/1000.0;
-        this.PGESdag = currentDag;
-    }
-    
-    /**
-     * Normalize (standardize) the sample, so it is has a mean of 0 and a standard deviation of 1.
-     *
-     * @param sample Sample to normalize.
-     * @return normalized (standardized) sample.
-     * @since 2.2
-     */
-    private void normalize_fit(double[] sample) {
-        DescriptiveStatistics stats = new DescriptiveStatistics();
-
-        // Add the data from the series to stats
-        for (double v : sample) {
-            stats.addValue(v);
-        }
-
-        // Compute mean and standard deviation
-        mean = stats.getMean();
-        standardDeviation = stats.getStandardDeviation();
-    }
-    
-    private double normalize_predict(double sample) {
-        return (sample - mean) / standardDeviation;
+        return new ArrayList<>(orderSet.get(random.nextInt(orderSet.size())));
     }
 
     
@@ -527,21 +642,19 @@ public class MCTSBN {
                     MCTSBN.EXPLORATION_CONSTANT * Math.sqrt(Math.log(o.getParent().getNumVisits()) / o.getNumVisits());
     }
     
-    public void updateUCTList() {
-        double best = Arrays.stream(hc.bestBDeuForNode).sum();
-        for (TreeNode tn : selectionSet){
-            tn.updateUCT(best);
-        }
-    }
+
     
     
     private void saveRound(int iteration, double totalTimeRound) {
+        if(csvWriter == null){
+            return;
+        }
         try {
             //System.out.println("Best order:      " + bestScore + "\t-> " + bestOrder);
             //System.out.println("Best order: " + toStringOrder(bestOrder));
             //System.out.println("------------------------------------------------------");
 
-            String result = (firstPart
+            String result = (header
                     + bestScore + ","
                     + iteration + ","
                     + totalTimeRound + "\n");
@@ -597,8 +710,18 @@ public class MCTSBN {
     }
 
     public Dag_n getPGESDag() {
-        return PGESdag;
+        return pgesDag;
     }
+
+
+    public boolean isDistributed() {
+        return isDistributed;
+    }
+
+    public void setDistributed(boolean distributed) {
+        isDistributed = distributed;
+    }
+
 
     @Override
     public String toString() {
@@ -616,7 +739,7 @@ public class MCTSBN {
     public String queueToString(){
         String res = "";
         res += ("\n\nEN COLA: \n");
-        for (TreeNode tn : selectionSet) {
+        for (TreeNode tn : candidates) {
             double explotationScore = ((tn.getTotalReward() / tn.getNumVisits()) - Problem.emptyGraphScore) / Problem.nInstances;
             double explorationScore = 0;
             if (tn.getParent() != null)
@@ -626,5 +749,17 @@ public class MCTSBN {
 
         return res;
     }
+
+    public HillClimbingEvaluator getHc() {
+        return hc;
+    }
+
+    public boolean getIsDistributed(){
+        return isDistributed;
+    }
+    public void setIsDistributed(boolean isDistributed){
+        this.isDistributed = isDistributed;
+    }
+
 
 }

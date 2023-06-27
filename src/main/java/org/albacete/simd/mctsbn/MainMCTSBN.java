@@ -4,7 +4,6 @@ import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DelimiterType;
-import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.threads.GESThread;
@@ -20,28 +19,53 @@ public class MainMCTSBN {
 
     public static void main(String[] args) {
         String networkFolder = "./res/networks/";
-        String net_name = "link";
-        String bbdd_path = networkFolder + "BBDD/" + net_name + ".ALL.csv";
+        String net_name = "andes";
+        String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif_.csv";//".ALL.csv";
         String netPath = networkFolder + net_name + ".xbif";
 
 
+        // Creating MCTSBN
         Problem problem = new Problem(bbdd_path);
-
-        MCTSBN mctsbn = new MCTSBN(problem, 300);
-
+        MCTSBN mctsbnSequencial = new MCTSBN(problem, 2400);
+        mctsbnSequencial.setDistributed(false);
         MCTSBN.NUMBER_SWAPS = 0.2;
         MCTSBN.PROBABILITY_SWAP = 0.2;
 
+        Problem problem2 = new Problem(bbdd_path);
+        MCTSBN mctsbnDistributed = new MCTSBN(problem2, 300);
+        mctsbnSequencial.setDistributed(true);
+        MCTSBN.NUMBER_SWAPS = 0.2;
+        MCTSBN.PROBABILITY_SWAP = 0.2;
+
+        // Setting initial time and end hook
+        System.out.println("Starting MCTSBN-Sequential");
         long startTime = System.currentTimeMillis();
-        addEndHook(mctsbn,startTime, netPath, problem);
+        //addEndHook(mctsbnSequencial,startTime, netPath, problem);
 
-        Dag_n result = mctsbn.search();
+        // Running MCTSBNSequencial
+        Dag_n result = mctsbnSequencial.search();
         long endTime = System.currentTimeMillis();
-        double score = GESThread.scoreGraph(result, problem);
+        double scoreSeq = GESThread.scoreGraph(result, problem);
+        System.out.println("MCTSBN-Sequential FINISHED!");
 
-        System.out.println("MCTSBN FINISHED!");
-        //System.out.println("Total time: " + (endTime - startTime)*1.0 / 1000);
-        //System.out.println("Score: " + score);
+        //Running Distributed with 8 Selection nodes
+        MCTSBN.NUM_SELECTION=8;
+        System.out.println("Starting MCTSBN-Distributed");
+        long startTime2 = System.currentTimeMillis();
+        Dag_n result2 = mctsbnDistributed.search();
+        long endTime2 = System.currentTimeMillis();
+        double scoreDis = GESThread.scoreGraph(result2,problem);
+        System.out.println("MCTSBN-Distributed FINISHED!");
+
+        // Printing results
+        System.out.println("MCTSBN-Sequential FINISHED!");
+        System.out.println("Total time: " + (endTime - startTime)*1.0 / 1000);
+        System.out.println("Score: " + scoreSeq);
+
+        System.out.println("MCTSBN-Distributed FINISHED!");
+        System.out.println("Total time: " + (endTime2 - startTime2)*1.0 / 1000);
+        System.out.println("Score: " + scoreDis);
+
         //System.out.println("Best Order");
         //System.out.println(toStringOrder(mctsbn.getBestOrder()));
         //System.out.println("Best Dag: ");
@@ -73,7 +97,7 @@ public class MainMCTSBN {
                     throw new RuntimeException(e);
                 }
 
-                HillClimbingEvaluator hc = mctsbn.hc;
+                HillClimbingEvaluator hc = mctsbn.getHc();
 
                 Dag_n dagOriginal = new Dag_n(controlBayesianNetwork.getDag());
                 ArrayList<Node> ordenOriginal = dagOriginal.getTopologicalOrder();

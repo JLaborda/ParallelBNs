@@ -8,12 +8,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class TreeNode implements Comparable<TreeNode>{
 
     private final State state;
     private final TreeNode parent;
-    private Set<TreeNode> children = new HashSet<>();
+    private Set<TreeNode> children = new CopyOnWriteArraySet<>();
     
     private int numVisits = 0;
     private double totalReward = 0;
@@ -68,7 +69,7 @@ public class TreeNode implements Comparable<TreeNode>{
     }
 
     public Set<Integer> getChildrenAction(){
-        Set<Integer> actions = new HashSet<>();
+        Set<Integer> actions = new CopyOnWriteArraySet<>();
         for (TreeNode child: children) {
             actions.add(child.state.getNode());
         }
@@ -114,10 +115,6 @@ public class TreeNode implements Comparable<TreeNode>{
 
     public boolean isExpanded() {
         return isExpanded;
-    }
-
-    public void setExpanded(boolean expanded) {
-        isExpanded = expanded;
     }
 
     @Override

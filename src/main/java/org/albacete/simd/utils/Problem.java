@@ -8,6 +8,7 @@ import edu.cmu.tetrad.graph.Node;
 import edu.cmu.tetrad.search.BDeuScore;
 import org.albacete.simd.threads.GESThread;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -217,6 +218,18 @@ public class Problem {
                 return node;
         }
         return null;
+    }
+
+    public ArrayList<Integer> nodeToIntegerList(List<Node> nodes){
+        ArrayList<Integer> integers = new ArrayList<>(nodes.size());
+        for (Node node : nodes) {
+            integers.add(nodeToInteger(node));
+        }
+        return integers;
+    }
+
+    public int nodeToInteger(Node node){
+        return this.hashIndices.get(node);
     }
 
 

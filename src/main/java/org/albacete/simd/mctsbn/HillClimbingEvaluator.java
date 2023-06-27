@@ -42,9 +42,21 @@ public class HillClimbingEvaluator {
         metric = new BDeuScore(problem.getData());
     }
 
+    public HillClimbingEvaluator(Problem problem){
+        this(problem, problem.getLocalScoreCache());
+    }
+
     public HillClimbingEvaluator(Problem problem, List<Integer> order, ConcurrentHashMap<String,Double> localScoreCache){
         this(problem, localScoreCache);
         setOrder(order);
+    }
+
+    public static List<HillClimbingEvaluator> createEvaluators(int n, Problem problem){
+        List<HillClimbingEvaluator> evaluators = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            evaluators.add(new HillClimbingEvaluator(problem));
+        }
+        return evaluators;
     }
 
 
@@ -109,9 +121,12 @@ public class HillClimbingEvaluator {
         }
         
         // Updating best BDeu for Node
+        /*
         if (bdeuFinal > bestBDeuForNode[child]) {
             bestBDeuForNode[child] = bdeuFinal;
         }
+        */
+
         
         return new Pair(child,parents,bdeuFinal);
     }
@@ -218,32 +233,14 @@ public class HillClimbingEvaluator {
         this.order = order;
     }
      
-    public ArrayList<Integer> nodeToIntegerList(List<Node> nodes){
-        ArrayList<Integer> integers = new ArrayList(nodes.size());
-        for (Node node : nodes) {
-            integers.add(nodeToInteger(node));
-        }
-        return integers;
-    }
-    
-    public int nodeToInteger(Node node){
-        return problem.getHashIndices().get(node);
-    }
 
-    public int[] nodesToInteger(List<Node> nodes){
-        int[] integers = new int[nodes.size()];
-        for (int i = 0; i < nodes.size(); i++) {
-            integers[i] = nodeToInteger(nodes.get(i));
-        }
-        return integers;
-    }
     
     public class Pair implements Comparable<Pair> {
         public final int node;
-        public final Set set;
+        public final Set<Integer> set;
         public final double bdeu;
 
-        public Pair(int node, Set a, double b) {
+        public Pair(int node, Set<Integer> a, double b) {
             this.node = node;
             this.set = a;
             this.bdeu = b;

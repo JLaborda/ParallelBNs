@@ -51,7 +51,7 @@ public class State {
         return possibleActions;
     }
     
-    public List<Integer> getPossibleActionsbyOrder(ArrayList<Integer> orderPGES){
+    public List<Integer> getPossibleActions(ArrayList<Integer> orderPGES){
         List<Integer> possibleActions = new ArrayList<>();
         for(Integer var : orderPGES){
             if(!order.contains(var)){

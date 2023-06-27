@@ -43,13 +43,13 @@ public class MainHCEvaluator {
         bestOrder.add(problem.getNode("CO2Report"));
         bestOrder.add(problem.getNode("XrayReport"));
 */
-        ConcurrentHashMap<String,Double> cache = new ConcurrentHashMap();
+        ConcurrentHashMap<String,Double> cache = new ConcurrentHashMap<>();
         long startTime1 = System.currentTimeMillis();
         for (int i = 0; i < 60; i++) {
 
             HillClimbingEvaluator hc = new HillClimbingEvaluator(problem, cache);
             
-            List<Integer> order = new ArrayList<>(hc.nodeToIntegerList(problem.getVariables()));
+            List<Integer> order = new ArrayList<>(problem.nodeToIntegerList(problem.getVariables()));
             Random random = new Random(i);
             Collections.shuffle(order, random);
         
