@@ -4,172 +4,177 @@ import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DelimiterType;
+import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.mctsbn.HillClimbingEvaluator;
-import org.albacete.simd.mctsbn.MCTSBN;
 import org.albacete.simd.threads.GESThread;
 import org.albacete.simd.utils.Problem;
 import org.albacete.simd.utils.Utils;
+import org.jetbrains.annotations.NotNull;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ExperimentMCTSLauncher {
     public static void main(String[] args) throws Exception {
+        // Reading parameters
         int index = Integer.parseInt(args[0]);
         String paramsFileName = args[1];
-        int threads = Integer.parseInt(args[2]);
+        //int threads = Integer.parseInt(args[2]);
+        String [] parameters = Utils.readParameters(paramsFileName, index);
 
-        String[] parameters = readParameters(paramsFileName, index);
+        // Creating experiment
+        String savePath = createSavePath(parameters);
+        ExperimentMCTS experimentMCTS = new ExperimentMCTS(parameters, savePath);
 
+        // Defining time variables
+        long startTime, endTime;
+
+
+        // Running the experiment
+        Dag_n resultMCTS = experimentMCTS.runExperiment();
+        if(resultMCTS == null){
+            System.out.println("Experiment has already been done before");
+            System.exit(0);
+        }
+
+        // Creating Original Dag
+        String netPath = parameters[2];
+        Dag controlDag = Utils.createOriginalDAG(netPath);
+        Dag_n dagOriginal = new Dag_n(controlDag);
+
+        // Setting up HC Control
+        Problem problem = experimentMCTS.getProblem();
+        HillClimbingEvaluator hc = setupHC(dagOriginal, problem);
+
+        // Running HC
+        startTime = System.currentTimeMillis();
+        hc.search();
+        endTime = System.currentTimeMillis();
+        Dag_n hcDag = new Dag_n(hc.getGraph());
+
+        // Computing results from experiments and contorl
+        // HC with perfect order
+        double bdeuHCPerfect = GESThread.scoreGraph(hcDag, problem);
+        double shdHCPerfect = Utils.SHD(Utils.removeInconsistencies(controlDag), hcDag);
+        double timeHCPerfect = (double) (endTime - startTime) / 1000;
+        System.out.println("\n Best HC: \n    BDeu: " + bdeuHCPerfect + "\n    SHD: " + shdHCPerfect + "\n\tTime(s): " + timeHCPerfect);
+
+        // GroundTruth DAG
+        double bdeuOriginal = GESThread.scoreGraph(dagOriginal, problem);
+        double shdOriginal = Utils.SHD(Utils.removeInconsistencies(controlDag), dagOriginal);
+        System.out.println("\n Original: \n    BDeu: " + bdeuOriginal + "\n    SHD: " + shdOriginal + "\n\tTime(s): " + 0.0);
+
+        // Results from initial PGES in MCTS
+        Dag_n PGESdag = new Dag_n(experimentMCTS.getPGESDag());
+        double bdeuPGES = GESThread.scoreGraph(PGESdag, problem);
+        double shdPGES = Utils.SHD(Utils.removeInconsistencies(controlDag), PGESdag);
+        double timePGES = experimentMCTS.getPGESTime();
+        System.out.println("\n PGES: \n    BDeu: " + bdeuPGES + "\n    SHD: " + shdPGES + "\n\tTime(s): " + timePGES);
+
+        // Results from MCTSBN
+        double bdeuMCTS = GESThread.scoreGraph(resultMCTS, problem);
+        double shdMCTS = Utils.SHD(Utils.removeInconsistencies(controlDag), resultMCTS);
+        double mctsbnTimeSeconds = experimentMCTS.getTotalTime();
+        System.out.println("\n MCTS: \n\tBDeu: " + bdeuMCTS + "\n\tSHD: " + shdMCTS + "\n\tTime(s): " + mctsbnTimeSeconds);
+
+        saveExperiment(parameters, experimentMCTS, bdeuHCPerfect, shdHCPerfect, timeHCPerfect, bdeuOriginal, shdOriginal, bdeuPGES, shdPGES, bdeuMCTS, shdMCTS);
+    }
+
+    private static String createSavePath(String[] parameters){
+        String resultsFolder = "results/";
+        String expHeader = "experiment_";
         String algName = parameters[0];
         String netName = parameters[1];
-        String netPath = parameters[2];
         String databasePath = parameters[3];
-        String databaseName = getDatabaseNameFromPattern(databasePath);
+        String databaseName = Utils.getDatabaseNameFromPattern(databasePath);
         int iterationLimit = Integer.parseInt(parameters[4]);
         double exploitConstant = Double.parseDouble(parameters[5]);
         double numberSwaps = Double.parseDouble(parameters[6]);
-        double probabilitySwap = Double.parseDouble(parameters[7]);
+        double probabilitySwaps = Double.parseDouble(parameters[7]);
 
-        String savePath = "results/experiment_" + netName + "_" + algName + "_" +
-                databaseName + "_t" + threads + "_it" + iterationLimit + "_ex" + exploitConstant
-                + "_ps" + numberSwaps + "_ns" + probabilitySwap + ".csv";
+
+        return resultsFolder + expHeader + netName + "_" + algName + "_" +
+                databaseName + "_it" + iterationLimit + "_ex" + exploitConstant
+                + "_ps" + numberSwaps + "_ns" + probabilitySwaps + ".csv";
+
+    }
+
+    private static void saveExperiment(String[] parameters, ExperimentMCTS experimentMCTS, double bdeuHCPerfect, double shdHCPerfect, double timeHCPerfect, double bdeuOriginal, double shdOriginal, double bdeuPGES, double shdPGES, double bdeuMCTS, double shdMCTS) throws IOException {
+
+        // Saving results
+        String savePath = experimentMCTS.getSavePath();
+        String algName = parameters[0];
+        String netName = parameters[1];
+        String databasePath = parameters[3];
+        String databaseName = Utils.getDatabaseNameFromPattern(databasePath);
+        int iterationLimit = Integer.parseInt(parameters[4]);
+        double exploitConstant = Double.parseDouble(parameters[5]);
+        double numberSwaps = Double.parseDouble(parameters[6]);
+        double probabilitySwaps = Double.parseDouble(parameters[7]);
+
+        double timeMCTS = experimentMCTS.getTotalTime();
+        double timePGES = experimentMCTS.getPGESTime();
+
         File file = new File(savePath);
-
-        // Si no existe el fichero
         if(file.length() == 0) {
-            Problem problem = new Problem(databasePath);
-            MCTSBN mctsbn = new MCTSBN(problem, iterationLimit, netName, databaseName, threads, exploitConstant, numberSwaps, probabilitySwap);
-            MCTSBN.EXPLOITATION_CONSTANT = exploitConstant;
-            MCTSBN.NUMBER_SWAPS = numberSwaps;
-            MCTSBN.PROBABILITY_SWAP = probabilitySwap;
+            BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
+            String header = "algorithm,network,bbdd,threads,itLimit,exploitConst,numSwaps,probSwap,bdeuMCTS,shdMCTS,timeMCTS,bdeuPGES,shdPGES,timePGES,bdeuOrig,shdOrig,bdeuPerfect,shdPerfect,timePerfect\n";
+            csvWriter.append(header);
 
-            double init = System.currentTimeMillis();
-            Dag_n result = mctsbn.search();
-            double time = (System.currentTimeMillis() - init)/1000.0;
+            String results = (algName + ","
+                    + netName + ","
+                    + databaseName + ","
+                    + Runtime.getRuntime().availableProcessors() + ","
+                    + iterationLimit + ","
+                    + exploitConstant + ","
+                    + numberSwaps + ","
+                    + probabilitySwaps + ","
+                    + bdeuMCTS + ","
+                    + shdMCTS + ","
+                    + timeMCTS + ","
+                    + bdeuPGES + ","
+                    + shdPGES + ","
+                    + timePGES + ","
+                    + bdeuOriginal + ","
+                    + shdOriginal + ","
+                    + bdeuHCPerfect + ","
+                    + shdHCPerfect + ","
+                    + timeHCPerfect + "\n");
+            csvWriter.append(results);
+            csvWriter.flush();
+            csvWriter.close();
+        }
+    }
 
-
-            // Calculate scores
-            MlBayesIm controlBayesianNetwork;
-            try {
-                controlBayesianNetwork = readOriginalBayesianNetwork(netPath);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            HillClimbingEvaluator hc = mctsbn.getHc();
-
-            Dag_n dagOriginal = new Dag_n(controlBayesianNetwork.getDag());
-            ArrayList<Node> ordenOriginal = dagOriginal.getTopologicalOrder();
-            ArrayList<Integer> ordenNuevosNodos = new ArrayList<>(ordenOriginal.size());
-            for (Node node : ordenOriginal) {
-                for (Node node2 : problem.getVariables()) {
-                    if (node.getName().equals(node2.getName())) {
-                        ordenNuevosNodos.add(problem.getHashIndices().get(node2));
-                    }
+    @NotNull
+    private static ArrayList<Integer> parseOriginalNodesToIntegers(Dag_n dagOriginal, Problem problem) {
+        ArrayList<Node> ordenOriginal = dagOriginal.getTopologicalOrder();
+        ArrayList<Integer> ordenNuevosNodos = new ArrayList<>(ordenOriginal.size());
+        for (Node node : ordenOriginal) {
+            for (Node node2 : problem.getVariables()) {
+                if (node.getName().equals(node2.getName())) {
+                    ordenNuevosNodos.add(problem.getHashIndices().get(node2));
                 }
             }
-            hc.setOrder(ordenNuevosNodos);
-            hc.search();
-            Dag_n hcDag = new Dag_n(hc.getGraph());
-            double bdeuHCPerfect = GESThread.scoreGraph(hcDag, problem);
-            double shdHCPerfect = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), hcDag);
-            System.out.println("\n Best HC: \n    BDeu: " + bdeuHCPerfect + "\n    SHD: " + shdHCPerfect);
-
-            double bdeuOriginal = GESThread.scoreGraph(dagOriginal, problem);
-            double shdOriginal = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), dagOriginal);
-            System.out.println("\n Original: \n    BDeu: " + bdeuOriginal + "\n    SHD: " + shdOriginal);
-
-            Dag_n PGESdag = new Dag_n(mctsbn.getPGESDag());
-            double bdeuPGES = GESThread.scoreGraph(PGESdag, problem);
-            double shdPGES = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), PGESdag);
-            System.out.println("\n PGES: \n    BDeu: " + bdeuPGES + "\n    SHD: " + shdPGES);
-
-            double bdeuMCTS = GESThread.scoreGraph(result, problem);
-            double shdMCTS = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), result);
-            System.out.println("\n MCTS: \n    BDeu: " + bdeuMCTS + "\n    SHD: " + shdMCTS);
-
-            file = new File(savePath);
-            if(file.length() == 0) {
-                BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
-                String header = "algorithm,network,bbdd,threads,itLimit,exploitConst,numSwaps,probSwap,bdeuMCTS,shdMCTS,bdeuPGES,shdPGES,bdeuOrig,shdOrig,bdeuPerfect,shdPerfect,timePGES,time\n";
-                csvWriter.append(header);
-
-                String results = (algName + ","
-                        + netName + ","
-                        + databaseName + ","
-                        + threads + ","
-                        + iterationLimit + ","
-                        + exploitConstant + ","
-                        + numberSwaps + ","
-                        + probabilitySwap + ","
-                        + bdeuMCTS + ","
-                        + shdMCTS + ","
-                        + bdeuPGES + ","
-                        + shdPGES + ","
-                        + bdeuOriginal + ","
-                        + shdOriginal + ","
-                        + bdeuHCPerfect + ","
-                        + shdHCPerfect + ","
-                        + (double) mctsbn.pgesTime + ","
-                        + (double) time + "\n");
-                csvWriter.append(results);
-                csvWriter.flush();
-                csvWriter.close();
-            }
         }
-        else {
-            System.out.println("Experimento:  " + savePath + "    ya existente.");
-        }
+        return ordenNuevosNodos;
     }
 
-    private static String getDatabaseNameFromPattern(String databasePath){
-        // Matching the end of the csv file to get the name of the database
-        Pattern pattern = Pattern.compile(".*/(.*).csv");
-        Matcher matcher = pattern.matcher(databasePath);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
+
+
+    private static HillClimbingEvaluator setupHC(Dag_n dagOriginal, Problem problem) {
+
+        HillClimbingEvaluator hc = new HillClimbingEvaluator(problem);
+        ArrayList<Integer> ordenNuevosNodos = parseOriginalNodesToIntegers(dagOriginal, problem);
+        hc.setOrder(ordenNuevosNodos);
+        return hc;
     }
 
-    public static String[] readParameters(String paramsFileName, int index) throws Exception {
-        String[] parameterStrings = null;
-        try (BufferedReader br = new BufferedReader(new FileReader(paramsFileName))) {
-            String line;
-            for (int i = 0; i < index; i++)
-                br.readLine();
-            line = br.readLine();
-            parameterStrings = line.split(" ");
-        }
-        catch(FileNotFoundException e){
-            System.out.println(e);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return parameterStrings;
-    }
 
-    private static MlBayesIm readOriginalBayesianNetwork(String netPath) throws Exception {
-        BIFReader bayesianReader = new BIFReader();
-        bayesianReader.processFile(netPath);
-        BayesNet bayesianNet = bayesianReader;
-        System.out.println("Numero de variables: " + bayesianNet.getNrOfNodes());
 
-        //Transforming the BayesNet into a BayesPm
-        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bayesianNet);
-        MlBayesIm bn2 = new MlBayesIm(bayesPm);
-
-        DataReader reader = new DataReader();
-        reader.setDelimiter(DelimiterType.COMMA);
-        reader.setMaxIntegralDiscrete(100);
-        return bn2;
-    }
 
 }

@@ -350,7 +350,7 @@ public class GESThreadTest {
      * @result This test should be true
      */
     @Test
-    public void ifNaYXTListContainsYisSemiDirectedBlockedShouldBeFalseTest() {
+    public void ifNaYXTListContainsYisSemiDirectedBlockedShouldBeTrueTest() {
         // Arrange
         // Nodes
         Node X = new GraphNode("X");
@@ -372,7 +372,7 @@ public class GESThreadTest {
         boolean result = GESThread.isSemiDirectedBlocked(X, Y, naYXT, g, null);
 
         // Assert
-        assertFalse(result);
+        assertTrue(result);
     }
 
     /**

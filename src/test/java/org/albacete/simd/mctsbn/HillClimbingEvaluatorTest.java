@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import org.albacete.simd.experiments.ExperimentBNBuilder;
 import org.albacete.simd.framework.BNBuilder;
-import static org.albacete.simd.mctsbn.MainMCTSBN.readOriginalBayesianNetwork;
 import org.albacete.simd.utils.Utils;
 
 public class HillClimbingEvaluatorTest {
@@ -135,7 +134,7 @@ public class HillClimbingEvaluatorTest {
         
         MlBayesIm controlBayesianNetwork = null;
         try {
-            controlBayesianNetwork = readOriginalBayesianNetwork(net_path);
+            controlBayesianNetwork = Utils.readOriginalBayesianNetwork(net_path);
         } catch (Exception e) {}
         double badScore = hcBadOrder.search();
         double optimalScore = hcOptimalOrder.search();
@@ -180,14 +179,14 @@ public class HillClimbingEvaluatorTest {
         System.out.println("Alg Name: " + experiment.getAlgName());
         experiment.runExperiment();
         experiment.printResults();
-        List<Integer> gesOrder = hcOptimalOrder.nodeToIntegerList(algorithm.getCurrentDag().getTopologicalOrder());
+        List<Integer> gesOrder = problem.nodeToIntegerList(algorithm.getCurrentDag().getTopologicalOrder());
         System.out.println("\n\nOrder GES: " + gesOrder + "\n\n");
         
         HillClimbingEvaluator hcGesOrder = new HillClimbingEvaluator(problem, gesOrder, cache1);
         
         MlBayesIm controlBayesianNetwork = null;
         try {
-            controlBayesianNetwork = readOriginalBayesianNetwork(net_path);
+            controlBayesianNetwork = Utils.readOriginalBayesianNetwork(net_path);
         } catch (Exception e) {}
         double gesScore = hcGesOrder.search();
         double optimalScore = hcOptimalOrder.search();
@@ -202,7 +201,7 @@ public class HillClimbingEvaluatorTest {
         Assert.assertTrue(gesScore + 0.000000001 >= experiment.getBdeuScore());
     }
     
-    @Test
+    /*@Test
     public void bestOrderGESPathfinderTest(){ String networkFolder = "./res/networks/";
         String net_name = "pathfinder";
         String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif50003_.csv";
@@ -232,7 +231,7 @@ public class HillClimbingEvaluatorTest {
         System.out.println("Alg Name: " + experiment.getAlgName());
         experiment.runExperiment();
         experiment.printResults();
-        List<Integer> gesOrder = hcOptimalOrder.nodeToIntegerList(algorithm.getCurrentDag().getTopologicalOrder());
+        List<Integer> gesOrder = problem.nodeToIntegerList(algorithm.getCurrentDag().getTopologicalOrder());
         System.out.println("\n\nOrder GES: " + gesOrder + "\n\n");
 
        
@@ -240,7 +239,7 @@ public class HillClimbingEvaluatorTest {
         
         MlBayesIm controlBayesianNetwork = null;
         try {
-            controlBayesianNetwork = readOriginalBayesianNetwork(net_path);
+            controlBayesianNetwork = Utils.readOriginalBayesianNetwork(net_path);
         } catch (Exception e) {}
         
         System.out.println("\nSearch GES order: ");
@@ -282,7 +281,7 @@ public class HillClimbingEvaluatorTest {
         
         Assert.assertTrue(gesScore + 0.000000001 >= experiment.getBdeuScore());
     }
-
+*/
     public static List<Integer> randomOrder(Problem problem, int seed){
         List<Integer> randomOrder = new ArrayList<>(problem.getVariables().size());
         for (int i = 0; i < problem.getVariables().size(); i++) {

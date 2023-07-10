@@ -1,19 +1,8 @@
 package org.albacete.simd.experiments;
 
-import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
-import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
-import org.albacete.simd.clustering.Clustering;
-import org.albacete.simd.clustering.HierarchicalClustering;
-import org.albacete.simd.clustering.RandomClustering;
-import org.albacete.simd.framework.BNBuilder;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
-
-import java.io.BufferedReader;
+import org.albacete.simd.utils.Utils;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -38,7 +27,7 @@ public class ExperimentBNLauncher {
     public static void main(String[] args) throws Exception {
 
         ExperimentBNLauncher experimentBNLauncher = getExperimentBNLauncherFromCommandLineArguments(args);
-        String[] parameters = experimentBNLauncher.readParameters();
+        String[] parameters = Utils.readParameters(experimentBNLauncher.paramsFileName, experimentBNLauncher.index);
 
         System.out.println("Launching experiment");
         experimentBNLauncher.createExperiment(parameters);
@@ -67,23 +56,6 @@ public class ExperimentBNLauncher {
         String saveFolder = args.length == 4 ? args[3] : "results/";
         
         return new ExperimentBNLauncher(index, paramsFileName, threads, saveFolder);
-    }
-
-    public String[] readParameters() throws Exception {
-        String[] parameterStrings = null;
-        try (BufferedReader br = new BufferedReader(new FileReader(paramsFileName))) {
-            String line;
-            for (int i = 0; i < index; i++)
-                br.readLine();
-            line = br.readLine();
-            parameterStrings = line.split(" ");
-        }
-        catch(FileNotFoundException e){
-            System.out.println(e);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return parameterStrings;
     }
 
     private void createExperiment(String[] parameters){

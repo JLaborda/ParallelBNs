@@ -775,6 +775,10 @@ public final class Dag_n implements Graph {
     public void addAttribute(String key, Object value) {
         this.attributes.put(key, value);
     }
+
+    public Dag toDag(){
+        return new Dag(this.graph);
+    }
 }
 
 

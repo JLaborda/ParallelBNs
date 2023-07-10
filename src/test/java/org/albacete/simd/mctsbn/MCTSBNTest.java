@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
 import org.albacete.simd.experiments.ExperimentBNBuilder;
 import org.albacete.simd.framework.BNBuilder;
-import static org.albacete.simd.mctsbn.MainMCTSBN.readOriginalBayesianNetwork;
 import org.albacete.simd.utils.Utils;
 
 

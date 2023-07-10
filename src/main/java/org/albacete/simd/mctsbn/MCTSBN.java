@@ -2,6 +2,7 @@ package org.albacete.simd.mctsbn;
 
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Graph;
+import me.tongfei.progressbar.ProgressBar;
 import org.albacete.simd.utils.Problem;
 
 import java.io.BufferedWriter;
@@ -43,16 +44,14 @@ public class MCTSBN {
     
     public static int NUM_ROLLOUTS = 1;
 
-    public static int NUM_SELECTION = 1;
+    public int NUM_SELECTION = 1;
 
     public static int NUM_EXPAND = 1;
-    
-    private static final int RANDOM_SELECTIONS = 3;
 
     /**
      * Problem of the search
      */
-    private final Problem problem;
+    private Problem problem;
     
     private final ArrayList<Integer> allVars;
 
@@ -94,8 +93,9 @@ public class MCTSBN {
         this.candidates = new MCTSQueue<>(problem.getVariables().size(), TreeNode::compareTo);
     }
 
-    public MCTSBN(Problem problem, int iterationLimit, String netName, String databaseName, int threads, double exploitConstant, double numberSwaps, double probabilitySwap){
+    public MCTSBN(Problem problem, int iterationLimit, String netName, String databaseName, int threads, double exploitConstant, double numberSwaps, double probabilitySwap, int selectionConstant){
         this(problem, iterationLimit);
+        this.NUM_SELECTION = selectionConstant;
         configSaveFile(iterationLimit, netName, databaseName, threads, exploitConstant, numberSwaps, probabilitySwap);
     }
 
@@ -124,24 +124,28 @@ public class MCTSBN {
         initialConfiguration(initialState);
 
         //2. Search loop
-        for (int i = 0; i < ITERATION_LIMIT; i++) {
-            //System.out.println("Iteration " + i + "...");
+        try (ProgressBar pb = new ProgressBar("MCTSBN", ITERATION_LIMIT)){
+            for (int i = 0; i < ITERATION_LIMIT; i++) {
+                pb.step();
+                //System.out.println("Iteration " + i + "...");
 
-            // Executing round
-            long startTime = System.currentTimeMillis();
-            executeRound();
-            long endTime = System.currentTimeMillis();
-            // Calculating time of the iteration
-            double totalTimeRound = 1.0 * (endTime - startTime) / 1000;
+                // Executing round
+                long startTime = System.currentTimeMillis();
+                executeRound();
+                long endTime = System.currentTimeMillis();
+                // Calculating time of the iteration
+                double totalTimeRound = 1.0 * (endTime - startTime) / 1000;
 
-            // Showing tree structure
-            //System.out.println("Tree Structure:");
-            //System.out.println(this);
+                // Showing tree structure
+                //System.out.println("Tree Structure:");
+                //System.out.println(this);
 
-            saveRound(i, totalTimeRound);
-            if(convergence){
-                System.out.println("Convergence has been found. Ending search");
-                break;
+                saveRound(i, totalTimeRound);
+                if (convergence) {
+                    System.out.println("Convergence has been found. Ending search");
+                    pb.stepTo(ITERATION_LIMIT);
+                    break;
+                }
             }
         }
         if(csvWriter != null) {
@@ -760,6 +764,23 @@ public class MCTSBN {
     public void setIsDistributed(boolean isDistributed){
         this.isDistributed = isDistributed;
     }
+
+    public Problem getProblem(){
+        return this.problem;
+    }
+
+    public void setProblem(Problem problem){
+        this.problem = problem;
+    }
+
+    public int getNUM_SELECTION() {
+        return NUM_SELECTION;
+    }
+
+    public void setNUM_SELECTION(int NUM_SELECTION) {
+        this.NUM_SELECTION = NUM_SELECTION;
+    }
+
 
 
 }

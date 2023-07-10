@@ -4,6 +4,7 @@ import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DelimiterType;
+import edu.cmu.tetrad.graph.Dag;
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.threads.GESThread;
@@ -17,25 +18,28 @@ import java.util.ArrayList;
 
 public class MainMCTSBN {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         String networkFolder = "./res/networks/";
-        String net_name = "andes";
+        String net_name = "alarm";
         String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif_.csv";//".ALL.csv";
         String netPath = networkFolder + net_name + ".xbif";
 
+        System.out.println(netPath);
+        Dag originalDag = Utils.createOriginalDAG(netPath);
+        Dag_n originalDagn = new Dag_n(originalDag);
 
         // Creating MCTSBN
         Problem problem = new Problem(bbdd_path);
-        MCTSBN mctsbnSequencial = new MCTSBN(problem, 2400);
+        MCTSBN mctsbnSequencial = new MCTSBN(problem, 10000);
         mctsbnSequencial.setDistributed(false);
-        MCTSBN.NUMBER_SWAPS = 0.2;
-        MCTSBN.PROBABILITY_SWAP = 0.2;
+        MCTSBN.NUMBER_SWAPS = 0;
+        MCTSBN.PROBABILITY_SWAP = 0;
 
         Problem problem2 = new Problem(bbdd_path);
-        MCTSBN mctsbnDistributed = new MCTSBN(problem2, 300);
+        MCTSBN mctsbnDistributed = new MCTSBN(problem2, 5000);
         mctsbnSequencial.setDistributed(true);
-        MCTSBN.NUMBER_SWAPS = 0.2;
-        MCTSBN.PROBABILITY_SWAP = 0.2;
+        MCTSBN.NUMBER_SWAPS = 0;
+        MCTSBN.PROBABILITY_SWAP = 0;
 
         // Setting initial time and end hook
         System.out.println("Starting MCTSBN-Sequential");
@@ -46,25 +50,30 @@ public class MainMCTSBN {
         Dag_n result = mctsbnSequencial.search();
         long endTime = System.currentTimeMillis();
         double scoreSeq = GESThread.scoreGraph(result, problem);
+        double shdSeq = Utils.SHD(result, originalDagn);
+
         System.out.println("MCTSBN-Sequential FINISHED!");
 
         //Running Distributed with 8 Selection nodes
-        MCTSBN.NUM_SELECTION=8;
+        mctsbnDistributed.setNUM_SELECTION(8);
         System.out.println("Starting MCTSBN-Distributed");
         long startTime2 = System.currentTimeMillis();
         Dag_n result2 = mctsbnDistributed.search();
         long endTime2 = System.currentTimeMillis();
         double scoreDis = GESThread.scoreGraph(result2,problem);
+        double shdDis = Utils.SHD(result2, originalDagn);
         System.out.println("MCTSBN-Distributed FINISHED!");
 
         // Printing results
         System.out.println("MCTSBN-Sequential FINISHED!");
         System.out.println("Total time: " + (endTime - startTime)*1.0 / 1000);
         System.out.println("Score: " + scoreSeq);
+        System.out.println("SHD: " + shdSeq);
 
         System.out.println("MCTSBN-Distributed FINISHED!");
         System.out.println("Total time: " + (endTime2 - startTime2)*1.0 / 1000);
         System.out.println("Score: " + scoreDis);
+        System.out.println("SHD: " + shdDis);
 
         //System.out.println("Best Order");
         //System.out.println(toStringOrder(mctsbn.getBestOrder()));
@@ -92,7 +101,7 @@ public class MainMCTSBN {
 
                 MlBayesIm controlBayesianNetwork;
                 try {
-                    controlBayesianNetwork = readOriginalBayesianNetwork(netPath);
+                    controlBayesianNetwork = Utils.readOriginalBayesianNetwork(netPath);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -137,22 +146,6 @@ public class MainMCTSBN {
 
             }
         });
-    }
-
-    public static MlBayesIm readOriginalBayesianNetwork(String netPath) throws Exception {
-        BIFReader bayesianReader = new BIFReader();
-        bayesianReader.processFile(netPath);
-        BayesNet bayesianNet = bayesianReader;
-        System.out.println("Numero de variables: " + bayesianNet.getNrOfNodes());
-
-        //Transforming the BayesNet into a BayesPm
-        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bayesianNet);
-        MlBayesIm bn2 = new MlBayesIm(bayesPm);
-
-        DataReader reader = new DataReader();
-        reader.setDelimiter(DelimiterType.COMMA);
-        reader.setMaxIntegralDiscrete(100);
-        return bn2;
     }
 
 }

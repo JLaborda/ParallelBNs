@@ -11,10 +11,12 @@ import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import weka.classifiers.bayes.BayesNet;
+import weka.classifiers.bayes.net.BIFReader;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
 
@@ -608,6 +610,59 @@ public class Utils {
         //System.out.println(graph);
         return new BayesPm(graph);
 
+    }
+
+    public static String getDatabaseNameFromPattern(String databasePath){
+        // Matching the end of the csv file to get the name of the database
+        Pattern pattern = Pattern.compile(".*/(.*).csv");
+        Matcher matcher = pattern.matcher(databasePath);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
+
+    public static String[] readParameters(String paramsFilePath, int index) throws Exception {
+        String[] parameterStrings = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(paramsFilePath))) {
+            String line;
+            for (int i = 0; i < index; i++)
+                br.readLine();
+            line = br.readLine();
+            parameterStrings = line.split(" ");
+        }
+        catch(FileNotFoundException e){
+            System.out.println(e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return parameterStrings;
+    }
+
+    public static MlBayesIm readOriginalBayesianNetwork(String netPath) throws Exception {
+        BIFReader bayesianReader = new BIFReader();
+        bayesianReader.processFile(netPath);
+        BayesNet bayesianNet = bayesianReader;
+        System.out.println("Numero de variables: " + bayesianNet.getNrOfNodes());
+
+        //Transforming the BayesNet into a BayesPm
+        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bayesianNet);
+        MlBayesIm bn2 = new MlBayesIm(bayesPm);
+
+        DataReader reader = new DataReader();
+        reader.setDelimiter(DelimiterType.COMMA);
+        reader.setMaxIntegralDiscrete(100);
+        return bn2;
+    }
+
+    public static Dag createOriginalDAG(String netPath) {
+        MlBayesIm controlBayesianNetwork;
+        try {
+            controlBayesianNetwork = Utils.readOriginalBayesianNetwork(netPath);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new Dag(controlBayesianNetwork.getDag());
     }
 
 }
