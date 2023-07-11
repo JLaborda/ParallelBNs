@@ -85,7 +85,8 @@ public class ExperimentMCTSLauncher {
     }
 
     private static String createSavePath(String[] parameters){
-        String resultsFolder = "results/";
+        String projectFolder = "/home/jorlabs/projects/ParallelBNs/";
+        String resultsFolder = projectFolder + "results/mctsbn-distributed/results-final/";
         String expHeader = "experiment_";
         String algName = parameters[0];
         String netName = parameters[1];
@@ -95,11 +96,11 @@ public class ExperimentMCTSLauncher {
         double exploitConstant = Double.parseDouble(parameters[5]);
         double numberSwaps = Double.parseDouble(parameters[6]);
         double probabilitySwaps = Double.parseDouble(parameters[7]);
-
+        double selectionConst = Integer.parseInt(parameters[8]);
 
         return resultsFolder + expHeader + netName + "_" + algName + "_" +
-                databaseName + "_it" + iterationLimit + "_ex" + exploitConstant
-                + "_ps" + numberSwaps + "_ns" + probabilitySwaps + ".csv";
+                databaseName + "_it" + iterationLimit + "_ex" + exploitConstant + 
+                "_sel" + selectionConst + "_ps" + probabilitySwaps + "_ns" + numberSwaps + ".csv";
 
     }
 
@@ -115,6 +116,7 @@ public class ExperimentMCTSLauncher {
         double exploitConstant = Double.parseDouble(parameters[5]);
         double numberSwaps = Double.parseDouble(parameters[6]);
         double probabilitySwaps = Double.parseDouble(parameters[7]);
+        int selectionConst = Integer.parseInt(parameters[8]);
 
         double timeMCTS = experimentMCTS.getTotalTime();
         double timePGES = experimentMCTS.getPGESTime();
@@ -122,7 +124,7 @@ public class ExperimentMCTSLauncher {
         File file = new File(savePath);
         if(file.length() == 0) {
             BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
-            String header = "algorithm,network,bbdd,threads,itLimit,exploitConst,numSwaps,probSwap,bdeuMCTS,shdMCTS,timeMCTS,bdeuPGES,shdPGES,timePGES,bdeuOrig,shdOrig,bdeuPerfect,shdPerfect,timePerfect\n";
+            String header = "algorithm,network,bbdd,threads,itLimit,exploitConst,selectionConst,numSwaps,probSwap,bdeuMCTS,shdMCTS,timeMCTS,bdeuPGES,shdPGES,timePGES,bdeuOrig,shdOrig,bdeuPerfect,shdPerfect,timePerfect\n";
             csvWriter.append(header);
 
             String results = (algName + ","
@@ -131,6 +133,7 @@ public class ExperimentMCTSLauncher {
                     + Runtime.getRuntime().availableProcessors() + ","
                     + iterationLimit + ","
                     + exploitConstant + ","
+                    + selectionConst + ","
                     + numberSwaps + ","
                     + probabilitySwaps + ","
                     + bdeuMCTS + ","
@@ -148,6 +151,7 @@ public class ExperimentMCTSLauncher {
             csvWriter.flush();
             csvWriter.close();
         }
+        System.out.println("Experiment save path: " + savePath);
     }
 
     @NotNull

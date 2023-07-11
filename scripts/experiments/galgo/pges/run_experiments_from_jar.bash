@@ -1,7 +1,6 @@
 #!/bin/bash
 
-PROJECT_FOLDER="/home/jorlabs/projects/ParallelBNs/"
-JAR_PATH="${PROJECT_FOLDER}target/ParallelBNs-1.0-EXPERIMENTS-SNAPSHOT-jar-with-dependencies.jar"
+JAR_PATH="/home/jorlabs/projects/ParallelBNs/target/mctsbn-distributed-1.0-jar-with-dependencies.jar"
 JAVA_BIN="/home/jorlabs/java/jdk1.8.0_251/bin/java"
 #SAVE_FOLDER="${PROJECT_FOLDER}/results/galgo/clustering/"
 

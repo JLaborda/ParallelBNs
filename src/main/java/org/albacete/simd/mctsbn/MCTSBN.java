@@ -84,6 +84,8 @@ public class MCTSBN {
     private String header;
     private boolean isDistributed = true;
 
+    private double timeSpentSavingRoundsSeconds = 0;
+
     public MCTSBN(Problem problem, int iterationLimit){
         this.problem = problem;
         this.ITERATION_LIMIT = iterationLimit;
@@ -100,7 +102,9 @@ public class MCTSBN {
     }
 
     private void configSaveFile(int iterationLimit, String netName, String databaseName, int threads, double exploitConstant, double numberSwaps, double probabilitySwap) {
-        String savePath = "results-it/experiment_" + netName + "_mcts_" +
+        String projectFolder = "/home/jorlabs/projects/ParallelBNs/";
+        String resultFolder = projectFolder + "results/mctsbn-distributed/results-it/";
+        String savePath = resultFolder + "experiment_" + netName + "_mcts_" +
                 databaseName + "_t" + threads + "_it" + iterationLimit + "_ex" + exploitConstant
                 + "_ps" + numberSwaps + "_ns" + probabilitySwap + ".csv";
         // Write results in each round

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-MAIN_PATH="/Users/jdls/developer/projects/ParallelBNs"
-JAR_PATH="${MAIN_PATH}/target/ParallelBNs-1.0-EXPERIMENTS-SNAPSHOT-jar-with-dependencies.jar"
+JAR_PATH="/home/jorlabs/projects/ParallelBNs/target/mctsbn-distributed-1.0-jar-with-dependencies.jar"
 PARAMS="alarm pges /Users/jdls/developer/projects/ParallelBNs/res/networks/alarm.xbif /Users/jdls/developer/projects/ParallelBNs/res/networks/BBDD/alarm.xbif_.csv /Users/jdls/developer/projects/ParallelBNs/res/networks/BBDD/tests/alarm_test.csv 5 250 1 2"
 #$2 #"${MAIN_PATH}/res/params/experiments_alarm.txt"
 JAVA_BIN=java #"/home/jorlabs/java/jdk1.8.0_251/bin/java"

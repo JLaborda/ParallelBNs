@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.albacete.simd</groupId>
-  <artifactId>ParallelBNs</artifactId>
-  <version>1.0-EXPERIMENTS-SNAPSHOT</version>
+  <artifactId>mctsbn-distributed</artifactId>
+  <version>1.0</version>
   <packaging>jar</packaging>
-  <name>ParallelBNs</name>
+  <name>mctsbn-distributed</name>
   <url>http://simd.albacete.org/</url>
 
   <properties>

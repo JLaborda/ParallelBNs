@@ -2,8 +2,9 @@
 # Define parameter values
 algorithm_name="mctsbn-distributed"
 bn_names=("alarm" "andes" "barley" "child" "earthquake" "hailfinder" "hepar2" "insurance" "link" "mildew" "munin" "pigs" "water" "win95pts")
-bn_path="./res/networks/"  # Replace with the actual BN path
-db_path="./res/networks/BBDD/"
+project_folder="/home/jorlabs/projects/ParallelBNs/"
+bn_path="${project_folder}res/networks/"  # Replace with the actual BN path
+db_path="${project_folder}res/networks/BBDD/"
 database_endings=(".xbif_.csv" ".xbif50001_.csv" ".xbif50002_.csv" ".xbif50003_.csv" ".xbif50004_.csv" ".xbif50005_.csv" ".xbif50006_.csv" ".xbif50007_.csv" ".xbif50008_.csv" ".xbif50009_.csv" ".xbif50001246_.csv")
 iteration_limit=10000
 exploit_constants=(50)
@@ -12,7 +13,8 @@ probability_swaps=(0 0.25 0.5 0.75 1)
 selection_constants=(1 2 4 8 16 32)
 
 # Generate parameters file
-output_file="./parameters_mctsbn_distributed.txt"
+
+output_file="/home/jorlabs/projects/ParallelBNs/res/params/mctsbn-distributed/parameters.txt"
 rm -f "$output_file"
 
 for bn_name in "${bn_names[@]}"; do
