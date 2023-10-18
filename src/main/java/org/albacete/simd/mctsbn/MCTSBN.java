@@ -143,8 +143,11 @@ public class MCTSBN {
                 // Showing tree structure
                 //System.out.println("Tree Structure:");
                 //System.out.println(this);
-
+                startTime = System.currentTimeMillis();
                 saveRound(i, totalTimeRound);
+                endTime = System.currentTimeMillis();
+                timeSpentSavingRoundsSeconds += 1.0 * (endTime - startTime) / 1000;
+
                 if (convergence) {
                     System.out.println("Convergence has been found. Ending search");
                     pb.stepTo(ITERATION_LIMIT);
@@ -785,6 +788,9 @@ public class MCTSBN {
         this.NUM_SELECTION = NUM_SELECTION;
     }
 
+    public double getTimeSpentSavingRoundsSeconds(){
+        return this.timeSpentSavingRoundsSeconds;
+    }
 
 
 }

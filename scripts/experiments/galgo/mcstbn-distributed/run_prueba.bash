@@ -9,8 +9,8 @@ then
   mvn clean package -Dmaven.test.skip
 fi
 
-INDEX=3
-PARAMS="/home/jorlabs/projects/ParallelBNs/res/params/mctsbn-distributed/parameters.txt"
+INDEX=1
+PARAMS="/home/jorlabs/projects/ParallelBNs/res/params/mctsbn-distributed/parameters-failed.txt"
 echo "--------------------------------------------------"
 echo "FROM run_prueba.bash"
 echo "Running experiment with index: $INDEX, params: $PARAMS,"

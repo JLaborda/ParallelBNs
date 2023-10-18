@@ -120,37 +120,37 @@ public class ExperimentMCTSLauncher {
 
         double timeMCTS = experimentMCTS.getTotalTime();
         double timePGES = experimentMCTS.getPGESTime();
+        double timeSpentSavingRoundsSeconds = experimentMCTS.getTimeSpentSavingRoundsSeconds();
 
-        File file = new File(savePath);
-        if(file.length() == 0) {
-            BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
-            String header = "algorithm,network,bbdd,threads,itLimit,exploitConst,selectionConst,numSwaps,probSwap,bdeuMCTS,shdMCTS,timeMCTS,bdeuPGES,shdPGES,timePGES,bdeuOrig,shdOrig,bdeuPerfect,shdPerfect,timePerfect\n";
-            csvWriter.append(header);
+        BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath));
+        String header = "algorithm,network,bbdd,threads,itLimit,exploitConst,selectionConst,numSwaps,probSwap,bdeuMCTS,shdMCTS,timeMCTS,bdeuPGES,shdPGES,timePGES,bdeuOrig,shdOrig,bdeuPerfect,shdPerfect,timePerfect,timeSpentSavingRoundsSeconds\n";
+        csvWriter.append(header);
 
-            String results = (algName + ","
-                    + netName + ","
-                    + databaseName + ","
-                    + Runtime.getRuntime().availableProcessors() + ","
-                    + iterationLimit + ","
-                    + exploitConstant + ","
-                    + selectionConst + ","
-                    + numberSwaps + ","
-                    + probabilitySwaps + ","
-                    + bdeuMCTS + ","
-                    + shdMCTS + ","
-                    + timeMCTS + ","
-                    + bdeuPGES + ","
-                    + shdPGES + ","
-                    + timePGES + ","
-                    + bdeuOriginal + ","
-                    + shdOriginal + ","
-                    + bdeuHCPerfect + ","
-                    + shdHCPerfect + ","
-                    + timeHCPerfect + "\n");
-            csvWriter.append(results);
-            csvWriter.flush();
-            csvWriter.close();
-        }
+        String results = (algName + ","
+                + netName + ","
+                + databaseName + ","
+                + Runtime.getRuntime().availableProcessors() + ","
+                + iterationLimit + ","
+                + exploitConstant + ","
+                + selectionConst + ","
+                + numberSwaps + ","
+                + probabilitySwaps + ","
+                + bdeuMCTS + ","
+                + shdMCTS + ","
+                + timeMCTS + ","
+                + bdeuPGES + ","
+                + shdPGES + ","
+                + timePGES + ","
+                + bdeuOriginal + ","
+                + shdOriginal + ","
+                + bdeuHCPerfect + ","
+                + shdHCPerfect + ","
+                + timeHCPerfect + ","
+                + timeSpentSavingRoundsSeconds + "\n");
+        csvWriter.append(results);
+        csvWriter.flush();
+        csvWriter.close();
+        
         System.out.println("Experiment save path: " + savePath);
     }
 

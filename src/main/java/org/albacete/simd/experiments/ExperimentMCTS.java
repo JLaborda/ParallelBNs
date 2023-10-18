@@ -51,10 +51,6 @@ public class ExperimentMCTS {
         this.algorithm = new MCTSBN(problem, iterationLimit, netName, databaseName, Runtime.getRuntime().availableProcessors(), exploitConstant, numberSwaps, probabilitySwaps, selectionConstant);
     }
 
-    private boolean checkIfExperimentHasBeenLaunched(){
-        saveFile = new File(savePath);
-        return (saveFile.exists()) && (saveFile.length() > 0);
-        }
 
     private void setUpExperiment() {
         MCTSBN.EXPLOITATION_CONSTANT = exploitConstant;
@@ -63,9 +59,7 @@ public class ExperimentMCTS {
     }
 
     public Dag_n runExperiment(){
-        if(checkIfExperimentHasBeenLaunched()){
-            return null;
-        }
+        saveFile = new File(savePath);
         this.setUpExperiment();
         double start = System.currentTimeMillis();
         resultDag = this.algorithm.search();
@@ -93,6 +87,9 @@ public class ExperimentMCTS {
         return this.savePath;
     }
 
+    public double getTimeSpentSavingRoundsSeconds(){
+        return this.algorithm.getTimeSpentSavingRoundsSeconds();
+    }
 
 
 

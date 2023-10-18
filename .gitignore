@@ -75,3 +75,10 @@ replicates/
 
 # ignore logs folders
 logs/
+
+# ignore results folder
+results/
+
+# ignore cluster output and errors
+*.o*
+*.e*

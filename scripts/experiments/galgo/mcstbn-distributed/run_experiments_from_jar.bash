@@ -19,4 +19,4 @@ echo "--------------------------------------------------"
 # Run experiment
 # cd $CWD
 # -Djava.util.concurrent.ForkJoinPool.common.parallelism=$THREADS 
-$JAVA_BIN -jar ${JAR_PATH} ${PBS_ARRAY_INDEX} ${PARAMS}
+$JAVA_BIN -Xmx32g -jar ${JAR_PATH} ${PBS_ARRAY_INDEX} ${PARAMS}
