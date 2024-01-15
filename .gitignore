@@ -82,3 +82,19 @@ results/
 # ignore cluster output and errors
 *.o*
 *.e*
+
+#ignore all plots folder
+plots/
+
+#ignore exreport folder and files
+exreport/
+exreport.r
+
+#ignore text files
+*.txt
+
+#ignore profiler
+profiler/
+
+#ignore all csv files
+*.csv
