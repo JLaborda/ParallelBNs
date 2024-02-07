@@ -75,3 +75,16 @@ replicates/
 
 # ignore logs folders
 logs/
+
+# Ignore notebooks
+*.ipynb
+
+# Ignore unnecessary results
+*.csv
+
+#Ignore parameters
+*.txt
+
+#Ignore exreport files
+exreport/
+exreport.r
