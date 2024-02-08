@@ -75,3 +75,16 @@ replicates/
 
 # ignore logs folders
 logs/
+
+# ignore csv files
+*.csv
+
+#ignore errors and outputs from pbscluster
+*.e*
+*.o*
+
+#ignore notebook folder
+notebooks/
+
+#ignore parameters folder
+res/params/
