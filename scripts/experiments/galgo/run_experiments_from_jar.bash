@@ -19,6 +19,11 @@ echo "FROM run_experiments_from_jar.bash"
 echo "Running experiment with index: $PBS_ARRAY_INDEX, params: $PARAMS, threads: $THREADS, JAR_file: $JAR_FILE, save_folder: $SAVE_FOLDER"
 echo "--------------------------------------------------"
 
+
+# Aumenta la cantidad de memoria disponible (ajusta el valor según sea necesario)
+MEMORY="32g"  # Cambia esto según tus necesidades
+
+
 # Run experiment
 #cd $CWD
-$JAVA_BIN -Djava.util.concurrent.ForkJoinPool.common.parallelism=$THREADS -jar ${JAR_FILE} ${PBS_ARRAY_INDEX} ${PARAMS} ${THREADS} ${SAVE_FOLDER}
+$JAVA_BIN -Xmx$MEMORY -Djava.util.concurrent.ForkJoinPool.common.parallelism=$THREADS -jar ${JAR_FILE} ${PARAMS} ${PBS_ARRAY_INDEX} ${SAVE_FOLDER}
