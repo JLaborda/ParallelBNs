@@ -76,6 +76,7 @@ replicates/
 # ignore logs folders
 logs/
 
+
 # ignore csv files
 *.csv
 
@@ -85,6 +86,15 @@ logs/
 
 #ignore notebook folder
 notebooks/
+*.ipynb
 
 #ignore parameters folder
 res/params/
+
+#Ignore parameters
+*.txt
+
+#Ignore exreport files
+exreport/
+exreport.r
+
