@@ -136,7 +136,7 @@ public class UtilsTest {
         MlBayesIm bn2 = new MlBayesIm(bayesPm2);
 
         // Acting: Getting the avgMarkovBlanquetDif:
-        double[] result = Utils.avgMarkovBlanquetdif(new Dag_n(bn1.getDag()), new Dag_n(bn2.getDag()));
+        double[] result = Utils.avgMarkovBlanketDelta(new Dag_n(bn1.getDag()), new Dag_n(bn2.getDag()));
         // Asserting
         assertNull(result);
 
@@ -151,7 +151,7 @@ public class UtilsTest {
         bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
         // Acting: Getting the avgMarkovBlanquetDif:
-        result = Utils.avgMarkovBlanquetdif(new Dag_n(bn1.getDag()), new Dag_n(bn2.getDag()));
+        result = Utils.avgMarkovBlanketDelta(new Dag_n(bn1.getDag()), new Dag_n(bn2.getDag()));
         // Asserting
         assertNotNull(result);
         for (double r : result) {
@@ -171,7 +171,7 @@ public class UtilsTest {
         System.out.println(dag2);
 
         // Acting: Calculating average MB
-        result = Utils.avgMarkovBlanquetdif(dag1, dag2);
+        result = Utils.avgMarkovBlanketDelta(dag1, dag2);
 
         // Asserting
 

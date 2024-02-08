@@ -162,11 +162,39 @@ public class SamplingBNGenerator {
  * @throws NumberFormatException
    */
   static public void main(String[] args) throws NumberFormatException, Exception {
-      System.out.println("Length of args: " + args.length);
-      System.out.println(args[0]);
-      System.out.println(args[1]);
-      System.out.println(args[2]);
-      File carpeta_experimentos = new File(args[0]);
+      int [] nummeroInstancias = {1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000};
+      long seed = 42;
+      String [] networkNames = {"andes","munin", "pigs", "diabetes", "link", "pathfinder"};
+      String networkFolderRoot = "res/networks/";
+      String outputFolderRoot = "res/large_datasets/";
+
+      for(String networkName : networkNames){
+        for(int instancias : nummeroInstancias){
+          String inputNetworkPath = networkFolderRoot + networkName + "/" + networkName + ".xbif" ;
+          SamplingBNGenerator sampler = new SamplingBNGenerator(inputNetworkPath, instancias, (int)seed);
+          sampler.generateInstances();
+          CSVSaver csv = new CSVSaver();
+          Instances data = sampler.bf.m_Instances;
+          csv.setInstances(data);
+          String outpath = outputFolderRoot + networkName + "/" + networkName + "_" + instancias + ".csv";
+          System.out.println("Saving to: " + outpath);
+          File fcsv = new File(outpath);
+          FileOutputStream output = new FileOutputStream(fcsv);
+          csv.setDestination(output);
+          csv.setNoHeaderRow(false);
+          csv.writeBatch();
+        }
+      }
+
+
+
+      //System.out.println("Length of args: " + args.length);
+      //System.out.println(args[0]); // Carpte de experimentos
+      //System.out.println(args[1]); // Numero de instancias
+      //System.out.println(args[2]); // Semilla
+      
+      //File carpeta_experimentos = new File(carpetaExpString);//new File(args[0]);
+      /* 
       ArrayList<String> experimentos = listarFicherosdeCarpeta(carpeta_experimentos);
       for(String exp: experimentos){
           System.out.println(exp);
@@ -190,7 +218,7 @@ public class SamplingBNGenerator {
               }
           }
 
-      }
+      }*/
   } // main
 
 
