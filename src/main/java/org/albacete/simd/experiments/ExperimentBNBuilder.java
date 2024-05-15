@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.albacete.simd.algorithms.bnbuilders.Fges_BNBuilder;
 import org.albacete.simd.algorithms.bnbuilders.GES_BNBuilder;
+import org.albacete.simd.algorithms.bnbuilders.MMHC_BNBuilder;
 import org.albacete.simd.algorithms.bnbuilders.PGESwithStages;
 import org.albacete.simd.algorithms.bnbuilders.Pc_BNBuilder;
 
@@ -123,12 +124,16 @@ public class ExperimentBNBuilder {
                 break;
             case "pc":
                 algorithm = new Pc_BNBuilder(paramsMap.get("databasePath"));
-
                 break;
-            
             case "ges":
                 algorithm = new GES_BNBuilder(paramsMap.get("databasePath"), true);
+                break;
+            case "mmhc":
+                algorithm = new MMHC_BNBuilder(paramsMap.get("databasePath"));
+                break;
             default:
+                System.out.println("ExperimentBNBuilder: No algorithm found with name: " + paramsMap.get("algName"));
+                System.exit(-1);
                 break;
         }
         

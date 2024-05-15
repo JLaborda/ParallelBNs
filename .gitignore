@@ -98,3 +98,12 @@ res/params/
 exreport/
 exreport.r
 
+#Ignore results folder
+results/
+
+# Ignore profiler folder
+profiler/
+
+# Ignore scripts folder
+scripts/
+

@@ -58,8 +58,8 @@ public class SimpleBNExperiment {
         //CGES algorithm = new CGES(ds, clustering, 4, 100000, "c2", CGES.Broadcasting.PAIR_BROADCASTING);
 
         //String expString = "algName pges numberOfRealThreads 16 netPath /home/jorlabs/projects/ParallelBNs/res/networks/andes/andes.xbif databasePath /home/jorlabs/projects/ParallelBNs/res/large_datasets/andes/andes_5000.csv netName andes";
-        //String expString = "algName pc netPath /home/jorlabs/projects/ParallelBNs/res/networks/andes/andes.xbif databasePath /home/jorlabs/projects/ParallelBNs/res/datasets/andes/andes8.csv netName andes";
-        String expString = "algName pc netName alarm netPath /home/jorlabs/projects/ParallelBNs/res/networks/alarm/alarm.xbif databasePath /home/jorlabs/projects/ParallelBNs/res/datasets/alarm/alarm2.csv netName alarm";
+        //String expString = "algName pc netName alarm netPath /home/jorlabs/projects/ParallelBNs/res/networks/alarm/alarm.xbif databasePath /home/jorlabs/projects/ParallelBNs/res/datasets/alarm/alarm2.csv netName alarm";
+        String expString = "algName mmhc netName alarm netPath /Users/jdls/developer/projects/ParallelBNs/res/networks/alarm/alarm.xbif databasePath /Users/jdls/developer/projects/ParallelBNs/res/datasets/alarm/alarm1.csv netName alarm";
         String[] expParameters = expString.split(" ");
         //2. Create experiment environment
         ExperimentBNBuilder experiment = new ExperimentBNBuilder(expParameters);

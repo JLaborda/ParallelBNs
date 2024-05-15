@@ -249,7 +249,7 @@ public class Utils {
     public static void moralizeGraph(Graph graph) {
         for(Node n: graph.getNodes()) {
             List<Node> p = graph.getParents(n);
-            for (int i=0; i<p.size()-1;i++)
+            for (int i=0; i<p.size()-1;i++){
                 for(int j=i+1; j<p.size();j++) {
                     Edge e1 = graph.getEdge(p.get(i), p.get(j));
                     Edge e2 = graph.getEdge(p.get(j), p.get(i));
@@ -258,6 +258,7 @@ public class Utils {
                         graph.addEdge(e);
                     }
                 }
+            }
         }
     }
 
